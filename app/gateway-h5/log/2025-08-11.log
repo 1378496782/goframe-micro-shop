@@ -22,3 +22,117 @@
 
 2025-08-11T09:23:23.361+08:00 [DEBU] service deregister: &{Service:0xc000381500 Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
 2025-08-11T09:23:23.367+08:00 [INFO] pid[16504]: all servers shutdown
+2025-08-11T17:56:47.570+08:00 [INFO] pid[16436]: http server started listening on [:8199]
+2025-08-11T17:56:47.570+08:00 [INFO] swagger ui is serving at address: http://127.0.0.1:8199/swagger/
+2025-08-11T17:56:47.571+08:00 [INFO] openapi specification is serving at address: http://127.0.0.1:8199/api.json
+2025-08-11T17:56:47.583+08:00 [DEBU] service register: &{Head: Deployment: Namespace: Name:default Version: Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+
+  ADDRESS | METHOD |        ROUTE        |                                                      HANDLER                                                      |           MIDDLEWARE             
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /*                  | shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS                                            | GLOBAL MIDDLEWARE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /api.json           | github.com/gogf/gf/v2/net/ghttp.(*Server).openapiSpec                                                             |                                  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | DELETE | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoDelete  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | GET    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoGetList | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | POST   | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | PUT    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoUpdate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /swagger/*          | github.com/gogf/gf/v2/net/ghttp.(*Server).swaggerUI                                                               | HOOK_BEFORE_SERVE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+
+2025-08-11T18:03:27.844+08:00 [INFO] pid[11868]: http server started listening on [:8199]
+2025-08-11T18:03:27.844+08:00 [INFO] swagger ui is serving at address: http://127.0.0.1:8199/swagger/
+2025-08-11T18:03:27.845+08:00 [INFO] openapi specification is serving at address: http://127.0.0.1:8199/api.json
+2025-08-11T18:03:27.857+08:00 [DEBU] service register: &{Head: Deployment: Namespace: Name:default Version: Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+
+  ADDRESS | METHOD |        ROUTE        |                                                      HANDLER                                                      |           MIDDLEWARE             
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /*                  | shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS                                            | GLOBAL MIDDLEWARE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /api.json           | github.com/gogf/gf/v2/net/ghttp.(*Server).openapiSpec                                                             |                                  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | DELETE | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoDelete  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | GET    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoGetList | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | POST   | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | PUT    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoUpdate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /swagger/*          | github.com/gogf/gf/v2/net/ghttp.(*Server).swaggerUI                                                               | HOOK_BEFORE_SERVE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+
+2025-08-11T18:07:47.519+08:00 [DEBU] service deregister: &{Service:0xc0001fc620 Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+2025-08-11T18:07:47.524+08:00 [INFO] pid[11868]: all servers shutdown
+2025-08-11T18:26:48.926+08:00 [INFO] 公众号：王中阳 pid[18680]: http server started listening on [:8199]
+2025-08-11T18:26:48.927+08:00 [INFO] 公众号：王中阳 swagger ui is serving at address: http://127.0.0.1:8199/swagger/
+2025-08-11T18:26:48.927+08:00 [INFO] 公众号：王中阳 openapi specification is serving at address: http://127.0.0.1:8199/api.json
+2025-08-11T18:26:48.940+08:00 [DEBU] 公众号：王中阳 service register: &{Head: Deployment: Namespace: Name:default Version: Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+
+  ADDRESS | METHOD |        ROUTE        |                                                      HANDLER                                                      |           MIDDLEWARE             
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /*                  | shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS                                            | GLOBAL MIDDLEWARE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /api.json           | github.com/gogf/gf/v2/net/ghttp.(*Server).openapiSpec                                                             |                                  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | DELETE | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoDelete  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | GET    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoGetList | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | POST   | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | PUT    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoUpdate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /swagger/*          | github.com/gogf/gf/v2/net/ghttp.(*Server).swaggerUI                                                               | HOOK_BEFORE_SERVE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+
+2025-08-11 18:30:01.035 [INFO] 公众号：王中阳 swagger ui is serving at address: http://127.0.0.1:8199/swagger/
+2025-08-11 18:30:01.035 [INFO] 公众号：王中阳 pid[17564]: http server started listening on [:8199]
+2025-08-11 18:30:01.035 [INFO] 公众号：王中阳 openapi specification is serving at address: http://127.0.0.1:8199/api.json
+2025-08-11 18:30:01.049 [DEBU] 公众号：王中阳 service register: &{Head: Deployment: Namespace: Name:default Version: Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+
+  ADDRESS | METHOD |        ROUTE        |                                                      HANDLER                                                      |           MIDDLEWARE             
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /*                  | shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS                                            | GLOBAL MIDDLEWARE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /api.json           | github.com/gogf/gf/v2/net/ghttp.(*Server).openapiSpec                                                             |                                  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | DELETE | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoDelete  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | GET    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoGetList | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | POST   | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | PUT    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoUpdate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /swagger/*          | github.com/gogf/gf/v2/net/ghttp.(*Server).swaggerUI                                                               | HOOK_BEFORE_SERVE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+
+2025-08-11 19:00:46.128 [DEBU] 公众号：王中阳 service deregister: &{Service:0xc000118150 Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+2025-08-11 19:00:46.133 [INFO] 公众号：王中阳 pid[17564]: all servers shutdown
+2025-08-11 19:03:12.699 [INFO] 公众号：王中阳 swagger ui is serving at address: http://127.0.0.1:8199/swagger/
+2025-08-11 19:03:12.700 [INFO] 公众号：王中阳 pid[17276]: http server started listening on [:8199]
+2025-08-11 19:03:12.700 [INFO] 公众号：王中阳 openapi specification is serving at address: http://127.0.0.1:8199/api.json
+2025-08-11 19:03:12.713 [DEBU] 公众号：王中阳 service register: &{Head: Deployment: Namespace: Name:default Version: Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+
+  ADDRESS | METHOD |        ROUTE        |                                                      HANDLER                                                      |           MIDDLEWARE             
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /*                  | shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS                                            | GLOBAL MIDDLEWARE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /api.json           | github.com/gogf/gf/v2/net/ghttp.(*Server).openapiSpec                                                             |                                  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | DELETE | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoDelete  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | GET    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoGetList | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | POST   | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | PUT    | /frontend/consignee | shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoUpdate  | ghttp.MiddlewareHandlerResponse  
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8199   | ALL    | /swagger/*          | github.com/gogf/gf/v2/net/ghttp.(*Server).swaggerUI                                                               | HOOK_BEFORE_SERVE                
+----------|--------|---------------------|-------------------------------------------------------------------------------------------------------------------|----------------------------------
+

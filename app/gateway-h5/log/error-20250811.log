@@ -1,0 +1,114 @@
+2025-08-11T17:59:30.959+08:00 {b834a5e60bae5a189cb8d8151e7dcb99} 200 "POST http 127.0.0.1:8199 /frontend/consignee HTTP/1.1" 7474.600, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 52, "", ""
+Stack:
+1. INSERT INTO `consignee_info`(`user_id`,`is_default`,`name`,`phone`,`province`,`city`,`town`,`street`,`detail`,`created_at`,`updated_at`) VALUES(46,71,'进国良','147515 64938','新疆维吾尔自治区','诸安市','ut qui','nostrud id eu consequat exercitation','sint et irure dolor','2025-08-11 17:59:30','2025-08-11 17:59:30') : Error 1406 (22001): Data too long for column 'phone' at row 1
+   1).  google.golang.org/grpc.getChainUnaryInvoker.func1.getChainUnaryInvoker.1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:489
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.GrpcClientTimeout
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:32
+   3).  google.golang.org/grpc.NewClient.chainUnaryClientInterceptors.func1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:477
+   4).  google.golang.org/grpc.(*ClientConn).Invoke
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/call.go:35
+   5).  shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1.(*consigneeInfoClient).Create
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1/consignee_info_grpc.pb.go:60
+   6).  shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user/user_v1_consignee_info_create.go:18
+   7).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-11T18:03:24.632+08:00 service deregister: &{Service:0xc000423dc0 Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+2025-08-11T18:03:24.638+08:00 pid[16436]: all servers shutdown
+2025-08-11T18:26:52.619+08:00 {34238c1f8aaf5a1813197c3e32e2d628} 公众号：王中阳 200 "POST http 127.0.0.1:8199 /frontend/consignee HTTP/1.1" 35411.100, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 52, "", ""
+Stack:
+1. INSERT INTO `consignee_info`(`user_id`,`is_default`,`name`,`phone`,`province`,`city`,`town`,`street`,`detail`,`created_at`,`updated_at`) VALUES(46,71,'进国良','147515 64938','新疆维吾尔自治区','诸安市','ut qui','nostrud id eu consequat exercitation','sint et irure dolor','2025-08-11 18:26:52','2025-08-11 18:26:52') : Error 1406 (22001): Data too long for column 'phone' at row 1
+   1).  google.golang.org/grpc.getChainUnaryInvoker.func1.getChainUnaryInvoker.1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:489
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.GrpcClientTimeout
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:32
+   3).  google.golang.org/grpc.NewClient.chainUnaryClientInterceptors.func1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:477
+   4).  google.golang.org/grpc.(*ClientConn).Invoke
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/call.go:35
+   5).  shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1.(*consigneeInfoClient).Create
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1/consignee_info_grpc.pb.go:60
+   6).  shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user/user_v1_consignee_info_create.go:18
+   7).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-11T18:29:56.981+08:00 公众号：王中阳 service deregister: &{Service:0xc0003887e0 Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+2025-08-11T18:29:56.989+08:00 公众号：王中阳 pid[18680]: all servers shutdown
+2025-08-11 19:03:22.172 {6c270ceb87b15a1842708760c9d18b75} 公众号：王中阳 200 "POST http 127.0.0.1:8199 /frontend/consignee HTTP/1.1" 36470.200, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 52, "", ""
+Stack:
+1. INSERT INTO `consignee_info`(`user_id`,`is_default`,`name`,`phone`,`province`,`city`,`town`,`street`,`detail`,`created_at`,`updated_at`) VALUES(46,71,'进国良','147515 64938','新疆维吾尔自治区','诸安市','ut qui','nostrud id eu consequat exercitation','sint et irure dolor','2025-08-11 19:03:22','2025-08-11 19:03:22') : Error 1406 (22001): Data too long for column 'phone' at row 1
+   1).  google.golang.org/grpc.getChainUnaryInvoker.func1.getChainUnaryInvoker.1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:489
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.GrpcClientTimeout
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:32
+   3).  google.golang.org/grpc.NewClient.chainUnaryClientInterceptors.func1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:477
+   4).  google.golang.org/grpc.(*ClientConn).Invoke
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/call.go:35
+   5).  shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1.(*consigneeInfoClient).Create
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1/consignee_info_grpc.pb.go:60
+   6).  shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user/user_v1_consignee_info_create.go:18
+   7).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-11 19:05:10.438 {d875e420a1b15a18437087604c85becd} 公众号：王中阳 200 "POST http 127.0.0.1:8199 /frontend/consignee HTTP/1.1" 24462.500, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 52, "", ""
+Stack:
+1. INSERT INTO `consignee_info`(`user_id`,`is_default`,`name`,`phone`,`province`,`city`,`town`,`street`,`detail`,`created_at`,`updated_at`) VALUES(46,71,'进国良','147515 64938','新疆维吾尔自治区','诸安市','ut qui','nostrud id eu consequat exercitation','sint et irure dolor','2025-08-11 19:05:10','2025-08-11 19:05:10') : Error 1406 (22001): Data too long for column 'phone' at row 1
+   1).  google.golang.org/grpc.getChainUnaryInvoker.func1.getChainUnaryInvoker.1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:489
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.GrpcClientTimeout
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:32
+   3).  google.golang.org/grpc.NewClient.chainUnaryClientInterceptors.func1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:477
+   4).  google.golang.org/grpc.(*ClientConn).Invoke
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/call.go:35
+   5).  shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1.(*consigneeInfoClient).Create
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1/consignee_info_grpc.pb.go:60
+   6).  shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user/user_v1_consignee_info_create.go:18
+   7).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-11 19:40:00.317 {0088e9b787b35a1846708760f2f05838} 公众号：王中阳 200 "POST http 127.0.0.1:8199 /frontend/consignee HTTP/1.1" 16115.700, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 52, "", ""
+Stack:
+1. ConsigneeInfoCreate 插入失败：: INSERT INTO `consignee_info`(`user_id`,`is_default`,`name`,`phone`,`province`,`city`,`town`,`street`,`detail`,`created_at`,`updated_at`) VALUES(8,81,'叔蒙','197409 48836','上海市','武宁市','nulla quis','quis','laboris occaecat nostrud','2025-08-11 19:40:00','2025-08-11 19:40:00') : Error 1406 (22001): Data too long for column 'phone' at row 1
+   1).  google.golang.org/grpc.getChainUnaryInvoker.func1.getChainUnaryInvoker.1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:489
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.GrpcClientTimeout
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:32
+   3).  google.golang.org/grpc.NewClient.chainUnaryClientInterceptors.func1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:477
+   4).  google.golang.org/grpc.(*ClientConn).Invoke
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/call.go:35
+   5).  shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1.(*consigneeInfoClient).Create
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1/consignee_info_grpc.pb.go:60
+   6).  shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user/user_v1_consignee_info_create.go:18
+   7).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-11 19:40:53.604 {182cfa1f94b35a1847708760bc299025} 公众号：王中阳 200 "POST http 127.0.0.1:8199 /frontend/consignee HTTP/1.1" 16261.200, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 52, "", ""
+Stack:
+1. ConsigneeInfo Create 插入失败: INSERT INTO `consignee_info`(`user_id`,`is_default`,`name`,`phone`,`province`,`city`,`town`,`street`,`detail`,`created_at`,`updated_at`) VALUES(8,81,'叔蒙','197409 48836','上海市','武宁市','nulla quis','quis','laboris occaecat nostrud','2025-08-11 19:40:53','2025-08-11 19:40:53') : Error 1406 (22001): Data too long for column 'phone' at row 1
+   1).  google.golang.org/grpc.getChainUnaryInvoker.func1.getChainUnaryInvoker.1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:489
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.GrpcClientTimeout
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:32
+   3).  google.golang.org/grpc.NewClient.chainUnaryClientInterceptors.func1
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:477
+   4).  google.golang.org/grpc.(*ClientConn).Invoke
+        C:/Users/Administrator/go/pkg/mod/google.golang.org/grpc@v1.74.2/call.go:35
+   5).  shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1.(*consigneeInfoClient).Create
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1/consignee_info_grpc.pb.go:60
+   6).  shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).ConsigneeInfoCreate
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user/user_v1_consignee_info_create.go:18
+   7).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        D:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-11 20:02:42.601 公众号：王中阳 service deregister: &{Service:0xc00027e930 Endpoints:192.168.1.5:8199,172.18.48.1:8199 Metadata:map[insecure:true protocol:http]}
+2025-08-11 20:02:42.606 公众号：王中阳 pid[17276]: all servers shutdown
