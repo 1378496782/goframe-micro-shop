@@ -1,0 +1,13 @@
+grpc:
+  name:             "user"
+  address:          ":31001"
+
+database:
+  default:
+    link:  "mysql:root:root@tcp(127.0.0.1:3306)/user"
+    debug:
+
+
+etcd:
+  address: "127.0.0.1:2379"
+
