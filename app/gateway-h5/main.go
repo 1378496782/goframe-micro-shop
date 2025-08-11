@@ -6,7 +6,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/cmd"
-	"shop-goframe-micro-service-refacotor/utility"
+	"shop-goframe-micro-service-refacotor/utility/middleware"
 )
 
 func main() {
@@ -23,6 +23,6 @@ func main() {
 	s := g.Server()
 
 	// 设置 CORS 头
-	s.Use(utility.MiddlewareCORS)
+	s.Use(middleware.MiddlewareCORS)
 	cmd.Main.Run(ctx)
 }

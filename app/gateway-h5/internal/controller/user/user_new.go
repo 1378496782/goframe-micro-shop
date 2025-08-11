@@ -7,7 +7,7 @@ package user
 import (
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/user"
-	"shop-goframe-micro-service-refacotor/utility"
+	"shop-goframe-micro-service-refacotor/utility/middleware"
 
 	consignee_info "shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1"
 )
@@ -18,7 +18,7 @@ type ControllerV1 struct {
 
 func NewV1() user.IUserV1 {
 	var conn = grpcx.Client.MustNewGrpcClientConn("user", grpcx.Client.ChainUnary(
-		utility.GrpcClientTimeout,
+		middleware.GrpcClientTimeout,
 	))
 	return &ControllerV1{
 		ConsigneeInfoClient: consignee_info.NewConsigneeInfoClient(conn),
