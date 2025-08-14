@@ -41,12 +41,12 @@ func Login(ctx context.Context, name, password string) (token string, expireIn i
 	}
 
 	// 5. 生成JWT Token
-	token, expireTime, err := utility.GenerateToken(ctx, user.Id)
+	token, expireTime, err := utility.GenerateToken(user.Id)
 	if err != nil {
 		return "", 0, nil, errors.New("生成token错误")
 	}
-
-	return token, int(expireTime.Sub(time.Now()).Seconds()), &user, nil
+	expireIn = int(expireTime.Sub(time.Now()).Seconds())
+	return token, expireIn, &user, nil
 }
 
 func Register(ctx context.Context, req *entity.UserInfo) (*entity.UserInfo, error) {
