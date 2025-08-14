@@ -1,0 +1,10 @@
+2025-08-14 11:55:07.768 {2c7ec92de7855b188a444a7aba9b55b3} 公众号：王中阳：gateway-h5 200 "GET http 127.0.0.1:8199 /frontend/user/info?id=6 HTTP/1.1" 25537.300, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 53, "Invalid Parameter", ""
+Stack:
+1. destination pointer cannot be nil
+   1).  shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user.(*ControllerV1).UserInfo
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user/user_v1_user_info.go:23
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-14 11:55:42.661 公众号：王中阳：gateway-h5 service deregister: &{Service:0xc00033c460 Endpoints:192.168.1.11:8199,172.31.128.1:8199,172.26.96.1:8199 Metadata:map[insecure:true protocol:http]}
+2025-08-14 11:55:42.666 公众号：王中阳：gateway-h5 pid[10792]: all servers shutdown

@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcmd"
 	"google.golang.org/grpc"
 	"shop-goframe-micro-service-refacotor/app/user/internal/controller/consignee_info"
+	"shop-goframe-micro-service-refacotor/app/user/internal/controller/user_info"
 )
 
 var (
@@ -22,6 +23,7 @@ var (
 			)
 			s := grpcx.Server.New(c)
 			consignee_info.Register(s)
+			user_info.Register(s)
 			s.Run()
 			return nil
 		},

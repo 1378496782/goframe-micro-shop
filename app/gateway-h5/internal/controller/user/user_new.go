@@ -7,13 +7,14 @@ package user
 import (
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/user"
-	"shop-goframe-micro-service-refacotor/utility/middleware"
-
 	consignee_info "shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1"
+	user_info "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
+	"shop-goframe-micro-service-refacotor/utility/middleware"
 )
 
 type ControllerV1 struct {
 	ConsigneeInfoClient consignee_info.ConsigneeInfoClient
+	UserInfoClient      user_info.UserInfoClient
 }
 
 func NewV1() user.IUserV1 {
@@ -21,6 +22,7 @@ func NewV1() user.IUserV1 {
 		middleware.GrpcClientTimeout,
 	))
 	return &ControllerV1{
+		UserInfoClient:      user_info.NewUserInfoClient(conn),
 		ConsigneeInfoClient: consignee_info.NewConsigneeInfoClient(conn),
 	}
 }
