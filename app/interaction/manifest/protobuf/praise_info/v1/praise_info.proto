@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package praise_info.v1;
 
-option go_package = "shop-goframe-micro-service/app/praise/api/praise_info/v1";
+option go_package = "shop-goframe-micro-service-refacotor/app/praise/api/praise_info/v1";
 
 import "pbentity/praise_info.proto";
 

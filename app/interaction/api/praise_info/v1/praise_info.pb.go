@@ -426,7 +426,7 @@ const file_praise_info_v1_praise_info_proto_rawDesc = "" +
 	"\vpraise_info\x12W\n" +
 	"\aGetList\x12$.praise_info.v1.PraiseInfoGetListReq\x1a$.praise_info.v1.PraiseInfoGetListRes\"\x00\x12T\n" +
 	"\x06Create\x12#.praise_info.v1.PraiseInfoCreateReq\x1a#.praise_info.v1.PraiseInfoCreateRes\"\x00\x12T\n" +
-	"\x06Delete\x12#.praise_info.v1.PraiseInfoDeleteReq\x1a#.praise_info.v1.PraiseInfoDeleteRes\"\x00B:Z8shop-goframe-micro-service/app/praise/api/praise_info/v1b\x06proto3"
+	"\x06Delete\x12#.praise_info.v1.PraiseInfoDeleteReq\x1a#.praise_info.v1.PraiseInfoDeleteRes\"\x00BDZBshop-goframe-micro-service-refacotor/app/praise/api/praise_info/v1b\x06proto3"
 
 var (
 	file_praise_info_v1_praise_info_proto_rawDescOnce sync.Once

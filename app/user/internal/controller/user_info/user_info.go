@@ -8,9 +8,9 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
-	"shop-goframe-micro-service-refacotor/app/user/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/user/internal/logic/user_info"
 	"shop-goframe-micro-service-refacotor/app/user/internal/model/entity"
+	"shop-goframe-micro-service-refacotor/utility/consts"
 	"time"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"

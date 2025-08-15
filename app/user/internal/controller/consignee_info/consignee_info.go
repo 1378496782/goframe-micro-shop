@@ -8,10 +8,10 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	v1 "shop-goframe-micro-service-refacotor/app/user/api/consignee_info/v1"
 	"shop-goframe-micro-service-refacotor/app/user/api/pbentity"
-	"shop-goframe-micro-service-refacotor/app/user/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/user/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/user/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility"
+	"shop-goframe-micro-service-refacotor/utility/consts"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 )

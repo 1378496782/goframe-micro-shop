@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package comment_info.v1;
 
-option go_package = "shop-goframe-micro-service/app/comment/api/comment_info/v1";
+option go_package = "shop-goframe-micro-service-refacotor/app/comment/api/comment_info/v1";
 
 import "pbentity/comment_info.proto";
 

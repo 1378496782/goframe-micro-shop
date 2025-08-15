@@ -426,7 +426,7 @@ const file_collection_info_v1_collection_info_proto_rawDesc = "" +
 	"\x0fcollection_info\x12g\n" +
 	"\aGetList\x12,.collection_info.v1.CollectionInfoGetListReq\x1a,.collection_info.v1.CollectionInfoGetListRes\"\x00\x12d\n" +
 	"\x06Create\x12+.collection_info.v1.CollectionInfoCreateReq\x1a+.collection_info.v1.CollectionInfoCreateRes\"\x00\x12d\n" +
-	"\x06Delete\x12+.collection_info.v1.CollectionInfoDeleteReq\x1a+.collection_info.v1.CollectionInfoDeleteRes\"\x00BBZ@shop-goframe-micro-service/app/collection/api/collection_info/v1b\x06proto3"
+	"\x06Delete\x12+.collection_info.v1.CollectionInfoDeleteReq\x1a+.collection_info.v1.CollectionInfoDeleteRes\"\x00BLZJshop-goframe-micro-service-refacotor/app/collection/api/collection_info/v1b\x06proto3"
 
 var (
 	file_collection_info_v1_collection_info_proto_rawDescOnce sync.Once

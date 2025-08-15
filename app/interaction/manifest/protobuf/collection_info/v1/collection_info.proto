@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package collection_info.v1;
 
-option go_package = "shop-goframe-micro-service/app/collection/api/collection_info/v1";
+option go_package = "shop-goframe-micro-service-refacotor/app/collection/api/collection_info/v1";
 
 import "pbentity/collection_info.proto";
 

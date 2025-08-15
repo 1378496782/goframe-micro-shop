@@ -1,0 +1,44 @@
+2025-08-15 15:46:48.125 [INFO] 公众号：王中阳：gateway-admin swagger ui is serving at address: http://127.0.0.1:8299/swagger/
+2025-08-15 15:46:48.125 [INFO] 公众号：王中阳：gateway-admin pid[24512]: http server started listening on [:8299]
+2025-08-15 15:46:48.126 [INFO] 公众号：王中阳：gateway-admin openapi specification is serving at address: http://127.0.0.1:8299/api.json
+2025-08-15 15:46:48.134 [DEBU] 公众号：王中阳：gateway-admin service register: &{Head: Deployment: Namespace: Name:default Version: Endpoints:192.168.1.11:8299,172.29.64.1:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+
+  ADDRESS | METHOD |          ROUTE          |                                                      HANDLER                                                       |           MIDDLEWARE             
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | ALL    | /*                      | shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS                                             | GLOBAL MIDDLEWARE                
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | ALL    | /api.json               | github.com/gogf/gf/v2/net/ghttp.(*Server).openapiSpec                                                              |                                  
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | POST   | /backend/admin/login    | shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/admin.(*ControllerV1).AdminInfoLogin    | ghttp.MiddlewareHandlerResponse  
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | POST   | /backend/admin/register | shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/admin.(*ControllerV1).AdminInfoRegister | ghttp.MiddlewareHandlerResponse  
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | ALL    | /swagger/*              | github.com/gogf/gf/v2/net/ghttp.(*Server).swaggerUI                                                                | HOOK_BEFORE_SERVE                
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+
+2025-08-15 15:49:06.124 [DEBU] 公众号：王中阳：gateway-admin service deregister: &{Service:0xc00033c0e0 Endpoints:192.168.1.11:8299,172.29.64.1:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+2025-08-15 15:49:06.128 [INFO] 公众号：王中阳：gateway-admin pid[24512]: all servers shutdown
+2025-08-15 15:49:07.010 [FATA] 公众号：王中阳：gateway-admin net.Listen address ":8199" failed: listen tcp :8199: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+1. net.Listen address ":8199" failed
+2. listen tcp :8199: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+
+2025-08-15 15:49:12.000 [INFO] 公众号：王中阳：gateway-admin swagger ui is serving at address: http://127.0.0.1:8299/swagger/
+2025-08-15 15:49:12.000 [INFO] 公众号：王中阳：gateway-admin pid[24968]: http server started listening on [:8299]
+2025-08-15 15:49:12.000 [INFO] 公众号：王中阳：gateway-admin openapi specification is serving at address: http://127.0.0.1:8299/api.json
+2025-08-15 15:49:12.007 [DEBU] 公众号：王中阳：gateway-admin service register: &{Head: Deployment: Namespace: Name:default Version: Endpoints:192.168.1.11:8299,172.29.64.1:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+
+  ADDRESS | METHOD |          ROUTE          |                                                      HANDLER                                                       |           MIDDLEWARE             
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | ALL    | /*                      | shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS                                             | GLOBAL MIDDLEWARE                
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | ALL    | /api.json               | github.com/gogf/gf/v2/net/ghttp.(*Server).openapiSpec                                                              |                                  
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | POST   | /backend/admin/login    | shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/admin.(*ControllerV1).AdminInfoLogin    | ghttp.MiddlewareHandlerResponse  
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | POST   | /backend/admin/register | shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/admin.(*ControllerV1).AdminInfoRegister | ghttp.MiddlewareHandlerResponse  
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+  :8299   | ALL    | /swagger/*              | github.com/gogf/gf/v2/net/ghttp.(*Server).swaggerUI                                                                | HOOK_BEFORE_SERVE                
+----------|--------|-------------------------|--------------------------------------------------------------------------------------------------------------------|----------------------------------
+
+2025-08-15 15:50:39.370 [DEBU] 公众号：王中阳：gateway-admin service deregister: &{Service:0xc000397e30 Endpoints:192.168.1.11:8299,172.29.64.1:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+2025-08-15 15:50:39.374 [INFO] 公众号：王中阳：gateway-admin pid[24968]: all servers shutdown

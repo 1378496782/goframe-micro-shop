@@ -417,7 +417,7 @@ const file_comment_info_v1_comment_info_proto_rawDesc = "" +
 	"\fcomment_info\x12[\n" +
 	"\aGetList\x12&.comment_info.v1.CommentInfoGetListReq\x1a&.comment_info.v1.CommentInfoGetListRes\"\x00\x12X\n" +
 	"\x06Create\x12%.comment_info.v1.CommentInfoCreateReq\x1a%.comment_info.v1.CommentInfoCreateRes\"\x00\x12X\n" +
-	"\x06Delete\x12%.comment_info.v1.CommentInfoDeleteReq\x1a%.comment_info.v1.CommentInfoDeleteRes\"\x00B<Z:shop-goframe-micro-service/app/comment/api/comment_info/v1b\x06proto3"
+	"\x06Delete\x12%.comment_info.v1.CommentInfoDeleteReq\x1a%.comment_info.v1.CommentInfoDeleteRes\"\x00BFZDshop-goframe-micro-service-refacotor/app/comment/api/comment_info/v1b\x06proto3"
 
 var (
 	file_comment_info_v1_comment_info_proto_rawDescOnce sync.Once
