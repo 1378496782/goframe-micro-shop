@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/admin"
+	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/file"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 )
 
@@ -21,6 +22,7 @@ var (
 				group.Group("/backend", func(group *ghttp.RouterGroup) {
 					group.Bind(
 						admin.NewV1(),
+						file.NewV1().UploadImage,
 					)
 				})
 				// 需要JWT验证的路由
