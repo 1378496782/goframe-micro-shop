@@ -15,11 +15,11 @@ import (
 )
 
 // UploadToQiniu 上传文件到七牛云
-func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (string, error) {
+func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (string, string, error) {
 	// 读取配置
 	cfg := g.Cfg().MustGet(ctx, "qiniu")
 	if cfg.IsEmpty() {
-		return "", errors.New("七牛云配置缺失")
+		return "", "", errors.New("七牛云配置缺失")
 	}
 
 	// 解析配置
@@ -66,11 +66,11 @@ func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (st
 	)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// 返回完整访问URL
-	return domain + "/" + key, nil
+	return domain + "/" + key, key, nil
 }
 
 // generateUniqueFilename 生成保留原始文件名的唯一文件名

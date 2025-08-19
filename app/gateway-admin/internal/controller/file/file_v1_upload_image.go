@@ -2,8 +2,12 @@ package file
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/frame/g"
 	"io"
+	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/logic/file_info"
 	"shop-goframe-micro-service-refacotor/app/gateway-admin/utility"
+	"shop-goframe-micro-service-refacotor/utility/consts"
+	"shop-goframe-micro-service-refacotor/utility/middleware"
 
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -31,9 +35,23 @@ func (c *ControllerV1) UploadImage(ctx context.Context, req *v1.UploadImageReq) 
 	}
 
 	// 4. 上传到七牛云
-	url, err := utility.UploadToQiniu(ctx, fileContent, req.File.Filename)
+	url, fileName, err := utility.UploadToQiniu(ctx, fileContent, req.File.Filename)
 	if err != nil {
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "上传到七牛云失败")
+	}
+
+	// 5. 从上下文中获取上传者ID
+	userId := ctx.Value(middleware.CtxUserId)
+	if userId == nil {
+		return nil, gerror.NewCode(gcode.CodeNotAuthorized, "无法获取用户ID")
+	}
+
+	// 错误类型
+	infoError := consts.InfoError(consts.FileInfo, consts.UploadImageFail)
+	err = file_info.UploadImage(ctx, url, fileName, userId.(int))
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 
 	// 5. 返回结果

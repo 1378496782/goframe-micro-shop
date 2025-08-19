@@ -22,14 +22,14 @@ var (
 				group.Group("/backend", func(group *ghttp.RouterGroup) {
 					group.Bind(
 						admin.NewV1(),
-						file.NewV1().UploadImage,
 					)
 				})
 				// 需要JWT验证的路由
 				group.Group("/backend", func(group *ghttp.RouterGroup) {
 					group.Middleware(middleware.JWTAuth)
 					group.Bind(
-					// 需要认证的接口
+						// 需要认证的接口
+						file.NewV1().UploadImage,
 					)
 				})
 			})

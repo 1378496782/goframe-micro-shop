@@ -9,6 +9,8 @@ const (
 	LoginFail          = "Login 登录失败"
 	UpdatePasswordFail = "UpdatePassword 修改密码失败"
 	GetUserInfoFail    = "GetUserInfo 获取用户信息失败"
+	UploadImageFail    = "UploadImage 图片保存失败"
+	FileInfo           = "FileInfo"
 	ConsigneeInfo      = "ConsigneeInfo"
 	UserInfo           = "UserInfo"
 	CollectionInfo     = "CollectionInfo"

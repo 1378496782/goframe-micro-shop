@@ -23,3 +23,8 @@ qiniu:
   secretKey: "W6dsUdQvqT7WWmrWTvOoNl01O_cU-tvGgRwGE-uw"   # 控制台获取的SK
   bucket:    "goframegoods"      # 空间名称
   domain:    "http://t15zl18vd.hn-bkt.clouddn.com" # 域名
+
+database:
+  default:
+    link:  "mysql:root:root@tcp(127.0.0.1:3306)/current"
+    debug:
