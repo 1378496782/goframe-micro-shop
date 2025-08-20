@@ -1,0 +1,28 @@
+// ==========================================================================
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
+// ==========================================================================
+
+syntax = "proto3";
+
+package pbentity;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/pbentity";
+
+import "google/protobuf/timestamp.proto";
+
+message GoodsInfo {
+    uint32                    Id               = 1;  //
+    string                    Name             = 2;  //
+    uint64                     Price            = 3;  // 价格(分)
+    uint32                     Level1CategoryId = 4;  // 1级分类id
+    uint32                     Level2CategoryId = 5;  // 2级分类id
+    uint32                     Level3CategoryId = 6;  // 3级分类id
+    string                    Brand            = 7;  // 品牌
+    uint32                     Stock            = 8;  // 库存
+    uint32                     Sale             = 9;  // 销量
+    string                    Tags             = 10; // 标签
+    string                    DetailInfo       = 11; // 商品详情
+    google.protobuf.Timestamp CreatedAt        = 12; //
+    google.protobuf.Timestamp UpdatedAt        = 13; //
+    google.protobuf.Timestamp DeletedAt        = 14; //
+}

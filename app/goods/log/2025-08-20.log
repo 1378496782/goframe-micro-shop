@@ -1,0 +1,20 @@
+2025-08-20 10:48:09.558 [DEBU] 公众号：王中阳：goods-service service register: &{Head: Deployment: Namespace: Name:goods Version: Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 10:48:09.567 [INFO] 公众号：王中阳：goods-service pid[17008]: grpc server started listening on [:31004]
+2025-08-20 10:51:23.754 [INFO] 公众号：王中阳：goods-service signal received: interrupt, gracefully shutting down
+2025-08-20 10:51:23.754 [DEBU] 公众号：王中阳：goods-service service deregister: &{Service:0xc00041c4d0 Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 10:51:30.062 [DEBU] 公众号：王中阳：goods-service service register: &{Head: Deployment: Namespace: Name:goods Version: Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 10:51:30.067 [INFO] 公众号：王中阳：goods-service pid[27404]: grpc server started listening on [:31004]
+2025-08-20 10:52:19.087 [INFO] 公众号：王中阳：goods-service signal received: interrupt, gracefully shutting down
+2025-08-20 10:52:19.087 [DEBU] 公众号：王中阳：goods-service service deregister: &{Service:0xc000294380 Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 10:52:21.029 [DEBU] 公众号：王中阳：goods-service service register: &{Head: Deployment: Namespace: Name:goods Version: Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 10:52:21.033 [INFO] 公众号：王中阳：goods-service pid[7520]: grpc server started listening on [:31004]
+2025-08-20 10:56:00.936 [INFO] 公众号：王中阳：goods-service signal received: interrupt, gracefully shutting down
+2025-08-20 10:56:00.936 [DEBU] 公众号：王中阳：goods-service service deregister: &{Service:0xc0002942a0 Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 11:00:02.924 [DEBU] 公众号：王中阳：goods-service service register: &{Head: Deployment: Namespace: Name:goods Version: Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 11:00:02.929 [INFO] 公众号：王中阳：goods-service pid[7656]: grpc server started listening on [:31004]
+2025-08-20 11:00:53.408 [INFO] 公众号：王中阳：goods-service signal received: interrupt, gracefully shutting down
+2025-08-20 11:00:53.408 [DEBU] 公众号：王中阳：goods-service service deregister: &{Service:0xc000390070 Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 11:36:39.112 [DEBU] 公众号：王中阳：goods-service service register: &{Head: Deployment: Namespace: Name:goods Version: Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}
+2025-08-20 11:36:39.122 [INFO] 公众号：王中阳：goods-service pid[13616]: grpc server started listening on [:31004]
+2025-08-20 12:44:37.577 [INFO] 公众号：王中阳：goods-service signal received: interrupt, gracefully shutting down
+2025-08-20 12:44:37.578 [DEBU] 公众号：王中阳：goods-service service deregister: &{Service:0xc0000b6d20 Endpoints:172.27.128.1:31004,192.168.1.2:31004,172.26.96.1:31004 Metadata:map[protocol:grpc]}

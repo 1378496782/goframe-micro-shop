@@ -1,0 +1,61 @@
+2025-08-20 11:41:05.141 {20a54a669e5c5d18ce00992372aca5b6} 公众号：王中阳：gateway-admin 200 "POST http 127.0.0.1:8299 /backend/goods HTTP/1.1" 6236.200, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 52, "", ""
+Stack:
+1. GoodsInfo Create 插入失败: INSERT INTO `goods_info`(`name`,`price`,`level1_category_id`,`level2_category_id`,`level3_category_id`,`brand`,`stock`,`sale`,`tags`,`detail_info`,`created_at`,`updated_at`) VALUES('维生素饮料',754,1,64,8,'reprehenderit esse ullamco Excepteur',2,70,'quis ullamco','nisi','2025-08-20 11:41:05','2025-08-20 11:41:05') : Error 1406 (22001): Data too long for column 'brand' at row 1
+   1).  google.golang.org/grpc.getChainUnaryInvoker.func1.getChainUnaryInvoker.1
+        C:/Users/yemcr/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:489
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.GrpcClientTimeout
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:32
+   3).  google.golang.org/grpc.NewClient.chainUnaryClientInterceptors.func1
+        C:/Users/yemcr/go/pkg/mod/google.golang.org/grpc@v1.74.2/clientconn.go:477
+   4).  google.golang.org/grpc.(*ClientConn).Invoke
+        C:/Users/yemcr/go/pkg/mod/google.golang.org/grpc@v1.74.2/call.go:35
+   5).  shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1.(*goodsInfoClient).Create
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1/goods_info_grpc.pb.go:77
+   6).  shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods.(*ControllerV1).GoodsInfoCreate
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods/goods_v1_goods_info_create.go:18
+   7).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-20 11:53:26.977 公众号：王中阳：gateway-admin service deregister: &{Service:0xc00033c4d0 Endpoints:172.27.128.1:8299,192.168.1.2:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+2025-08-20 11:53:26.981 公众号：王中阳：gateway-admin pid[2072]: all servers shutdown
+2025-08-20 11:53:34.196 {546beacc4c5d5d18c2b22b093b2501b2} 公众号：王中阳：gateway-admin 200 "GET http 127.0.0.1:8299 /backend/goods/detail?id=2 HTTP/1.1" 15525.200, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 53, "Invalid Parameter", ""
+Stack:
+1. destination pointer cannot be nil
+   1).  shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods.(*ControllerV1).GoodsInfoGetDetail
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods/goods_v1_goods_info_get_detail.go:27
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-20 11:53:41.937 公众号：王中阳：gateway-admin service deregister: &{Service:0xc00029d810 Endpoints:172.27.128.1:8299,192.168.1.2:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+2025-08-20 11:53:41.941 公众号：王中阳：gateway-admin pid[23204]: all servers shutdown
+2025-08-20 11:53:45.705 {0cc8247b4f5d5d1850ebed6759f2a30e} 公众号：王中阳：gateway-admin 500 "GET http 127.0.0.1:8299 /backend/goods/detail?id=2 HTTP/1.1" 11069.200, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 68, "Internal Panic", ""
+Stack:
+1. exception recovered
+   1).  shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods.(*ControllerV1).GoodsInfoGetDetail
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods/goods_v1_goods_info_get_detail.go:27
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+2. runtime error: invalid memory address or nil pointer dereference
+
+2025-08-20 11:54:07.330 公众号：王中阳：gateway-admin service deregister: &{Service:0xc0002aa460 Endpoints:172.27.128.1:8299,192.168.1.2:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+2025-08-20 11:54:07.336 公众号：王中阳：gateway-admin pid[11916]: all servers shutdown
+2025-08-20 12:00:11.747 {f0f6a85ca95d5d185e80b774ee3c3914} 公众号：王中阳：gateway-admin 200 "GET http 127.0.0.1:8299 /backend/goods/detail?id=1 HTTP/1.1" 18058.600, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 53, "Invalid Parameter", ""
+Stack:
+1. destination pointer cannot be nil
+   1).  shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods.(*ControllerV1).GoodsInfoGetDetail
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods/goods_v1_goods_info_get_detail.go:27
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-20 12:01:40.617 公众号：王中阳：gateway-admin service deregister: &{Service:0xc00029ff10 Endpoints:172.27.128.1:8299,192.168.1.2:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+2025-08-20 12:01:40.624 公众号：王中阳：gateway-admin pid[20188]: all servers shutdown
+2025-08-20 12:02:04.920 {5c74d7b6c35d5d187dbf7c6dae804536} 公众号：王中阳：gateway-admin 200 "GET http 127.0.0.1:8299 /backend/goods/detail?id=1 HTTP/1.1" 8226.900, 127.0.0.1, "", "Apifox/1.0.0 (https://apifox.com)", 53, "Invalid Parameter", ""
+Stack:
+1. destination pointer cannot be nil
+   1).  shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods.(*ControllerV1).GoodsInfoGetDetail
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods/goods_v1_goods_info_get_detail.go:26
+   2).  shop-goframe-micro-service-refacotor/utility/middleware.MiddlewareCORS
+        E:/Code/Goframe/shop-goframe-micro-service-refacotor/utility/middleware/middleware.go:22
+
+2025-08-20 12:02:15.499 公众号：王中阳：gateway-admin service deregister: &{Service:0xc000298070 Endpoints:172.27.128.1:8299,192.168.1.2:8299,172.26.96.1:8299 Metadata:map[insecure:true protocol:http]}
+2025-08-20 12:02:15.504 公众号：王中阳：gateway-admin pid[14416]: all servers shutdown

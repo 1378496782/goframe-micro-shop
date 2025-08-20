@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcmd"
 	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/admin"
 	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/file"
+	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 )
 
@@ -30,6 +31,7 @@ var (
 					group.Bind(
 						// 需要认证的接口
 						file.NewV1().UploadImage,
+						goods.NewV1(),
 					)
 				})
 			})

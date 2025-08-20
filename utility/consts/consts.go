@@ -2,6 +2,7 @@ package consts
 
 const (
 	GetListFail        = "GetList 查询失败"
+	GetDetailFile      = "GetDetail 查询失败"
 	CreateFail         = "Create 插入失败"
 	UpdateFail         = "Update 更新失败"
 	DeleteFail         = "Delete 删除失败"
@@ -10,6 +11,8 @@ const (
 	UpdatePasswordFail = "UpdatePassword 修改密码失败"
 	GetUserInfoFail    = "GetUserInfo 获取用户信息失败"
 	UploadImageFail    = "UploadImage 图片保存失败"
+	GoodsImages        = "GoodsImages"
+	GoodsInfo          = "GoodsInfo"
 	FileInfo           = "FileInfo"
 	ConsigneeInfo      = "ConsigneeInfo"
 	UserInfo           = "UserInfo"

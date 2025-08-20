@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package goods_info.v1;
+
+option go_package = "shop-goframe-micro-service/app/goods/api/goods_info/v1";
+
+import "pbentity/goods_info.proto";
+
+service goods_info {
+  // 商品列表
+  rpc GetList(GoodsInfoGetListReq) returns (GoodsInfoGetListRes) {}
+  // 商品详情
+  rpc GetDetail(GoodsInfoGetDetailReq) returns (GoodsInfoGetDetailRes) {}
+  // 创建商品
+  rpc Create(GoodsInfoCreateReq) returns (GoodsInfoCreateRes) {}
+  // 修改商品
+  rpc Update(GoodsInfoUpdateReq) returns (GoodsInfoUpdateRes) {}
+  // 删除商品
+  rpc Delete(GoodsInfoDeleteReq) returns (GoodsInfoDeleteRes) {}
+}
+
+message GoodsInfoGetDetailReq {
+  uint32 id = 1;
+}
+
+
+message GoodsInfoGetDetailRes {
+  pbentity.GoodsInfo data = 1;
+}
+
+
+// 新增消息定义
+message GoodsInfoCreateReq {
+  string name = 1;
+  uint64 price = 2;
+  uint32 level1_category_id = 3;
+  uint32 level2_category_id = 4;
+  uint32 level3_category_id = 5;
+  string brand = 6;
+  uint32 stock = 7;
+  uint32 sale = 8;
+  string tags = 9;
+  string detail_info = 10;
+}
+
+message GoodsInfoCreateRes {
+  uint32 id = 1;
+}
+
+message GoodsInfoUpdateReq {
+  uint32 id = 1;
+  string name = 2;
+  uint64 price = 3;
+  uint32 level1_category_id = 4;
+  uint32 level2_category_id = 5;
+  uint32 level3_category_id = 6;
+  string brand = 7;
+  uint32 stock = 8;
+  uint32 sale = 9;
+  string tags = 10;
+  string detail_info = 11;
+}
+
+message GoodsInfoUpdateRes {
+  uint32 id = 1;
+}
+
+message GoodsInfoDeleteReq {
+  uint32 id = 1;
+}
+
+message GoodsInfoDeleteRes {
+
+}
+
+message GoodsInfoGetListReq {
+  uint32 page = 1;
+  uint32 size = 2;  // 修改：字段编号必须从1开始递增
+}
+
+
+message GoodsInfoListResponse {
+  repeated pbentity.GoodsInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message GoodsInfoGetListRes {
+  GoodsInfoListResponse data = 1;
+}
