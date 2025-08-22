@@ -21,6 +21,7 @@ type GoodsImagesGetListRes struct {
 // 商品图片项
 type GoodsImagesItem struct {
 	Id      uint32 `json:"id" dc:"商品图片ID"`
+	Url     string `json:"url" dc:"七牛云url"`
 	GoodsId uint32 `json:"goods_id" dc:"商品ID"`
 	FileId  uint32 `json:"file_id" dc:"文件ID"`
 	Sort    uint32 `json:"sort" dc:"排序"`
@@ -29,6 +30,7 @@ type GoodsImagesItem struct {
 // 创建商品图片
 type GoodsImagesCreateReq struct {
 	g.Meta  `path:"/goods/images" method:"post" tags:"商品图片管理" sm:"创建商品图片"`
+	Url     string `json:"url" dc:"七牛云url"`
 	GoodsId uint32 `json:"goods_id" v:"required" dc:"商品ID"`
 	FileId  uint32 `json:"file_id" v:"required" dc:"文件ID（关联file_info）"`
 	Sort    uint32 `json:"sort" dc:"排序"`

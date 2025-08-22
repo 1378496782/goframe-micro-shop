@@ -32,6 +32,7 @@ type GoodsInfoGetListRes struct {
 type GoodsInfoItem struct {
 	Id               uint32                 `json:"id" dc:"商品ID"`
 	Name             string                 `json:"name" dc:"商品名称"`
+	Images           string                 `json:"images" dc:"支持单图,多图"`
 	Price            uint64                 `json:"price" dc:"价格"`
 	Level1CategoryId uint32                 `json:"level1_category_id" dc:"一级分类ID"`
 	Level2CategoryId uint32                 `json:"level2_category_id" dc:"二级分类ID"`
@@ -49,6 +50,7 @@ type GoodsInfoItem struct {
 type GoodsInfoCreateReq struct {
 	g.Meta           `path:"/goods" method:"post" tags:"商品管理" sm:"创建商品"`
 	Name             string `json:"name" v:"required" dc:"商品名称"`
+	Images           string `json:"images" dc:"支持单图,多图"`
 	Price            uint64 `json:"price" v:"required" dc:"价格"`
 	Level1CategoryId uint32 `json:"level1_category_id" v:"required" dc:"一级分类ID"`
 	Level2CategoryId uint32 `json:"level2_category_id" dc:"二级分类ID"`
@@ -69,6 +71,7 @@ type GoodsInfoUpdateReq struct {
 	g.Meta           `path:"/goods" method:"put" tags:"商品管理" sm:"更新商品"`
 	Id               uint32 `json:"id" v:"required" dc:"商品ID"`
 	Name             string `json:"name" dc:"商品名称"`
+	Images           string `json:"images" dc:"支持单图,多图"`
 	Price            uint64 `json:"price" dc:"价格"`
 	Level1CategoryId uint32 `json:"level1_category_id" dc:"一级分类ID"`
 	Level2CategoryId uint32 `json:"level2_category_id" dc:"二级分类ID"`
