@@ -54,7 +54,8 @@ func GetGoodsCache() *gcache.Cache {
 func SetEmptyGoodsDetail(ctx context.Context, productId uint32) error {
 	key := fmt.Sprintf("goods:detail:%d", productId)
 	// 设置一个短时间的空值，防止缓存穿透
-	return goodsCache.Set(ctx, key, nil, 1*time.Minute)
+	emptyValue := "__EMPTY__"
+	return goodsCache.Set(ctx, key, emptyValue, 1*time.Minute)
 }
 
 // SetGoodsDetail 设置商品详情缓存
