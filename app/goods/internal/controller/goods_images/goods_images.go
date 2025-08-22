@@ -71,12 +71,6 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsImagesGetListReq) (
 }
 
 func (*Controller) Create(ctx context.Context, req *v1.GoodsImagesCreateReq) (res *v1.GoodsImagesCreateRes, err error) {
-	// 定义一个实体对象，用于接收转换后的请求数据
-	var goodsImages *entity.GoodsImages
-	// 将请求参数req转换为实体对象goodsImages
-	if err := gconv.Struct(req, &goodsImages); err != nil {
-		return nil, err
-	}
 	// 错误类型
 	infoError := consts.InfoError(consts.GoodsImages, consts.CreateFail)
 	// 向数据库中插入数据并获取自动生成的ID

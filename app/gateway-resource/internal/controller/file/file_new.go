@@ -5,7 +5,7 @@
 package file
 
 import (
-	"shop-goframe-micro-service-refacotor/app/gateway-admin/api/file"
+	"shop-goframe-micro-service-refacotor/app/gateway-resource/api/file"
 )
 
 type ControllerV1 struct{}

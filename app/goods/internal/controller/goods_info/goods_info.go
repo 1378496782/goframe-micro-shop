@@ -8,8 +8,10 @@ import (
 	"shop-goframe-micro-service-refacotor/app/goods/api/pbentity"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/model/entity"
+	"shop-goframe-micro-service-refacotor/app/goods/utility/goodsRedis"
 	"shop-goframe-micro-service-refacotor/utility"
 	"shop-goframe-micro-service-refacotor/utility/consts"
+	"time"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -77,7 +79,23 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 }
 
 func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq) (res *v1.GoodsInfoGetDetailRes, err error) {
-	// 错误类型
+	// 先尝试从Redis获取
+	detail, err := goodsRedis.GetGoodsDetail(ctx, req.Id)
+	if err != nil {
+		g.Log().Infof(ctx, "Redis查询失败: %v", err)
+		// 继续查询数据库，不直接返回错误
+	} else if !detail.IsNil() {
+		// 缓存命中，反序列化数据
+		var cachedRes v1.GoodsInfoGetDetailRes
+		if err := detail.Struct(&cachedRes); err != nil {
+			g.Log().Errorf(ctx, "缓存数据反序列化失败: %v", err)
+			// 继续查询数据库
+		} else {
+			g.Log().Info(ctx, "goods detail缓存命中")
+			return &cachedRes, nil
+		}
+	}
+	// 缓存未命中，查询数据库
 	infoError := consts.InfoError(consts.GoodsInfo, consts.GetDetailFile)
 	record, err := dao.GoodsInfo.Ctx(ctx).Where("id", req.Id).One()
 	if err != nil {
@@ -86,6 +104,8 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 	}
 	if record.IsEmpty() {
 		g.Log().Errorf(ctx, "%v %v", infoError+"查询商品不存在", err)
+		// 设置空缓存防止缓存穿透
+		_ = goodsRedis.SetEmptyGoodsDetail(ctx, req.Id)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError+"查询商品不存在")
 	}
 
@@ -105,18 +125,22 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 	pbGoods.CreatedAt = utility.SafeConvertTime(goods.CreatedAt)
 	pbGoods.UpdatedAt = utility.SafeConvertTime(goods.UpdatedAt)
 
-	return &v1.GoodsInfoGetDetailRes{
+	// 组装响应
+	res = &v1.GoodsInfoGetDetailRes{
 		Data: &pbGoods,
-	}, nil
+	}
+	// 同步设置缓存（使用较短的超时时间避免阻塞）
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
+	defer cancel()
+
+	if err := goodsRedis.SetGoodsDetail(ctxWithTimeout, pbGoods.Id, res); err != nil {
+		g.Log().Warningf(ctx, "设置商品详情缓存失败: %v", err)
+		// 不返回错误，因为主业务已成功
+	}
+	return res, nil
 }
 
 func (*Controller) Create(ctx context.Context, req *v1.GoodsInfoCreateReq) (res *v1.GoodsInfoCreateRes, err error) {
-	// 定义一个实体对象，用于接收转换后的请求数据
-	var goodsInfo *entity.GoodsInfo
-	// 将请求参数req转换为实体对象goodsInfo
-	if err := gconv.Struct(req, &goodsInfo); err != nil {
-		return nil, err
-	}
 	// 错误类型
 	infoError := consts.InfoError(consts.GoodsInfo, consts.CreateFail)
 	// 向数据库中插入数据并获取自动生成的ID

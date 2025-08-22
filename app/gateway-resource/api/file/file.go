@@ -7,7 +7,7 @@ package file
 import (
 	"context"
 
-	"shop-goframe-micro-service-refacotor/app/gateway-admin/api/file/v1"
+	"shop-goframe-micro-service-refacotor/app/gateway-resource/api/file/v1"
 )
 
 type IFileV1 interface {

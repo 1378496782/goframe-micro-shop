@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS `goods_info`;
 CREATE TABLE `goods_info` (
       `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
       `name` VARCHAR(200) NOT NULL DEFAULT '',
+      `images` JSON DEFAULT NULL COMMENT '支持单图,多图',
       `price` INT NOT NULL DEFAULT 1 COMMENT '价格(分)',
       `level1_category_id` INT NOT NULL COMMENT '1级分类id',
       `level2_category_id` INT NOT NULL DEFAULT 0 COMMENT '2级分类id',
@@ -22,6 +23,7 @@ CREATE TABLE `goods_info` (
 DROP TABLE IF EXISTS `goods_images`;
 CREATE TABLE `goods_images` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `url` VARCHAR(255) DEFAULT NULL COMMENT '七牛云url',
     `goods_id` INT NOT NULL COMMENT '商品ID',
     `file_id` INT NOT NULL COMMENT '文件ID（关联file_info）',
     `sort` TINYINT NOT NULL DEFAULT 0 COMMENT '排序',

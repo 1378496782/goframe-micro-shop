@@ -21,3 +21,16 @@ database:
 
 etcd:
   address: "127.0.0.1:2379"
+
+# Redis配置
+redis:
+  # 商品服务专用配置
+  goods:
+    address: "127.0.0.1:6379"
+    db: 1  # 使用单独的db
+    pass: ""
+    idleTimeout: "600s"
+    maxActive: 50
+    idle: 10
+    connectTimeout: "5s"
+    # 可以添加其他Redis配置参数

@@ -116,14 +116,15 @@ type GoodsInfoCreateReq struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Name             string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Price            uint64                 `protobuf:"varint,2,opt,name=price,proto3" json:"price,omitempty"`
-	Level1CategoryId uint32                 `protobuf:"varint,3,opt,name=level1_category_id,json=level1CategoryId,proto3" json:"level1_category_id,omitempty"`
-	Level2CategoryId uint32                 `protobuf:"varint,4,opt,name=level2_category_id,json=level2CategoryId,proto3" json:"level2_category_id,omitempty"`
-	Level3CategoryId uint32                 `protobuf:"varint,5,opt,name=level3_category_id,json=level3CategoryId,proto3" json:"level3_category_id,omitempty"`
-	Brand            string                 `protobuf:"bytes,6,opt,name=brand,proto3" json:"brand,omitempty"`
-	Stock            uint32                 `protobuf:"varint,7,opt,name=stock,proto3" json:"stock,omitempty"`
-	Sale             uint32                 `protobuf:"varint,8,opt,name=sale,proto3" json:"sale,omitempty"`
-	Tags             string                 `protobuf:"bytes,9,opt,name=tags,proto3" json:"tags,omitempty"`
-	DetailInfo       string                 `protobuf:"bytes,10,opt,name=detail_info,json=detailInfo,proto3" json:"detail_info,omitempty"`
+	Images           string                 `protobuf:"bytes,3,opt,name=Images,proto3" json:"Images,omitempty"`
+	Level1CategoryId uint32                 `protobuf:"varint,4,opt,name=level1_category_id,json=level1CategoryId,proto3" json:"level1_category_id,omitempty"`
+	Level2CategoryId uint32                 `protobuf:"varint,5,opt,name=level2_category_id,json=level2CategoryId,proto3" json:"level2_category_id,omitempty"`
+	Level3CategoryId uint32                 `protobuf:"varint,6,opt,name=level3_category_id,json=level3CategoryId,proto3" json:"level3_category_id,omitempty"`
+	Brand            string                 `protobuf:"bytes,7,opt,name=brand,proto3" json:"brand,omitempty"`
+	Stock            uint32                 `protobuf:"varint,8,opt,name=stock,proto3" json:"stock,omitempty"`
+	Sale             uint32                 `protobuf:"varint,9,opt,name=sale,proto3" json:"sale,omitempty"`
+	Tags             string                 `protobuf:"bytes,10,opt,name=tags,proto3" json:"tags,omitempty"`
+	DetailInfo       string                 `protobuf:"bytes,11,opt,name=detail_info,json=detailInfo,proto3" json:"detail_info,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -170,6 +171,13 @@ func (x *GoodsInfoCreateReq) GetPrice() uint64 {
 		return x.Price
 	}
 	return 0
+}
+
+func (x *GoodsInfoCreateReq) GetImages() string {
+	if x != nil {
+		return x.Images
+	}
+	return ""
 }
 
 func (x *GoodsInfoCreateReq) GetLevel1CategoryId() uint32 {
@@ -277,14 +285,15 @@ type GoodsInfoUpdateReq struct {
 	Id               uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name             string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Price            uint64                 `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
-	Level1CategoryId uint32                 `protobuf:"varint,4,opt,name=level1_category_id,json=level1CategoryId,proto3" json:"level1_category_id,omitempty"`
-	Level2CategoryId uint32                 `protobuf:"varint,5,opt,name=level2_category_id,json=level2CategoryId,proto3" json:"level2_category_id,omitempty"`
-	Level3CategoryId uint32                 `protobuf:"varint,6,opt,name=level3_category_id,json=level3CategoryId,proto3" json:"level3_category_id,omitempty"`
-	Brand            string                 `protobuf:"bytes,7,opt,name=brand,proto3" json:"brand,omitempty"`
-	Stock            uint32                 `protobuf:"varint,8,opt,name=stock,proto3" json:"stock,omitempty"`
-	Sale             uint32                 `protobuf:"varint,9,opt,name=sale,proto3" json:"sale,omitempty"`
-	Tags             string                 `protobuf:"bytes,10,opt,name=tags,proto3" json:"tags,omitempty"`
-	DetailInfo       string                 `protobuf:"bytes,11,opt,name=detail_info,json=detailInfo,proto3" json:"detail_info,omitempty"`
+	Images           string                 `protobuf:"bytes,4,opt,name=Images,proto3" json:"Images,omitempty"`
+	Level1CategoryId uint32                 `protobuf:"varint,5,opt,name=level1_category_id,json=level1CategoryId,proto3" json:"level1_category_id,omitempty"`
+	Level2CategoryId uint32                 `protobuf:"varint,6,opt,name=level2_category_id,json=level2CategoryId,proto3" json:"level2_category_id,omitempty"`
+	Level3CategoryId uint32                 `protobuf:"varint,7,opt,name=level3_category_id,json=level3CategoryId,proto3" json:"level3_category_id,omitempty"`
+	Brand            string                 `protobuf:"bytes,8,opt,name=brand,proto3" json:"brand,omitempty"`
+	Stock            uint32                 `protobuf:"varint,9,opt,name=stock,proto3" json:"stock,omitempty"`
+	Sale             uint32                 `protobuf:"varint,10,opt,name=sale,proto3" json:"sale,omitempty"`
+	Tags             string                 `protobuf:"bytes,11,opt,name=tags,proto3" json:"tags,omitempty"`
+	DetailInfo       string                 `protobuf:"bytes,12,opt,name=detail_info,json=detailInfo,proto3" json:"detail_info,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -338,6 +347,13 @@ func (x *GoodsInfoUpdateReq) GetPrice() uint64 {
 		return x.Price
 	}
 	return 0
+}
+
+func (x *GoodsInfoUpdateReq) GetImages() string {
+	if x != nil {
+		return x.Images
+	}
+	return ""
 }
 
 func (x *GoodsInfoUpdateReq) GetLevel1CategoryId() uint32 {
@@ -692,26 +708,11 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x15GoodsInfoGetDetailReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"@\n" +
 	"\x15GoodsInfoGetDetailRes\x12'\n" +
-	"\x04data\x18\x01 \x01(\v2\x13.pbentity.GoodsInfoR\x04data\"\xbd\x02\n" +
+	"\x04data\x18\x01 \x01(\v2\x13.pbentity.GoodsInfoR\x04data\"\xd5\x02\n" +
 	"\x12GoodsInfoCreateReq\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05price\x18\x02 \x01(\x04R\x05price\x12,\n" +
-	"\x12level1_category_id\x18\x03 \x01(\rR\x10level1CategoryId\x12,\n" +
-	"\x12level2_category_id\x18\x04 \x01(\rR\x10level2CategoryId\x12,\n" +
-	"\x12level3_category_id\x18\x05 \x01(\rR\x10level3CategoryId\x12\x14\n" +
-	"\x05brand\x18\x06 \x01(\tR\x05brand\x12\x14\n" +
-	"\x05stock\x18\a \x01(\rR\x05stock\x12\x12\n" +
-	"\x04sale\x18\b \x01(\rR\x04sale\x12\x12\n" +
-	"\x04tags\x18\t \x01(\tR\x04tags\x12\x1f\n" +
-	"\vdetail_info\x18\n" +
-	" \x01(\tR\n" +
-	"detailInfo\"$\n" +
-	"\x12GoodsInfoCreateRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"\xcd\x02\n" +
-	"\x12GoodsInfoUpdateReq\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05price\x18\x03 \x01(\x04R\x05price\x12,\n" +
+	"\x05price\x18\x02 \x01(\x04R\x05price\x12\x16\n" +
+	"\x06Images\x18\x03 \x01(\tR\x06Images\x12,\n" +
 	"\x12level1_category_id\x18\x04 \x01(\rR\x10level1CategoryId\x12,\n" +
 	"\x12level2_category_id\x18\x05 \x01(\rR\x10level2CategoryId\x12,\n" +
 	"\x12level3_category_id\x18\x06 \x01(\rR\x10level3CategoryId\x12\x14\n" +
@@ -721,6 +722,23 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x04tags\x18\n" +
 	" \x01(\tR\x04tags\x12\x1f\n" +
 	"\vdetail_info\x18\v \x01(\tR\n" +
+	"detailInfo\"$\n" +
+	"\x12GoodsInfoCreateRes\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"\xe5\x02\n" +
+	"\x12GoodsInfoUpdateReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05price\x18\x03 \x01(\x04R\x05price\x12\x16\n" +
+	"\x06Images\x18\x04 \x01(\tR\x06Images\x12,\n" +
+	"\x12level1_category_id\x18\x05 \x01(\rR\x10level1CategoryId\x12,\n" +
+	"\x12level2_category_id\x18\x06 \x01(\rR\x10level2CategoryId\x12,\n" +
+	"\x12level3_category_id\x18\a \x01(\rR\x10level3CategoryId\x12\x14\n" +
+	"\x05brand\x18\b \x01(\tR\x05brand\x12\x14\n" +
+	"\x05stock\x18\t \x01(\rR\x05stock\x12\x12\n" +
+	"\x04sale\x18\n" +
+	" \x01(\rR\x04sale\x12\x12\n" +
+	"\x04tags\x18\v \x01(\tR\x04tags\x12\x1f\n" +
+	"\vdetail_info\x18\f \x01(\tR\n" +
 	"detailInfo\"$\n" +
 	"\x12GoodsInfoUpdateRes\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"$\n" +

@@ -2,17 +2,17 @@ package file
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
-	"io"
-	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/logic/file_info"
-	"shop-goframe-micro-service-refacotor/app/gateway-admin/utility"
-	"shop-goframe-micro-service-refacotor/utility/consts"
-	"shop-goframe-micro-service-refacotor/utility/middleware"
-
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
+	"io"
+	"shop-goframe-micro-service-refacotor/app/gateway-resource/internal/logic/file_info"
+	"shop-goframe-micro-service-refacotor/app/gateway-resource/internal/model/entity"
+	"shop-goframe-micro-service-refacotor/app/gateway-resource/utility"
+	"shop-goframe-micro-service-refacotor/utility/consts"
 
-	"shop-goframe-micro-service-refacotor/app/gateway-admin/api/file/v1"
+	"shop-goframe-micro-service-refacotor/app/gateway-resource/api/file/v1"
 )
 
 func (c *ControllerV1) UploadImage(ctx context.Context, req *v1.UploadImageReq) (res *v1.UploadImageRes, err error) {
@@ -40,15 +40,14 @@ func (c *ControllerV1) UploadImage(ctx context.Context, req *v1.UploadImageReq) 
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "上传到七牛云失败")
 	}
 
-	// 5. 从上下文中获取上传者ID
-	userId := ctx.Value(middleware.CtxUserId)
-	if userId == nil {
-		return nil, gerror.NewCode(gcode.CodeNotAuthorized, "无法获取用户ID")
+	var fileData *entity.FileInfo
+	// 将请求参数req转换为实体对象consigneeInfo
+	if err := gconv.Struct(req, &fileData); err != nil {
+		return nil, err
 	}
-
 	// 错误类型
 	infoError := consts.InfoError(consts.FileInfo, consts.UploadImageFail)
-	err = file_info.UploadImage(ctx, url, fileName, userId.(int))
+	err = file_info.UploadImage(ctx, url, fileName, fileData)
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)

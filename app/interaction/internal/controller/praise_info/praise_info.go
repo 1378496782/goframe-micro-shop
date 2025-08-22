@@ -78,12 +78,6 @@ func (*Controller) GetList(ctx context.Context, req *v1.PraiseInfoGetListReq) (r
 
 // Create 创建
 func (*Controller) Create(ctx context.Context, req *v1.PraiseInfoCreateReq) (res *v1.PraiseInfoCreateRes, err error) {
-	// 定义一个实体对象，用于接收转换后的请求数据
-	var praiseInfo *entity.PraiseInfo
-	// 将请求参数req转换为实体对象praiseInfo
-	if err := gconv.Struct(req, &praiseInfo); err != nil {
-		return nil, err
-	}
 	// 错误类型
 	infoError := consts.InfoError(consts.PraiseInfo, consts.CreateFail)
 	// 向数据库中插入数据并获取自动生成的ID

@@ -79,12 +79,6 @@ func (*Controller) GetList(ctx context.Context, req *v1.ConsigneeInfoGetListReq)
 
 // Create 创建
 func (*Controller) Create(ctx context.Context, req *v1.ConsigneeInfoCreateReq) (res *v1.ConsigneeInfoCreateRes, err error) {
-	// 定义一个实体对象，用于接收转换后的请求数据
-	var consigneeInfo *entity.ConsigneeInfo
-	// 将请求参数req转换为实体对象consigneeInfo
-	if err := gconv.Struct(req, &consigneeInfo); err != nil {
-		return nil, err
-	}
 	// 错误类型
 	infoError := consts.InfoError(consts.ConsigneeInfo, consts.CreateFail)
 	// 向数据库中插入数据并获取自动生成的ID
