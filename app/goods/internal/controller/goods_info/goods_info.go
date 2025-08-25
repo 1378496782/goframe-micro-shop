@@ -167,6 +167,14 @@ func (*Controller) Update(ctx context.Context, req *v1.GoodsInfoUpdateReq) (res 
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
+	// 数据库更新成功后，删除缓存
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
+	defer cancel()
+
+	if err := goodsRedis.DeleteGoodsDetail(ctxWithTimeout, req.Id); err != nil {
+		g.Log().Warningf(ctx, "删除商品详情数据缓存失败: %v", err)
+		// 不返回错误，因为主业务已成功
+	}
 
 	// 返回更新成功响应，包含被更新ID
 	return &v1.GoodsInfoUpdateRes{Id: req.Id}, nil

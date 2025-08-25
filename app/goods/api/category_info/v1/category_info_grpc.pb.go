@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	CategoryInfo_GetList_FullMethodName = "/category_info.v1.category_info/GetList"
-	CategoryInfo_GetTree_FullMethodName = "/category_info.v1.category_info/GetTree"
+	CategoryInfo_GetAll_FullMethodName  = "/category_info.v1.category_info/GetAll"
 	CategoryInfo_Create_FullMethodName  = "/category_info.v1.category_info/Create"
 	CategoryInfo_Update_FullMethodName  = "/category_info.v1.category_info/Update"
 	CategoryInfo_Delete_FullMethodName  = "/category_info.v1.category_info/Delete"
@@ -32,7 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CategoryInfoClient interface {
 	GetList(ctx context.Context, in *CategoryInfoGetListReq, opts ...grpc.CallOption) (*CategoryInfoGetListRes, error)
-	GetTree(ctx context.Context, in *CategoryInfoGetTreeReq, opts ...grpc.CallOption) (*CategoryInfoGetTreeRes, error)
+	GetAll(ctx context.Context, in *CategoryInfoGetAllReq, opts ...grpc.CallOption) (*CategoryInfoGetAllRes, error)
 	Create(ctx context.Context, in *CategoryInfoCreateReq, opts ...grpc.CallOption) (*CategoryInfoCreateRes, error)
 	Update(ctx context.Context, in *CategoryInfoUpdateReq, opts ...grpc.CallOption) (*CategoryInfoUpdateRes, error)
 	Delete(ctx context.Context, in *CategoryInfoDeleteReq, opts ...grpc.CallOption) (*CategoryInfoDeleteRes, error)
@@ -56,10 +56,10 @@ func (c *categoryInfoClient) GetList(ctx context.Context, in *CategoryInfoGetLis
 	return out, nil
 }
 
-func (c *categoryInfoClient) GetTree(ctx context.Context, in *CategoryInfoGetTreeReq, opts ...grpc.CallOption) (*CategoryInfoGetTreeRes, error) {
+func (c *categoryInfoClient) GetAll(ctx context.Context, in *CategoryInfoGetAllReq, opts ...grpc.CallOption) (*CategoryInfoGetAllRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CategoryInfoGetTreeRes)
-	err := c.cc.Invoke(ctx, CategoryInfo_GetTree_FullMethodName, in, out, cOpts...)
+	out := new(CategoryInfoGetAllRes)
+	err := c.cc.Invoke(ctx, CategoryInfo_GetAll_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *categoryInfoClient) Delete(ctx context.Context, in *CategoryInfoDeleteR
 // for forward compatibility.
 type CategoryInfoServer interface {
 	GetList(context.Context, *CategoryInfoGetListReq) (*CategoryInfoGetListRes, error)
-	GetTree(context.Context, *CategoryInfoGetTreeReq) (*CategoryInfoGetTreeRes, error)
+	GetAll(context.Context, *CategoryInfoGetAllReq) (*CategoryInfoGetAllRes, error)
 	Create(context.Context, *CategoryInfoCreateReq) (*CategoryInfoCreateRes, error)
 	Update(context.Context, *CategoryInfoUpdateReq) (*CategoryInfoUpdateRes, error)
 	Delete(context.Context, *CategoryInfoDeleteReq) (*CategoryInfoDeleteRes, error)
@@ -118,8 +118,8 @@ type UnimplementedCategoryInfoServer struct{}
 func (UnimplementedCategoryInfoServer) GetList(context.Context, *CategoryInfoGetListReq) (*CategoryInfoGetListRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
-func (UnimplementedCategoryInfoServer) GetTree(context.Context, *CategoryInfoGetTreeReq) (*CategoryInfoGetTreeRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTree not implemented")
+func (UnimplementedCategoryInfoServer) GetAll(context.Context, *CategoryInfoGetAllReq) (*CategoryInfoGetAllRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (UnimplementedCategoryInfoServer) Create(context.Context, *CategoryInfoCreateReq) (*CategoryInfoCreateRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
@@ -169,20 +169,20 @@ func _CategoryInfo_GetList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CategoryInfo_GetTree_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CategoryInfoGetTreeReq)
+func _CategoryInfo_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CategoryInfoGetAllReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CategoryInfoServer).GetTree(ctx, in)
+		return srv.(CategoryInfoServer).GetAll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CategoryInfo_GetTree_FullMethodName,
+		FullMethod: CategoryInfo_GetAll_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CategoryInfoServer).GetTree(ctx, req.(*CategoryInfoGetTreeReq))
+		return srv.(CategoryInfoServer).GetAll(ctx, req.(*CategoryInfoGetAllReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -253,8 +253,8 @@ var CategoryInfo_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CategoryInfo_GetList_Handler,
 		},
 		{
-			MethodName: "GetTree",
-			Handler:    _CategoryInfo_GetTree_Handler,
+			MethodName: "GetAll",
+			Handler:    _CategoryInfo_GetAll_Handler,
 		},
 		{
 			MethodName: "Create",

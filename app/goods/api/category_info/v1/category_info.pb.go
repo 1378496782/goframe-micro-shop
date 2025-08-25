@@ -23,9 +23,338 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 新增消息定义
+type CategoryInfoCreateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ParentId      uint32                 `protobuf:"varint,1,opt,name=ParentId,proto3" json:"ParentId,omitempty" dc:"父级id"` // 父级id
+	Name          string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`                    //
+	PicUrl        string                 `protobuf:"bytes,3,opt,name=PicUrl,proto3" json:"PicUrl,omitempty" dc:"icon"`      // icon
+	Level         uint32                 `protobuf:"varint,4,opt,name=Level,proto3" json:"Level,omitempty" dc:"等级 默认1级分类"`  // 等级 默认1级分类
+	Sort          uint32                 `protobuf:"varint,5,opt,name=Sort,proto3" json:"Sort,omitempty"`                   //
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryInfoCreateReq) Reset() {
+	*x = CategoryInfoCreateReq{}
+	mi := &file_category_info_v1_category_info_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryInfoCreateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryInfoCreateReq) ProtoMessage() {}
+
+func (x *CategoryInfoCreateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_category_info_v1_category_info_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryInfoCreateReq.ProtoReflect.Descriptor instead.
+func (*CategoryInfoCreateReq) Descriptor() ([]byte, []int) {
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CategoryInfoCreateReq) GetParentId() uint32 {
+	if x != nil {
+		return x.ParentId
+	}
+	return 0
+}
+
+func (x *CategoryInfoCreateReq) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CategoryInfoCreateReq) GetPicUrl() string {
+	if x != nil {
+		return x.PicUrl
+	}
+	return ""
+}
+
+func (x *CategoryInfoCreateReq) GetLevel() uint32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *CategoryInfoCreateReq) GetSort() uint32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+type CategoryInfoCreateRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryInfoCreateRes) Reset() {
+	*x = CategoryInfoCreateRes{}
+	mi := &file_category_info_v1_category_info_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryInfoCreateRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryInfoCreateRes) ProtoMessage() {}
+
+func (x *CategoryInfoCreateRes) ProtoReflect() protoreflect.Message {
+	mi := &file_category_info_v1_category_info_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryInfoCreateRes.ProtoReflect.Descriptor instead.
+func (*CategoryInfoCreateRes) Descriptor() ([]byte, []int) {
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CategoryInfoCreateRes) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type CategoryInfoUpdateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`                       //
+	ParentId      uint32                 `protobuf:"varint,2,opt,name=ParentId,proto3" json:"ParentId,omitempty" dc:"父级id"` // 父级id
+	Name          string                 `protobuf:"bytes,3,opt,name=Name,proto3" json:"Name,omitempty"`                    //
+	PicUrl        string                 `protobuf:"bytes,4,opt,name=PicUrl,proto3" json:"PicUrl,omitempty" dc:"icon"`      // icon
+	Level         uint32                 `protobuf:"varint,5,opt,name=Level,proto3" json:"Level,omitempty" dc:"等级 默认1级分类"`  // 等级 默认1级分类
+	Sort          uint32                 `protobuf:"varint,6,opt,name=Sort,proto3" json:"Sort,omitempty"`                   //
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryInfoUpdateReq) Reset() {
+	*x = CategoryInfoUpdateReq{}
+	mi := &file_category_info_v1_category_info_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryInfoUpdateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryInfoUpdateReq) ProtoMessage() {}
+
+func (x *CategoryInfoUpdateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_category_info_v1_category_info_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryInfoUpdateReq.ProtoReflect.Descriptor instead.
+func (*CategoryInfoUpdateReq) Descriptor() ([]byte, []int) {
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CategoryInfoUpdateReq) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CategoryInfoUpdateReq) GetParentId() uint32 {
+	if x != nil {
+		return x.ParentId
+	}
+	return 0
+}
+
+func (x *CategoryInfoUpdateReq) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CategoryInfoUpdateReq) GetPicUrl() string {
+	if x != nil {
+		return x.PicUrl
+	}
+	return ""
+}
+
+func (x *CategoryInfoUpdateReq) GetLevel() uint32 {
+	if x != nil {
+		return x.Level
+	}
+	return 0
+}
+
+func (x *CategoryInfoUpdateReq) GetSort() uint32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
+type CategoryInfoUpdateRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryInfoUpdateRes) Reset() {
+	*x = CategoryInfoUpdateRes{}
+	mi := &file_category_info_v1_category_info_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryInfoUpdateRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryInfoUpdateRes) ProtoMessage() {}
+
+func (x *CategoryInfoUpdateRes) ProtoReflect() protoreflect.Message {
+	mi := &file_category_info_v1_category_info_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryInfoUpdateRes.ProtoReflect.Descriptor instead.
+func (*CategoryInfoUpdateRes) Descriptor() ([]byte, []int) {
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CategoryInfoUpdateRes) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type CategoryInfoDeleteReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryInfoDeleteReq) Reset() {
+	*x = CategoryInfoDeleteReq{}
+	mi := &file_category_info_v1_category_info_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryInfoDeleteReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryInfoDeleteReq) ProtoMessage() {}
+
+func (x *CategoryInfoDeleteReq) ProtoReflect() protoreflect.Message {
+	mi := &file_category_info_v1_category_info_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryInfoDeleteReq.ProtoReflect.Descriptor instead.
+func (*CategoryInfoDeleteReq) Descriptor() ([]byte, []int) {
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CategoryInfoDeleteReq) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type CategoryInfoDeleteRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CategoryInfoDeleteRes) Reset() {
+	*x = CategoryInfoDeleteRes{}
+	mi := &file_category_info_v1_category_info_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CategoryInfoDeleteRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CategoryInfoDeleteRes) ProtoMessage() {}
+
+func (x *CategoryInfoDeleteRes) ProtoReflect() protoreflect.Message {
+	mi := &file_category_info_v1_category_info_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CategoryInfoDeleteRes.ProtoReflect.Descriptor instead.
+func (*CategoryInfoDeleteRes) Descriptor() ([]byte, []int) {
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{5}
+}
+
 type CategoryInfoGetListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ParentId      uint32                 `protobuf:"varint,1,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty" dc:"关键过滤条件：获取某个父分类下的直接子类。0表示获取所有顶级分类"` // 关键过滤条件：获取某个父分类下的直接子类。0表示获取所有顶级分类
+	Sort          uint32                 `protobuf:"varint,1,opt,name=sort,proto3" json:"sort,omitempty"`
 	Page          uint32                 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
 	Size          uint32                 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"` // 修改：字段编号必须从1开始递增
 	unknownFields protoimpl.UnknownFields
@@ -34,7 +363,7 @@ type CategoryInfoGetListReq struct {
 
 func (x *CategoryInfoGetListReq) Reset() {
 	*x = CategoryInfoGetListReq{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[0]
+	mi := &file_category_info_v1_category_info_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +375,7 @@ func (x *CategoryInfoGetListReq) String() string {
 func (*CategoryInfoGetListReq) ProtoMessage() {}
 
 func (x *CategoryInfoGetListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[0]
+	mi := &file_category_info_v1_category_info_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,12 +388,12 @@ func (x *CategoryInfoGetListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CategoryInfoGetListReq.ProtoReflect.Descriptor instead.
 func (*CategoryInfoGetListReq) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{0}
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *CategoryInfoGetListReq) GetParentId() uint32 {
+func (x *CategoryInfoGetListReq) GetSort() uint32 {
 	if x != nil {
-		return x.ParentId
+		return x.Sort
 	}
 	return 0
 }
@@ -95,7 +424,7 @@ type CategoryInfoListResponse struct {
 
 func (x *CategoryInfoListResponse) Reset() {
 	*x = CategoryInfoListResponse{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[1]
+	mi := &file_category_info_v1_category_info_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -107,7 +436,7 @@ func (x *CategoryInfoListResponse) String() string {
 func (*CategoryInfoListResponse) ProtoMessage() {}
 
 func (x *CategoryInfoListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[1]
+	mi := &file_category_info_v1_category_info_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -120,7 +449,7 @@ func (x *CategoryInfoListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CategoryInfoListResponse.ProtoReflect.Descriptor instead.
 func (*CategoryInfoListResponse) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{1}
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *CategoryInfoListResponse) GetList() []*pbentity.CategoryInfo {
@@ -160,7 +489,7 @@ type CategoryInfoGetListRes struct {
 
 func (x *CategoryInfoGetListRes) Reset() {
 	*x = CategoryInfoGetListRes{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[2]
+	mi := &file_category_info_v1_category_info_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -172,7 +501,7 @@ func (x *CategoryInfoGetListRes) String() string {
 func (*CategoryInfoGetListRes) ProtoMessage() {}
 
 func (x *CategoryInfoGetListRes) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[2]
+	mi := &file_category_info_v1_category_info_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -185,7 +514,7 @@ func (x *CategoryInfoGetListRes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CategoryInfoGetListRes.ProtoReflect.Descriptor instead.
 func (*CategoryInfoGetListRes) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{2}
+	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CategoryInfoGetListRes) GetData() *CategoryInfoListResponse {
@@ -195,350 +524,26 @@ func (x *CategoryInfoGetListRes) GetData() *CategoryInfoListResponse {
 	return nil
 }
 
-// 树形节点消息体
-type TreeNode struct {
+type CategoryInfoGetAllReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Category      *pbentity.CategoryInfo `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
-	Children      []*TreeNode            `protobuf:"bytes,2,rep,name=children,proto3" json:"children,omitempty" dc:"递归定义子节点"` // 递归定义子节点
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TreeNode) Reset() {
-	*x = TreeNode{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TreeNode) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TreeNode) ProtoMessage() {}
-
-func (x *TreeNode) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TreeNode.ProtoReflect.Descriptor instead.
-func (*TreeNode) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *TreeNode) GetCategory() *pbentity.CategoryInfo {
-	if x != nil {
-		return x.Category
-	}
-	return nil
-}
-
-func (x *TreeNode) GetChildren() []*TreeNode {
-	if x != nil {
-		return x.Children
-	}
-	return nil
-}
-
-type CategoryInfoGetTreeReq struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 可以留空，也可以加一个root_id参数用于获取指定节点为根的子树
-	RootId        uint32 `protobuf:"varint,1,opt,name=root_id,json=rootId,proto3" json:"root_id,omitempty" dc:"可以留空，也可以加一个root_id参数用于获取指定节点为根的子树"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CategoryInfoGetTreeReq) Reset() {
-	*x = CategoryInfoGetTreeReq{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CategoryInfoGetTreeReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CategoryInfoGetTreeReq) ProtoMessage() {}
-
-func (x *CategoryInfoGetTreeReq) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CategoryInfoGetTreeReq.ProtoReflect.Descriptor instead.
-func (*CategoryInfoGetTreeReq) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *CategoryInfoGetTreeReq) GetRootId() uint32 {
-	if x != nil {
-		return x.RootId
-	}
-	return 0
-}
-
-type CategoryInfoGetTreeRes struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Trees         []*TreeNode            `protobuf:"bytes,1,rep,name=trees,proto3" json:"trees,omitempty" dc:"通常root_id=0时，这里返回的是多个顶级分类构成的森林"` // 通常root_id=0时，这里返回的是多个顶级分类构成的森林
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CategoryInfoGetTreeRes) Reset() {
-	*x = CategoryInfoGetTreeRes{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CategoryInfoGetTreeRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CategoryInfoGetTreeRes) ProtoMessage() {}
-
-func (x *CategoryInfoGetTreeRes) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CategoryInfoGetTreeRes.ProtoReflect.Descriptor instead.
-func (*CategoryInfoGetTreeRes) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *CategoryInfoGetTreeRes) GetTrees() []*TreeNode {
-	if x != nil {
-		return x.Trees
-	}
-	return nil
-}
-
-// 新增消息定义
-type CategoryInfoCreateReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ParentId      uint32                 `protobuf:"varint,1,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	PicUrl        string                 `protobuf:"bytes,3,opt,name=pic_url,json=picUrl,proto3" json:"pic_url,omitempty"`
-	Sort          uint32                 `protobuf:"varint,4,opt,name=sort,proto3" json:"sort,omitempty" dc:"level 字段由服务端自动计算，不应由客户端传入"` // level 字段由服务端自动计算，不应由客户端传入
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CategoryInfoCreateReq) Reset() {
-	*x = CategoryInfoCreateReq{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CategoryInfoCreateReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CategoryInfoCreateReq) ProtoMessage() {}
-
-func (x *CategoryInfoCreateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CategoryInfoCreateReq.ProtoReflect.Descriptor instead.
-func (*CategoryInfoCreateReq) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *CategoryInfoCreateReq) GetParentId() uint32 {
-	if x != nil {
-		return x.ParentId
-	}
-	return 0
-}
-
-func (x *CategoryInfoCreateReq) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *CategoryInfoCreateReq) GetPicUrl() string {
-	if x != nil {
-		return x.PicUrl
-	}
-	return ""
-}
-
-func (x *CategoryInfoCreateReq) GetSort() uint32 {
-	if x != nil {
-		return x.Sort
-	}
-	return 0
-}
-
-type CategoryInfoCreateRes struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CategoryInfoCreateRes) Reset() {
-	*x = CategoryInfoCreateRes{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CategoryInfoCreateRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CategoryInfoCreateRes) ProtoMessage() {}
-
-func (x *CategoryInfoCreateRes) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CategoryInfoCreateRes.ProtoReflect.Descriptor instead.
-func (*CategoryInfoCreateRes) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *CategoryInfoCreateRes) GetId() uint32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-type CategoryInfoUpdateReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	PicUrl        string                 `protobuf:"bytes,3,opt,name=pic_url,json=picUrl,proto3" json:"pic_url,omitempty"`
-	Sort          uint32                 `protobuf:"varint,4,opt,name=sort,proto3" json:"sort,omitempty" dc:"移除了 parent_id 和 level，因为它们创建后不应更改"` // 移除了 parent_id 和 level，因为它们创建后不应更改
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CategoryInfoUpdateReq) Reset() {
-	*x = CategoryInfoUpdateReq{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CategoryInfoUpdateReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CategoryInfoUpdateReq) ProtoMessage() {}
-
-func (x *CategoryInfoUpdateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CategoryInfoUpdateReq.ProtoReflect.Descriptor instead.
-func (*CategoryInfoUpdateReq) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *CategoryInfoUpdateReq) GetId() uint32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *CategoryInfoUpdateReq) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *CategoryInfoUpdateReq) GetPicUrl() string {
-	if x != nil {
-		return x.PicUrl
-	}
-	return ""
-}
-
-func (x *CategoryInfoUpdateReq) GetSort() uint32 {
-	if x != nil {
-		return x.Sort
-	}
-	return 0
-}
-
-type CategoryInfoUpdateRes struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CategoryInfoUpdateRes) Reset() {
-	*x = CategoryInfoUpdateRes{}
+func (x *CategoryInfoGetAllReq) Reset() {
+	*x = CategoryInfoGetAllReq{}
 	mi := &file_category_info_v1_category_info_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CategoryInfoUpdateRes) String() string {
+func (x *CategoryInfoGetAllReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CategoryInfoUpdateRes) ProtoMessage() {}
+func (*CategoryInfoGetAllReq) ProtoMessage() {}
 
-func (x *CategoryInfoUpdateRes) ProtoReflect() protoreflect.Message {
+func (x *CategoryInfoGetAllReq) ProtoReflect() protoreflect.Message {
 	mi := &file_category_info_v1_category_info_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -550,39 +555,33 @@ func (x *CategoryInfoUpdateRes) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CategoryInfoUpdateRes.ProtoReflect.Descriptor instead.
-func (*CategoryInfoUpdateRes) Descriptor() ([]byte, []int) {
+// Deprecated: Use CategoryInfoGetAllReq.ProtoReflect.Descriptor instead.
+func (*CategoryInfoGetAllReq) Descriptor() ([]byte, []int) {
 	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *CategoryInfoUpdateRes) GetId() uint32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-type CategoryInfoDeleteReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+type CategoryInfoGetAllRes struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	List          []*pbentity.CategoryInfo `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	Total         uint32                   `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CategoryInfoDeleteReq) Reset() {
-	*x = CategoryInfoDeleteReq{}
+func (x *CategoryInfoGetAllRes) Reset() {
+	*x = CategoryInfoGetAllRes{}
 	mi := &file_category_info_v1_category_info_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CategoryInfoDeleteReq) String() string {
+func (x *CategoryInfoGetAllRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CategoryInfoDeleteReq) ProtoMessage() {}
+func (*CategoryInfoGetAllRes) ProtoMessage() {}
 
-func (x *CategoryInfoDeleteReq) ProtoReflect() protoreflect.Message {
+func (x *CategoryInfoGetAllRes) ProtoReflect() protoreflect.Message {
 	mi := &file_category_info_v1_category_info_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -594,61 +593,52 @@ func (x *CategoryInfoDeleteReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CategoryInfoDeleteReq.ProtoReflect.Descriptor instead.
-func (*CategoryInfoDeleteReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use CategoryInfoGetAllRes.ProtoReflect.Descriptor instead.
+func (*CategoryInfoGetAllRes) Descriptor() ([]byte, []int) {
 	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *CategoryInfoDeleteReq) GetId() uint32 {
+func (x *CategoryInfoGetAllRes) GetList() []*pbentity.CategoryInfo {
 	if x != nil {
-		return x.Id
+		return x.List
+	}
+	return nil
+}
+
+func (x *CategoryInfoGetAllRes) GetTotal() uint32 {
+	if x != nil {
+		return x.Total
 	}
 	return 0
-}
-
-type CategoryInfoDeleteRes struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CategoryInfoDeleteRes) Reset() {
-	*x = CategoryInfoDeleteRes{}
-	mi := &file_category_info_v1_category_info_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CategoryInfoDeleteRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CategoryInfoDeleteRes) ProtoMessage() {}
-
-func (x *CategoryInfoDeleteRes) ProtoReflect() protoreflect.Message {
-	mi := &file_category_info_v1_category_info_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CategoryInfoDeleteRes.ProtoReflect.Descriptor instead.
-func (*CategoryInfoDeleteRes) Descriptor() ([]byte, []int) {
-	return file_category_info_v1_category_info_proto_rawDescGZIP(), []int{11}
 }
 
 var File_category_info_v1_category_info_proto protoreflect.FileDescriptor
 
 const file_category_info_v1_category_info_proto_rawDesc = "" +
 	"\n" +
-	"$category_info/v1/category_info.proto\x12\x10category_info.v1\x1a\x1cpbentity/category_info.proto\"]\n" +
-	"\x16CategoryInfoGetListReq\x12\x1b\n" +
-	"\tparent_id\x18\x01 \x01(\rR\bparentId\x12\x12\n" +
+	"$category_info/v1/category_info.proto\x12\x10category_info.v1\x1a\x1cpbentity/category_info.proto\"\x89\x01\n" +
+	"\x15CategoryInfoCreateReq\x12\x1a\n" +
+	"\bParentId\x18\x01 \x01(\rR\bParentId\x12\x12\n" +
+	"\x04Name\x18\x02 \x01(\tR\x04Name\x12\x16\n" +
+	"\x06PicUrl\x18\x03 \x01(\tR\x06PicUrl\x12\x14\n" +
+	"\x05Level\x18\x04 \x01(\rR\x05Level\x12\x12\n" +
+	"\x04Sort\x18\x05 \x01(\rR\x04Sort\"'\n" +
+	"\x15CategoryInfoCreateRes\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"\x99\x01\n" +
+	"\x15CategoryInfoUpdateReq\x12\x0e\n" +
+	"\x02Id\x18\x01 \x01(\rR\x02Id\x12\x1a\n" +
+	"\bParentId\x18\x02 \x01(\rR\bParentId\x12\x12\n" +
+	"\x04Name\x18\x03 \x01(\tR\x04Name\x12\x16\n" +
+	"\x06PicUrl\x18\x04 \x01(\tR\x06PicUrl\x12\x14\n" +
+	"\x05Level\x18\x05 \x01(\rR\x05Level\x12\x12\n" +
+	"\x04Sort\x18\x06 \x01(\rR\x04Sort\"'\n" +
+	"\x15CategoryInfoUpdateRes\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"'\n" +
+	"\x15CategoryInfoDeleteReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"\x17\n" +
+	"\x15CategoryInfoDeleteRes\"T\n" +
+	"\x16CategoryInfoGetListReq\x12\x12\n" +
+	"\x04sort\x18\x01 \x01(\rR\x04sort\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +
 	"\x04size\x18\x03 \x01(\rR\x04size\"\x84\x01\n" +
 	"\x18CategoryInfoListResponse\x12*\n" +
@@ -657,34 +647,14 @@ const file_category_info_v1_category_info_proto_rawDesc = "" +
 	"\x04size\x18\x03 \x01(\rR\x04size\x12\x14\n" +
 	"\x05total\x18\x04 \x01(\rR\x05total\"X\n" +
 	"\x16CategoryInfoGetListRes\x12>\n" +
-	"\x04data\x18\x01 \x01(\v2*.category_info.v1.CategoryInfoListResponseR\x04data\"v\n" +
-	"\bTreeNode\x122\n" +
-	"\bcategory\x18\x01 \x01(\v2\x16.pbentity.CategoryInfoR\bcategory\x126\n" +
-	"\bchildren\x18\x02 \x03(\v2\x1a.category_info.v1.TreeNodeR\bchildren\"1\n" +
-	"\x16CategoryInfoGetTreeReq\x12\x17\n" +
-	"\aroot_id\x18\x01 \x01(\rR\x06rootId\"J\n" +
-	"\x16CategoryInfoGetTreeRes\x120\n" +
-	"\x05trees\x18\x01 \x03(\v2\x1a.category_info.v1.TreeNodeR\x05trees\"u\n" +
-	"\x15CategoryInfoCreateReq\x12\x1b\n" +
-	"\tparent_id\x18\x01 \x01(\rR\bparentId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x17\n" +
-	"\apic_url\x18\x03 \x01(\tR\x06picUrl\x12\x12\n" +
-	"\x04sort\x18\x04 \x01(\rR\x04sort\"'\n" +
-	"\x15CategoryInfoCreateRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"h\n" +
-	"\x15CategoryInfoUpdateReq\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x17\n" +
-	"\apic_url\x18\x03 \x01(\tR\x06picUrl\x12\x12\n" +
-	"\x04sort\x18\x04 \x01(\rR\x04sort\"'\n" +
-	"\x15CategoryInfoUpdateRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"'\n" +
-	"\x15CategoryInfoDeleteReq\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"\x17\n" +
-	"\x15CategoryInfoDeleteRes2\xeb\x03\n" +
+	"\x04data\x18\x01 \x01(\v2*.category_info.v1.CategoryInfoListResponseR\x04data\"\x17\n" +
+	"\x15CategoryInfoGetAllReq\"Y\n" +
+	"\x15CategoryInfoGetAllRes\x12*\n" +
+	"\x04list\x18\x01 \x03(\v2\x16.pbentity.CategoryInfoR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\rR\x05total2\xe8\x03\n" +
 	"\rcategory_info\x12_\n" +
-	"\aGetList\x12(.category_info.v1.CategoryInfoGetListReq\x1a(.category_info.v1.CategoryInfoGetListRes\"\x00\x12_\n" +
-	"\aGetTree\x12(.category_info.v1.CategoryInfoGetTreeReq\x1a(.category_info.v1.CategoryInfoGetTreeRes\"\x00\x12\\\n" +
+	"\aGetList\x12(.category_info.v1.CategoryInfoGetListReq\x1a(.category_info.v1.CategoryInfoGetListRes\"\x00\x12\\\n" +
+	"\x06GetAll\x12'.category_info.v1.CategoryInfoGetAllReq\x1a'.category_info.v1.CategoryInfoGetAllRes\"\x00\x12\\\n" +
 	"\x06Create\x12'.category_info.v1.CategoryInfoCreateReq\x1a'.category_info.v1.CategoryInfoCreateRes\"\x00\x12\\\n" +
 	"\x06Update\x12'.category_info.v1.CategoryInfoUpdateReq\x1a'.category_info.v1.CategoryInfoUpdateRes\"\x00\x12\\\n" +
 	"\x06Delete\x12'.category_info.v1.CategoryInfoDeleteReq\x1a'.category_info.v1.CategoryInfoDeleteRes\"\x00BEZCshop-goframe-micro-service-refacotor/app/goods/api/category_info/v1b\x06proto3"
@@ -701,43 +671,40 @@ func file_category_info_v1_category_info_proto_rawDescGZIP() []byte {
 	return file_category_info_v1_category_info_proto_rawDescData
 }
 
-var file_category_info_v1_category_info_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_category_info_v1_category_info_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_category_info_v1_category_info_proto_goTypes = []any{
-	(*CategoryInfoGetListReq)(nil),   // 0: category_info.v1.CategoryInfoGetListReq
-	(*CategoryInfoListResponse)(nil), // 1: category_info.v1.CategoryInfoListResponse
-	(*CategoryInfoGetListRes)(nil),   // 2: category_info.v1.CategoryInfoGetListRes
-	(*TreeNode)(nil),                 // 3: category_info.v1.TreeNode
-	(*CategoryInfoGetTreeReq)(nil),   // 4: category_info.v1.CategoryInfoGetTreeReq
-	(*CategoryInfoGetTreeRes)(nil),   // 5: category_info.v1.CategoryInfoGetTreeRes
-	(*CategoryInfoCreateReq)(nil),    // 6: category_info.v1.CategoryInfoCreateReq
-	(*CategoryInfoCreateRes)(nil),    // 7: category_info.v1.CategoryInfoCreateRes
-	(*CategoryInfoUpdateReq)(nil),    // 8: category_info.v1.CategoryInfoUpdateReq
-	(*CategoryInfoUpdateRes)(nil),    // 9: category_info.v1.CategoryInfoUpdateRes
-	(*CategoryInfoDeleteReq)(nil),    // 10: category_info.v1.CategoryInfoDeleteReq
-	(*CategoryInfoDeleteRes)(nil),    // 11: category_info.v1.CategoryInfoDeleteRes
-	(*pbentity.CategoryInfo)(nil),    // 12: pbentity.CategoryInfo
+	(*CategoryInfoCreateReq)(nil),    // 0: category_info.v1.CategoryInfoCreateReq
+	(*CategoryInfoCreateRes)(nil),    // 1: category_info.v1.CategoryInfoCreateRes
+	(*CategoryInfoUpdateReq)(nil),    // 2: category_info.v1.CategoryInfoUpdateReq
+	(*CategoryInfoUpdateRes)(nil),    // 3: category_info.v1.CategoryInfoUpdateRes
+	(*CategoryInfoDeleteReq)(nil),    // 4: category_info.v1.CategoryInfoDeleteReq
+	(*CategoryInfoDeleteRes)(nil),    // 5: category_info.v1.CategoryInfoDeleteRes
+	(*CategoryInfoGetListReq)(nil),   // 6: category_info.v1.CategoryInfoGetListReq
+	(*CategoryInfoListResponse)(nil), // 7: category_info.v1.CategoryInfoListResponse
+	(*CategoryInfoGetListRes)(nil),   // 8: category_info.v1.CategoryInfoGetListRes
+	(*CategoryInfoGetAllReq)(nil),    // 9: category_info.v1.CategoryInfoGetAllReq
+	(*CategoryInfoGetAllRes)(nil),    // 10: category_info.v1.CategoryInfoGetAllRes
+	(*pbentity.CategoryInfo)(nil),    // 11: pbentity.CategoryInfo
 }
 var file_category_info_v1_category_info_proto_depIdxs = []int32{
-	12, // 0: category_info.v1.CategoryInfoListResponse.list:type_name -> pbentity.CategoryInfo
-	1,  // 1: category_info.v1.CategoryInfoGetListRes.data:type_name -> category_info.v1.CategoryInfoListResponse
-	12, // 2: category_info.v1.TreeNode.category:type_name -> pbentity.CategoryInfo
-	3,  // 3: category_info.v1.TreeNode.children:type_name -> category_info.v1.TreeNode
-	3,  // 4: category_info.v1.CategoryInfoGetTreeRes.trees:type_name -> category_info.v1.TreeNode
-	0,  // 5: category_info.v1.category_info.GetList:input_type -> category_info.v1.CategoryInfoGetListReq
-	4,  // 6: category_info.v1.category_info.GetTree:input_type -> category_info.v1.CategoryInfoGetTreeReq
-	6,  // 7: category_info.v1.category_info.Create:input_type -> category_info.v1.CategoryInfoCreateReq
-	8,  // 8: category_info.v1.category_info.Update:input_type -> category_info.v1.CategoryInfoUpdateReq
-	10, // 9: category_info.v1.category_info.Delete:input_type -> category_info.v1.CategoryInfoDeleteReq
-	2,  // 10: category_info.v1.category_info.GetList:output_type -> category_info.v1.CategoryInfoGetListRes
-	5,  // 11: category_info.v1.category_info.GetTree:output_type -> category_info.v1.CategoryInfoGetTreeRes
-	7,  // 12: category_info.v1.category_info.Create:output_type -> category_info.v1.CategoryInfoCreateRes
-	9,  // 13: category_info.v1.category_info.Update:output_type -> category_info.v1.CategoryInfoUpdateRes
-	11, // 14: category_info.v1.category_info.Delete:output_type -> category_info.v1.CategoryInfoDeleteRes
-	10, // [10:15] is the sub-list for method output_type
-	5,  // [5:10] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	11, // 0: category_info.v1.CategoryInfoListResponse.list:type_name -> pbentity.CategoryInfo
+	7,  // 1: category_info.v1.CategoryInfoGetListRes.data:type_name -> category_info.v1.CategoryInfoListResponse
+	11, // 2: category_info.v1.CategoryInfoGetAllRes.list:type_name -> pbentity.CategoryInfo
+	6,  // 3: category_info.v1.category_info.GetList:input_type -> category_info.v1.CategoryInfoGetListReq
+	9,  // 4: category_info.v1.category_info.GetAll:input_type -> category_info.v1.CategoryInfoGetAllReq
+	0,  // 5: category_info.v1.category_info.Create:input_type -> category_info.v1.CategoryInfoCreateReq
+	2,  // 6: category_info.v1.category_info.Update:input_type -> category_info.v1.CategoryInfoUpdateReq
+	4,  // 7: category_info.v1.category_info.Delete:input_type -> category_info.v1.CategoryInfoDeleteReq
+	8,  // 8: category_info.v1.category_info.GetList:output_type -> category_info.v1.CategoryInfoGetListRes
+	10, // 9: category_info.v1.category_info.GetAll:output_type -> category_info.v1.CategoryInfoGetAllRes
+	1,  // 10: category_info.v1.category_info.Create:output_type -> category_info.v1.CategoryInfoCreateRes
+	3,  // 11: category_info.v1.category_info.Update:output_type -> category_info.v1.CategoryInfoUpdateRes
+	5,  // 12: category_info.v1.category_info.Delete:output_type -> category_info.v1.CategoryInfoDeleteRes
+	8,  // [8:13] is the sub-list for method output_type
+	3,  // [3:8] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_category_info_v1_category_info_proto_init() }
@@ -751,7 +718,7 @@ func file_category_info_v1_category_info_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_category_info_v1_category_info_proto_rawDesc), len(file_category_info_v1_category_info_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
