@@ -30,7 +30,7 @@ const (
 type GoodsInfo struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Id               uint32                 `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`                                         //
-	Name             string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty"`                                      //
+	Name             string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty" dc:"商品名字"`                            // 商品名字
 	Images           string                 `protobuf:"bytes,3,opt,name=Images,proto3" json:"Images,omitempty" dc:"支持单图,多图"`                     // 支持单图,多图
 	Price            int32                  `protobuf:"varint,4,opt,name=Price,proto3" json:"Price,omitempty" dc:"价格(分)"`                        // 价格(分)
 	Level1CategoryId int32                  `protobuf:"varint,5,opt,name=Level1CategoryId,proto3" json:"Level1CategoryId,omitempty" dc:"1级分类id"` // 1级分类id

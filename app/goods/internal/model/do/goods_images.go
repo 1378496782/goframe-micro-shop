@@ -12,6 +12,7 @@ import (
 type GoodsImages struct {
 	g.Meta  `orm:"table:goods_images, do:true"`
 	Id      interface{} //
+	Url     interface{} // 七牛云url
 	GoodsId interface{} // 商品ID
 	FileId  interface{} // 文件ID（关联file_info）
 	Sort    interface{} // 排序

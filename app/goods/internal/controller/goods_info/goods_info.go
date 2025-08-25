@@ -160,12 +160,6 @@ func (*Controller) Create(ctx context.Context, req *v1.GoodsInfoCreateReq) (res 
 }
 
 func (*Controller) Update(ctx context.Context, req *v1.GoodsInfoUpdateReq) (res *v1.GoodsInfoUpdateRes, err error) {
-	// 定义一个实体对象，用于接收转换后的请求数据
-	var goodsInfo *entity.GoodsInfo
-	// 将请求参数req转换为实体对象goodsInfo
-	if err := gconv.Struct(req, &goodsInfo); err != nil {
-		return nil, err
-	}
 	infoError := consts.InfoError(consts.GoodsInfo, consts.UpdateFail)
 	// 根据ID更新数据库中的信息
 	_, err = dao.GoodsInfo.Ctx(ctx).Where("id", req.Id).Update(req)

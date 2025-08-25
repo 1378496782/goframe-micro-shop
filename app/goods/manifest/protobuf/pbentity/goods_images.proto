@@ -12,7 +12,8 @@ option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/pbentity
 
 message GoodsImages {
     uint32 Id      = 1; //
-    int32  GoodsId = 2; // 商品ID
-    int32  FileId  = 3; // 文件ID（关联file_info）
-    int32  Sort    = 4; // 排序
+    string Url     = 2; // 七牛云url
+    int32  GoodsId = 3; // 商品ID
+    int32  FileId  = 4; // 文件ID（关联file_info）
+    int32  Sort    = 5; // 排序
 }

@@ -29,9 +29,10 @@ const (
 type GoodsImages struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint32                 `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`                                //
-	GoodsId       int32                  `protobuf:"varint,2,opt,name=GoodsId,proto3" json:"GoodsId,omitempty" dc:"商品ID"`            // 商品ID
-	FileId        int32                  `protobuf:"varint,3,opt,name=FileId,proto3" json:"FileId,omitempty" dc:"文件ID（关联file_info）"` // 文件ID（关联file_info）
-	Sort          int32                  `protobuf:"varint,4,opt,name=Sort,proto3" json:"Sort,omitempty" dc:"排序"`                    // 排序
+	Url           string                 `protobuf:"bytes,2,opt,name=Url,proto3" json:"Url,omitempty" dc:"七牛云url"`                   // 七牛云url
+	GoodsId       int32                  `protobuf:"varint,3,opt,name=GoodsId,proto3" json:"GoodsId,omitempty" dc:"商品ID"`            // 商品ID
+	FileId        int32                  `protobuf:"varint,4,opt,name=FileId,proto3" json:"FileId,omitempty" dc:"文件ID（关联file_info）"` // 文件ID（关联file_info）
+	Sort          int32                  `protobuf:"varint,5,opt,name=Sort,proto3" json:"Sort,omitempty" dc:"排序"`                    // 排序
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,6 +74,13 @@ func (x *GoodsImages) GetId() uint32 {
 	return 0
 }
 
+func (x *GoodsImages) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 func (x *GoodsImages) GetGoodsId() int32 {
 	if x != nil {
 		return x.GoodsId
@@ -98,12 +106,13 @@ var File_pbentity_goods_images_proto protoreflect.FileDescriptor
 
 const file_pbentity_goods_images_proto_rawDesc = "" +
 	"\n" +
-	"\x1bpbentity/goods_images.proto\x12\bpbentity\"c\n" +
+	"\x1bpbentity/goods_images.proto\x12\bpbentity\"u\n" +
 	"\vGoodsImages\x12\x0e\n" +
-	"\x02Id\x18\x01 \x01(\rR\x02Id\x12\x18\n" +
-	"\aGoodsId\x18\x02 \x01(\x05R\aGoodsId\x12\x16\n" +
-	"\x06FileId\x18\x03 \x01(\x05R\x06FileId\x12\x12\n" +
-	"\x04Sort\x18\x04 \x01(\x05R\x04SortB=Z;shop-goframe-micro-service-refacotor/app/goods/api/pbentityb\x06proto3"
+	"\x02Id\x18\x01 \x01(\rR\x02Id\x12\x10\n" +
+	"\x03Url\x18\x02 \x01(\tR\x03Url\x12\x18\n" +
+	"\aGoodsId\x18\x03 \x01(\x05R\aGoodsId\x12\x16\n" +
+	"\x06FileId\x18\x04 \x01(\x05R\x06FileId\x12\x12\n" +
+	"\x04Sort\x18\x05 \x01(\x05R\x04SortB=Z;shop-goframe-micro-service-refacotor/app/goods/api/pbentityb\x06proto3"
 
 var (
 	file_pbentity_goods_images_proto_rawDescOnce sync.Once

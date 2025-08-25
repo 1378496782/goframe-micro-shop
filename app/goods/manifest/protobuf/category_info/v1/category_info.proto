@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package category_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/category_info/v1";
+
+import "pbentity/category_info.proto";
+
+service category_info {
+  rpc GetList(CategoryInfoGetListReq) returns (CategoryInfoGetListRes) {}
+  rpc GetTree(CategoryInfoGetTreeReq) returns (CategoryInfoGetTreeRes) {}
+  rpc Create(CategoryInfoCreateReq) returns (CategoryInfoCreateRes) {}
+  rpc Update(CategoryInfoUpdateReq) returns (CategoryInfoUpdateRes) {}
+  rpc Delete(CategoryInfoDeleteReq) returns (CategoryInfoDeleteRes) {}
+}
+
+message CategoryInfoGetListReq {
+  uint32 parent_id = 1; // 关键过滤条件：获取某个父分类下的直接子类。0表示获取所有顶级分类
+  uint32 page = 2;
+  uint32 size = 3;  // 修改：字段编号必须从1开始递增
+}
+
+
+message CategoryInfoListResponse {
+  repeated pbentity.CategoryInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message CategoryInfoGetListRes {
+  CategoryInfoListResponse data = 1;
+}
+
+// 树形节点消息体
+message TreeNode {
+  pbentity.CategoryInfo category = 1;
+  repeated TreeNode children = 2; // 递归定义子节点
+}
+
+message CategoryInfoGetTreeReq {
+  // 可以留空，也可以加一个root_id参数用于获取指定节点为根的子树
+  uint32 root_id = 1;
+}
+
+message CategoryInfoGetTreeRes {
+  repeated TreeNode trees = 1; // 通常root_id=0时，这里返回的是多个顶级分类构成的森林
+}
+
+// 新增消息定义
+message CategoryInfoCreateReq {
+  uint32 parent_id = 1;
+  string name = 2;
+  string pic_url = 3;
+  uint32 sort = 4;
+  // level 字段由服务端自动计算，不应由客户端传入
+}
+
+message CategoryInfoCreateRes {
+  uint32 id = 1;
+}
+
+message CategoryInfoUpdateReq {
+  uint32 id = 1;
+  string name = 2;
+  string pic_url = 3;
+  uint32 sort = 4;
+  // 移除了 parent_id 和 level，因为它们创建后不应更改
+}
+
+message CategoryInfoUpdateRes {
+  uint32 id = 1;
+}
+
+message CategoryInfoDeleteReq {
+  uint32 id = 1;
+}
+
+message CategoryInfoDeleteRes {
+}
+
+
+

@@ -22,6 +22,7 @@ type GoodsImagesDao struct {
 // GoodsImagesColumns defines and stores column names for the table goods_images.
 type GoodsImagesColumns struct {
 	Id      string //
+	Url     string // 七牛云url
 	GoodsId string // 商品ID
 	FileId  string // 文件ID（关联file_info）
 	Sort    string // 排序
@@ -30,6 +31,7 @@ type GoodsImagesColumns struct {
 // goodsImagesColumns holds the columns for the table goods_images.
 var goodsImagesColumns = GoodsImagesColumns{
 	Id:      "id",
+	Url:     "url",
 	GoodsId: "goods_id",
 	FileId:  "file_id",
 	Sort:    "sort",

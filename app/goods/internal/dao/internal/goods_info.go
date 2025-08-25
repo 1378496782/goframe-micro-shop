@@ -22,7 +22,7 @@ type GoodsInfoDao struct {
 // GoodsInfoColumns defines and stores column names for the table goods_info.
 type GoodsInfoColumns struct {
 	Id               string //
-	Name             string //
+	Name             string // 商品名字
 	Images           string // 支持单图,多图
 	Price            string // 价格(分)
 	Level1CategoryId string // 1级分类id

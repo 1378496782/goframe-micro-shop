@@ -12,7 +12,7 @@ import "google/protobuf/timestamp.proto";
 
 message GoodsInfo {
     uint32                    Id               = 1;  //
-    string                    Name             = 2;  //
+    string                    Name             = 2;  // 商品名字
     string                    Images           = 3;  // 支持单图,多图
     int32                     Price            = 4;  // 价格(分)
     int32                     Level1CategoryId = 5;  // 1级分类id

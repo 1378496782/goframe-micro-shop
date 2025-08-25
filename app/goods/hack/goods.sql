@@ -30,3 +30,33 @@ CREATE TABLE `goods_images` (
     PRIMARY KEY (`id`),
     INDEX `idx_goods` (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品详情图';
+
+
+-- ----------------------------
+-- Table structure for category_info
+-- ----------------------------
+DROP TABLE IF EXISTS `category_info`;
+CREATE TABLE `category_info`  (
+      `id` int(0) NOT NULL AUTO_INCREMENT,
+      `parent_id` int(0) NOT NULL DEFAULT 0 COMMENT '父级id',
+      `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+      `pic_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'icon',
+      `level` tinyint(1) NOT NULL DEFAULT 1 COMMENT '等级 默认1级分类',
+      `sort` tinyint(1) NOT NULL DEFAULT 1,
+      `created_at` datetime(0) DEFAULT NULL,
+      `updated_at` datetime(0) DEFAULT NULL,
+      `deleted_at` datetime(0) DEFAULT NULL,
+      PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '轮播图表\n' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of category_info
+-- ----------------------------
+INSERT INTO `category_info` VALUES (1, 0, '家用电器', '', 1, 1, NULL, NULL, NULL);
+INSERT INTO `category_info` VALUES (2, 1, '电视', '', 2, 1, NULL, NULL, NULL);
+INSERT INTO `category_info` VALUES (3, 2, '全面屏电视', '', 3, 1, NULL, NULL, NULL);
+INSERT INTO `category_info` VALUES (4, 2, '教育电视', '', 3, 1, NULL, NULL, NULL);
+INSERT INTO `category_info` VALUES (5, 1, '智慧屏电视', '', 3, 1, NULL, NULL, NULL);
+INSERT INTO `category_info` VALUES (6, 0, '手机/数码', '', 1, 2, '2022-07-27 15:07:31', '2022-07-27 15:08:57', NULL);
+INSERT INTO `category_info` VALUES (7, 66, '111', 'http://dummyimage.com/400x400', 62, 26, '2022-07-27 15:08:41', '2023-01-13 21:25:55', NULL);
+INSERT INTO `category_info` VALUES (8, 9, '理收每从最想', 'http://dummyimage.com/400x400', 68, 99, '2023-01-13 21:17:33', '2023-01-13 21:17:33', '2023-01-13 21:19:07');

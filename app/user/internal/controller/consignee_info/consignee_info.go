@@ -94,12 +94,6 @@ func (*Controller) Create(ctx context.Context, req *v1.ConsigneeInfoCreateReq) (
 
 // Update 更新
 func (*Controller) Update(ctx context.Context, req *v1.ConsigneeInfoUpdateReq) (res *v1.ConsigneeInfoUpdateRes, err error) {
-	// 定义一个实体对象，用于接收转换后的请求数据
-	var consigneeInfo *entity.ConsigneeInfo
-	// 将请求参数req转换为实体对象consigneeInfo
-	if err := gconv.Struct(req, &consigneeInfo); err != nil {
-		return nil, err
-	}
 	infoError := consts.InfoError(consts.ConsigneeInfo, consts.UpdateFail)
 	// 根据ID更新数据库中的信息
 	_, err = dao.ConsigneeInfo.Ctx(ctx).Where("id", req.Id).Update(req)
