@@ -1,0 +1,60 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索商品" 
+      placeholder-class="placeholder"
+      bindinput="onSearchInput"
+    />
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+
+  <!-- 轮播图 -->
+  <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000">
+    <swiper-item wx:for="{{banners}}" wx:key="id">
+      <image src="{{item.image}}" class="banner-image" mode="aspectFill" bindtap="onBannerClick" data-url="{{item.url}}"/>
+    </swiper-item>
+  </swiper>
+
+  <!-- 分类导航 -->
+  <view class="category-nav">
+    <view 
+      class="category-item" 
+      wx:for="{{categories}}" 
+      wx:key="id"
+      bindtap="onCategoryClick"
+      data-id="{{item.id}}"
+    >
+      <image src="{{item.icon}}" class="category-icon"/>
+      <text class="category-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 推荐商品 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">热门推荐</text>
+      <text class="section-more" bindtap="onViewMore">查看更多 ></text>
+    </view>
+    <view class="product-list">
+      <view 
+        class="product-item" 
+        wx:for="{{products}}" 
+        wx:key="id"
+        bindtap="onProductClick"
+        data-id="{{item.id}}"
+      >
+        <image src="{{item.image}}" class="product-image" mode="aspectFill"/>
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <view class="price-section">
+            <text class="current-price">¥{{item.price}}</text>
+            <text class="original-price">¥{{item.originalPrice}}</text>
+          </view>
+          <text class="sales">已售{{item.sales}}件</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

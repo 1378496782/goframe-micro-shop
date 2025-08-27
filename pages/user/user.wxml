@@ -1,0 +1,78 @@
+<view class="container">
+  <!-- 用户信息头部 -->
+  <view class="user-header">
+    <image class="avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" />
+    <view class="user-info">
+      <text class="username">{{userInfo.nickname || '未登录用户'}}</text>
+      <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
+    </view>
+    <button class="login-btn" wx:if="{{!isLoggedIn}}" bindtap="onLogin">登录/注册</button>
+  </view>
+
+  <!-- 订单状态 -->
+  <view class="order-status">
+    <view class="status-header">
+      <text class="title">我的订单</text>
+      <text class="view-all" bindtap="viewAllOrders">查看全部 ></text>
+    </view>
+    <view class="status-items">
+      <view class="status-item" bindtap="viewOrders" data-status="1">
+        <image src="/images/order-pending.png" class="status-icon" />
+        <text>待付款</text>
+        <text class="badge" wx:if="{{orderCounts.pending > 0}}">{{orderCounts.pending}}</text>
+      </view>
+      <view class="status-item" bindtap="viewOrders" data-status="2">
+        <image src="/images/order-shipping.png" class="status-icon" />
+        <text>待发货</text>
+        <text class="badge" wx:if="{{orderCounts.shipping > 0}}">{{orderCounts.shipping}}</text>
+      </view>
+      <view class="status-item" bindtap="viewOrders" data-status="3">
+        <image src="/images/order-delivered.png" class="status-icon" />
+        <text>待收货</text>
+        <text class="badge" wx:if="{{orderCounts.delivered > 0}}">{{orderCounts.delivered}}</text>
+      </view>
+      <view class="status-item" bindtap="viewOrders" data-status="4">
+        <image src="/images/order-completed.png" class="status-icon" />
+        <text>已完成</text>
+        <text class="badge" wx:if="{{orderCounts.completed > 0}}">{{orderCounts.completed}}</text>
+      </view>
+      <view class="status-item" bindtap="viewOrders" data-status="5">
+        <image src="/images/order-after-sale.png" class="status-icon" />
+        <text>售后</text>
+        <text class="badge" wx:if="{{orderCounts.afterSale > 0}}">{{orderCounts.afterSale}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-list">
+    <view class="menu-item" bindtap="navigateTo" data-url="/pages/favorites/favorites">
+      <image src="/images/icon-favorite.png" class="menu-icon" />
+      <text>我的收藏</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="navigateTo" data-url="/pages/address/address">
+      <image src="/images/icon-address.png" class="menu-icon" />
+      <text>收货地址</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="navigateTo" data-url="/pages/coupon/coupon">
+      <image src="/images/icon-coupon.png" class="menu-icon" />
+      <text>优惠券</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="navigateTo" data-url="/pages/service/service">
+      <image src="/images/icon-service.png" class="menu-icon" />
+      <text>客服中心</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="menu-item" bindtap="navigateTo" data-url="/pages/settings/settings">
+      <image src="/images/icon-settings.png" class="menu-icon" />
+      <text>设置</text>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <button class="logout-btn" wx:if="{{isLoggedIn}}" bindtap="onLogout">退出登录</button>
+</view>

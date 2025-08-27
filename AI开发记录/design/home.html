@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>商城首页 - Mobile WEB电商系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <style>
+        /* 自定义主题色和设计规范 */
+        :root {
+            --primary-color: #19aecc;
+            --secondary-color: #FFB300;
+            --success-color: #00C48F;
+            --error-color: #F53F3F;
+            --neutral-color: #86909C;
+            --bg-primary: #F7F8FA;
+            --bg-secondary: #FFFFFF;
+            --bg-card: #F2F3F5;
+            --text-primary: #1D2129;
+            --text-secondary: #4E5969;
+            --text-tertiary: #86909C;
+            --text-disabled: #C9CDD4;
+        }
+
+        .primary-color {
+            color: var(--primary-color);
+        }
+
+        .bg-primary-color {
+            background-color: var(--primary-color);
+        }
+
+        .border-primary-color {
+            border-color: var(--primary-color);
+        }
+
+        /* 骨架屏动画 */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* 轮播图动画 */
+        .carousel-container {
+            scroll-behavior: smooth;
+        }
+
+        /* 按钮波纹效果 */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .ripple:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ripple:active:before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* 暗色模式 */
+        .dark {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-card: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-tertiary: #999999;
+        }
+
+        /* 自定义滚动条 */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* 商品卡片悬停效果 */
+        .product-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 限时活动倒计时样式 */
+        .countdown-item {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+            min-width: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white">
+    <!-- 顶部导航与搜索区 -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+        <div class="flex items-center justify-between p-4">
+            <!-- Logo区域 -->
+            <div class="flex items-center space-x-2">
+                <iconify-icon icon="mdi:store" class="text-2xl primary-color"></iconify-icon>
+                <span class="font-bold text-lg primary-color">商城</span>
+            </div>
+
+            <!-- 城市定位 -->
+            <div class="flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-300">
+                <iconify-icon icon="mdi:map-marker" class="text-base"></iconify-icon>
+                <span>北京</span>
+                <iconify-icon icon="mdi:chevron-down" class="text-base"></iconify-icon>
+            </div>
+
+            <!-- 右侧功能区 -->
+            <div class="flex items-center space-x-3">
+                <iconify-icon icon="mdi:qrcode-scan" class="text-xl text-gray-600 dark:text-gray-300"></iconify-icon>
+                <iconify-icon icon="mdi:bell-outline" class="text-xl text-gray-600 dark:text-gray-300"></iconify-icon>
+                <div class="relative">
+                    <iconify-icon icon="mdi:message-outline"
+                        class="text-xl text-gray-600 dark:text-gray-300"></iconify-icon>
+                    <span
+                        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="px-4 pb-3">
+            <div class="relative">
+                <iconify-icon icon="mdi:magnify"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></iconify-icon>
+                <input type="text" placeholder="搜索商品、品牌、店铺"
+                    class="w-full pl-10 pr-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-full border-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-600 transition-colors">
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <iconify-icon icon="mdi:camera" class="text-gray-400"></iconify-icon>
+                </div>
+            </div>
+
+            <!-- 热搜标签 -->
+            <div class="flex items-center space-x-2 mt-2 overflow-x-auto custom-scrollbar">
+                <span class="text-xs text-gray-500 whitespace-nowrap">热搜:</span>
+                <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full whitespace-nowrap">新年特惠</span>
+                <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full whitespace-nowrap">数码产品</span>
+                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full whitespace-nowrap">居家好物</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主Banner轮播区 -->
+    <section class="relative">
+        <div class="carousel-container flex overflow-x-auto snap-x snap-mandatory" id="banner-carousel">
+            <div class="min-w-full snap-start relative">
+                <img src="https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="新年大促" class="w-full h-48 object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
+                    <div class="text-white p-6">
+                        <h2 class="text-xl font-bold mb-2">新年大促</h2>
+                        <p class="text-sm opacity-90">全场5折起，限时抢购</p>
+                    </div>
+                </div>
+            </div>
+            <div class="min-w-full snap-start relative">
+                <img src="https://images.pexels.com/photos/1229861/pexels-photo-1229861.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="品质生活" class="w-full h-48 object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
+                    <div class="text-white p-6">
+                        <h2 class="text-xl font-bold mb-2">品质生活</h2>
+                        <p class="text-sm opacity-90">精选好物，提升生活品质</p>
+                    </div>
+                </div>
+            </div>
+            <div class="min-w-full snap-start relative">
+                <img src="https://images.pexels.com/photos/1488463/pexels-photo-1488463.jpeg?auto=compress&cs=tinysrgb&w=800"
+                    alt="数码专场" class="w-full h-48 object-cover">
+                <div class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
+                    <div class="text-white p-6">
+                        <h2 class="text-xl font-bold mb-2">数码专场</h2>
+                        <p class="text-sm opacity-90">最新科技产品，抢先体验</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 轮播指示器 -->
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <div class="w-2 h-2 bg-white rounded-full opacity-100"></div>
+            <div class="w-2 h-2 bg-white rounded-full opacity-50"></div>
+            <div class="w-2 h-2 bg-white rounded-full opacity-50"></div>
+        </div>
+    </section>
+
+    <!-- 快捷功能入口区 -->
+    <section class="bg-white dark:bg-gray-800 p-4 mt-2">
+        <div class="grid grid-cols-5 gap-4">
+            <div class="text-center">
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:flash" class="text-white text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">限时秒杀</span>
+            </div>
+            <div class="text-center">
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:account-group" class="text-white text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">拼团购</span>
+            </div>
+            <div class="text-center">
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:ticket-percent" class="text-white text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">优惠券</span>
+            </div>
+            <div class="text-center">
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:gift" class="text-white text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">每日签到</span>
+            </div>
+            <div class="text-center">
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:view-grid" class="text-white text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">全部分类</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 品牌/专题/活动区 -->
+    <section class="bg-white dark:bg-gray-800 p-4 mt-2">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-lg">品牌馆</h3>
+            <span class="text-sm primary-color">更多品牌 ></span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div
+                class="bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg p-4 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h4 class="font-bold mb-1">Apple专场</h4>
+                    <p class="text-sm opacity-90">新品首发，限时优惠</p>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded-full mt-2 inline-block">立即抢购</span>
+                </div>
+                <iconify-icon icon="mdi:apple" class="absolute -right-2 -bottom-2 text-6xl opacity-20"></iconify-icon>
+            </div>
+
+            <div class="bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg p-4 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h4 class="font-bold mb-1">小米生态</h4>
+                    <p class="text-sm opacity-90">智能家居，品质生活</p>
+                    <span class="text-xs bg-white/20 px-2 py-1 rounded-full mt-2 inline-block">探索更多</span>
+                </div>
+                <iconify-icon icon="mdi:home-automation"
+                    class="absolute -right-2 -bottom-2 text-6xl opacity-20"></iconify-icon>
+            </div>
+        </div>
+    </section>
+
+    <!-- 商品分类与发现区 -->
+    <section class="bg-white dark:bg-gray-800 p-4 mt-2">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-lg">热门分类</h3>
+            <span class="text-sm primary-color">全部分类 ></span>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:cellphone" class="text-red-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">手机数码</span>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:tshirt-crew" class="text-blue-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">服装鞋包</span>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:home" class="text-green-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">家居生活</span>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:food" class="text-yellow-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">食品生鲜</span>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:lipstick" class="text-purple-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">美妆护肤</span>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:dumbbell" class="text-indigo-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">运动户外</span>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:baby-face" class="text-pink-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">母婴用品</span>
+            </div>
+            <div class="text-center">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <iconify-icon icon="mdi:dots-horizontal" class="text-gray-500 text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-300">更多</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 限时活动/营销专区 -->
+    <section class="bg-white dark:bg-gray-800 p-4 mt-2">
+        <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-2">
+                <iconify-icon icon="mdi:flash" class="text-red-500 text-xl"></iconify-icon>
+                <h3 class="font-bold text-lg">限时秒杀</h3>
+                <div class="flex items-center space-x-1 ml-2">
+                    <span class="text-xs text-gray-500">距离结束</span>
+                    <div class="countdown-item">02</div>
+                    <span class="text-xs">:</span>
+                    <div class="countdown-item">45</div>
+                    <span class="text-xs">:</span>
+                    <div class="countdown-item">32</div>
+                </div>
+            </div>
+            <span class="text-sm primary-color">更多 ></span>
+        </div>
+
+        <div class="flex space-x-3 overflow-x-auto custom-scrollbar">
+            <div class="min-w-32 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
+                <img src="https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=200"
+                    alt="商品" class="w-20 h-20 object-cover rounded-lg mx-auto mb-2">
+                <div class="text-xs text-gray-600 dark:text-gray-300 mb-1">智能手表</div>
+                <div class="flex items-center justify-center space-x-1">
+                    <span class="text-red-500 font-bold text-sm">¥299</span>
+                    <span class="text-gray-400 line-through text-xs">¥599</span>
+                </div>
+            </div>
+            <div class="min-w-32 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
+                <img src="https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=200"
+                    alt="商品" class="w-20 h-20 object-cover rounded-lg mx-auto mb-2">
+                <div class="text-xs text-gray-600 dark:text-gray-300 mb-1">蓝牙耳机</div>
+                <div class="flex items-center justify-center space-x-1">
+                    <span class="text-red-500 font-bold text-sm">¥199</span>
+                    <span class="text-gray-400 line-through text-xs">¥399</span>
+                </div>
+            </div>
+            <div class="min-w-32 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 text-center">
+                <img src="https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg?auto=compress&cs=tinysrgb&w=200"
+                    alt="商品" class="w-20 h-20 object-cover rounded-lg mx-auto mb-2">
+                <div class="text-xs text-gray-600 dark:text-gray-300 mb-1">运动鞋</div>
+                <div class="flex items-center justify-center space-x-1">
+                    <span class="text-red-500 font-bold text-sm">¥399</span>
+                    <span class="text-gray-400 line-through text-xs">¥799</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 个性化推荐区 -->
+    <section class="bg-white dark:bg-gray-800 p-4 mt-2">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-lg">猜你喜欢</h3>
+            <iconify-icon icon="mdi:refresh" class="text-xl text-gray-400"></iconify-icon>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div class="product-card bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <img src="https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=300"
+                    alt="商品" class="w-full h-32 object-cover">
+                <div class="p-3">
+                    <h4 class="text-sm font-medium mb-1 line-clamp-2">高品质蓝牙无线耳机 降噪音乐耳机</h4>
+                    <div class="flex items-center space-x-1 mb-2">
+                        <span class="text-red-500 font-bold">¥299</span>
+                        <span class="text-gray-400 line-through text-xs">¥599</span>
+                        <span class="bg-red-100 text-red-600 text-xs px-1 rounded">5折</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center space-x-1">
+                            <iconify-icon icon="mdi:star" class="text-yellow-400"></iconify-icon>
+                            <span>4.8</span>
+                        </div>
+                        <span>已售1.2万</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <img src="https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=300"
+                    alt="商品" class="w-full h-32 object-cover">
+                <div class="p-3">
+                    <h4 class="text-sm font-medium mb-1 line-clamp-2">智能运动手表 健康监测多功能</h4>
+                    <div class="flex items-center space-x-1 mb-2">
+                        <span class="text-red-500 font-bold">¥899</span>
+                        <span class="text-gray-400 line-through text-xs">¥1299</span>
+                        <span class="bg-red-100 text-red-600 text-xs px-1 rounded">限时</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center space-x-1">
+                            <iconify-icon icon="mdi:star" class="text-yellow-400"></iconify-icon>
+                            <span>4.9</span>
+                        </div>
+                        <span>已售8千</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <img src="https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg?auto=compress&cs=tinysrgb&w=300"
+                    alt="商品" class="w-full h-32 object-cover">
+                <div class="p-3">
+                    <h4 class="text-sm font-medium mb-1 line-clamp-2">时尚运动鞋 透气舒适跑步鞋</h4>
+                    <div class="flex items-center space-x-1 mb-2">
+                        <span class="text-red-500 font-bold">¥399</span>
+                        <span class="text-gray-400 line-through text-xs">¥799</span>
+                        <span class="bg-green-100 text-green-600 text-xs px-1 rounded">包邮</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center space-x-1">
+                            <iconify-icon icon="mdi:star" class="text-yellow-400"></iconify-icon>
+                            <span>4.7</span>
+                        </div>
+                        <span>已售5千</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                <img src="https://images.pexels.com/photos/1229861/pexels-photo-1229861.jpeg?auto=compress&cs=tinysrgb&w=300"
+                    alt="商品" class="w-full h-32 object-cover">
+                <div class="p-3">
+                    <h4 class="text-sm font-medium mb-1 line-clamp-2">居家收纳盒 多功能整理箱</h4>
+                    <div class="flex items-center space-x-1 mb-2">
+                        <span class="text-red-500 font-bold">¥59</span>
+                        <span class="text-gray-400 line-through text-xs">¥99</span>
+                        <span class="bg-blue-100 text-blue-600 text-xs px-1 rounded">新品</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                        <div class="flex items-center space-x-1">
+                            <iconify-icon icon="mdi:star" class="text-yellow-400"></iconify-icon>
+                            <span>4.6</span>
+                        </div>
+                        <span>已售3千</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button
+            class="w-full mt-4 py-2 text-center text-gray-500 text-sm border border-gray-200 dark:border-gray-600 rounded-lg">
+            查看更多商品
+        </button>
+    </section>
+
+    <!-- 社区与互动内容区 -->
+    <section class="bg-white dark:bg-gray-800 p-4 mt-2">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-lg">社区精选</h3>
+            <span class="text-sm primary-color">进入社区 ></span>
+        </div>
+
+        <div class="space-y-3">
+            <div class="flex space-x-3">
+                <img src="https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+                    alt="用户头像" class="w-10 h-10 rounded-full object-cover">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-1">
+                        <span class="font-medium text-sm">小美</span>
+                        <span class="bg-pink-100 text-pink-600 text-xs px-2 py-0.5 rounded-full">达人</span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">这款蓝牙耳机音质真的很棒，降噪效果也不错，推荐给大家！</p>
+                    <div class="flex space-x-2">
+                        <img src="https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=100"
+                            alt="晒单图" class="w-16 h-16 rounded-lg object-cover">
+                        <img src="https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=100"
+                            alt="晒单图" class="w-16 h-16 rounded-lg object-cover">
+                    </div>
+                    <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-1">
+                                <iconify-icon icon="mdi:heart-outline"></iconify-icon>
+                                <span>128</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <iconify-icon icon="mdi:comment-outline"></iconify-icon>
+                                <span>32</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <iconify-icon icon="mdi:share-outline"></iconify-icon>
+                                <span>分享</span>
+                            </div>
+                        </div>
+                        <span>2小时前</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-3">
+                <img src="https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+                    alt="用户头像" class="w-10 h-10 rounded-full object-cover">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-1">
+                        <span class="font-medium text-sm">阳光男孩</span>
+                        <span class="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">认证</span>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">运动鞋穿着很舒服，跑步时脚感很好，值得购买！</p>
+                    <div class="flex space-x-2">
+                        <img src="https://images.pexels.com/photos/1334597/pexels-photo-1334597.jpeg?auto=compress&cs=tinysrgb&w=100"
+                            alt="晒单图" class="w-16 h-16 rounded-lg object-cover">
+                    </div>
+                    <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-1">
+                                <iconify-icon icon="mdi:heart" class="text-red-500"></iconify-icon>
+                                <span>89</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <iconify-icon icon="mdi:comment-outline"></iconify-icon>
+                                <span>15</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <iconify-icon icon="mdi:share-outline"></iconify-icon>
+                                <span>分享</span>
+                            </div>
+                        </div>
+                        <span>5小时前</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部导航栏 -->
+    <nav
+        class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
+        <div class="flex items-center justify-around py-2">
+            <div class="flex flex-col items-center space-y-1 py-1">
+                <iconify-icon icon="mdi:home" class="text-xl primary-color"></iconify-icon>
+                <span class="text-xs primary-color font-medium">首页</span>
+            </div>
+            <div class="flex flex-col items-center space-y-1 py-1">
+                <iconify-icon icon="mdi:view-grid" class="text-xl text-gray-400"></iconify-icon>
+                <span class="text-xs text-gray-400">分类</span>
+            </div>
+            <div class="flex flex-col items-center space-y-1 py-1">
+                <iconify-icon icon="mdi:account-group" class="text-xl text-gray-400"></iconify-icon>
+                <span class="text-xs text-gray-400">社区</span>
+            </div>
+            <div class="flex flex-col items-center space-y-1 py-1 relative">
+                <iconify-icon icon="mdi:cart" class="text-xl text-gray-400"></iconify-icon>
+                <span class="text-xs text-gray-400">购物车</span>
+                <span
+                    class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
+            </div>
+            <div class="flex flex-col items-center space-y-1 py-1">
+                <iconify-icon icon="mdi:account" class="text-xl text-gray-400"></iconify-icon>
+                <span class="text-xs text-gray-400">我的</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 浮动操作区 -->
+    <div class="fixed right-4 bottom-20 flex flex-col space-y-3 z-40">
+        <!-- 返回顶部 -->
+        <button
+            class="w-12 h-12 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center ripple"
+            onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <iconify-icon icon="mdi:arrow-up" class="text-xl text-gray-600 dark:text-gray-300"></iconify-icon>
+        </button>
+
+        <!-- 客服 -->
+        <button class="w-12 h-12 bg-primary-color rounded-full shadow-lg flex items-center justify-center ripple">
+            <iconify-icon icon="mdi:message-text" class="text-xl text-white"></iconify-icon>
+        </button>
+    </div>
+
+    <!-- 暗色模式切换按钮 -->
+    <button id="theme-toggle"
+        class="fixed top-20 right-4 w-10 h-10 bg-white dark:bg-gray-700 rounded-full shadow-lg flex items-center justify-center z-40">
+        <iconify-icon icon="mdi:weather-night" class="text-lg text-gray-600 dark:text-yellow-400"></iconify-icon>
+    </button>
+
+    <!-- 底部间距 -->
+    <div class="h-20"></div>
+
+    <script>
+        // 暗色模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // 初始化主题
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        // 轮播图自动播放
+        const carousel = document.getElementById('banner-carousel');
+        let currentSlide = 0;
+        const totalSlides = 3;
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            const scrollPosition = currentSlide * carousel.offsetWidth;
+            carousel.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+
+            // 更新指示器
+            const indicators = document.querySelectorAll('.absolute.bottom-4 > div');
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('opacity-100', index === currentSlide);
+                indicator.classList.toggle('opacity-50', index !== currentSlide);
+            });
+        }
+
+        // 每3秒自动切换
+        setInterval(nextSlide, 3000);
+
+        // 倒计时功能
+        function updateCountdown() {
+            const countdownItems = document.querySelectorAll('.countdown-item');
+            let hours = parseInt(countdownItems[0].textContent);
+            let minutes = parseInt(countdownItems[1].textContent);
+            let seconds = parseInt(countdownItems[2].textContent);
+
+            seconds--;
+            if (seconds < 0) {
+                seconds = 59;
+                minutes--;
+                if (minutes < 0) {
+                    minutes = 59;
+                    hours--;
+                    if (hours < 0) {
+                        hours = 0;
+                        minutes = 0;
+                        seconds = 0;
+                    }
+                }
+            }
+
+            countdownItems[0].textContent = hours.toString().padStart(2, '0');
+            countdownItems[1].textContent = minutes.toString().padStart(2, '0');
+            countdownItems[2].textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // 每秒更新倒计时
+        setInterval(updateCountdown, 1000);
+
+        // 添加点击波纹效果
+        document.querySelectorAll('.ripple').forEach(button => {
+            button.addEventListener('click', function (e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple-effect');
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // 模拟加载完成后移除骨架屏
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.skeleton').forEach(el => {
+                el.classList.remove('skeleton');
+            });
+        });
+
+        // 滚动时显示/隐藏返回顶部按钮
+        window.addEventListener('scroll', () => {
+            const backToTop = document.querySelector('.fixed.right-4.bottom-20 button');
+            if (window.scrollY > 300) {
+                backToTop.style.opacity = '1';
+                backToTop.style.pointerEvents = 'auto';
+            } else {
+                backToTop.style.opacity = '0.5';
+                backToTop.style.pointerEvents = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
