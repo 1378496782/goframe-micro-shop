@@ -25,3 +25,12 @@ elasticsearch:
   # 索引名配置
   indices:
     goods: "mall_goods"            # 商品索引名
+
+# Canal配置
+binlog:
+  goods:
+    mysql:
+      host: "127.0.0.1"
+      port: 3306
+      username: "root"
+      password: "root"

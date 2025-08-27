@@ -22,6 +22,9 @@ func (c *ControllerV1) SearchGoods(ctx context.Context, req *v1.SearchGoodsReq) 
 		Total: 0,
 	}
 
+	// 调试：打印请求参数
+	g.Log().Debugf(ctx, "Search request: %+v", req)
+
 	// 错误类型
 	infoError := consts.InfoError(consts.SearchGoods, consts.SearchFail)
 
@@ -35,19 +38,21 @@ func (c *ControllerV1) SearchGoods(ctx context.Context, req *v1.SearchGoodsReq) 
 	// 2. 构建查询条件
 	boolQuery := elastic.NewBoolQuery()
 
-	// 关键词搜索（只搜索商品名称）
+	// 软删除过滤
+	boolQuery.MustNot(elastic.NewWildcardQuery("deleted_at", "*?*"))
+
 	if req.Keyword != "" {
 		matchQuery := elastic.NewMatchQuery("name", req.Keyword)
 		boolQuery.Must(matchQuery)
+		g.Log().Debugf(ctx, "Adding keyword search: %s", req.Keyword)
 	}
 
-	// 品牌筛选
 	if req.Brand != "" {
 		termQuery := elastic.NewTermQuery("brand", req.Brand)
 		boolQuery.Filter(termQuery)
+		g.Log().Debugf(ctx, "Adding brand filter: %s", req.Brand)
 	}
 
-	// 价格区间筛选
 	if req.MinPrice > 0 || req.MaxPrice > 0 {
 		rangeQuery := elastic.NewRangeQuery("price")
 		if req.MinPrice > 0 {
@@ -57,14 +62,14 @@ func (c *ControllerV1) SearchGoods(ctx context.Context, req *v1.SearchGoodsReq) 
 			rangeQuery.Lte(req.MaxPrice)
 		}
 		boolQuery.Filter(rangeQuery)
+		g.Log().Debugf(ctx, "Adding price range: %d - %d", req.MinPrice, req.MaxPrice)
 	}
 
 	// 3. 构建搜索请求
 	esIndexGoods := g.Cfg().MustGet(ctx, "elasticsearch.indices.goods").String()
-	g.Log().Info(ctx, esIndexGoods)
-	searchService := client.Search().Index(esIndexGoods).Query(boolQuery)
+	g.Log().Debugf(ctx, "Using index: %s", esIndexGoods)
 
-	// 分页
+	searchService := client.Search().Index(esIndexGoods).Query(boolQuery)
 	searchService.From(int((req.Page - 1) * req.Size)).Size(int(req.Size))
 
 	// 排序
@@ -79,12 +84,17 @@ func (c *ControllerV1) SearchGoods(ctx context.Context, req *v1.SearchGoodsReq) 
 		searchService.Sort("_score", false)
 	}
 
-	// 高亮显示
+	// 高亮
 	highlight := elastic.NewHighlight().
 		Field("name").
 		PreTags("<em>").
 		PostTags("</em>")
 	searchService.Highlight(highlight)
+
+	// 调试：打印ES查询
+	source := searchService.Source
+	sourceJson, _ := json.MarshalIndent(source, "", "  ")
+	g.Log().Debugf(ctx, "ES Query: %s", string(sourceJson))
 
 	// 4. 执行搜索
 	searchResult, err := searchService.Do(ctx)
@@ -93,15 +103,17 @@ func (c *ControllerV1) SearchGoods(ctx context.Context, req *v1.SearchGoodsReq) 
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, infoError)
 	}
 
-	// 设置总数
+	g.Log().Debugf(ctx, "Search result total hits: %d", searchResult.TotalHits())
+
+	// 5. 处理结果
 	response.Total = uint32(searchResult.TotalHits())
 
-	// 5. 处理商品列表数据
 	for _, hit := range searchResult.Hits.Hits {
-		// 解析商品信息
+		g.Log().Debugf(ctx, "Processing hit: %s", hit.Id)
 
 		var goods v1.GoodsInfoItem
 		if err := json.Unmarshal(hit.Source, &goods); err != nil {
+			g.Log().Errorf(ctx, "Failed to unmarshal hit: %v", err)
 			continue
 		}
 
@@ -115,5 +127,6 @@ func (c *ControllerV1) SearchGoods(ctx context.Context, req *v1.SearchGoodsReq) 
 		response.List = append(response.List, &goods)
 	}
 
+	g.Log().Debugf(ctx, "Returning %d items", len(response.List))
 	return response, nil
 }

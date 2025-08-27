@@ -11,8 +11,21 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/qiniu/go-sdk/v7 v7.25.4
+	go.etcd.io/etcd/client/v3 v3.6.4
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.7
+)
+
+require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
+	github.com/pingcap/errors v0.11.5-0.20250318082626-8f80e5cb09ec // indirect
+	github.com/pingcap/log v1.1.1-0.20241212030209-7e3ff8601a2a // indirect
+	github.com/pingcap/tidb/pkg/parser v0.0.0-20250421232622-526b2c79173d // indirect
+	github.com/shopspring/decimal v1.2.0 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
 
 require (
@@ -29,6 +42,7 @@ require (
 	github.com/gammazero/toposort v0.1.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-mysql-org/go-mysql v1.13.0
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogf/gf/contrib/registry/file/v2 v2.9.0 // indirect
@@ -50,7 +64,6 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.4 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.4 // indirect
-	go.etcd.io/etcd/client/v3 v3.6.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.37.0 // indirect
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
