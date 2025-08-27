@@ -1,56 +1,59 @@
+const { api } = require('../../utils/api');
+
 Page({
   data: {
     banners: [
       { id: 1, image: 'http://wangzhongyang.com/images/logo_removebg.png', url: '/pages/category/category' },
-      { id: 2, image: 'http://wangzhongyang.com/images/logo_removebg.png', url: '/pages/category/category' },
-      { id: 3, image: 'http://wangzhongyang.com/images/logo_removebg.png', url: '/pages/category/category' }
+      { id: 2, image: 'http://wangzhongyang.com/images/logo极速版_removebg.png', url: '/pages/category/category' },
+      { id极速版: 3, image: 'http://wangzhongyang.com/images/logo_removebg.png', url: '/pages/category/category' }
     ],
-    categories: [
-      { id: 1, name: '手机', icon: 'http://wangzhongyang.com/images/logo_removebg.png' },
-      { id: 2, name: '电脑', icon: 'http://wangzhongyang.com/images/logo_removebg.png' },
-      { id: 3, name: '配件', icon: 'http://wangzhongyang.com/images/logo_removebg.png' },
-      { id: 4, name: '家电', icon: 'http://wangzhongyang.com/images/logo_removebg.png' },
-      { id: 5, name: '服饰', icon: 'http://wangzhongyang.com/images/logo_removebg.png' }
-    ],
-    products: [
-      {
-        id: 1,
-        name: '高品质智能手机 8GB+256GB',
-        price: '2999.00',
-        originalPrice: '3999.00',
-        image: 'http://wangzhongyang.com/images/logo_removebg.png',
-        sales: 12560
-      },
-      {
-        id: 2,
-        name: '轻薄笔记本电脑 i7处理器',
-        price: '5999.00',
-        originalPrice: '6999.00',
-        image: 'http://wangzhongyang.com/images/logo_removebg.png',
-        sales: 8560
-      },
-      {
-        id: 3,
-        name: '无线蓝牙耳机 降噪版',
-        price: '399.00',
-        originalPrice: '499.00',
-        image: 'http://wangzhongyang.com/images/logo_removebg.png',
-        sales: 23450
-      },
-      {
-        id: 4,
-        name: '智能手表 运动健康版',
-        price: '899.00',
-        originalPrice: '1099.00',
-        image: 'http://wangzhongyang.com/images/logo_removebg.png',
-        sales: 15680
-      }
-    ],
-    searchValue: ''
+    categories: [],
+    products: [],
+    searchValue: '',
+    loading: false
   },
 
   onLoad() {
     console.log('首页加载')
+    this.loadHomeData()
+  },
+
+  async loadHomeData() {
+    this.setData({ loading: true })
+    
+    try {
+      // 并行加载分类和商品数据
+      const [categoriesRes, productsRes] = await Promise.all([
+        api.getCategories(),
+        api.getGoodsList({ page: 1, size: 10 })
+      ])
+      
+      if (categoriesRes.code === 200) {
+        this.setData({
+          categories: categoriesRes.data.map(item => ({
+            ...item,
+            icon: 'http://wangzhongyang.com/images/logo_removebg.png'
+          }))
+        })
+      }
+      
+      if (productsRes.code === 200) {
+        this.setData({
+          products: productsRes.data.list.map(item => ({
+            ...item,
+            image: 'http://wangzhongyang.com/images/logo_removebg.png'
+          }))
+        })
+      }
+    } catch (error) {
+      console.error('加载首页数据失败:', error)
+      wx.showToast({
+        title: '数据加载失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ loading: false })
+    }
   },
 
   onShow() {
@@ -106,8 +109,8 @@ Page({
 
   onPullDownRefresh() {
     console.log('下拉刷新')
-    setTimeout(() => {
+    this.loadHomeData().then(() => {
       wx.stopPullDownRefresh()
-    }, 1000)
+    })
   }
 })
