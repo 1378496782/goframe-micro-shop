@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package order_info.v1;
 
-option go_package = "shop-goframe-micro-service/app/order/api/order_info/v1";
+option go_package = "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1";
 
 import "pbentity/order_info.proto";
 import "pbentity/order_goods_info.proto";

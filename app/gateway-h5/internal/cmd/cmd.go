@@ -23,7 +23,6 @@ var (
 				group.Group("/", func(group *ghttp.RouterGroup) {
 					group.Bind(
 						user.NewV1(),
-						order.NewV1(),
 					)
 				})
 				// 需要JWT验证的路由
@@ -32,6 +31,7 @@ var (
 					group.Bind(
 						// 需要认证的接口
 						interaction.NewV1(),
+						order.NewV1(),
 					)
 				})
 			})
