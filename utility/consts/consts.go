@@ -12,6 +12,7 @@ const (
 	GetUserInfoFail    = "GetUserInfo 获取用户信息失败"
 	UploadImageFail    = "UploadImage 图片保存失败"
 	SearchFail         = "SearchFail  搜索失败 "
+	OrderInfo          = "OrderInfo"
 	SearchGoods        = "SearchGoods"
 	CategoryInfo       = "CategoryInfo"
 	GoodsImages        = "GoodsImages"

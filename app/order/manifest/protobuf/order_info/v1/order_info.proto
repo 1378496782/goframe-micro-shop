@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package order_info.v1;
+
+option go_package = "shop-goframe-micro-service/app/order/api/order_info/v1";
+
+import "pbentity/order_info.proto";
+import "pbentity/order_goods_info.proto";
+import "google/protobuf/timestamp.proto";
+
+service order_info {
+  rpc Create(OrderInfoCreateReq) returns (OrderInfoCreateRes) {}
+  rpc GetDetail(OrderInfoGetDetailReq) returns (OrderInfoGetDetailRes) {}
+  rpc GetList(OrderInfoGetListReq) returns (OrderInfoGetListRes) {}
+}
+
+// 创建订单请求
+message OrderInfoCreateReq {
+  uint32 price = 1;                       // 订单金额
+  uint32 coupon_price = 2;                // 优惠券金额
+  uint32 actual_price = 3;                // 实际支付金额
+  string consignee_name = 4;             // 收货人姓名
+  string consignee_phone = 5;            // 收货人手机号
+  string consignee_address = 6;          // 收货人详细地址
+  string remark = 7;                     // 备注
+  repeated OrderGoodsItem order_goods_info = 8; // 订单商品信息
+}
+
+// 订单商品项
+message OrderGoodsItem {
+  uint32 goods_id = 1;            // 商品id
+  uint32 goods_options_id = 2;    // 商品规格id
+  uint32 count = 3;               // 商品数量
+  string remark = 4;             // 备注
+  uint32 price = 5;               // 商品金额
+  uint32 coupon_price = 6;        // 商品优惠券金额
+  uint32 actual_price = 7;        // 商品实际支付金额
+}
+
+// 创建订单响应
+message OrderInfoCreateRes {
+  uint32 id = 1;
+}
+
+// 根据ID查询请求
+message OrderInfoGetDetailReq {
+  uint32 id = 1;
+}
+
+// 根据ID查询响应
+message OrderInfoGetDetailRes {
+  pbentity.OrderInfo order_info = 1;
+  repeated pbentity.OrderGoodsInfo order_goods_infos = 2;
+}
+
+// 分页查询请求
+message OrderInfoGetListReq {
+  uint32 page = 1;                        // 分页号码，默认1
+  uint32 size = 2;                        // 分页数量，最大50
+  string number = 3;                     // 订单编号
+  uint32 user_id = 4;                     // 用户id
+  uint32 pay_type = 5;                    // 支付方式 1微信 2支付宝 3云闪付
+  google.protobuf.Timestamp pay_at_gte = 6; // 支付时间>=
+  google.protobuf.Timestamp pay_at_lte = 7; // 支付时间<=
+  uint32 status = 8;                      // 订单状态：1待支付 2已支付待发货 3已发货 4已收货待评价
+  string consignee_phone = 9;            // 收货人手机号
+  uint32 price_gte = 10;                  // 订单金额>= 单位分
+  uint32 price_lte = 11;                  // 订单金额<= 单位分
+  google.protobuf.Timestamp date_gte = 12; // 创建时间>=
+  google.protobuf.Timestamp date_lte = 13; // 创建时间<=
+}
+
+// 分页数据响应
+message OrderInfoListResponse {
+  repeated pbentity.OrderInfo list = 1;
+  uint32 total = 2;
+  uint32 page = 3;
+  uint32 size = 4;
+}
+
+// 分页查询响应
+message OrderInfoGetListRes {
+  OrderInfoListResponse data = 1;
+}

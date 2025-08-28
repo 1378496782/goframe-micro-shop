@@ -70,7 +70,6 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 		// 单独处理时间字段（gconv无法自动转换）
 		pbGoods.CreatedAt = utility.SafeConvertTime(goods.CreatedAt)
 		pbGoods.UpdatedAt = utility.SafeConvertTime(goods.UpdatedAt)
-		pbGoods.UpdatedAt = utility.SafeConvertTime(goods.UpdatedAt)
 
 		response.List = append(response.List, &pbGoods)
 	}
