@@ -9,7 +9,7 @@ import (
 
 // 自定义JWT声明
 type CustomClaims struct {
-	UserId int `json:"userId"`
+	UserId uint32 `json:"userId"`
 	jwt.RegisteredClaims
 }
 
@@ -29,7 +29,7 @@ func EncryptPassword(password, salt string) string {
 }
 
 // 生成JWT Token
-func GenerateToken(userId int) (string, time.Time, error) {
+func GenerateToken(userId uint32) (string, time.Time, error) {
 	expireTime := time.Now().Add(24 * time.Hour)
 	claims := CustomClaims{
 		UserId: userId,

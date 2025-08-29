@@ -674,7 +674,7 @@ const file_order_info_v1_order_info_proto_rawDesc = "" +
 	"order_info\x12P\n" +
 	"\x06Create\x12!.order_info.v1.OrderInfoCreateReq\x1a!.order_info.v1.OrderInfoCreateRes\"\x00\x12Y\n" +
 	"\tGetDetail\x12$.order_info.v1.OrderInfoGetDetailReq\x1a$.order_info.v1.OrderInfoGetDetailRes\"\x00\x12S\n" +
-	"\aGetList\x12\".order_info.v1.OrderInfoGetListReq\x1a\".order_info.v1.OrderInfoGetListRes\"\x00B8Z6shop-goframe-micro-service/app/order/api/order_info/v1b\x06proto3"
+	"\aGetList\x12\".order_info.v1.OrderInfoGetListReq\x1a\".order_info.v1.OrderInfoGetListRes\"\x00BBZ@shop-goframe-micro-service-refacotor/app/order/api/order_info/v1b\x06proto3"
 
 var (
 	file_order_info_v1_order_info_proto_rawDescOnce sync.Once

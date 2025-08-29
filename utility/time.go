@@ -19,3 +19,8 @@ func SafeConvertTime(t *gtime.Time) *timestamppb.Timestamp {
 func GenerateOrderNumber() string {
 	return fmt.Sprintf("ORD%s%04d", time.Now().Format("20060102150405"), rand.Intn(9999))
 }
+
+// GenerateRefundNumber 生成售后订单编号
+func GenerateRefundNumber() string {
+	return fmt.Sprintf("REF%s%04d", time.Now().Format("20060102150405"), rand.Intn(9999))
+}

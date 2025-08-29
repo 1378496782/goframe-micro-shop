@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/os/gcmd"
 	"google.golang.org/grpc"
 	"shop-goframe-micro-service-refacotor/app/order/internal/controller/order_info"
+	"shop-goframe-micro-service-refacotor/app/order/internal/controller/refund_info"
 )
 
 var (
@@ -22,6 +23,7 @@ var (
 			)
 			s := grpcx.Server.New(c)
 			order_info.Register(s)
+			refund_info.Register(s)
 			s.Run()
 			return nil
 		},
