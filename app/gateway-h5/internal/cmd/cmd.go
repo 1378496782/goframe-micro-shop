@@ -32,6 +32,7 @@ var (
 						// 需要认证的接口
 						interaction.NewV1(),
 						order.NewV1(),
+
 					)
 				})
 			})

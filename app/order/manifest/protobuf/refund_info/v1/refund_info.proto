@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package refund_info.v1;
 
-option go_package = "shop-goframe-micro-service-refacotor/app/refund/api/refund_info/v1";
+option go_package = "shop-goframe-micro-service-refacotor/app/order/api/refund_info/v1";
 
 import "pbentity/refund_info.proto";
 
