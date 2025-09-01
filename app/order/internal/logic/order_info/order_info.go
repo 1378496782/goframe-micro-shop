@@ -9,6 +9,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
+	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
 	"shop-goframe-micro-service-refacotor/utility"
 
 	"github.com/gogf/gf/v2/util/gconv"
@@ -79,7 +80,23 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 	}
 
 	success = true
+
+	// 订单创建成功后，异步发送延迟消息
+	go sendOrderTimeoutMessage(ctx, orderId)
+
 	return orderId, nil
+}
+
+// sendOrderTimeoutMessage 发送订单超时消息
+func sendOrderTimeoutMessage(ctx context.Context, orderId int32) {
+	// 获取配置的延迟时间
+	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
+
+	// 使用静态方法发送订单超时消息
+	err := rabbitmq.SendOrderTimeoutMessageStatic(ctx, orderId, delay)
+	if err != nil {
+		g.Log().Errorf(ctx, "发送订单超时消息失败, 订单ID: %d, 错误: %v", orderId, err)
+	}
 }
 
 // GetDetail 获取订单详情

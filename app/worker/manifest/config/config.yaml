@@ -1,10 +1,12 @@
-grpc:
-  name:             "order"
-  address:          ":31005"
+# 服务器配置
+server:
+  address: ":8599"
+  openapiPath: "/api.json"
+  swaggerPath: "/swagger"
   logger:
     path: "./log" # 日志文件路径。默认为空，表示关闭，仅输出到终端
     file: "{Y-m-d}.log" # 日志文件格式。默认为"{Y-m-d}.log"
-    prefix: "公众号：王中阳：order-service" # 日志内容输出前缀。方便在所有日志行里一眼认出是我们这个服务产生的。
+    prefix: "公众号：王中阳：worker-service" # 日志内容输出前缀。默认为空
     level: "all" # 日志输出级别
     stdout: true  # 日志是否同时输出到终端。默认true
     rotateSize: 104857600   # 100MB切割日志文件
@@ -12,15 +14,6 @@ grpc:
     # ctxKeys 告诉日志组件从 context 中提取指定键的值
     ctxKeys: [ "traceId" ]    # 自动记录链路追踪ID 自定义Context上下文变量名称，自动打印Context的变量到日志中
     timeFormat: "2006-01-02 15:04:05.000" # 精确到毫秒
-
-database:
-  default:
-    link:  "mysql:root:root@tcp(127.0.0.1:3306)/order"
-    debug:
-
-
-etcd:
-  address: "127.0.0.1:2379"
 
 # RabbitMQ 配置
 rabbitmq:
@@ -30,10 +23,3 @@ rabbitmq:
       orderDelayExchange: "order.delay.exchange"
     queue:
       orderTimeoutQueue: "order.timeout.queue"
-    consumer:
-      prefetchCount: 1  # 每个消费者预取的消息数量
-      autoAck: false    # 是否自动确认消息
-
-# 业务配置
-business:
-  orderTimeout: 1800000  # 订单超时时间（毫秒），默认30分钟
