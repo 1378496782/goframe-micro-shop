@@ -1,0 +1,302 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_USERNAME: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # etcd 服务发现
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.0
+    container_name: etcd
+    environment:
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+    ports:
+      - "2379:2379"
+    networks:
+      - app-network
+
+  # Redis 服务
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    command: redis-server --appendonly yes
+
+  # RabbitMQ 服务（带延迟插件）
+  rabbitmq:
+    image: rabbitmq:4.1.0-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: root
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq/plugins/rabbitmq_delayed_message_exchange-4.1.0.ez:/opt/rabbitmq/plugins/rabbitmq_delayed_message_exchange.ez
+    networks:
+      - app-network
+    # 先启用插件再启动服务
+    command:
+      - /bin/sh
+      - -c
+      - |
+        # 确保插件文件存在
+        ls -la /opt/rabbitmq/plugins/
+        # 启用插件
+        rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+        # 启动服务
+        exec rabbitmq-server
+
+
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+      - ./elasticsearch/plugins/ik:/tmp/ik-plugin
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    # 安装ik分词器
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ./bin/elasticsearch-plugin install --batch file:///tmp/ik-plugin/elasticsearch-analysis-ik-8.11.0.zip
+        exec /usr/local/bin/docker-entrypoint.sh
+
+  # Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_MONITORING_ENABLED=false
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-network
+
+  # Go 服务 - 使用构建的镜像
+  admin-service:
+    build: .
+    container_name: admin-service
+    command: ["./admin"]
+    environment:
+      - ENV=production
+    ports:
+      - "31003:31003"
+    volumes:
+      - ./app/admin/manifest/config/:/app/config/
+      - ./log:/app/log
+    depends_on:
+      - etcd
+      - mysql
+    networks:
+      - app-network
+
+  goods-service:
+    build: .
+    container_name: goods-service
+    command: ["./goods"]
+    environment:
+      - ENV=production
+    ports:
+      - "31004:31004"
+    volumes:
+      - ./app/goods/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+      - mysql
+      - redis
+    networks:
+        - app-network
+
+  order-service:
+    build: .
+    container_name: order-service
+    command: ["./order"]
+    environment:
+      - ENV=production
+    ports:
+      - "31005:31005"
+    volumes:
+      - ./app/order/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+      - mysql
+      - rabbitmq
+    networks:
+      - app-network
+
+  user-service:
+    build: .
+    container_name: user-service
+    command: ["./user"]
+    environment:
+      - ENV=production
+    ports:
+      - "31001:31001"
+    volumes:
+      - ./app/user/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+      - mysql
+    networks:
+      - app-network
+
+  interaction-service:
+    build: .
+    container_name: interaction-service
+    command: ["./interaction"]
+    environment:
+      - ENV=production
+    ports:
+      - "31002:31002"
+    volumes:
+      - ./app/interaction/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+      - mysql
+    networks:
+      - app-network
+
+  worker-service:
+    build: .
+    container_name: worker-service
+    command: ["./worker"]
+    environment:
+      - ENV=production
+    ports:
+      - "8599:8599"
+    volumes:
+      - ./app/worker/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - rabbitmq
+    networks:
+      - app-network
+
+  search-service:
+    build: .
+    container_name: search-service
+    command: ["./search"]
+    environment:
+      - ENV=production
+    ports:
+      - "8499:8499"
+    volumes:
+      - ./app/search/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - mysql
+      - etcd
+      - elasticsearch
+    networks:
+      - app-network
+
+  gateway-admin:
+    build: .
+    container_name: gateway-admin
+    command: ["./gateway-admin"]
+    environment:
+      - ENV=production
+    ports:
+      - "8299:8299"
+    volumes:
+      - ./app/gateway-admin/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+    networks:
+      - app-network
+
+  gateway-h5:
+    build: .
+    container_name: gateway-h5
+    command: ["./gateway-h5"]
+    environment:
+      - ENV=production
+    ports:
+      - "8199:8199"
+    volumes:
+      - ./app/gateway-h5/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+    networks:
+      - app-network
+
+  gateway-resource:
+    build: .
+    container_name: gateway-resource
+    command: ["./gateway-resource"]
+    environment:
+      - ENV=production
+      - QINIU_ACCESS_KEY=${QINIU_ACCESS_KEY}
+      - QINIU_SECRET_KEY=${QINIU_SECRET_KEY}
+    ports:
+      - "8399:8399"
+    volumes:
+      - ./app/gateway-resource/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+      - mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  rabbitmq_data:
+  es-data:

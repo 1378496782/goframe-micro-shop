@@ -37,15 +37,15 @@ CREATE TABLE `goods_images` (
 -- ----------------------------
 DROP TABLE IF EXISTS `category_info`;
 CREATE TABLE `category_info`  (
-      `id` int(0) NOT NULL AUTO_INCREMENT,
-      `parent_id` int(0) NOT NULL DEFAULT 0 COMMENT '父级id',
+      `id` int NOT NULL AUTO_INCREMENT,
+      `parent_id` int NOT NULL DEFAULT 0 COMMENT '父级id',
       `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
       `pic_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'icon',
       `level` tinyint(1) NOT NULL DEFAULT 1 COMMENT '等级 默认1级分类',
       `sort` tinyint(1) NOT NULL DEFAULT 1,
-      `created_at` datetime(0) DEFAULT NULL,
-      `updated_at` datetime(0) DEFAULT NULL,
-      `deleted_at` datetime(0) DEFAULT NULL,
+      `created_at` datetime DEFAULT NULL,
+      `updated_at` datetime DEFAULT NULL,
+      `deleted_at` datetime DEFAULT NULL,
       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '轮播图表\n' ROW_FORMAT = Dynamic;
 

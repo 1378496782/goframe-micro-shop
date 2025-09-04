@@ -15,9 +15,9 @@ grpc:
 
 database:
   default:
-    link:  "mysql:root:root@tcp(127.0.0.1:3306)/admin"
+    link:  "mysql:root:root@tcp(mysql:3306)/admin"
     debug:
 
 
 etcd:
-  address: "127.0.0.1:2379"
+  address: "etcd:2379"

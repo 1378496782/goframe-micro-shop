@@ -15,18 +15,18 @@ grpc:
 
 database:
   default:
-    link:  "mysql:root:root@tcp(127.0.0.1:3306)/goods"
+    link:  "mysql:root:root@tcp(mysql:3306)/goods"
     debug:
 
 
 etcd:
-  address: "127.0.0.1:2379"
+  address: "etcd:2379"
 
 # Redis配置
 redis:
   # 商品服务专用配置
   goods:
-    address: "127.0.0.1:6379"
+    address: "redis:6379"
     db: 1  # 使用单独的db
     pass: ""
     idleTimeout: "600s"
