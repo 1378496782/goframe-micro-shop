@@ -4,10 +4,6 @@ FROM golang:1.24.5-alpine AS builder
 # 设置工作目录
 WORKDIR /app
 
-# 设置环境变量
-ENV GO111MODULE=on
-ENV GOPROXY=https://goproxy.cn
-
 # 复制 go.mod 和 go.sum 文件
 COPY go.mod go.sum ./
 
