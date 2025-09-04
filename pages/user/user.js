@@ -23,7 +23,7 @@ Page({
   },
 
   // 检查登录状态
-  checkLoginStatus() {
+  async checkLoginStatus() {
     const { isLoggedIn, userInfo } = checkLoginStatus()
     app.globalData.isLoggedIn = isLoggedIn
     app.globalData.userInfo = userInfo
@@ -32,6 +32,11 @@ Page({
       isLoggedIn,
       userInfo: userInfo || {}
     })
+    
+    // 如果已登录，获取最新的用户信息
+    if (isLoggedIn) {
+      await this.getUserInfo()
+    }
   },
 
   // 登录
@@ -101,17 +106,33 @@ Page({
   },
 
   // 获取用户信息
-  getUserInfo() {
-    if (this.data.isLoggedIn) {
-      // 模拟获取用户信息
-      const userInfo = {
-        nickname: '微信用户',
-        avatar: 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户',
-        level: '黄金会员'
-      }
+  async getUserInfo() {
+    if (!this.data.isLoggedIn) {
+      return
+    }
+    
+    try {
+      const { userAPI } = require('../../utils/request')
+      const res = await userAPI.getInfo()
       
-      app.globalData.userInfo = userInfo
-      this.setData({ userInfo })
+      if (res.code === 0) {
+        const userInfo = {
+          nickname: res.data.username || '微信用户',
+          avatar: res.data.avatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户',
+          level: res.data.level || '普通会员'
+        }
+        
+        // 保存用户信息到全局和本地
+        app.globalData.userInfo = userInfo
+        const { saveUserInfo } = require('../../utils/request')
+        saveUserInfo(userInfo)
+        
+        this.setData({ userInfo })
+      } else {
+        console.error('获取用户信息失败:', res.message)
+      }
+    } catch (error) {
+      console.error('获取用户信息异常:', error)
     }
   },
 
