@@ -4,7 +4,11 @@
     "pages/category/category",
     "pages/cart/cart",
     "pages/user/user",
-    "pages/product-detail/product-detail"
+    "pages/product-detail/product-detail",
+    "pages/login/login",
+    "pages/register/register",
+    "pages/test/test",
+    "pages/search/search"
   ],
   "window": {
     "navigationBarBackgroundColor": "#19aecc",
@@ -42,5 +46,6 @@
     "request": 10000,
     "downloadFile": 10000
   },
-  "debug": true
+  "debug": true,
+  "requestLegacyDomain": true
 }

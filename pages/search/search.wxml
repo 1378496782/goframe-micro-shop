@@ -1,0 +1,97 @@
+<view class="search-container">
+  <!-- 搜索栏 -->
+  <view class="search-header">
+    <view class="search-input-group">
+      <input 
+        class="search-input" 
+        placeholder="搜索商品" 
+        placeholder-class="placeholder"
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+        bindconfirm="onSearch"
+      />
+      <button class="search-btn" bindtap="onSearch">搜索</button>
+    </view>
+    
+    <button class="filter-btn" bindtap="toggleFilter">
+      <text class="icon">筛选</text>
+    </button>
+  </view>
+
+  <!-- 筛选面板 -->
+  <view class="filter-panel" wx:if="{{showFilter}}">
+    <view class="filter-group">
+      <text class="filter-label">品牌</text>
+      <input 
+        class="filter-input" 
+        placeholder="输入品牌名称"
+        value="{{brand}}"
+        bindinput="onBrandInput"
+      />
+    </view>
+
+    <view class="filter-group">
+      <text class="filter-label">价格范围</text>
+      <view class="price-input-group">
+        <input 
+          class="price-input" 
+          placeholder="最低价"
+          type="number"
+          value="{{minPrice}}"
+          bindinput="onMinPriceInput"
+        />
+        <text class="price-separator">-</text>
+        <input 
+          class="price-input" 
+          placeholder="最高价"
+          type="number"
+          value="{{maxPrice}}"
+          bindinput="onMaxPriceInput"
+        />
+      </view>
+    </view>
+
+    <view class="filter-group">
+      <text class="filter-label">排序方式</text>
+      <picker 
+        class="sort-picker" 
+        value="{{sort}}" 
+        range="{{['default', 'price_asc', 'price_desc', 'sale']}}"
+        range-key="{{['默认', '价格升序', '价格降序', '销量']}}"
+        bindchange="onSortChange"
+      >
+        <view class="picker-value">
+          {{sort === 'default' ? '默认' : sort === 'price_asc' ? '价格升序' : sort === 'price_desc' ? '价格降序' : '销量'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-actions">
+      <button class="filter-reset" bindtap="resetFilter">重置</button>
+      <button class="filter-apply" bindtap="applyFilter">应用</button>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goods-list">
+    <block wx:for="{{goodsList}}" wx:key="id">
+      <goods-card 
+        goods="{{item}}" 
+        bindtap="goToProductDetail"
+      />
+    </block>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <view class="no-more" wx:if="{{!hasMore && goodsList.length > 0}}">
+      <text>没有更多商品了</text>
+    </view>
+
+    <view class="empty-state" wx:if="{{!loading && goodsList.length === 0}}">
+      <text>暂无商品，尝试搜索其他关键词</text>
+    </view>
+  </view>
+</view>

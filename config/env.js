@@ -1,20 +1,31 @@
 // 环境配置
 const config = {
   // 当前环境
-  env: 'development', // development: 开发环境, production: 生产环境
+  env: 'development', // development: 开发环境, production: 生产环境, test: 测试环境
   
   // API配置
   api: {
     baseURL: 'https://api.example.com', // 生产环境API地址
     mockBaseURL: '', // Mock模式不需要baseURL
-    timeout: 10000
+    timeout: 10000,
+    retryCount: 3,    // 请求重试次数
+    retryDelay: 1000  // 重试延迟(ms)
   },
   
   // 功能开关
   features: {
-    useMock: true, // 是否使用Mock数据
-    debug: true,   // 是否开启调试模式
-    logger: true   // 是否开启日志
+    useMock: true,     // 是否使用Mock数据
+    debug: true,       // 是否开启调试模式
+    logger: true,      // 是否开启日志
+    errorSimulation: true, // 是否开启错误模拟
+    cacheEnabled: true // 是否开启缓存
+  },
+  
+  // Mock配置
+  mock: {
+    networkDelay: 500,   // 网络延迟(ms)
+    errorRate: 0.1,      // 错误率(0-1)
+    cacheDuration: 5 * 60 * 1000 // 缓存持续时间(ms)
   },
   
   // 版本信息

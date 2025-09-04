@@ -71,6 +71,11 @@
       <text>设置</text>
       <text class="arrow">></text>
     </view>
+    <view class="menu-item" bindtap="onChangePassword">
+      <image src="https://via.placeholder.com/40x40/19aecc/ffffff?text=🔒" class="menu-icon" />
+      <text>修改密码</text>
+      <text class="arrow">></text>
+    </view>
   </view>
 
   <!-- 退出登录 -->

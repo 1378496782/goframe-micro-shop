@@ -1,3 +1,6 @@
+const { API } = require('./utils/env')
+const { checkLoginStatus } = require('./utils/request')
+
 App({
   onLaunch() {
     console.log('小程序初始化')
@@ -19,14 +22,10 @@ App({
   
   // 检查登录状态
   checkLoginStatus() {
-    const token = wx.getStorageSync('token')
-    if (token) {
-      console.log('用户已登录')
-      this.globalData.isLoggedIn = true
-    } else {
-      console.log('用户未登录')
-      this.globalData.isLoggedIn = false
-    }
+    const { isLoggedIn, userInfo } = checkLoginStatus()
+    this.globalData.isLoggedIn = isLoggedIn
+    this.globalData.userInfo = userInfo
+    console.log(isLoggedIn ? '用户已登录' : '用户未登录')
   },
   
   // 获取系统信息
@@ -44,6 +43,7 @@ App({
     isLoggedIn: false,
     userInfo: null,
     systemInfo: null,
-    cartCount: 0
+    cartCount: 0,
+    API
   }
 })

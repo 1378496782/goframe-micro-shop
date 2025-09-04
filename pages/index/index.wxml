@@ -45,14 +45,13 @@
         bindtap="onProductClick"
         data-id="{{item.id}}"
       >
-        <image src="{{item.image}}" class="product-image" mode="aspectFill"/>
+        <image src="{{item.mainImage || 'https://via.placeholder.com/200x200?text=商品图片'}}" class="product-image" mode="aspectFill"/>
         <view class="product-info">
           <text class="product-name">{{item.name}}</text>
           <view class="price-section">
-            <text class="current-price">¥{{item.price}}</text>
-            <text class="original-price">¥{{item.originalPrice}}</text>
+            <text class="current-price">¥{{item.priceFormatted}}</text>
           </view>
-          <text class="sales">已售{{item.sales}}件</text>
+          <text class="sales">已售{{item.sale || 0}}件</text>
         </view>
       </view>
     </view>

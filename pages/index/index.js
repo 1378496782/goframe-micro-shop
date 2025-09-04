@@ -28,7 +28,7 @@ Page({
         api.getGoodsList({ page: 1, size: 10 })
       ])
       
-      if (categoriesRes.code === 200) {
+      if (categoriesRes.code === 0) {
         this.setData({
           categories: categoriesRes.data.map(item => ({
             ...item,
@@ -37,12 +37,27 @@ Page({
         })
       }
       
-      if (productsRes.code === 200) {
-        this.setData({
-          products: productsRes.data.list.map(item => ({
+      if (productsRes.code === 0) {
+        // 格式化商品数据：价格转换和图片提取
+        const formattedProducts = productsRes.data.list.map(item => {
+          let mainImage = ''
+          try {
+            const imagesData = JSON.parse(item.images)
+            mainImage = imagesData.image || ''
+          } catch (e) {
+            console.warn('解析图片数据失败:', e)
+            mainImage = ''
+          }
+          
+          return {
             ...item,
-            image: 'http://wangzhongyang.com/images/logo_removebg.png'
-          }))
+            priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
+            mainImage: mainImage
+          }
+        })
+        
+        this.setData({
+          products: formattedProducts
         })
       }
     } catch (error) {

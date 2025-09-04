@@ -5,6 +5,37 @@ const config = require('../config/env');
 const isMock = config.features.useMock;
 const BASE_URL = isMock ? '' : config.api.baseURL;
 
+// 错误状态模拟配置
+const errorSimulation = {
+  enabled: config.features.debug, // 仅在调试模式开启
+  rate: 0.1, // 10%的错误率
+  errorCodes: [400, 401, 403, 404, 500],
+  errorMessages: {
+    400: '请求参数错误',
+    401: '未授权访问',
+    403: '访问被禁止',
+    404: '资源不存在',
+    500: '服务器内部错误'
+  }
+};
+
+// 模拟错误响应
+function simulateError() {
+  if (!errorSimulation.enabled || Math.random() > errorSimulation.rate) {
+    return null;
+  }
+  
+  const errorCode = errorSimulation.errorCodes[
+    Math.floor(Math.random() * errorSimulation.errorCodes.length)
+  ];
+  
+  return {
+    code: errorCode,
+    message: errorSimulation.errorMessages[errorCode] || '未知错误',
+    data: null
+  };
+}
+
 // Mock数据
 const mockData = {
   // 首页相关
@@ -100,7 +131,7 @@ const mockData = {
   '/frontend/user/info': {
     method: 'POST',
     response: {
-      code: 200,
+      code极速版: 200,
       message: 'success',
       data: {
         id: 1,
@@ -110,16 +141,117 @@ const mockData = {
         phone: '13800138000'
       }
     }
+  },
+
+  // 购物车相关Mock数据
+  '/frontend/cart': {
+    method: 'GET',
+    response: {
+      code: 200,
+      message: 'success',
+      data: {
+        items: [
+          {
+            id: 1,
+            productId: 1,
+            productName: '高品质智能手机 8GB+256GB',
+            price: '2999.00',
+            image: 'http://wangzhongyang.com/images/logo_removebg.png',
+            quantity: 2,
+            selected: true
+          },
+          {
+            id: 2,
+            productId: 2,
+            productName: '轻薄笔记本电脑 i7处理器',
+            price: '5999.00',
+            image: 'http://wangzhongyang.com/images/logo_removebg.png',
+            quantity: 1,
+            selected: true
+          }
+        ],
+        totalPrice: '11997.00',
+        totalQuantity: 3
+      }
+    }
+  },
+
+  // 订单相关Mock数据
+  '/frontend/order': {
+    method: 'GET',
+    response: {
+      code: 200,
+      message: 'success',
+      data: {
+        list: [
+          {
+            id: 'ORDER202401010001',
+            status: 2, // 1: 待付款, 2: 待发货, 3: 已发货, 4: 已完成, 5: 已取消
+            totalAmount: '11997.00',
+            createTime: '2024-01-01 10:00:00',
+            products: [
+              {
+                name: '高品质智能手机 8GB+256GB',
+                image: 'http://wangzhongyang.com/images/logo_removebg.png',
+                price: '2999.00',
+                quantity: 2
+              },
+              {
+                name: '轻薄笔记本电脑 i7处理器',
+                image: 'http://wangzhongyang.com/images/logo_removebg.png',
+                price: '5999.00',
+                quantity: 1
+              }
+            ]
+          }
+        ],
+        total: 1,
+        page: 1,
+        size: 10
+      }
+    }
   }
 };
+
+// 数据缓存
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
 
 // 统一的请求封装
 function request(url, data = {}, method = 'GET') {
   return new Promise((resolve, reject) => {
+    // 生成缓存键
+    const cacheKey = `${method}:${url}:${JSON.stringify(data)}`;
+    
+    // 检查缓存（仅对GET请求）
+    if (method === 'GET') {
+      const cached = cache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        console.log('[API] 使用缓存数据:', cacheKey);
+        resolve(cached.data);
+        return;
+      }
+    }
+    
     if (isMock && mockData[url] && mockData[url].method === method) {
       // 使用Mock数据
       setTimeout(() => {
-        resolve(mockData[url].response);
+        // 模拟错误
+        const errorResponse = simulateError();
+        if (errorResponse) {
+          reject(errorResponse);
+          return;
+        }
+        
+        const response = mockData[url].response;
+        // 缓存GET请求结果
+        if (method === 'GET') {
+          cache.set(cacheKey, {
+            data: response,
+            timestamp: Date.now()
+          });
+        }
+        resolve(response);
       }, 500); // 模拟网络延迟
     } else {
       // 真实网络请求
@@ -128,6 +260,13 @@ function request(url, data = {}, method = 'GET') {
         data: data,
         method: method,
         success: (res) => {
+          // 缓存GET请求结果
+          if (method === 'GET') {
+            cache.set(cacheKey, {
+              data: res.data,
+              timestamp: Date.now()
+            });
+          }
           resolve(res.data);
         },
         fail: (err) => {
@@ -156,7 +295,19 @@ const api = {
   // 收藏相关
   getCollections: () => request('/frontend/collection', {}, 'GET'),
   addCollection: (data) => request('/frontend/collection', data, 'POST'),
-  removeCollection: (id) => request('/frontend/collection', { id }, 'DELETE')
+  removeCollection: (id) => request('/frontend/collection', { id }, 'DELETE'),
+
+  // 购物车相关
+  getCart: () => request('/frontend/cart', {}, 'GET'),
+  addToCart: (data) => request('/frontend/cart', data, 'POST'),
+  updateCartItem: (data) => request('/frontend/cart', data, 'PUT'),
+  removeCartItem: (id) => request('/frontend/cart', { id }, 'DELETE'),
+
+  // 订单相关
+  createOrder: (data) => request('/frontend/order', data, 'POST'),
+  getOrders: (params) => request('/frontend/order', params, 'GET'),
+  getOrderDetail: (id) => request('/frontend/order/detail', { id }, 'GET'),
+  cancelOrder: (id) => request('/frontend/order/cancel', { id }, 'PUT')
 };
 
 module.exports = {

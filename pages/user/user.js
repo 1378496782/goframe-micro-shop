@@ -1,4 +1,5 @@
 const app = getApp()
+const { checkLoginStatus } = require('../../utils/request')
 
 Page({
   data: {
@@ -23,12 +24,13 @@ Page({
 
   // 检查登录状态
   checkLoginStatus() {
-    const isLoggedIn = app.globalData.isLoggedIn
-    const userInfo = app.globalData.userInfo || {}
+    const { isLoggedIn, userInfo } = checkLoginStatus()
+    app.globalData.isLoggedIn = isLoggedIn
+    app.globalData.userInfo = userInfo
     
     this.setData({
       isLoggedIn,
-      userInfo
+      userInfo: userInfo || {}
     })
   },
 
@@ -111,5 +113,25 @@ Page({
       app.globalData.userInfo = userInfo
       this.setData({ userInfo })
     }
+  },
+
+  // 修改密码
+  onChangePassword() {
+    if (!this.data.isLoggedIn) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (res) => {
+          if (res.confirm) {
+            this.onLogin()
+          }
+        }
+      })
+      return
+    }
+    
+    wx.navigateTo({
+      url: '/pages/change-password/change-password'
+    })
   }
 })
