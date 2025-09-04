@@ -15,11 +15,11 @@ server:
     timeFormat: "2006-01-02 15:04:05.000" # 精确到毫秒
 
 etcd:
-  address: "etcd:2379"
+  address: "127.0.0.1:2379"
 
 # manifest/config/config.yaml
 elasticsearch:
-  address: "http://elasticsearch:9200" # ES地址，集群用逗号分隔
+  address: "http://localhost:9200" # ES地址，集群用逗号分隔
   sniff: false                     # 是否启用集群嗅探
   healthcheck: true                # 启动时健康检查
   # 索引名配置
@@ -30,7 +30,7 @@ elasticsearch:
 binlog:
   goods:
     mysql:
-      host: "mysql"
+      host: "127.0.0.1"
       port: 3306
       username: "root"
       password: "root"

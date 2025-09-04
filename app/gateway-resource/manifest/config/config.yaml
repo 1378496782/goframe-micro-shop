@@ -1,35 +1,30 @@
 server:
-  address: ":8199"
+  address:     ":8399"
   openapiPath: "/api.json"
   swaggerPath: "/swagger"
   logger:
-    path: "./log"
-    file: "{Y-m-d}.log"
+    path: "./log" # 日志文件路径。默认为空，表示关闭，仅输出到终端
+    file: "{Y-m-d}.log" # 日志文件格式。默认为"{Y-m-d}.log"
     prefix: "公众号：王中阳：gateway-resource" # 日志内容输出前缀。默认为空
-    level: "all"
-    stdout: false
-    rotateSize: 104857600
-    rotateBackupLimit: 7
-    ctxKeys: ["traceId"]
-    timeFormat: "2006-01-02 15:04:05.000"
+    level: "all" # 日志输出级别
+    stdout: true  # 日志是否同时输出到终端。默认true
+    rotateSize: 104857600   # 100MB切割日志文件
+    rotateBackupLimit: 7    # 保留7天日志
+    # ctxKeys 告诉日志组件从 context 中提取指定键的值
+    ctxKeys: [ "traceId" ]    # 自动记录链路追踪ID 自定义Context上下文变量名称，自动打印Context的变量到日志中
+    timeFormat: "2006-01-02 15:04:05.000" # 精确到毫秒
 
 etcd:
-  address: "etcd:2379"
-  dialTimeout: "5s"
+  address: "127.0.0.1:2379"
 
-
-# 七牛云配置（使用环境变量）
+# 七牛云配置
 qiniu:
-  accessKey: "${QINIU_ACCESS_KEY}"
-  secretKey: "${QINIU_SECRET_KEY}"
-  bucket: "goframegoods"
-  domain: "http://t15zl18vd.hn-bkt.clouddn.com"
-  uploadTokenExpire: 3600
+  accessKey: "PplZ60IjaXzQTtim6JjMUcAZ_cIUh9JmD0hMVa8O"   # 控制台获取的AK
+  secretKey: "W6dsUdQvqT7WWmrWTvOoNl01O_cU-tvGgRwGE-uw"   # 控制台获取的SK
+  bucket:    "goframegoods"      # 空间名称
+  domain:    "http://t15zl18vd.hn-bkt.clouddn.com" # 域名
 
 database:
   default:
-    link: "mysql:root:root@tcp(mysql:3306)/resource"
-    debug: false
-    maxOpenConns: 50
-    maxIdleConns: 10
-    connMaxLifetime: "30m"
+    link:  "mysql:root:root@tcp(127.0.0.1:3306)/resource"
+    debug:
