@@ -5,6 +5,8 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
+	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/banner"
+	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/goods"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/interaction"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/order"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user"
@@ -23,6 +25,8 @@ var (
 				group.Group("/", func(group *ghttp.RouterGroup) {
 					group.Bind(
 						user.NewV1(),
+						goods.NewV1(),
+						banner.NewV1(),
 					)
 				})
 				// 需要JWT验证的路由
@@ -32,7 +36,6 @@ var (
 						// 需要认证的接口
 						interaction.NewV1(),
 						order.NewV1(),
-
 					)
 				})
 			})

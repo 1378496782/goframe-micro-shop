@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/admin"
+	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/banner"
 	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/goods"
 	"shop-goframe-micro-service-refacotor/app/gateway-admin/internal/controller/order"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
@@ -32,6 +33,7 @@ var (
 						// 需要认证的接口
 						goods.NewV1(),
 						order.NewV1(),
+						banner.NewV1(),
 					)
 				})
 			})
