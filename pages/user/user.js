@@ -26,7 +26,7 @@ Page({
   },
 
   // 检查登录状态
-  checkLoginStatus() {
+  async checkLoginStatus() {
     const { isLoggedIn, userInfo } = checkLoginStatus()
     app.globalData.isLoggedIn = isLoggedIn
     app.globalData.userInfo = userInfo
@@ -35,6 +35,11 @@ Page({
       isLoggedIn,
       userInfo: userInfo || {}
     })
+    
+    // 如果已登录，获取最新的用户信息
+    if (isLoggedIn) {
+      await this.getUserInfo()
+    }
   },
 
   // 登录
