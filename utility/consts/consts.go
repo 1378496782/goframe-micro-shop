@@ -24,6 +24,8 @@ const (
 	CommentInfo        = "CommentInfo"
 	PraiseInfo         = "PraiseInfo"
 	AdminInfo          = "AdminInfo"
+	PositionInfo       = "PositionInfo"
+	RotationInfo       = "RotationInfo"
 )
 
 func InfoError(info string, fail string) string {

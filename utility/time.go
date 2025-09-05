@@ -24,3 +24,11 @@ func GenerateOrderNumber() string {
 func GenerateRefundNumber() string {
 	return fmt.Sprintf("REF%s%04d", time.Now().Format("20060102150405"), rand.Intn(9999))
 }
+
+// GetOrderBy 排序方式判断函数
+func GetOrderBy(sort uint32) string {
+	if sort == 2 {
+		return "sort desc" // 传2：倒序，sort值越大越靠前
+	}
+	return "sort asc" // 默认或传1：升序，sort值越小越靠前
+}
