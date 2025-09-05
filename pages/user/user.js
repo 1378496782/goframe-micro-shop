@@ -20,6 +20,9 @@ Page({
 
   onShow() {
     this.checkLoginStatus()
+    if (this.data.isLoggedIn) {
+      this.getUserInfo()
+    }
   },
 
   // 检查登录状态
@@ -103,15 +106,20 @@ Page({
   // 获取用户信息
   getUserInfo() {
     if (this.data.isLoggedIn) {
-      // 模拟获取用户信息
-      const userInfo = {
-        nickname: '微信用户',
-        avatar: 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户',
-        level: '黄金会员'
-      }
+      // 从storage获取真实的用户信息
+      const { getUserInfo: getStoredUserInfo } = require('../../utils/request')
+      const userInfo = getStoredUserInfo()
       
-      app.globalData.userInfo = userInfo
-      this.setData({ userInfo })
+      console.log('从storage获取的用户信息:', userInfo)
+      console.log('当前全局用户信息:', app.globalData.userInfo)
+      
+      if (userInfo && Object.keys(userInfo).length > 0) {
+        app.globalData.userInfo = userInfo
+        this.setData({ userInfo })
+        console.log('用户信息已更新到页面')
+      } else {
+        console.log('storage中没有用户信息或为空')
+      }
     }
   },
 

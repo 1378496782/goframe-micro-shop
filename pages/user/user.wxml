@@ -1,9 +1,9 @@
 <view class="container">
   <!-- 用户信息头部 -->
   <view class="user-header">
-    <image class="avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" />
+    <image class="avatar" src="{{userInfo.avatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
     <view class="user-info">
-      <text class="username">{{userInfo.nickname || '未登录用户'}}</text>
+      <text class="username">{{userInfo.name || userInfo.nickname || '未登录用户'}}</text>
       <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
     </view>
     <button class="login-btn" wx:if="{{!isLoggedIn}}" bindtap="onLogin">登录/注册</button>

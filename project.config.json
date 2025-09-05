@@ -40,7 +40,12 @@
     },
     "checkInvalidKey": true,
     "disableUseStrict": false,
-    "useCompilerPlugins": false
+    "useCompilerPlugins": false,
+    "compileWorklet": false,
+    "localPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true
   },
   "compileType": "miniprogram",
   "libVersion": "3.9.2",

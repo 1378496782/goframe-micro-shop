@@ -53,21 +53,26 @@ Page({
     userAPI.login({
       name: phone,
       password: password
-    }).then(() => {
+    }).then((loginData) => {
       this.setData({ loading: false });
       
-      // 更新全局登录状态
+      // 更新全局登录状态和用户信息
       app.globalData.isLoggedIn = true
+      const userInfo = loginData.userInfo || loginData.user_info || {}
+      app.globalData.userInfo = userInfo
+      
+      console.log('登录成功，用户信息:', userInfo)
+      console.log('全局用户信息:', app.globalData.userInfo)
       
       wx.showToast({
         title: '登录成功',
         icon: 'success'
       });
       
-      // 登录成功后跳转到首页
+      // 登录成功后跳转到个人中心页面，确保用户信息显示更新
       setTimeout(() => {
         wx.switchTab({
-          url: '/pages/index/index'
+          url: '/pages/user/user'
         });
       }, 1500);
     }).catch(err => {

@@ -127,7 +127,7 @@ const userAPI = {
     }).then(data => {
       // 保存token和用户信息
       saveToken(data.token)
-      saveUserInfo(data.user_info)
+      saveUserInfo(data.userInfo || data.user_info || {})
       return data
     })
   },
