@@ -1,0 +1,915 @@
+<template>
+{{$lens := .table.Columns|len}}
+{{$businessName := .table.BusinessName | CaseCamelLower}}
+{{$treeParentCode := .table.TreeParentCode}}
+{{$treeCode := .table.TreeCode}}
+{{$treeName := .table.TreeName}}
+{{$firstColumn := index .table.ListColumns 0 }}
+
+  <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-container">
+    <el-card shadow="hover">
+        <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-search mb15">
+            <el-form :model="tableData.param" ref="queryRef" :inline="true" label-width="100px">
+            <el-row>
+            {{$colIndex := 0}}
+            {{range $index, $column := .table.QueryColumns}}
+              {{if and $column.IsQuery (ne $column.ColumnName "created_by") (ne $column.ColumnName "updated_by")}}
+                {{if eq $colIndex 2}}
+                <el-col :span="8" :class="!showAll ? 'colBlock' : 'colNone'">
+                  <el-form-item>
+                    <el-button type="primary"  @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
+                    <el-button type="primary" link  @click="toggleSearch">
+                      {{"{{"}} word {{"}}"}}
+                      <el-icon v-show="showAll"><ele-ArrowUp/></el-icon>
+                      <el-icon v-show="!showAll"><ele-ArrowDown /></el-icon>
+                    </el-button>
+                  </el-form-item>
+                </el-col>
+                {{end}}
+                {{if eq $column.HtmlType "input" "textarea" "inputNumber"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                  <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                    <el-input
+                        v-model="tableData.param.{{$column.HtmlField}}{{if eq $column.QueryType "BETWEEN"}}[0]{{end}}"
+                        placeholder="请输入{{$column.ColumnComment}}"
+                        clearable
+                        {{if eq $column.QueryType "BETWEEN"}}style="width:100px"{{end}}
+                        @keyup.enter.native="{{$businessName}}List"
+                    />
+                    {{if eq $column.QueryType "BETWEEN"}} -
+                    <el-input
+                        v-model="tableData.param.{{$column.HtmlField}}[1]"
+                        placeholder="请输入{{$column.ColumnComment}}"
+                        clearable
+                        style="width:100px"
+                        @keyup.enter.native="{{$businessName}}List"
+                    />
+                    {{end}}
+                  </el-form-item>
+                </el-col>
+                  {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "switch"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <el-switch  v-model="tableData.param.{{$column.HtmlField}}" class="ml-2" />
+                    </el-form-item>
+                </el-col>
+                {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.DictType "") }}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                  <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                    <el-select filterable v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
+                        <el-option
+                            v-for="dict in {{$column.DictType}}"
+                            :key="dict.value"
+                            :label="dict.label"
+                            :value="dict.value"
+                        />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if and (eq $column.HtmlType "treeSelect" "treeSelects") (ne $column.LinkTableName "")}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        {{$tLabel:=""}}
+                        {{$tValue:=""}}
+                        {{range $li,$lc := $.table.LinkedTables}}
+                            {{if eq $lc.TableName $column.LinkTableName}}
+                                {{$tLabel = $lc.OptionsStruct.TreeName}}
+                                {{$tValue = $lc.OptionsStruct.TreeCode}}
+                            {{end}}
+                        {{end}}
+                        <el-cascader
+                                v-model="tableData.param.{{$column.HtmlField}}"
+                                placeholder="请选择"
+                                :options="{{$column.HtmlField}}Options"
+                                filterable
+                                clearable
+                                :props="{ label: '{{$tLabel}}',value: '{{$tValue}}',checkStrictly: true,emitPath: false }"
+                        />
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "date"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                  <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                    <el-date-picker
+                        clearable  style="width: 200px"
+                        v-model="tableData.param.{{$column.HtmlField}}"
+                        value-format="YYYY-MM-DD"
+                    {{if eq $column.QueryType "BETWEEN"}}
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                    {{else}}
+                        type="date"
+                        placeholder="选择{{$column.ColumnComment}}"
+                    {{end}}
+                     ></el-date-picker>
+                  </el-form-item>
+                </el-col>
+                  {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "datetime"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                  <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                    <el-date-picker
+                        clearable  style="width: 200px"
+                        v-model="tableData.param.{{$column.HtmlField}}"
+                        format="YYYY-MM-DD HH:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                    {{if eq $column.QueryType "BETWEEN"}}
+                        type="datetimerange"
+                        range-separator="至"
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                    {{else}}
+                        type="datetime"
+                        placeholder="选择{{$column.ColumnComment}}"
+                    {{end}}
+                    ></el-date-picker>
+                  </el-form-item>
+                </el-col>
+                  {{$colIndex = ($colIndex | plus 1)}}
+                {{else if and (eq $column.HtmlType "select" "radio" "checkbox" "selects") (ne $column.LinkTableName "")}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                  <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                    <el-select filterable v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable  {{if $column.IsCascadeParent}}@change="query{{$column.ColumnName | CaseCamel}}Changed"{{end}} style="width:200px;">
+                      <el-option
+                      {{if $column.IsCascade}}
+                          v-for="item in {{$column.HtmlField}}QueryOptions"
+                      {{else}}
+                          v-for="item in {{$column.HtmlField}}Options"
+                      {{end}}
+                          :key="item.key"
+                          :label="item.value"
+                          :value="item.key"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                  {{$colIndex = ($colIndex | plus 1)}}
+                {{else if and (eq $column.HtmlType "treeSelect" "treeSelects") (ne $column.LinkTableName "")}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        {{$tLabel:=""}}
+                        {{$tValue:=""}}
+                        {{range $li,$lc := $.table.LinkedTables}}
+                            {{if eq $lc.TableName $column.LinkTableName}}
+                                {{$tLabel = $lc.OptionsStruct.TreeName}}
+                                {{$tValue = $lc.OptionsStruct.TreeCode}}
+                            {{end}}
+                        {{end}}
+                        <el-cascader
+                                v-model="tableData.param.{{$column.HtmlField}}"
+                                placeholder="请选择"
+                                :options="{{$column.HtmlField}}Options"
+                                filterable
+                                clearable
+                                :props="{ label: '{{$tLabel}}',value: '{{$tValue}}',checkStrictly: true,emitPath: false }"
+                        />
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "userSelectorSingle"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-user v-model="{{$column.HtmlField}}" :multiple="false"></select-user>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "userSelectorMultiple"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-user v-model="tableData.param.{{$column.HtmlField}}"></select-user>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "deptSelectorSingle"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-dept v-model="tableData.param.{{$column.HtmlField}}"></select-dept>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                    <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                        <select-dept v-model="tableData.param.{{$column.HtmlField}}" :multiple="true"></select-dept>
+                    </el-form-item>
+                </el-col>
+                {{$colIndex = ($colIndex | plus 1)}}
+                {{else}}
+                <el-col :span="8" {{if lt $colIndex 2}}class="colBlock"{{else}}:class="showAll ? 'colBlock' : 'colNone'"{{end}}>
+                  <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+                    <el-select filterable v-model="tableData.param.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" clearable style="width:200px;">
+                        <el-option label="请选择字典生成" value="" />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                  {{$colIndex = ($colIndex | plus 1)}}
+                {{end}}
+              {{end}}
+            {{end}}
+            {{if gt $colIndex 2}}
+                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
+                  <el-form-item>
+                    <el-button type="primary"  @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
+                    <el-button type="primary" link  @click="toggleSearch">
+                        {{"{{"}} word {{"}}"}}
+                        <el-icon v-show="showAll"><ele-ArrowUp/></el-icon>
+                        <el-icon v-show="!showAll"><ele-ArrowDown /></el-icon>
+                    </el-button>
+                  </el-form-item>
+                </el-col>
+            {{else}}
+                <el-col :span="8" class="colBlock">
+                  <el-form-item>
+                    <el-button type="primary"   @click="{{$businessName}}List"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
+                  </el-form-item>
+                </el-col>
+            {{end}}
+              </el-row>
+            </el-form>
+
+            <el-row :gutter="10" class="mb8">
+              <el-col :span="1.5">
+                <el-button
+                  type="primary"
+
+                  @click="handleAdd"
+                  v-auth="'{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/add'"
+                ><el-icon><ele-Plus /></el-icon>新增</el-button>
+              </el-col>
+              <el-col :span="1.5">
+                <el-button
+                  type="success"
+                  :disabled="single"
+                  @click="handleUpdate(null)"
+                  v-auth="'{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/edit'"
+                ><el-icon><ele-Edit /></el-icon>修改</el-button>
+              </el-col>
+              <el-col :span="1.5">
+                <el-button
+                  type="danger"
+                  :disabled="multiple"
+                  @click="handleDelete(null)"
+                  v-auth="'{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/delete'"
+                ><el-icon><ele-Delete /></el-icon>删除</el-button>
+              </el-col>
+            {{if .table.ExcelPort }}
+                <el-col :span="1.5">
+                    <el-button
+                            type="warning"
+                            @click="handleExport()"
+                            v-auth="'{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/export'"
+                    ><el-icon><ele-Download /></el-icon>导出Excel</el-button>
+                </el-col>
+            {{end}}
+            {{if .table.ExcelImp }}
+                <el-col :span="1.5">
+                    <el-button
+                            type="success"
+                            @click="handleImport()"
+                            v-auth="'{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/import'"
+                    ><el-icon><ele-Upload /></el-icon>导入Excel</el-button>
+                </el-col>
+            {{end}}
+            </el-row>
+        </div>
+        <div style="height: 800px;">
+            <el-auto-resizer>
+                <template #default="{ height, width }">
+                    <el-table-v2
+                        v-model:expanded-row-keys="expandedRowKeys"
+                        :columns="columns"
+                        :data="treeData"
+                        :width="width"
+                        :height="height"
+                        :expand-column-key="expandColumnKey"
+                        fixed
+                        @row-expand="onRowExpanded"
+                        @expanded-rows-change="onExpandedRowsChange"
+                    />
+                </template>
+            </el-auto-resizer>
+        </div>
+    </el-card>
+    <{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit
+       ref="editRef"
+       {{range $index, $column := .table.Columns}}
+       {{if ne $column.DictType ""}}
+       :{{$column.HtmlField}}Options="{{$column.DictType}}"
+       {{else if ne $column.LinkTableName ""}}
+       {{if $column.IsCascade}}
+       {{/*级联处理*/}}
+       {{else}}
+       {{/*关联表处理*/}}
+       :{{$column.HtmlField}}Options="{{$column.HtmlField}}Options"
+       {{end}}
+       {{end}}
+       {{end}}
+       :{{$businessName}}Options="tableData.data"
+       @{{$businessName}}List="{{$businessName}}List"
+    ></{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit>
+    <{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail
+      ref="detailRef"
+      {{range $index, $column := .table.Columns}}
+      {{if ne $column.DictType ""}}
+      :{{$column.HtmlField}}Options="{{$column.DictType}}"
+      {{else if ne $column.LinkTableName ""}}
+      {{if $column.IsCascade}}
+      {{/*级联处理*/}}
+      {{else}}
+      {{/*关联表处理*/}}
+      :{{$column.HtmlField}}Options="{{$column.HtmlField}}Options"
+      {{end}}
+      {{end}}
+      {{end}}
+      :{{$businessName}}Options="tableData.data"
+      @{{$businessName}}List="{{$businessName}}List"
+    ></{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail>
+  {{if .table.ExcelImp}}
+      <loadExcel ref="loadExcel{{.table.ClassName}}Ref" @getList="{{$businessName}}List"
+                 upUrl="{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/import"
+                 tplUrl="/{{.apiVersion}}/{{.table.ModuleName}}/{{$businessName}}/excelTemplate"></loadExcel>
+  {{end}}
+  </div>
+</template>
+
+<script setup lang="ts">
+
+{{$tokenImp := false}}
+{{$imgsImp := false}}
+{{$editImp := false }}
+{{$fileImp := false}}
+{{$getUserList:=false}}
+{{$selectorUserImp:=false}}
+{{$selectorDeptImp:=false}}
+
+{{range $index,$column:=.table.Columns}}
+{{if eq $column.HtmlType "richtext"}}
+{{$editImp = true}}
+{{else if eq $column.HtmlType "imagefile"}}
+{{$tokenImp = true}}
+{{else if eq $column.HtmlType "images"}}
+{{$imgsImp = true}}
+{{else if eq $column.HtmlType "file" "files"}}
+{{$fileImp = true}}
+{{else if or (eq $column.HtmlType "userSelectorSingle") (eq $column.HtmlType "userSelectorMultiple")}}
+{{$selectorUserImp = true}}
+{{else if or (eq $column.HtmlType "deptSelectorSingle") (eq $column.HtmlType "deptSelectorMultiple")}}
+{{$selectorDeptImp = true}}
+{{end}}
+{{if eq $column.HtmlField "createdBy" "updatedBy"}}
+{{$getUserList = true}}
+{{end}}
+{{end}}
+{{/*去重处理*/}}
+{{$hasImports:=newArray}}
+import {ItemOptions} from "/@/api/items";
+import {toRefs, reactive, onMounted, ref, defineComponent, computed,getCurrentInstance,toRaw,h,unref,FunctionalComponent} from 'vue';
+import {ElMessageBox, ElMessage, FormInstance,RowExpandHandler,ExpandedRowsChangeHandler,TableV2FixedDir, Column, ElLink, ElIcon, ElCheckbox, CheckboxValueType,ElImage,ElTag,ElSwitch} from 'element-plus';
+import { EditPen,View,DeleteFilled } from '@element-plus/icons-vue'
+import {
+    list{{.table.ClassName}},
+    get{{.table.ClassName}},
+    del{{.table.ClassName}},
+    add{{.table.ClassName}},
+    update{{.table.ClassName}},
+    {{range $index,$column:= .table.Columns}}
+    {{if eq $column.HtmlType "switch"}}
+    change{{$.table.ClassName}}{{$column.GoField}},
+    {{end}}
+    {{end}}
+    {{if gt (len .table.LinkedTables) 0}}
+    linkedDataSearch
+    {{end}}
+} from "/@/api/{{.modulePath}}/{{$businessName}}";
+import {
+    {{.table.ClassName}}TableColumns,
+    {{.table.ClassName}}InfoData,
+    {{.table.ClassName}}TableDataState,
+    {{range $ti, $linkedTable := .table.LinkedTables}}
+    Linked{{$.table.ClassName}}{{$linkedTable.ClassName}},
+    {{end}}
+} from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/model"
+import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/edit.vue"
+import {{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Detail from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/detail.vue"
+import {auth} from '/@/utils/authFunction'
+import _ from 'lodash'
+{{if .table.ExcelPort }}
+import {downLoadXml} from "/@/utils/zipdownload";
+{{end}}
+{{if .table.ExcelImp}}
+import loadExcel from "/@/components/loadExcel/index.vue"
+{{end}}
+{{if $selectorUserImp}}
+import selectUser from "/@/components/selectUser/index.vue"
+{{end}}
+{{if $selectorDeptImp}}
+import selectDept from "/@/components/selectDept/index.vue"
+{{end}}
+defineOptions({ name: "{{.apiVersion|replace "/" "_"|CaseCamelLower}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}List"})
+const {proxy} = <any>getCurrentInstance()
+const loading = ref(false)
+const queryRef = ref()
+const editRef = ref();
+const detailRef = ref();
+{{if .table.ExcelImp}}
+const loadExcel{{.table.ClassName}}Ref = ref();
+{{end}}
+// 是否显示所有搜索选项
+const showAll =  ref(false)
+// 非单个禁用
+const single = ref(true)
+// 非多个禁用
+const multiple =ref(true)
+const word = computed(()=>{
+    if(showAll.value === false) {
+        //对文字进行处理
+        return "展开搜索";
+    } else {
+        return "收起搜索";
+    }
+})
+// 字典选项数据
+{{$dictArr:=newArray}}
+{{range $index, $column := .table.Columns}}
+{{if and (ne $column.DictType "") (ne (inArray $dictArr $column.DictType) true)}}
+{{$dictArr = append $dictArr $column.DictType}}
+{{end}}
+{{end}}
+const {
+    {{range $index, $column := $dictArr}}
+    {{$column}},
+    {{end}}
+} = proxy.useDict(
+    {{range $index, $column := $dictArr}}
+    '{{$column}}',
+    {{end}}
+)
+{{range $index, $column := .table.Columns}}
+{{if ne $column.LinkTableName ""}}
+{{if $column.IsCascade }}
+// {{$column.HtmlField}}QueryOptions关联表数据
+const {{$column.HtmlField}}QueryOptions = ref<Array<ItemOptions>>([])
+// {{$column.HtmlField}}FormOptions关联表数据
+const {{$column.HtmlField}}FormOptions = ref<Array<ItemOptions>>([])
+{{else}}
+// {{$column.HtmlField}}Options关联表数据
+const {{$column.HtmlField}}Options = ref<Array<ItemOptions>>([])
+{{end}}
+{{end}}
+{{end}}
+const dataList = ref<Array<{{$.table.ClassName}}TableColumns>>([])
+const state = reactive<{{.table.ClassName}}TableDataState>({
+    {{.table.PkColumn.HtmlField}}s:[],
+    tableData: {
+        data: [],
+        total: 0,
+        loading: false,
+        param: {
+            pageNum: 1,
+            pageSize: 10,
+            {{range $index, $column := .table.QueryColumns}}
+            {{if eq $column.QueryType "BETWEEN"}}
+            {{$column.HtmlField}}: [],
+            {{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+            {{$column.HtmlField}}: [],
+            {{else}}
+            {{$column.HtmlField}}: undefined,
+            {{end}}{{end}}
+            dateRange: []
+        },
+    },
+});
+const { tableData } = toRefs(state);
+{{range $index, $column := .table.QueryColumns}}
+{{if eq $column.HtmlType "userSelectorSingle"}}
+const {{$column.HtmlField}} = computed({
+    get:()=>{
+        return state.tableData.param.{{$column.HtmlField}}?[state.tableData.param.{{$column.HtmlField}}]:[]
+    },
+    set:(val:number[])=>{
+        state.tableData.param.{{$column.HtmlField}} = val?val[0]:0
+    }
+})
+{{end}}
+{{end}}
+// 页面加载时
+onMounted(() => {
+    initTableData();
+});
+// 初始化表格数据
+const initTableData = () => {
+    {{if gt (len .table.LinkedTables) 0}}
+    linkedData()
+    {{end}}
+    {{$businessName}}List()
+};
+{{if gt (len .table.LinkedTables) 0}}
+const linkedData = ()=>{
+    linkedDataSearch().then((res:any)=>{
+        {{range $index, $column := .table.Columns}}
+        {{if ne $column.LinkTableName ""}}
+        //关联{{$column.LinkTableName}}表选项
+        {{range $li,$lc := $.table.LinkedTables}}
+        {{if eq $lc.TableName $column.LinkTableName}}
+        {{if eq $lc.TplCategory "tree"}}
+        {{$column.HtmlField}}Options.value = proxy.handleTree(res.data.linked{{$.table.ClassName}}{{$column.LinkTableClass}}, '{{$lc.OptionsStruct.TreeCode}}', '{{$lc.OptionsStruct.TreeParentCode}}')
+        {{else}}
+        {{$column.HtmlField}}Options.value = proxy.setItems(res, '{{$column.LinkLabelId | CaseCamelLower}}', '{{$column.LinkLabelName | CaseCamelLower}}','linked{{$.table.ClassName}}{{$column.LinkTableClass}}')
+        {{end}}
+        {{end}}
+        {{end}}
+        {{end}}
+        {{end}}
+    })
+}
+{{end}}
+/** 重置按钮操作 */
+const resetQuery = (formEl: FormInstance | undefined) => {
+    if (!formEl) return
+    formEl.resetFields()
+    {{$businessName}}List()
+};
+// 获取列表数据
+const {{$businessName}}List = ()=>{
+  loading.value = true
+  list{{.table.ClassName}}(state.tableData.param).then((res:any)=>{
+    let list = res.data.list??[];
+    {{range $index,$column := .table.ListColumns}}
+    {{if eq $column.HtmlField "createdBy" "updatedBy" "dept_id"}}
+    list.map((item:any)=>{
+        {{if eq $column.HtmlField "createdBy"}}
+        item.createdBy = item?.createdUser.userNickname
+        {{end}}
+        {{if eq $column.HtmlField "deptId"}}
+        item.deptId = item.deptInfo?.deptName
+        {{end}}
+        {{if eq $column.HtmlField "updatedBy"}}
+        item.updatedBy = item?.updatedUser.userNickname
+        {{end}}
+    })
+    {{end}}
+    {{end}}
+    {{if ne .table.PkColumn.HtmlField "id"}}
+    if(list.length > 0 &&  typeof list[0].id == "undefined"){
+        list.map((item:any)=>{
+            item.id = item.{{.table.PkColumn.HtmlField}}
+        })
+    }
+    {{end}}
+    dataList.value = _.clone(res.data.list)
+    list = proxy.handleTree(res.data.list||[], "{{$treeCode}}", "{{$treeParentCode}}");
+    state.tableData.data = list;
+    loading.value = false
+    setVrData(list)
+  })
+};
+const toggleSearch = () => {
+    showAll.value = !showAll.value;
+}
+{{range $index, $column := .table.Columns}}
+{{if ne $column.DictType ""}}
+{{if eq $column.HtmlType "checkbox"}}
+// {{$column.ColumnComment}}字典翻译
+const {{$column.HtmlField}}Format = (row:{{$.table.ClassName}}TableColumns) => {
+        let {{$column.HtmlField}} = row.{{$column.HtmlField}}.split(",")
+        let data:Array<string> = [];
+        {{$column.HtmlField}}.map(item=>{
+        data.push(proxy.selectDictLabel({{$column.DictType}}.value, item))
+    })
+    return data.join(",")
+}
+{{else}}
+// {{$column.ColumnComment}}字典翻译
+const {{$column.HtmlField}}Format = (row:{{$.table.ClassName}}TableColumns) => {
+    return proxy.selectDictLabel({{$column.DictType}}.value, row.{{$column.HtmlField}});
+}
+{{end}}
+{{end}}
+{{if eq $column.HtmlType "switch"}}
+const change{{$column.GoField}} = (row:{{$.table.ClassName}}TableColumns) => {
+    change{{$.table.ClassName}}{{$column.GoField}}(row.{{$.table.PkColumn.HtmlField}},row.{{$column.HtmlField}})
+        .catch(()=>{
+            setTimeout(()=>{
+                row.{{$column.HtmlField}} = !row.{{$column.HtmlField}}
+            },300)
+        })
+}
+{{end}}
+{{end}}
+// 多选框选中数据
+const handleSelectionChange = (selection:Array<{{.table.ClassName}}InfoData>) => {
+    state.{{.table.PkColumn.HtmlField}}s = selection.map(item => item.{{.table.PkColumn.HtmlField}})
+    single.value = selection.length!=1
+    multiple.value = !selection.length
+}
+const handleAdd =  ()=>{
+    editRef.value.openDialog()
+}
+const handleUpdate = (row: {{$.table.ClassName}}TableColumns|null) => {
+    if(!row){
+        row = dataList.value.find((item:{{$.table.ClassName}}TableColumns)=>{
+            return item.{{.table.PkColumn.HtmlField}} ===state.{{.table.PkColumn.HtmlField}}s[0]
+        }) as {{$.table.ClassName}}TableColumns
+    }
+    editRef.value.openDialog(toRaw(row));
+};
+const handleDelete = (row: {{$.table.ClassName}}TableColumns|null) => {
+    let msg = '你确定要删除所选数据？';
+    let {{.table.PkColumn.HtmlField}}:{{.table.PkColumn.TsType}}[] = [] ;
+    if(row){
+    msg = `此操作将永久删除数据，是否继续?`
+    {{.table.PkColumn.HtmlField}} = [row.{{.table.PkColumn.HtmlField}}]
+    }else{
+    {{.table.PkColumn.HtmlField}} = state.{{.table.PkColumn.HtmlField}}s
+    }
+    if({{.table.PkColumn.HtmlField}}.length===0){
+        ElMessage.error('请选择要删除的数据。');
+        return
+    }
+    ElMessageBox.confirm(msg, '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning',
+    })
+        .then(() => {
+            del{{.table.ClassName}}({{.table.PkColumn.HtmlField}}).then(()=>{
+                ElMessage.success('删除成功');
+                {{$businessName}}List();
+            })
+        })
+        .catch(() => {});
+}
+const handleView = (row:{{$.table.ClassName}}TableColumns)=>{
+    detailRef.value.openDialog(toRaw(row));
+}
+//========================================================================================================
+const columns = ref<Column[]>([])
+const treeData = ref<any[]>([])
+
+type SelectionCellProps = {
+    value: boolean
+    intermediate?: boolean
+    onChange: (value: CheckboxValueType) => void
+}
+
+const SelectionCell: FunctionalComponent<SelectionCellProps> = ({
+    value,
+    intermediate = false,
+    onChange,
+}) => {
+    return h(ElCheckbox,{modelValue:value,indeterminate:intermediate,onChange:onChange})
+}
+const setVrData = (list:{{$.table.ClassName}}TableColumns[])=>{
+    const _columns:any[] = [
+        {key: 'selection',dataKey: '{{.table.PkColumn.HtmlField}}',title: ``,width:80,
+            {{if .table.PkColumn.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+            headerCellRenderer:()=>{
+                let _data = unref(dataList.value)
+                const onChange = (value: CheckboxValueType) =>{
+                    _data = _data.map((row:any) => {
+                        row.checked = value
+                        return row
+                    })
+                    treeData.value = proxy.handleTree(_data||[], "{{$treeCode}}", "{{$treeParentCode}}")
+                    state.{{.table.PkColumn.HtmlField}}s = _data.map((item:any) => {
+                        if(item.checked){
+                            return item.{{.table.PkColumn.HtmlField}}
+                        }
+                    }).filter(item=>item!==undefined)
+                    single.value = state.{{.table.PkColumn.HtmlField}}s.length!=1
+                    multiple.value = !state.{{.table.PkColumn.HtmlField}}s.length
+                }
+                const allSelected = _data.every((row:any) => row.checked)
+                const containsChecked = _data.some((row:any) => row.checked)
+                return h(ElCheckbox,{value:allSelected,intermediate:containsChecked && !allSelected,onChange:onChange})
+            },
+            cellRenderer:({rowData: row})=>{
+                return h(SelectionCell, {value:row.checked,intermediate:false,onChange:(v:CheckboxValueType)=>{
+                        row.checked=v
+                        if(v){
+                            state.{{.table.PkColumn.HtmlField}}s.push(row.{{.table.PkColumn.HtmlField}})
+                            state.{{.table.PkColumn.HtmlField}}s =  [...new Set(state.{{.table.PkColumn.HtmlField}}s)]
+                        }else{
+                            state.{{.table.PkColumn.HtmlField}}s = state.{{.table.PkColumn.HtmlField}}s.filter(item=>item!==row.{{.table.PkColumn.HtmlField}})
+                        }
+                        single.value = state.{{.table.PkColumn.HtmlField}}s.length!=1
+                        multiple.value = !state.{{.table.PkColumn.HtmlField}}s.length
+                    }
+                })
+            }
+        }
+    ]
+    {{range $index, $column := .table.ListColumns}}
+    {{if $column.IsPk}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+    })
+    {{else if eq $column.HtmlType "date"}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ cellData: {{$column.HtmlField}} }) => {
+            return h('span', proxy.parseTime({{$column.HtmlField}}, '{y}-{m}-{d}'));
+        }
+    })
+    {{else if eq $column.HtmlType "datetime"}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ cellData: {{$column.HtmlField}} }) => {
+            return h('span', proxy.parseTime({{$column.HtmlField}}, '{y}-{m}-{d} {h}:{i}:{s}'));
+        }
+    })
+    {{else if eq $column.HtmlField "createdBy"}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+    })
+    {{else if eq $column.HtmlField "updatedBy"}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+    })
+    {{else if eq $column.HtmlType "imagefile"}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({cellData: {{$column.HtmlField}} }) => {
+            const children = []
+            if(!proxy.isEmpty({{$column.HtmlField}})){
+                children.push(h(ElImage,{fit:'contain',style:'width:50px;height:50px',src:proxy.getUpFileUrl({{$column.HtmlField}})}))
+            }
+            return ('div',children)
+        }
+    })
+    {{else if eq $column.HtmlType "switch"}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ rowData:row,cellData:{{$column.HtmlField}} }) => {
+            return h(ElSwitch,{modelValue:{{$column.HtmlField}},
+            'onUpdate:modelValue': (value) => {
+                // 更新数据
+                row.{{$column.HtmlField}} = value;
+            },
+            onClick: () => { change{{$column.GoField}}(row)}});
+        }
+    })
+    {{else if eq $column.HtmlType "userSelectorSingle" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+            return h('span', linked{{$column.GoField}}?linked{{$column.GoField}}.userNickname:'');
+        }
+    })
+    {{else if eq $column.HtmlType "userSelectorMultiple" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+            cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+                return h('span', linked{{$column.GoField}}?linked{{$column.GoField}}.map((res:any)=>{return res.userNickname}).join('，'):'');
+        }
+    })
+    {{else if eq $column.HtmlType "deptSelectorSingle" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+      {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+            cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+                return h('span', linked{{$column.GoField}}?linked{{$column.GoField}}.deptName:'');
+        }
+    })
+    {{else if eq $column.HtmlType "deptSelectorMultiple" }}
+    _columns.push({key: 'linked{{$column.GoField}}',dataKey: 'linked{{$column.GoField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({ cellData: linked{{$column.GoField}} }) => {
+            return h('span',linked{{$column.GoField}}?linked{{$column.GoField}}.map((res:any)=>{return res?.deptName}).join('，'):'');
+        }
+    })
+    {{else if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+    {{if ne $column.LinkTableName ""}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({cellData: {{$column.HtmlField}} }) => {
+            const children = []
+            if(linked{{$column.GoField}}){
+                linked{{$column.GoField}}.map(item=>{
+                    children.push(h(ElTag,{class:"ml-2",type:'success'},[item.{{$column.LinkLabelName|CaseCamelLower}}]))
+                })
+            }
+            return ('div',children)
+        }
+    })
+    {{else if ne $column.DictType ""}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({rowData:row}) => {
+            return ('span',[{{$column.HtmlField}}Format(row)])
+        }
+    })
+    {{end}}
+    {{else if ne $column.LinkTableName ""}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: 'linked{{$column.GoField}}.{{$column.LinkLabelName | CaseCamelLower}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+    })
+    {{else if ne $column.DictType ""}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+        cellRenderer: ({rowData:row}) => {
+            return ('span',[{{$column.HtmlField}}Format(row)])
+        }
+    })
+    {{else if ne $column.HtmlField ""}}
+    _columns.push({key: '{{$column.HtmlField}}',dataKey: '{{$column.HtmlField}}',title: `{{$column.ColumnComment}}`,
+        {{if gt $column.MinWidth 0}}width:{{$column.MinWidth}},{{end}}
+        {{if $column.IsFixed}}fixed: TableV2FixedDir.LEFT,{{end}}
+    })
+    {{end}}
+    {{end}}
+    _columns.push({key: 'operations',dataKey: '{{$.table.PkColumn.HtmlField}}',title: `操作`,width:200,fixed: TableV2FixedDir.RIGHT,
+        cellRenderer: ({rowData:row,cellData:{{$.table.PkColumn.HtmlField}}}) => {
+            const link = []
+            if(auth('{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/get')){
+                link.push(h(ElLink, { type: 'primary',underline:false, onClick: () => { handleView(row) } },
+                    () => [
+                        h(ElIcon, () => [h(View)]),
+                        '详情'
+                    ]
+                ))
+            }
+            if(auth('{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/edit')){
+                link.push(h(ElLink, { type: 'primary',underline:false, onClick: () => { handleUpdate(row) } },
+                    () => [
+                        h(ElIcon, () => [h(EditPen)]),
+                        '修改'
+                    ]
+                ))
+            }
+            if(auth('{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/delete')){
+                link.push(h(ElLink, { type: 'primary',underline:false, onClick: () => { handleDelete(row) } },
+                    () => [
+                        h(ElIcon, () => [h(DeleteFilled)]),
+                        '删除'
+                    ]
+                ))
+            }
+            return h('div',{class:'tb-operations'},link)
+        }
+    })
+    columns.value = _columns
+    treeData.value = list
+}
+//=============================================================================================================
+const expandColumnKey = '{{$firstColumn.HtmlField}}'
+
+const expandedRowKeys = ref<string[]>([])
+
+const onRowExpanded = (exp: Parameters<RowExpandHandler<any>>[0]) => {
+    console.log('Expanded:', exp)
+}
+
+const onExpandedRowsChange = (
+    expandedKeys: Parameters<ExpandedRowsChangeHandler>[0]
+) => {
+    console.log('expandedKeys:',expandedKeys)
+}
+{{if .table.ExcelPort }}
+//导出excel
+const handleExport = ()=>{
+    downLoadXml('/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/export',state.tableData.param,'get')
+}
+{{end}}
+{{if .table.ExcelImp}}
+const handleImport=()=>{
+    loadExcel{{$.table.ClassName}}Ref.value.open()
+}
+{{end}}
+</script>
+<style lang="scss" scoped>
+    .colBlock {
+        display: block;
+    }
+    .colNone {
+        display: none;
+    }
+    :deep(.tb-operations .el-link){
+        margin-left: 12px;
+        .el-icon{
+            margin-right: 5px;
+        }
+    }
+</style>

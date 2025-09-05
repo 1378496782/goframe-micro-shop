@@ -1,0 +1,25 @@
+// ==========================================================================
+// GFast自动生成router操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/router/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+package router
+
+////
+import (
+	"context"
+	"github.com/gogf/gf/v2/net/ghttp"
+	"{{.goModName}}/{{.table.PackageName}}/controller"
+)
+
+func (router *Router) Bind{{.table.ClassName}}Controller(ctx context.Context, group *ghttp.RouterGroup) {
+	group.Group("/{{$.table.ClassName|CaseCamelLower}}", func(group *ghttp.RouterGroup) {
+		group.Bind(
+			controller.{{.table.ClassName}},
+		)
+	})
+}

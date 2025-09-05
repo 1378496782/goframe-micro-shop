@@ -1,0 +1,152 @@
+// ==========================================================================
+// GFast自动生成api操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: api/v1/{{.table.ModuleName }}/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}相关参数
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+package {{.table.ModuleName }}
+////
+import (
+    "github.com/gogf/gf/v2/frame/g"
+    {{if .table.ExcelImp}}
+    "github.com/gogf/gf/v2/net/ghttp"
+    {{end}}
+    commonApi "{{.goModName}}/api/v1/common"
+    "{{.goModName}}/{{.table.PackageName}}/model"
+)
+
+
+// {{.table.ClassName}}SearchReq 分页请求参数
+type {{.table.ClassName}}SearchReq struct {
+    g.Meta   `path:"/list" tags:"{{$.table.FunctionName}}" method:"get" summary:"{{$.table.TableComment}}列表"`
+    commonApi.Author
+    model.{{.table.ClassName}}SearchReq
+}
+
+
+// {{.table.ClassName}}SearchRes 列表返回结果
+type {{.table.ClassName}}SearchRes struct {
+    g.Meta `mime:"application/json"`
+    *model.{{.table.ClassName}}SearchRes
+}
+
+{{if .table.ExcelPort }}
+// {{.table.ClassName}}ExportReq 导出请求
+type {{.table.ClassName}}ExportReq struct {
+    g.Meta   `path:"/export" tags:"{{$.table.FunctionName}}" method:"get" summary:"{{$.table.TableComment}}导出"`
+    commonApi.Author
+    model.{{.table.ClassName}}SearchReq
+}
+// {{.table.ClassName}}ExportRes 导出响应
+type {{.table.ClassName}}ExportRes struct {
+    commonApi.EmptyRes
+}
+
+{{end}}
+
+{{if .table.ExcelImp}}
+type {{.table.ClassName}}ExcelTemplateReq struct {
+    g.Meta `path:"/excelTemplate" tags:"{{$.table.FunctionName}}" method:"get" summary:"导出模板文件"`
+    commonApi.Author
+}
+
+type {{.table.ClassName}}ExcelTemplateRes struct {
+    commonApi.EmptyRes
+}
+
+type {{.table.ClassName}}ImportReq struct {
+    g.Meta `path:"/import" tags:"{{$.table.FunctionName}}" method:"post" summary:"{{$.table.TableComment}}导入"`
+    commonApi.Author
+    File   *ghttp.UploadFile `p:"file" type:"file" dc:"选择上传文件"  v:"required#上传文件必须"`
+}
+
+type {{.table.ClassName}}ImportRes struct {
+    commonApi.EmptyRes
+}
+{{end}}
+
+{{if gt (len .table.LinkedTables) 0}}
+//相关连表查询数据
+type Linked{{$.table.ClassName}}DataSearchReq struct{
+    g.Meta   `path:"/linkedData" tags:"{{$.table.FunctionName}}" method:"get" summary:"{{$.table.TableComment}}关联表数据"`
+    commonApi.Author
+}
+{{end}}
+
+{{if gt (len .table.LinkedTables) 0}}
+//相关连表查询数据
+type Linked{{$.table.ClassName}}DataSearchRes struct{
+    g.Meta `mime:"application/json"`
+    *model.Linked{{$.table.ClassName}}DataSearchRes
+}
+{{end}}
+
+
+// {{.table.ClassName}}AddReq 添加操作请求参数
+type {{.table.ClassName}}AddReq struct {
+    g.Meta   `path:"/add" tags:"{{$.table.FunctionName}}" method:"post" summary:"{{$.table.TableComment}}添加"`
+    commonApi.Author
+    *model.{{.table.ClassName}}AddReq
+}
+
+// {{.table.ClassName}}AddRes 添加操作返回结果
+type {{.table.ClassName}}AddRes  struct {
+    commonApi.EmptyRes
+}
+
+
+// {{.table.ClassName}}EditReq 修改操作请求参数
+type {{.table.ClassName}}EditReq struct {
+    g.Meta   `path:"/edit" tags:"{{$.table.FunctionName}}" method:"put" summary:"{{$.table.TableComment}}修改"`
+    commonApi.Author
+    *model.{{.table.ClassName}}EditReq
+}
+
+// {{.table.ClassName}}EditRes 修改操作返回结果
+type {{.table.ClassName}}EditRes  struct {
+    commonApi.EmptyRes
+}
+
+// {{.table.ClassName}}GetReq 获取一条数据请求
+type {{.table.ClassName}}GetReq struct {
+    g.Meta `path:"/get" tags:"{{$.table.FunctionName}}" method:"get" summary:"获取{{$.table.TableComment}}信息"`
+    commonApi.Author
+    {{$.table.PkColumn.GoField}}    {{$.table.PkColumn.GoType}} `p:"{{$.table.PkColumn.HtmlField}}" v:"required#主键必须"` //通过主键获取
+}
+
+// {{.table.ClassName}}GetRes 获取一条数据结果
+type {{.table.ClassName}}GetRes struct {
+    g.Meta `mime:"application/json"`
+    *model.{{.table.ClassName}}InfoRes
+}
+
+// {{.table.ClassName}}DeleteReq 删除数据请求
+type {{.table.ClassName}}DeleteReq struct {
+    g.Meta `path:"/delete" tags:"{{$.table.FunctionName}}" method:"delete" summary:"删除{{$.table.TableComment}}"`
+    commonApi.Author
+    {{$.table.PkColumn.GoField}}s    []{{$.table.PkColumn.GoType}} `p:"{{$.table.PkColumn.HtmlField}}s" v:"required#主键必须"` //通过主键删除
+}
+
+// {{.table.ClassName}}DeleteRes 删除数据返回
+type {{.table.ClassName}}DeleteRes struct {
+    commonApi.EmptyRes
+}
+
+{{range $index,$column:= .table.Columns}}
+{{if eq $column.HtmlType "switch"}}
+// {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
+type {{$.table.ClassName}}{{$column.GoField}}SwitchReq struct {
+    g.Meta   `path:"/change{{$column.GoField}}" tags:"{{$.table.FunctionName}}" method:"put" summary:"修改{{$column.ColumnComment}}"`
+    commonApi.Author
+    {{$.table.PkColumn.GoField}}    {{$.table.PkColumn.GoType}} `p:"{{$.table.PkColumn.HtmlField}}" v:"required#主键必须"` //通过主键修改
+    {{$column.GoField}}    {{$column.GoType}} `p:"{{$column.HtmlField}}" v:"required#状态必须"` //通过主键获取
+}
+
+type {{$.table.ClassName}}{{$column.GoField}}SwitchRes struct {
+    commonApi.EmptyRes
+}
+{{end}}
+{{end}}

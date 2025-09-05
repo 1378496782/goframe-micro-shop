@@ -1,0 +1,89 @@
+import request from '/@/utils/request'
+
+{{$businessName := .table.BusinessName | CaseCamelLower}}
+
+
+// 查询{{.table.FunctionName}}列表
+export function list{{.table.ClassName}}(query:object) {
+  return request({
+    url: '/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询{{.table.FunctionName}}详细
+export function get{{.table.ClassName}}({{.table.PkColumn.HtmlField}}:{{.table.PkColumn.TsType}}) {
+  return request({
+    url: '/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/get',
+    method: 'get',
+    params: {
+      {{.table.PkColumn.HtmlField}}: {{.table.PkColumn.HtmlField}}.toString()
+    }
+  })
+}
+
+// 新增{{.table.FunctionName}}
+export function add{{.table.ClassName}}(data:object) {
+  return request({
+    url: '/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/add',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改{{.table.FunctionName}}
+export function update{{.table.ClassName}}(data:object) {
+  return request({
+    url: '/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/edit',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除{{.table.FunctionName}}
+export function del{{.table.ClassName}}({{.table.PkColumn.HtmlField}}s:{{.table.PkColumn.TsType}}[]) {
+  return request({
+    url: '/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/delete',
+    method: 'delete',
+    data:{
+      {{.table.PkColumn.HtmlField}}s:{{.table.PkColumn.HtmlField}}s
+    }
+  })
+}
+
+
+{{$getUserList:=false}}
+
+{{/*去重处理*/}}
+{{$hasMethods:=newArray}}
+{{range $index,$column:= .table.Columns}}
+{{if eq $column.HtmlType "switch"}}
+// {{$.table.FunctionName}}{{$column.ColumnComment}}修改
+export function change{{$.table.ClassName}}{{$column.GoField}}({{$.table.PkColumn.HtmlField}}:{{$.table.PkColumn.TsType}},{{$column.HtmlField}}:{{$column.TsType}}) {
+  const data = {
+    {{$.table.PkColumn.HtmlField}},
+    {{$column.HtmlField}}
+  }
+  return request({
+    url: '/{{$.apiVersion}}/{{$.modulePath}}/{{$businessName}}/change{{$column.GoField}}',
+    method: 'put',
+    data:data
+  })
+}
+{{end}}
+
+{{if eq $column.HtmlField "createdBy" "updatedBy"}}
+{{$getUserList = true}}
+{{end}}
+{{end}}
+
+{{if gt (len .table.LinkedTables) 0}}
+//相关连表查询数据
+export function linkedDataSearch(){
+  return request({
+    url: '/{{.apiVersion}}/{{.modulePath}}/{{$businessName}}/linkedData',
+    method: 'get'
+  })
+}
+{{end}}

@@ -1,0 +1,46 @@
+// ==========================================================================
+// GFast自动生成model entity操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/model/entity/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+package entity
+
+////
+import (
+    {{if .table.HasTimeColumn}}
+    "github.com/gogf/gf/v2/os/gtime"
+    {{end}}
+    "github.com/gogf/gf/v2/util/gmeta"
+)
+
+////
+// {{.table.ClassName}} is the golang structure for table {{.table.TableName}}.
+type {{.table.ClassName}} struct {
+    gmeta.Meta   `orm:"table:{{.table.TableName}}"`
+    {{range $index, $column := .table.Columns}}
+    {{if $column.IsPk}}{{$column.GoField}}       {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}},primary" json:"{{$column.HtmlField}}{{if $.table.UseSnowId}},string{{end}}"`    // {{$column.ColumnComment}} {{else}}{{$column.GoField}}    {{if eq $column.GoType "Time"}}*gtime.Time{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}}" json:"{{$column.HtmlField}}"`    // {{$column.ColumnComment}} {{end}}
+    {{if ne $column.LinkTableName ""}}
+    {{range $ti, $linkedTable := $.table.LinkedTables}}
+    {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+    Linked{{$column.GoField}}  *Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" json:"linked{{$column.GoField}}"`
+    {{end}}
+    {{end}}
+    {{end}}
+    {{end}}
+
+}
+
+{{range $ti, $linkedTable := .table.LinkedTables}}
+////
+type Linked{{$.table.ClassName}}{{$linkedTable.ClassName}} struct {
+    gmeta.Meta   `orm:"table:{{$linkedTable.TableName}}"`
+    {{range $ci, $linkedColumn := $linkedTable.RefColumns.Values}}
+    {{$linkedColumn.GoField}}    {{if eq $linkedColumn.GoType "Time"}}*gtime.Time{{else}}{{$linkedColumn.GoType}}{{end}}         `orm:"{{$linkedColumn.ColumnName}}" json:"{{$linkedColumn.HtmlField}}"`    // {{$linkedColumn.ColumnComment}}
+    {{end}}
+}
+{{end}}

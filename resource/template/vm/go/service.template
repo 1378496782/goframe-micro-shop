@@ -1,0 +1,71 @@
+// ==========================================================================
+// GFast自动生成service操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/service/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+{{$structName := .table.BusinessName | CaseCamelLower}}
+
+package service
+////
+
+{{$gjson:=false}}
+{{range $index, $column := .table.Columns}}
+{{if eq $column.HtmlType "images" "file" "files"}}
+{{$gjson = true}}
+{{end}}
+{{end}}
+
+import (
+	"context"
+	{{if .table.ExcelImp}}
+	"github.com/gogf/gf/v2/net/ghttp"
+	{{end}}
+	"{{.goModName}}/{{.table.PackageName}}/model"
+	{{if or .table.HasConversion (eq .table.TplCategory "tree")}}
+	{{end}}
+)
+
+////
+type I{{.table.ClassName}} interface {
+	List(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (res *model.{{.table.ClassName}}SearchRes, err error)
+	{{if .table.ExcelPort }}
+	GetExportData(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (listRes []*model.{{.table.ClassName}}InfoRes, err error)
+	{{end}}
+	{{if .table.ExcelImp }}
+	Import(ctx context.Context,file *ghttp.UploadFile)(err error)
+	{{end}}
+	GetBy{{.table.PkColumn.GoField}}(ctx context.Context, {{.table.PkColumn.GoField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error)
+	Add(ctx context.Context, req *model.{{.table.ClassName}}AddReq) (err error)
+	Edit(ctx context.Context, req *model.{{.table.ClassName}}EditReq) (err error)
+	Delete(ctx context.Context, {{$.table.PkColumn.GoField}} []{{$.table.PkColumn.GoType}}) (err error)
+	{{if gt (len .table.LinkedTables) 0}}
+	Linked{{$.table.ClassName}}DataSearch(ctx context.Context)(res *model.Linked{{$.table.ClassName}}DataSearchRes,err error)
+	{{end}}
+	{{range $index,$column:= .table.Columns}}
+	{{if eq $column.HtmlType "switch"}}
+	// {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
+	Change{{$column.GoField}} (ctx context.Context,{{$.table.PkColumn.HtmlField}} {{$.table.PkColumn.GoType}},{{$column.HtmlField}} {{$column.GoType}})(err error)
+	{{end}}
+	{{end}}
+}
+
+////
+var local{{.table.ClassName}} I{{.table.ClassName}}
+
+////
+func {{.table.ClassName}}() I{{.table.ClassName}} {
+	if local{{.table.ClassName}} == nil {
+		panic("implement not found for interface I{{.table.ClassName}}, forgot register?")
+	}
+	return local{{.table.ClassName}}
+}
+
+////
+func Register{{.table.ClassName}}(i I{{.table.ClassName}}) {
+	local{{.table.ClassName}} = i
+}

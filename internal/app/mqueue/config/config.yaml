@@ -1,0 +1,21 @@
+# 正式项目请修改manifest/config.yaml下的配置，这个只是示例和Test使用
+mqueue:
+  enable: true
+  closeWaitTime: 5                             # 关闭服务器时等待刷盘时间(秒),最好不要小于5
+  driver: "diskQueue"                          # 驱动类型 nsq|diskQueue|rocketmq
+  channel: "channel"                           # 默认频道名称
+  nsq:
+    address: "192.168.75.3"                    # nsq地址
+    producer_port: 4150                        # 生产者端口
+    consumer_port: 4161                        # 消费者http端口
+  rocketmq:
+    nameServers: "192.168.75.3:9876"           # 服务器地址
+    retry: 2                                   # 重试次数
+    logLevel: "warn"                           # 日志级别 debug|error|warn|fatal
+  diskQueue:
+    dataPath: "./resource/data/storage/diskqueue"            # 存储路径
+    maxBytesPerFile: 2097152                   # 单个单件最大字节数(byte)，默认：2m(2097152)
+    syncEvery: 2500                            # 多少次读写后刷盘
+    syncTimeout: 2                             # 刷盘间隔（秒）
+    maxMsgSize: 128144                         # 最大消息字节数(byte)
+    minMsgSize: 0                              # 最小消息字节数

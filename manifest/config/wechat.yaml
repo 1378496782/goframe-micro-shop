@@ -1,0 +1,25 @@
+gfToken:
+  cacheKey: "WechatGfToken:"
+  timeOut: 2592000  #30天
+  maxRefresh: 1296000
+  multiLogin: true
+  encryptKey: "CHANGE_ME_GFTOKEN_ENCRYPT_KEY"
+  cacheModel: "redis"
+  excludePaths:
+    - "/api/v1/wechat/login"
+wechat:
+  AppID: "CHANGE_ME_WECHAT_APP_ID"
+  Secret: "CHANGE_ME_WECHAT_SECRET"
+  HttpDebug: false
+  AesKey: "CHANGE_ME_WECHAT_AES_KEY"
+  isDebug: true
+  isDebug2: true
+  Log:
+    Level: "debug"
+    File: "./resource/log/wechat/wechat.log"
+    Error: "./resource/log/wechat/error.log"
+  Cache:
+    Type: 1 #0使用内存 1使用redis
+    Addr: "127.0.0.1:6379"
+    Password: ""
+    DB: 0

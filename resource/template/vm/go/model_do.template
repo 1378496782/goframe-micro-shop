@@ -1,0 +1,28 @@
+// ==========================================================================
+// GFast自动生成model entity操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/model/entity/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+package do
+
+////
+import (
+    {{if .table.HasTimeColumn}}
+    "github.com/gogf/gf/v2/os/gtime"
+    {{end}}
+    "github.com/gogf/gf/v2/util/gmeta"
+)
+
+////
+// {{.table.ClassName}} is the golang structure for table {{.table.TableName}}.
+type {{.table.ClassName}} struct {
+    gmeta.Meta   `orm:"table:{{.table.TableName}}, do:true"`
+    {{range $index, $column := .table.Columns}}
+    {{if $column.IsPk}}{{$column.GoField}}       {{if eq $column.GoType "Time"}}*gtime.Time{{else}}interface{}{{end}}         `orm:"{{$column.ColumnName}},primary" json:"{{$column.HtmlField}}"`    // {{$column.ColumnComment}} {{else}}{{$column.GoField}}    {{if eq $column.GoType "Time"}}*gtime.Time{{else}}interface{}{{end}}         `orm:"{{$column.ColumnName}}" json:"{{$column.HtmlField}}"`    // {{$column.ColumnComment}} {{end}}
+    {{end}}
+}

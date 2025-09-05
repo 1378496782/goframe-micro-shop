@@ -1,0 +1,719 @@
+// ==========================================================================
+// GFast自动生成logic操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/logic/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+{{$structName := .table.BusinessName | CaseCamelLower}}
+
+package {{$structName}}
+////
+{{$gjson:=false}}
+{{$libUtils:=false}}
+{{$usedSystemModule:=false}}
+{{$gstr:=false}}
+{{$hasLinkTable:=false}}
+{{$useCommonService:=false}}
+{{$hasDeptSelector:=false}}
+{{$hasUserMultipleSelector:=false}}
+{{$usedSystemModel := false}}
+{{range $index, $column := .table.Columns}}
+{{if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
+{{$libUtils = true}}
+{{end}}
+{{if eq $column.HtmlType "deptSelectorMultiple" "deptSelectorSingle"}}
+{{$hasDeptSelector = true}}
+{{end}}
+{{if eq $column.HtmlType "userSelectorMultiple"}}
+    {{$hasUserMultipleSelector = true}}
+{{end}}
+{{if and (or (eq $column.HtmlField "createdBy" "updatedBy" "deletedBy" "deptId") (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle")) (ne $.table.ModuleName "system")}}
+{{$usedSystemModule = true}}
+{{end}}
+{{if and (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle") (ne $.table.ModuleName "system")}}
+{{$usedSystemModel = true}}
+{{end}}
+{{if eq $column.HtmlType "selects" "checkbox"}}
+{{range $ti, $linkedTable := $.table.LinkedTables}}
+{{if eq $column.LinkTableClass $linkedTable.ClassName}}
+{{$gstr = true}}
+{{$hasLinkTable = true}}
+{{end}}
+{{end}}
+{{end}}
+{{end}}
+{{if and .table.UseSnowId (not .table.IsPkInsertable)}}
+{{$useCommonService = true}}
+{{end}}
+
+import (
+    "context"
+    "github.com/gogf/gf/v2/frame/g"
+    {{if .table.ExcelImp}}
+    "errors"
+    "github.com/gogf/gf/v2/net/ghttp"
+    "github.com/gogf/gf/v2/database/gdb"
+    "github.com/xuri/excelize/v2"
+    {{end}}
+    {{if $gstr}}
+    "github.com/gogf/gf/v2/text/gstr"
+    {{end}}
+    {{if or .table.HasConversion (eq .table.TplCategory "tree")}}
+    "github.com/gogf/gf/v2/util/gconv"
+    {{end}}
+    {{if $useCommonService}}
+    commonService "{{.goModName}}/internal/app/common/service"
+    {{end}}
+    "{{.goModName}}/{{.table.PackageName}}/dao"
+    "{{.goModName}}/{{.table.PackageName}}/model"
+    "{{.goModName}}/{{.table.PackageName}}/model/do"
+    "{{.goModName}}/{{.table.PackageName}}/service"
+    {{if ne .table.TplCategory "tree"}}
+    "{{.goModName}}/internal/app/system/consts"
+    {{end}}
+    {{if $usedSystemModule}}
+    systemService "{{.goModName}}/internal/app/system/service"
+    {{end}}
+    {{if $usedSystemModel}}
+    systemModel "{{.goModName}}/internal/app/system/model"
+    {{end}}
+    {{if or (eq .table.TplCategory "tree") $libUtils}}
+    "{{.goModName}}/library/libUtils"
+    {{end}}
+    "{{.goModName}}/library/liberr"
+
+
+    {{/*去重处理-导入关联表依赖包*/}}
+    {{$hasMethods:=newArray}}
+    {{range $index,$column:= .table.LinkedTables}}
+    {{if ne $column.TableName ""}}
+    {{if not (inArray $hasMethods (concat "list" $column.ClassName))}}
+    {{$hasMethods = append $hasMethods (concat "list" $column.ClassName)}}
+    {{/*关联{{$column.LinkTableName}}表选项*/}}
+    {{if ne $column.PackageName $.table.PackageName}}
+    linked{{$column.ClassName}}Dao "{{$.goModName}}/{{$column.PackageName}}/dao"
+    {{end}}
+    {{end}}
+    {{end}}
+    {{end}}
+)
+
+
+{{$pk:=""}}
+{{$pkGoField:=""}}
+
+{{$createdAt:=""}}
+{{$createdAtGoField:=""}}
+
+{{range $index, $column := .table.Columns}}
+{{if $column.IsPk}}
+    {{$pk = $column.ColumnName}}
+    {{$pkGoField = $column.GoField}}
+{{end}}
+{{if eq $column.ColumnName "created_at"}}
+    {{$createdAt = $column.ColumnName}}
+    {{$createdAtGoField = $column.GoField}}
+{{end}}
+{{end}}
+////
+func init() {
+	service.Register{{.table.ClassName}}(New())
+}
+////
+func New() service.I{{.table.ClassName}} {
+	return &s{{.table.ClassName}}{}
+}
+////
+type s{{.table.ClassName}} struct{}
+////
+func (s *s{{.table.ClassName}})List(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (listRes *model.{{.table.ClassName}}SearchRes, err error){
+    listRes = new(model.{{.table.ClassName}}SearchRes)
+    err = g.Try(ctx, func(ctx context.Context) {
+        m := dao.{{.table.ClassName}}.Ctx(ctx).WithAll()
+        {{range $index, $column := .table.QueryColumns}}
+        {{if eq $column.QueryType "LIKE"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" like ?", "%"+req.{{$column.GoField}}+"%")
+        }
+        {{else if eq $column.QueryType "EQ"}}
+          {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+        if len(req.{{$column.GoField}}) > 0 {
+            if systemService.ToolsGenTable().IsMysql() {
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where("JSON_CONTAINS(`{{$column.ColumnName}}`,?)", gconv.String(v))
+                }
+            }else{
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where(`"{{$column.ColumnName}}" @> '[?]'::jsonb`, v)
+                }
+            }
+        }
+          {{else if eq $column.GoType "string"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{else if eq $column.GoType "Time"}}
+            {{if eq $column.ColumnName "created_at"}}
+        if len(req.DateRange) != 0 {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >=? AND "+dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" <=?", req.DateRange[0], req.DateRange[1])
+        }
+            {{else}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+            {{end}}
+          {{else if or (eq $column.GoType "int") (eq $column.GoType "int64") (eq $column.GoType "uint") (eq $column.GoType "uint64") (eq $column.GoType "bool")}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{end}}
+        {{else if eq $column.QueryType "BETWEEN" }}
+        if req.{{$column.GoField}} != nil && len(req.{{$column.GoField}}) > 0 {
+          if req.{{$column.GoField}}[0] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >= ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[0]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+          if len(req.{{$column.GoField}}) > 1 && req.{{$column.GoField}}[1] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" < ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[1]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+        }
+        {{end}}
+        {{end}}
+        {{if ne .table.TplCategory "tree"}}
+        listRes.Total, err = m.Count()
+        liberr.ErrIsNil(ctx, err, "获取总行数失败")
+        if req.PageNum == 0 {
+            req.PageNum = 1
+        }
+        listRes.CurrentPage = req.PageNum
+        if req.PageSize == 0 {
+            req.PageSize = consts.PageSize
+        }
+        order:= "{{.table.SortColumn}} {{.table.SortType}}"
+        if req.OrderBy!=""{
+            order = req.OrderBy
+        }
+        var res []*model.{{.table.ClassName}}ListRes
+        err = m.Page(req.PageNum, req.PageSize).Order(order).Scan(&res)
+        {{else}}
+        order:= "{{.table.SortColumn}} {{.table.SortType}}"
+        if req.OrderBy!=""{
+            order = req.OrderBy
+        }
+        var res []*model.{{.table.ClassName}}ListRes
+        err = m.Order(order).Scan(&res)
+        {{end}}
+        liberr.ErrIsNil(ctx, err, "获取数据失败")
+        listRes.List = make([]*model.{{.table.ClassName}}ListRes,len(res))
+        for k,v:=range res{
+            {{range $index, $column := .table.Columns}}
+            {{if and $column.IsList (eq $column.HtmlType "userSelectorMultiple")}}
+            var linked{{$column.GoField}} []*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.SysUserSimpleRes
+            linked{{$column.GoField}}, err = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysUser().GetUsers(ctx, gconv.Interfaces(v.{{$column.GoField}}))
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
+            {{if and $column.IsList (eq $column.HtmlType "deptSelectorMultiple")}}
+            linked{{$column.GoField}} := make([]*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.LinkDeptRes, len(v.{{$column.GoField}}))
+            for lk, lv := range v.{{$column.GoField}} {
+                linked{{$column.GoField}}[lk] = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, lv)
+            }
+            {{end}}
+            {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+            {{range $ti, $linkedTable := $.table.LinkedTables}}
+            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            err = g.Model("{{$linkedTable.TableName}}").
+            Fields(model.Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{}).
+            Where("{{$column.LinkLabelId}}", gstr.Split(v.{{$column.GoField}}, ",")).
+            Scan(&v.Linked{{$column.GoField}})
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
+            {{end}}
+            {{end}}
+            {{end}}
+            listRes.List[k] = &model.{{.table.ClassName}}ListRes{
+                {{if eq .table.TplCategory "tree"}}
+                  {{range $index, $column := .table.Columns}}
+                    {{if or (eq $column.HtmlField $.table.TreeCode) (eq $column.HtmlField $.table.TreeParentCode) (eq $column.HtmlField $.table.TreeName) }}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                    {{end}}
+                    {{if and $column.IsList (eq $column.HtmlField "createdBy")}}
+                CreatedUser:v.CreatedUser,
+                    {{end}}
+                    {{if and $column.IsList (eq $column.HtmlField "deptId")}}
+                    {{if $usedSystemModule}}
+                DeptInfo:systemService.SysDept().GetByDept(ctx, v.DeptId),
+                    {{else}}
+                DeptInfo:service.SysDept().GetByDept(ctx, v.DeptId),
+                    {{end}}
+                    {{end}}
+                    {{if and $column.IsList (eq $column.HtmlField "UpdatedBy")}}
+                UpdatedUser:v.UpdatedUser,
+                    {{end}}
+                    {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
+                      {{if eq $column.HtmlType "images" "file" "files"}}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                      {{else}}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                        {{range $ti, $linkedTable := $.table.LinkedTables}}
+                            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+                Linked{{$column.GoField}}:v.Linked{{$column.GoField}},
+                            {{end}}
+                        {{end}}
+                      {{end}}
+                    {{end}}
+                    {{if eq $column.HtmlType "userSelectorSingle"}}
+                Linked{{$column.GoField}} : v.Linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "userSelectorMultiple"}}
+                Linked{{$column.GoField}} : linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorSingle"}}
+                Linked{{$column.GoField}}:  {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, v.{{$column.GoField}}),
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+                Linked{{$column.GoField}}: linked{{$column.GoField}},
+                    {{end}}
+                  {{end}}
+                {{else}}
+                  {{if not .table.IsPkListable}}
+                {{.table.PkColumn.GoField}} : v.{{.table.PkColumn.GoField}},
+                  {{end}}
+                  {{range $index, $column := .table.ListColumns}}
+                  {{if and $column.IsList (eq $column.HtmlField "createdBy")}}
+                CreatedUser:v.CreatedUser,
+                  {{end}}
+                  {{if and $column.IsList (eq $column.HtmlField "deptId")}}
+                      {{if $usedSystemModule}}
+                DeptInfo:systemService.SysDept().GetByDept(ctx, v.DeptId),
+                      {{else}}
+                DeptInfo:service.SysDept().GetByDept(ctx, v.DeptId),
+                      {{end}}
+                  {{end}}
+                  {{if and $column.IsList (eq $column.HtmlField "UpdatedBy")}}
+                UpdatedUser:v.UpdatedUser,
+                  {{end}}
+                    {{if eq $column.HtmlType "images" "file" "files"}}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                    {{else}}
+                {{$column.GoField}} : v.{{$column.GoField}},
+                    {{range $ti, $linkedTable := $.table.LinkedTables}}
+                        {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+                Linked{{$column.GoField}}:v.Linked{{$column.GoField}},
+                        {{end}}
+                    {{end}}
+                    {{end}}
+                        {{if eq $column.HtmlType "userSelectorSingle"}}
+                Linked{{$column.GoField}} : v.Linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "userSelectorMultiple"}}
+                Linked{{$column.GoField}} : linked{{$column.GoField}},
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorSingle"}}
+                Linked{{$column.GoField}}:  {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, v.{{$column.GoField}}),
+                    {{end}}
+                    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+                Linked{{$column.GoField}}: linked{{$column.GoField}},
+                    {{end}}
+                  {{end}}
+                {{end}}
+            }
+        }
+    })
+    return
+}
+
+{{if .table.ExcelPort }}
+////
+func (s *s{{.table.ClassName}})GetExportData(ctx context.Context, req *model.{{.table.ClassName}}SearchReq) (listRes []*model.{{.table.ClassName}}InfoRes, err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        m := dao.{{.table.ClassName}}.Ctx(ctx).WithAll()
+        {{range $index, $column := .table.QueryColumns}}
+        {{if eq $column.QueryType "LIKE"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" like ?", "%"+req.{{$column.GoField}}+"%")
+        }
+        {{else if eq $column.QueryType "EQ"}}
+          {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+        if len(req.{{$column.GoField}}) > 0 {
+            if systemService.ToolsGenTable().IsMysql() {
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where("JSON_CONTAINS(`{{$column.ColumnName}}`,?)", gconv.String(v))
+                }
+            }else{
+                for _, v := range req.{{$column.GoField}} {
+                    m = m.Where(`"{{$column.ColumnName}}" @> '[?]'::jsonb`, v)
+                }
+            }
+        }
+          {{else if eq $column.GoType "string"}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{else if eq $column.GoType "Time"}}
+            {{if eq $column.ColumnName "created_at"}}
+        if len(req.DateRange) != 0 {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >=? AND "+dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" <=?", req.DateRange[0], req.DateRange[1])
+        }
+            {{else}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+            {{end}}
+          {{else if or (eq $column.GoType "int") (eq $column.GoType "int64") (eq $column.GoType "uint") (eq $column.GoType "uint64") (eq $column.GoType "bool")}}
+        if req.{{$column.GoField}} != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" = ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}{{if ne $column.FieldConversion ""}}){{end}})
+        }
+          {{end}}
+        {{else if eq $column.QueryType "BETWEEN" }}
+        if req.{{$column.GoField}} != nil && len(req.{{$column.GoField}}) > 0 {
+          if req.{{$column.GoField}}[0] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" >= ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[0]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+          if len(req.{{$column.GoField}}) > 1 && req.{{$column.GoField}}[1] != "" {
+            m = m.Where(dao.{{$.table.ClassName}}.Columns().{{$column.GoField}}+" < ?", {{if ne $column.FieldConversion ""}}{{$column.FieldConversion}}({{end}}req.{{$column.GoField}}[1]{{if ne $column.FieldConversion ""}}){{end}})
+          }
+        }
+        {{end}}
+        {{end}}
+        if req.PageNum == 0 {
+            req.PageNum = 1
+        }
+        if req.PageSize == 0 {
+            req.PageSize = consts.PageSize
+        }
+        order:= "{{.table.SortColumn}} {{.table.SortType}}"
+        if req.OrderBy!=""{
+            order = req.OrderBy
+        }
+        err = m.Page(req.PageNum, req.PageSize).Order(order).Scan(&listRes)
+        liberr.ErrIsNil(ctx, err, "获取数据失败")
+        {{if $hasLinkTable}}
+        for _,v:=range listRes{
+            {{range $index, $column := .table.Columns}}
+            {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+            {{range $ti, $linkedTable := $.table.LinkedTables}}
+            {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            err = g.Model("{{$linkedTable.TableName}}").
+            Fields(model.Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{}).
+            Where("{{$column.LinkLabelId}}", gstr.Split(v.{{$column.GoField}}, ",")).
+            Scan(&v.Linked{{$column.GoField}})
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
+            {{end}}
+            {{end}}
+            {{end}}
+        }
+        {{end}}
+    })
+    return
+}
+{{end}}
+
+{{if .table.ExcelImp}}
+////
+func(s *s{{.table.ClassName}})Import(ctx context.Context,file *ghttp.UploadFile)(err error){
+    if file == nil {
+        err = errors.New("请上传数据文件")
+        return
+    }
+    var data []do.{{.table.ClassName}}
+    err = g.Try(ctx, func(ctx context.Context) {
+        f,err:=file.Open()
+        liberr.ErrIsNil(ctx,err)
+        defer f.Close()
+        exFile,err := excelize.OpenReader(f)
+        liberr.ErrIsNil(ctx,err)
+        defer exFile.Close()
+        rows, err := exFile.GetRows("Sheet1")
+        liberr.ErrIsNil(ctx,err)
+        if len(rows)==0{
+            liberr.ErrIsNil(ctx,errors.New("表格内容不能为空"))
+        }
+        d:=make([]interface{}, len(rows[0]))
+        data=make([]do.{{.table.ClassName}},len(rows)-1)
+
+        for k,v:=range rows{
+            if k==0{
+                continue
+            }
+            for kv,vv:=range v{
+                d[kv] = vv
+            }
+            {{if $.table.UseSnowId}}
+            var {{$.table.PkColumn.HtmlField}} uint64
+            {{$.table.PkColumn.HtmlField}}, err = commonService.SnowID().GenID()
+            liberr.ErrIsNil(ctx, err)
+            {{end}}
+            data[k-1] = do.{{.table.ClassName}}{
+                {{$i:=0}}
+                {{range $index, $column := .table.Columns}}
+                {{$add:=false}}
+                {{if and $column.IsPk $.table.IsPkInsertable}}
+                {{$.table.PkColumn.GoField}}:d[{{$i}}],
+                {{$add = true}}
+                {{else if and $column.IsPk $.table.UseSnowId}}
+                {{$.table.PkColumn.GoField}}:{{$.table.PkColumn.HtmlField}},
+                {{else if and (ne $column.IsPk true) (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files") (ne $column.HtmlType "imageSelector") (ne $column.HtmlType "fileSelector")}}
+                {{$add = true}}
+                {{if eq $column.GoType "int" "uint" "int64" "uint64" "bool" }}
+                {{$column.GoField}}:gconv.Int64(d[{{$i}}]),
+                {{else if eq $column.GoType "float64"}}
+                {{$column.GoField}}:gconv.Float64(d[{{$i}}]),
+                {{else if eq $column.GoType "Time"}}
+                {{$column.GoField}}:gconv.GTime(d[{{$i}}]),
+                {{else}}
+                {{$column.GoField}}:d[{{$i}}],
+                {{end}}
+                {{end}}
+                {{if $add}}
+                {{$i = plus $i 1}}
+                {{end}}
+                {{end}}
+            }
+        }
+        if len(data)>0{
+            err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+                _,err = dao.{{.table.ClassName}}.Ctx(ctx).Batch(500).Insert(data)
+                return err
+            })
+            liberr.ErrIsNil(ctx,err)
+        }
+    })
+    return
+}
+{{end}}
+
+////
+{{if gt (len .table.LinkedTables) 0}}
+// LinkedDataSearch 相关连表查询数据
+func(s *s{{.table.ClassName}}) Linked{{$.table.ClassName}}DataSearch(ctx context.Context) (res *model.Linked{{$.table.ClassName}}DataSearchRes, err error) {
+    res = new(model.Linked{{$.table.ClassName}}DataSearchRes)
+    {{/*去重处理-导入关联表依赖包*/}}
+    {{$hasMethods3:=newArray}}
+    {{range $index,$column:= .table.LinkedTables}}
+    {{if ne $column.TableName ""}}
+    {{if not (inArray $hasMethods3 (concat "list" $column.ClassName))}}
+    {{$hasMethods3 = append $hasMethods3 (concat "list" $column.ClassName)}}
+    {{/*关联{{$column.LinkTableName}}表选项*/}}
+    res.Linked{{$.table.ClassName}}{{$column.ClassName}}, err = s.List{{$.table.ClassName}}{{$column.ClassName}}(ctx)
+    liberr.ErrIsNil(ctx,err,"获取关联表信息失败")
+    {{end}}
+    {{end}}
+    {{end}}
+    return
+}
+{{end}}
+
+////
+func (s *s{{.table.ClassName}})GetBy{{$pkGoField}}(ctx context.Context, {{$.table.PkColumn.HtmlField}} {{$.table.PkColumn.GoType}}) (res *model.{{.table.ClassName}}InfoRes,err error){
+    err =g.Try(ctx, func(ctx context.Context){
+        err = dao.{{.table.ClassName}}.Ctx(ctx).WithAll().Where(dao.{{.table.ClassName}}.Columns().{{$pkGoField}},  {{$.table.PkColumn.HtmlField}}).Scan(&res)
+        liberr.ErrIsNil(ctx,err,"获取信息失败")
+        {{if or $.table.HasDeptId $hasDeptSelector $hasUserMultipleSelector}}
+        if res!=nil{
+        {{if $.table.HasDeptId}}
+        {{if $usedSystemModule}}
+            res.DeptInfo = systemService.SysDept().GetByDept(ctx, res.DeptId)
+        {{else}}
+            res.DeptInfo = service.SysDept().GetByDept(ctx, res.DeptId)
+        {{end}}
+        {{end}}
+        {{range $index, $column := .table.Columns}}
+        {{if eq $column.HtmlType "userSelectorMultiple"}}
+            res.Linked{{$column.GoField}}, err = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysUser().GetUsers(ctx, gconv.Interfaces(res.{{$column.GoField}}))
+            liberr.ErrIsNil(ctx, err)
+        {{else if eq $column.HtmlType "deptSelectorSingle"}}
+            res.Linked{{$column.GoField}} = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, res.{{$column.GoField}})
+        {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+            res.Linked{{$column.GoField}} = make([]*{{if $usedSystemModel}}systemModel{{else}}model{{end}}.LinkDeptRes, len(res.{{$column.GoField}}))
+            for k, v := range res.{{$column.GoField}} {
+                res.Linked{{$column.GoField}}[k] = {{if $usedSystemModule}}systemService{{else}}service{{end}}.SysDept().GetByDept(ctx, v)
+            }
+        {{end}}
+        {{end}}
+        }
+        {{end}}
+        {{range $index, $column := .table.Columns}}
+        {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}
+        {{range $ti, $linkedTable := $.table.LinkedTables}}
+        {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+            err = g.Model("{{$linkedTable.TableName}}").
+            Fields(model.Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}{}).
+            Where("{{$column.LinkLabelId}}", gstr.Split(res.{{$column.GoField}}, ",")).
+            Scan(&res.Linked{{$column.GoField}})
+            liberr.ErrIsNil(ctx, err)
+        {{end}}
+        {{end}}
+        {{end}}
+        {{end}}
+    })
+    return
+}
+////
+func (s *s{{.table.ClassName}})Add(ctx context.Context, req *model.{{.table.ClassName}}AddReq) (err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        {{if and .table.UseSnowId (not .table.IsPkInsertable)}}
+        var {{.table.PkColumn.HtmlField}} uint64
+        {{.table.PkColumn.HtmlField}}, err = commonService.SnowID().GenID()
+        liberr.ErrIsNil(ctx, err)
+        {{end}}
+        {{range $index, $column := .table.EditColumns}}
+        {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
+        {{$column.HtmlField}} := ""
+        req.{{$column.GoField}}.FilterEmpty()
+        if !req.{{$column.GoField}}.IsEmpty(){
+            {{$column.HtmlField}}=req.{{$column.GoField}}.Join(",")
+        }
+        {{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
+        for _,obj:=range req.{{$column.GoField}}{
+            obj.Url,err = libUtils.GetFilesPath(ctx,obj.Url)
+            liberr.ErrIsNil(ctx, err)
+        }
+        {{end}}
+        {{end}}
+        _, err = dao.{{.table.ClassName}}.Ctx(ctx).Insert(do.{{.table.ClassName}}{
+            {{if .table.IsPkInsertable}}
+            {{.table.PkColumn.GoField}}:req.{{.table.PkColumn.GoField}},
+            {{else if .table.UseSnowId}}
+            {{.table.PkColumn.GoField}}:{{.table.PkColumn.HtmlField}},
+            {{end}}
+            {{range $index, $column := .table.EditColumns}}
+            {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
+            {{$column.GoField}}:{{$column.HtmlField}},
+            {{else}}
+            {{$column.GoField}}:req.{{$column.GoField}},
+            {{end}}
+            {{end}}
+            {{if .table.HasCreatedBy}}
+            {{if $usedSystemModule}}
+            CreatedBy:systemService.Context().GetUserId(ctx),
+            {{else}}
+            CreatedBy:service.Context().GetUserId(ctx),
+            {{end}}
+            {{end}}
+            {{if .table.HasDeptId}}
+            {{if $usedSystemModule}}
+            DeptId:systemService.Context().GetDeptId(ctx),
+            {{else}}
+            DeptId:service.Context().GetDeptId(ctx),
+            {{end}}
+            {{end}}
+        })
+        liberr.ErrIsNil(ctx, err, "添加失败")
+    })
+    return
+}
+////
+func (s *s{{.table.ClassName}})Edit(ctx context.Context, req *model.{{.table.ClassName}}EditReq) (err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        {{range $index, $column := .table.EditColumns}}
+        {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
+        {{$column.HtmlField}} := ""
+        req.{{$column.GoField}}.FilterEmpty()
+        if !req.{{$column.GoField}}.IsEmpty(){
+            {{$column.HtmlField}}=req.{{$column.GoField}}.Join(",")
+        }
+        {{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
+        for _,obj:=range req.{{$column.GoField}}{
+            obj.Url,err = libUtils.GetFilesPath(ctx,obj.Url)
+            liberr.ErrIsNil(ctx, err)
+        }
+        {{end}}
+        {{end}}
+        _, err = dao.{{.table.ClassName}}.Ctx(ctx).WherePri(req.{{.table.PkColumn.GoField}}).Update(do.{{.table.ClassName}}{
+            {{range $index, $column := .table.EditColumns}}
+            {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
+            {{$column.GoField}}:{{$column.HtmlField}},
+            {{else}}
+            {{$column.GoField}}:req.{{$column.GoField}},
+            {{end}}
+            {{end}}
+            {{if .table.HasUpdatedBy}}
+            {{if $usedSystemModule}}
+            UpdatedBy:systemService.Context().GetUserId(ctx),
+            {{else}}
+            UpdatedBy:service.Context().GetUserId(ctx),
+            {{end}}
+            {{end}}
+        })
+        liberr.ErrIsNil(ctx, err, "修改失败")
+    })
+    return
+}
+////
+func (s *s{{.table.ClassName}})Delete(ctx context.Context, {{$.table.PkColumn.HtmlField}}s []{{$.table.PkColumn.GoType}}) (err error){
+    err = g.Try(ctx,func(ctx context.Context){
+        {{if eq .table.TplCategory "tree"}}
+        {{$.table.PkColumn.HtmlField}}s, err = s.GetChildrenIds(ctx,{{$.table.PkColumn.HtmlField}}s)
+        liberr.ErrIsNil(ctx,err)
+        {{end}}
+        _, err = dao.{{.table.ClassName}}.Ctx(ctx).Delete(dao.{{.table.ClassName}}.Columns().{{$pkGoField}}+" in (?)", {{$.table.PkColumn.HtmlField}}s)
+        liberr.ErrIsNil(ctx,err,"删除失败")
+    })
+    return
+}
+
+////
+{{if eq .table.TplCategory "tree"}}
+// GetChildrenIds 通过ID获取子级ID
+func (s *s{{.table.ClassName}})GetChildrenIds(ctx context.Context,ids []{{$.table.PkColumn.GoType}}) (returnIds []{{$.table.PkColumn.GoType}},err error) {
+    err = g.Try(ctx,func(ctx context.Context){
+        //获取所有
+        var all *model.{{.table.ClassName}}SearchRes
+        all, err = s.List(ctx, &model.{{.table.ClassName}}SearchReq{})
+        liberr.ErrIsNil(ctx,err)
+        list := make(g.List, len(all.List))
+        for k, info := range all.List {
+            list[k] = gconv.Map(info)
+        }
+        for _, id := range ids {
+            returnIds = append(returnIds,id)
+            children := libUtils.FindSonByParentId(list, id, "{{.table.TreeParentCode}}", "{{.table.TreeCode}}")
+            for _, cid := range children {
+                returnIds = append(returnIds, cid["{{.table.TreeCode}}"].({{$.table.PkColumn.GoType}}))
+            }
+        }
+    })
+	return
+}
+{{end}}
+
+{{/*去重处理-导入关联表依赖包*/}}
+{{$hasMethods2:=newArray}}
+{{range $index,$column:= .table.LinkedTables}}
+{{if ne $column.TableName ""}}
+{{if not (inArray $hasMethods2 (concat "list" $column.ClassName))}}
+{{$hasMethods2 = append $hasMethods2 (concat "list" $column.ClassName)}}
+{{/*关联{{$column.LinkTableName}}表选项*/}}
+func (s *s{{$.table.ClassName}}) List{{$.table.ClassName}}{{$column.ClassName}}(ctx context.Context)(linked{{$.table.ClassName}}{{$column.ClassName}} []*model.Linked{{$.table.ClassName}}{{$column.ClassName}},err error){
+    err = g.Try(ctx,func(ctx context.Context){
+        err = {{if ne $column.PackageName $.table.PackageName}}linked{{$column.ClassName}}Dao{{else}}dao{{end}}.{{$column.ClassName}}.
+        Ctx(ctx).
+        Fields(model.Linked{{$.table.ClassName}}{{$column.ClassName}}{}).Scan(&linked{{$.table.ClassName}}{{$column.ClassName}})
+        liberr.ErrIsNil(ctx,err)
+    })
+    return
+}
+////
+{{end}}
+{{end}}
+{{end}}
+
+{{range $index,$column:= .table.Columns}}
+{{if eq $column.HtmlType "switch"}}
+// {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
+func (s *s{{$.table.ClassName}}) Change{{$column.GoField}} (ctx context.Context,{{$.table.PkColumn.HtmlField}} {{$.table.PkColumn.GoType}},{{$column.HtmlField}} {{$column.GoType}})(err error){
+    err = g.Try(ctx, func(ctx context.Context) {
+        _, err = dao.{{$.table.ClassName}}.Ctx(ctx).WherePri({{$.table.PkColumn.HtmlField}}).
+            Update(do.{{$.table.ClassName}}{
+                {{$column.GoField}}:{{$column.HtmlField}},
+            })
+        liberr.ErrIsNil(ctx, err, "修改失败")
+    })
+    return
+}
+{{end}}
+{{end}}
