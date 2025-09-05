@@ -290,6 +290,23 @@ services:
       - mysql
     networks:
       - app-network
+      -
+  banner-service:
+    build: .
+    container_name: banner-service
+    command: [ "./banner" ]
+    environment:
+      - ENV=production
+    ports:
+      - "31006:31006"
+    volumes:
+      - ./app/banner/manifest/config:/app/config
+      - ./log:/app/log
+    depends_on:
+      - etcd
+      - mysql
+    networks:
+      - app-network
 
 networks:
   app-network:

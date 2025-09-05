@@ -28,6 +28,7 @@ RUN go build -o bin/search ./app/search
 RUN go build -o bin/gateway-admin ./app/gateway-admin
 RUN go build -o bin/gateway-h5 ./app/gateway-h5
 RUN go build -o bin/gateway-resource ./app/gateway-resource
+RUN go build -o bin/banner ./app/banner
 
 # 使用更小的运行时镜像
 FROM alpine:latest
