@@ -38,34 +38,214 @@ function simulateError() {
 
 // Mock数据
 const mockData = {
-  // 首页相关
-  '/frontend/goods': {
+  // 首页相关 - 轮播图
+  '/frontend/rotation': {
     method: 'GET',
     response: {
-      code: 200,
-      message: 'success',
+      code: 0,
+      message: 'OK',
       data: {
         list: [
           {
-            id: 1,
-            name: '高品质智能手机 8GB+256GB',
-            price: '2999.00',
-            originalPrice: '3999.00',
-            image: 'http://wangzhongyang.com/images/logo_removebg.png',
-            sales: 12560
-          },
-          {
-            id: 2,
-            name: '轻薄笔记本电脑 i7处理器',
-            price: '5999.00',
-            originalPrice: '6999.00',
-            image: 'http://wangzhongyang.com/images/logo_removebg.png',
-            sales: 8560
+            "id": 1,
+            "pic_url": "http://wangzhongyang.com/images/logo_removebg.png",
+            "link": "https://example.com",
+            "sort": 10,
+            "created_at": {
+              "seconds": 1658206381
+            },
+            "updated_at": {
+              "seconds": 1658206764
+            }
           }
         ],
-        total: 2,
-        page: 1,
-        size: 10
+        "page": 1,
+        "size": 10,
+        "total": 1
+      }
+    }
+  },
+
+  // 首页相关 - 热门推荐商品
+  '/frontend/goods': {
+    method: 'GET',
+    response: {
+      code: 0,
+      message: 'OK',
+      data: {
+        list: [
+          {
+            "id": 1,
+            "pic_url": "",
+            "images": "{\"image\": \"http://dummyimage.com/400x400\"}",
+            "name": "转群治",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970352
+            },
+            "updated_at": {
+              "seconds": 1756970352
+            }
+          },
+          {
+            "id": 2,
+            "pic_url": "",
+            "images": "{\"image\": \"http://wangzhongyang.com/images/logo_removebg.png\"}",
+            "name": "转群治",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970387
+            },
+            "updated_at": {
+              "seconds": 1756970387
+            }
+          },
+          {
+            "id": 3,
+            "pic_url": "",
+            "images": "{\"image\": \"http://wangzhongyang.com/images/logo_removebg.png\"}",
+            "name": "转群治",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970388
+            },
+            "updated_at": {
+              "seconds": 1756970388
+            }
+          },
+          {
+            "id": 4,
+            "pic_url": "",
+            "images": "{\"image\": \"http://wangzhongyang.com/images/logo_removebg.png\"}",
+            "name": "转群治",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970389
+            },
+            "updated_at": {
+              "seconds": 1756970389
+            }
+          },
+          {
+            "id": 5,
+            "pic_url": "",
+            "images": "{\"image\": \"http://wangzhongyang.com/images/logo_removebg.png\"}",
+            "name": "转群治",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970390
+            },
+            "updated_at": {
+              "seconds": 1756970390
+            }
+          },
+          {
+            "id": 6,
+            "pic_url": "",
+            "images": "{\"image\": \"http://wangzhongyang.com/images/logo_removebg.png\"}",
+            "name": "转群治",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970390
+            },
+            "updated_at": {
+              "seconds": 1756970390
+            }
+          },
+          {
+            "id": 7,
+            "pic_url": "",
+            "images": "{\"image\": \"http://wangzhongyang.com/images/logo_removebg.png\"}",
+            "name": "手机",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970400
+            },
+            "updated_at": {
+              "seconds": 1756970400
+            }
+          },
+          {
+            "id": 8,
+            "pic_url": "",
+            "images": "{\"image\": \"http://wangzhongyang.com/images/logo_removebg.png\"}",
+            "name": "手机",
+            "price": 99,
+            "level1_category_id": 3,
+            "level2_category_id": 49,
+            "level3_category_id": 14,
+            "brand": "veniam",
+            "stock": 69284016,
+            "sale": 61,
+            "tags": "velit ut proident",
+            "detail_info": "officia tempor fugiat culpa",
+            "created_at": {
+              "seconds": 1756970401
+            },
+            "updated_at": {
+              "seconds": 1756970401
+            }
+          }
+        ],
+        "page": 1,
+        "size": 10,
+        "total": 8
       }
     }
   },
@@ -131,7 +311,7 @@ const mockData = {
   '/frontend/user/info': {
     method: 'POST',
     response: {
-      code极速版: 200,
+      code: 200,
       message: 'success',
       data: {
         id: 1,
@@ -140,6 +320,16 @@ const mockData = {
         email: 'test@example.com',
         phone: '13800138000'
       }
+    }
+  },
+
+  // 修改密码
+  '/frontend/user/update/password': {
+    method: 'PUT',
+    response: {
+      code: 0,
+      message: '密码修改成功',
+      data: null
     }
   },
 
@@ -254,11 +444,21 @@ function request(url, data = {}, method = 'GET') {
         resolve(response);
       }, 500); // 模拟网络延迟
     } else {
+      // 获取token
+      const token = wx.getStorageSync('token') || '';
+      
+      // 设置请求头
+      const header = {};
+      if (token) {
+        header['Authorization'] = `Bearer ${token}`;
+      }
+      
       // 真实网络请求
       wx.request({
         url: `${BASE_URL}${url}`,
         data: data,
         method: method,
+        header: header,
         success: (res) => {
           // 缓存GET请求结果
           if (method === 'GET') {
@@ -279,6 +479,9 @@ function request(url, data = {}, method = 'GET') {
 
 // API方法封装
 const api = {
+  // 首页轮播图
+  getBanners: () => request('/frontend/rotation', {}, 'GET'),
+
   // 商品相关
   getGoodsList: (params) => request('/frontend/goods', params, 'GET'),
   getGoodsDetail: (id) => request('/frontend/goods/detail', { id }, 'GET'),

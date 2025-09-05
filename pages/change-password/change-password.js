@@ -2,39 +2,31 @@ const { api } = require('../../utils/api')
 
 Page({
   data: {
-    oldPassword: '',
-    newPassword: '',
+    password: '',
     confirmPassword: '',
+    secretAnswer: '',
     loading: false
   },
 
   // 输入框事件
-  onOldPasswordInput(e) {
-    this.setData({ oldPassword: e.detail.value })
-  },
-
-  onNewPasswordInput(e) {
-    this.setData({ newPassword: e.detail.value })
+  onPasswordInput(e) {
+    this.setData({ password: e.detail.value })
   },
 
   onConfirmPasswordInput(e) {
     this.setData({ confirmPassword: e.detail.value })
   },
 
+  onSecretAnswerInput(e) {
+    this.setData({ secretAnswer: e.detail.value })
+  },
+
   // 提交修改密码
   async onSubmit() {
-    const { oldPassword, newPassword, confirmPassword } = this.data
+    const { password, confirmPassword, secretAnswer } = this.data
 
     // 表单验证
-    if (!oldPassword.trim()) {
-      wx.showToast({
-        title: '请输入原密码',
-        icon: 'none'
-      })
-      return
-    }
-
-    if (!newPassword.trim()) {
+    if (!password.trim()) {
       wx.showToast({
         title: '请输入新密码',
         icon: 'none'
@@ -42,7 +34,7 @@ Page({
       return
     }
 
-    if (newPassword.length < 6) {
+    if (password.length < 6) {
       wx.showToast({
         title: '新密码至少6位',
         icon: 'none'
@@ -50,9 +42,17 @@ Page({
       return
     }
 
-    if (newPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       wx.showToast({
         title: '两次输入密码不一致',
+        icon: 'none'
+      })
+      return
+    }
+
+    if (!secretAnswer.trim()) {
+      wx.showToast({
+        title: '请输入密保答案',
         icon: 'none'
       })
       return
@@ -62,8 +62,8 @@ Page({
 
     try {
       const res = await api.updatePassword({
-        old_password: oldPassword,
-        new_password: newPassword
+        password: password,
+        secret_answer: secretAnswer
       })
 
       if (res.code === 0) {

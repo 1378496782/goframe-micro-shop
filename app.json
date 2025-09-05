@@ -8,7 +8,10 @@
     "pages/login/login",
     "pages/register/register",
     "pages/test/test",
-    "pages/search/search"
+    "pages/search/search",
+    "pages/more-goods/more-goods",
+    "pages/change-password/change-password",
+    "pages/webview/webview"
   ],
   "window": {
     "navigationBarBackgroundColor": "#19aecc",

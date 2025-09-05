@@ -22,11 +22,22 @@ Page({
     this.setData({ loading: true })
     
     try {
-      // 并行加载分类和商品数据
-      const [categoriesRes, productsRes] = await Promise.all([
+      // 并行加载轮播图、分类和商品数据
+      const [bannersRes, categoriesRes, productsRes] = await Promise.all([
+        api.getBanners(),
         api.getCategories(),
         api.getGoodsList({ page: 1, size: 10 })
       ])
+      
+      if (bannersRes.code === 0) {
+        this.setData({
+          banners: bannersRes.data.list.map(item => ({
+            id: item.id,
+            image: item.pic_url,
+            url: item.link
+          }))
+        })
+      }
       
       if (categoriesRes.code === 0) {
         this.setData({
@@ -111,8 +122,18 @@ Page({
 
   onViewMore() {
     wx.navigateTo({
-      url: '/pages/category/category'
+      url: '/pages/more-goods/more-goods'
     })
+  },
+  
+  // 轮播图点击事件
+  onBannerClick(e) {
+    const { url } = e.currentTarget.dataset
+    if (url) {
+      wx.navigateTo({
+        url: `/pages/webview/webview?url=${encodeURIComponent(url)}`
+      })
+    }
   },
 
   onProductClick(e) {
