@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS `goods_info`;
 CREATE TABLE `goods_info` (
           `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
           `name` VARCHAR(200) NOT NULL COMMENT '商品名字',
+          `pic_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '主图',
           `images` JSON DEFAULT NULL COMMENT '支持单图,多图',
           `price` INT NOT NULL COMMENT '价格(分)',
           `level1_category_id` INT NOT NULL COMMENT '1级分类id',

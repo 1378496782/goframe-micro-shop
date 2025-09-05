@@ -23,6 +23,7 @@ type GoodsInfoDao struct {
 type GoodsInfoColumns struct {
 	Id               string //
 	Name             string // 商品名字
+	PicUrl           string // 主图
 	Images           string // 支持单图,多图
 	Price            string // 价格(分)
 	Level1CategoryId string // 1级分类id
@@ -42,6 +43,7 @@ type GoodsInfoColumns struct {
 var goodsInfoColumns = GoodsInfoColumns{
 	Id:               "id",
 	Name:             "name",
+	PicUrl:           "pic_url",
 	Images:           "images",
 	Price:            "price",
 	Level1CategoryId: "level1_category_id",

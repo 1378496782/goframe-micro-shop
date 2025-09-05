@@ -31,6 +31,7 @@ type GoodsInfoGetListRes struct {
 
 type GoodsInfoItem struct {
 	Id               uint32                 `json:"id" dc:"商品ID"`
+	PicUrl           string                 `json:"pic_url" dc:"主图"`
 	Images           string                 `json:"images" dc:"支持单图,多图"`
 	Name             string                 `json:"name" dc:"商品名称"`
 	Price            uint64                 `json:"price" dc:"价格"`

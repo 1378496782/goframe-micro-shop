@@ -14,6 +14,7 @@ type GoodsInfo struct {
 	g.Meta           `orm:"table:goods_info, do:true"`
 	Id               interface{} //
 	Name             interface{} // 商品名字
+	PicUrl           interface{} // 主图
 	Images           interface{} // 支持单图,多图
 	Price            interface{} // 价格(分)
 	Level1CategoryId interface{} // 1级分类id

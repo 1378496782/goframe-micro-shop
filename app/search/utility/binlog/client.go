@@ -117,7 +117,7 @@ func handleDelete(ctx context.Context, rows [][]interface{}) {
 func parseRowData(row []interface{}) map[string]interface{} {
 	// 这里需要根据你的表结构定义字段名
 	fields := []string{
-		"id", "name", "images", "price", "level1_category_id",
+		"id", "name", "pic_url", "images", "price", "level1_category_id",
 		"level2_category_id", "level3_category_id", "brand",
 		"stock", "sale", "tags", "detail_info",
 		"created_at", "updated_at", "deleted_at",
@@ -148,6 +148,7 @@ func upsertToES(ctx context.Context, data map[string]interface{}) {
 		BodyJson(map[string]interface{}{
 			"id":                 gconv.Uint32(data["id"]),
 			"name":               gconv.String(data["name"]),
+			"pic_url":            gconv.String(data["pic_url"]),
 			"images":             gconv.String(data["images"]),
 			"price":              gconv.Uint64(data["price"]),
 			"level1_category_id": gconv.Uint32(data["level1_category_id"]),
