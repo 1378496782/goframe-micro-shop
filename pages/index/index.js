@@ -51,19 +51,19 @@ Page({
       if (productsRes.code === 0) {
         // 格式化商品数据：价格转换和图片提取
         const formattedProducts = productsRes.data.list.map(item => {
-          let mainImage = ''
+          let imageUrl = ''
           try {
-            const imagesData = JSON.parse(item.images)
-            mainImage = imagesData.image || ''
+            const imagesObj = JSON.parse(item.images)
+            imageUrl = imagesObj.image || ''
           } catch (e) {
             console.warn('解析图片数据失败:', e)
-            mainImage = ''
+            imageUrl = ''
           }
           
           return {
             ...item,
             priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
-            mainImage: mainImage
+            mainImage: imageUrl || 'https://via.placeholder.com/200x200?text=商品图片'
           }
         })
         
