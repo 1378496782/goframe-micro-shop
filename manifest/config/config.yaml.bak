@@ -31,9 +31,93 @@ database:
     Path: "resource/log/sql"
 
   default:
-    link:   "mysql:gfast3:gfast333@tcp(localhost:3306)/gfast-v32?charset=utf8mb4&parseTime=true&loc=Local"
+    link:   "mysql:root:root@tcp(101.42.249.106:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+#    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
+#    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug:  true
     charset: "utf8mb4" #数据库编码
+    #charset: "utf8" #数据库编码
+    dryRun: false #空跑
+    maxIdle: 10 #连接池最大闲置的连接数
+    maxOpen: 10 #连接池最大打开的连接数
+    maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
+
+  goods:
+#    link: "mysql:root:111111@tcp(127.0.0.1:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
+#    线上
+    link: "mysql:root:root@tcp(101.42.249.106:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
+    #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
+    debug: true
+    charset: "utf8mb4" #数据库编码
+    #charset: "utf8" #数据库编码
+    dryRun: false #空跑
+    maxIdle: 10 #连接池最大闲置的连接数
+    maxOpen: 10 #连接池最大打开的连接数
+    maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
+
+  user:
+    link: "mysql:root:root@tcp(101.42.249.106:3306)/user?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
+    #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
+    debug: true
+    charset: "utf8mb4" #数据库编码
+    #charset: "utf8" #数据库编码
+    dryRun: false #空跑
+    maxIdle: 10 #连接池最大闲置的连接数
+    maxOpen: 10 #连接池最大打开的连接数
+    maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
+
+  interaction:
+    link: "mysql:root:root@tcp(101.42.249.106:3306)/interaction?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
+    #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
+    debug: true
+    charset: "utf8mb4" #数据库编码
+    #charset: "utf8" #数据库编码
+    dryRun: false #空跑
+    maxIdle: 10 #连接池最大闲置的连接数
+    maxOpen: 10 #连接池最大打开的连接数
+    maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
+
+  order:
+    link: "mysql:root:root@tcp(101.42.249.106:3306)/order?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
+    #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
+    debug: true
+    charset: "utf8mb4" #数据库编码
+    #charset: "utf8" #数据库编码
+    dryRun: false #空跑
+    maxIdle: 10 #连接池最大闲置的连接数
+    maxOpen: 10 #连接池最大打开的连接数
+    maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
+
+  resource:
+    link: "mysql:root:root@tcp(101.42.249.106:3306)/resource?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
+    #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
+    debug: true
+    charset: "utf8mb4" #数据库编码
+    #charset: "utf8" #数据库编码
+    dryRun: false #空跑
+    maxIdle: 10 #连接池最大闲置的连接数
+    maxOpen: 10 #连接池最大打开的连接数
+    maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
+
+  banner:
+    link: "mysql:root:root@tcp(101.42.249.106:3306)/banner?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
+    #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
+    debug: true
+    charset: "utf8mb4" #数据库编码
+    #charset: "utf8" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
@@ -45,19 +129,17 @@ gfToken:
   maxRefresh: 5400
   multiLogin: true
   encryptKey: "CHANGE_ME_GFTOKEN_ENCRYPT_KEY"
-  cacheModel: "dist"  #缓存模式 memory OR redis OR dist
-  distPath: "./resource/data/distTokenDb" #使用磁盘缓存时配置数据缓存的目录
+  cacheModel: "redis"
   excludePaths:
     - "/api/v1/system/login"
     - "api/v1/system/logout"
-
 
 # Redis 配置示例
 redis:
   # 单实例配置
   default:
     address: 127.0.0.1:6379
-    db: 1
+    db: 12
     idleTimeout: "60s" #连接最大空闲时间，使用时间字符串例如30s/1m/1d
     maxConnLifetime: "90s" #连接最长存活时间，使用时间字符串例如30s/1m/1d
     waitTimeout: "60s" #等待连接池连接的超时时间，使用时间字符串例如30s/1m/1d
@@ -70,64 +152,40 @@ system:
   notCheckAuthAdminIds: [1,2,31]  #无需验证后台权限的用户id
   dataDir: "./resource/data"
   cache:
-    model: "dist"  #缓存模式 memory OR redis OR dist
-    distPath: "./resource/data/distCacheDb" #使用磁盘缓存时配置数据缓存的目录
+    model: "redis"  #缓存模式 memory OR redis
     prefix: "gFastV3Cache:" #缓存前缀
-  verifyStatus: 1 #0关闭验证码 1图形验证码 2交互验证码
+  verifyStatus: 0 #0关闭验证码 1图形验证码 2交互验证码
 
 #casbin配置
 casbin:
   modelFile: "./resource/casbin/rbac_model.conf"
   policyFile: "./resource/casbin/rbac_policy.csv"
 
-
-# CLI.
-gfcli:
-  gen:
-    dao:
-      - link:            "mysql:gfast3:gfast333@tcp(localhost:3306)/gfast-v32"
-        tables:          "tools_gen_table,tools_gen_table_column"
-        removePrefix:    "gf_"
-        descriptionTag:  true
-        noModelComment:  true
-        path: "./internal/app/system"
-
 # 上传配置
 upload:
-  default: 0   # 默认上传至本地 0 - 本地 1 - 腾讯云 2 - 七牛云 3- 阿里oss
-  tencentCOS:     # 腾讯云
+  default: 0   # 默认上传至本地
+  tencentCOS:
     upPath : "/gfast/"
-    rawUrl :    "https://xxx-xxxx.cos.ap-chongqing.myqcloud.com"
-    secretID :  "xxxxxxxxxxxxxxxxxxxx"
-    secretKey : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  qiniou: # 七牛云
-    accessKey : "xxxxxxxxxxxxxxxxxxxxxx"
-    sercetKey: "xxxxxxxxxxxxxxxxxxxxx"
-    bucket : "gfast-test"
-    qiniuServer : "http://xxxxxxxxxxx.hn-bkt.clouddn.com"
-  oss: #阿里云oss
-    accessKeyID: "xxxxxxxxxxxxxxxxxxx"
-    accessKeySecret: "xxxxxxxxxxxxxxxxxxxx"
-    endPoint: "xxx.xxxx.com" #自定域名
-    bucketName: "xxx" #使用的存储桶
-    isHttps: true #是否开启https访问
-    path: "gfast" #上传文件保存路径
+    rawUrl :    "https://xxxxxx.ap-xxxxx.myqcloud.com"
+    secretID :  "xxxxxxxxxx"
+    secretKey : "xxxxxxxxxx"
 
 # 代码生成配置
 gen:
   author: "gfast"
-  moduleName: "system"
+  moduleName: "shop"
   apiName: "api/v1"
-  packageName: "internal/app/system"
+  packageName: "internal/app/shop"
   goModName: "github.com/tiger1103/gfast/v3"
   autoRemovePre: true   #是否自动删除表前缀
   tablePrefix: "table_,qxkj_"   #表前缀
   templatePath: "./resource/template/vm"  #代码生成模板路径
-  frontDir: "../../../project/webProject/p2022/gfast-v3.2-ui/gfast3.2-ui" #前端路径
+#  frontDir: "D:\\project\\webProject\\p2023\\gfast-mandate-ui" #前端路径
+  frontDir: "C:\\code\\micro-shop-gfast-mandate-ui" #前端路径
 
 # 消息队列
 mqueue:
-  enable: false
+  enable: false                                 # 开启消息队列功能
   closeWaitTime: 5                             # 关闭服务器时等待刷盘时间(秒),最好不要小于5
   driver: "diskQueue"                          # 驱动类型 nsq|diskQueue|rocketmq
   channel: "channel"                           # 默认频道名称
