@@ -106,6 +106,8 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:8.11.0
     container_name: kibana
+    volumes:
+      - kibana_data:/usr/share/kibana/data
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - SERVER_NAME=kibana
@@ -290,7 +292,7 @@ services:
       - mysql
     networks:
       - app-network
-      -
+
   banner-service:
     build: .
     container_name: banner-service
@@ -317,3 +319,4 @@ volumes:
   redis_data:
   rabbitmq_data:
   es-data:
+  kibana_data:

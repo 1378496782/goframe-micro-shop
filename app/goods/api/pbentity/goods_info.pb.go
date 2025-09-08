@@ -45,6 +45,7 @@ type GoodsInfo struct {
 	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`                           //
 	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`                           //
 	DeletedAt        *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=DeletedAt,proto3" json:"DeletedAt,omitempty"`                           //
+	Sort             uint32                 `protobuf:"varint,17,opt,name=Sort,proto3" json:"Sort,omitempty" dc:"排序 倒序"`                         // 排序 倒序
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -191,11 +192,18 @@ func (x *GoodsInfo) GetDeletedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *GoodsInfo) GetSort() uint32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
 var File_pbentity_goods_info_proto protoreflect.FileDescriptor
 
 const file_pbentity_goods_info_proto_rawDesc = "" +
 	"\n" +
-	"\x19pbentity/goods_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9b\x04\n" +
+	"\x19pbentity/goods_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\xaf\x04\n" +
 	"\tGoodsInfo\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\rR\x02Id\x12\x12\n" +
 	"\x04Name\x18\x02 \x01(\tR\x04Name\x12\x16\n" +
@@ -215,7 +223,8 @@ const file_pbentity_goods_info_proto_rawDesc = "" +
 	"DetailInfo\x128\n" +
 	"\tCreatedAt\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\x128\n" +
 	"\tUpdatedAt\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tUpdatedAt\x128\n" +
-	"\tDeletedAt\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAtB=Z;shop-goframe-micro-service-refacotor/app/goods/api/pbentityb\x06proto3"
+	"\tDeletedAt\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAt\x12\x12\n" +
+	"\x04Sort\x18\x11 \x01(\rR\x04SortB=Z;shop-goframe-micro-service-refacotor/app/goods/api/pbentityb\x06proto3"
 
 var (
 	file_pbentity_goods_info_proto_rawDescOnce sync.Once

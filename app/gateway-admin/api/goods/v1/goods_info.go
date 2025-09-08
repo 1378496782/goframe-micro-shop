@@ -20,6 +20,7 @@ type GoodsInfoGetListReq struct {
 	g.Meta `path:"/goods" method:"get" tags:"商品管理" sm:"商品分页列表"`
 	Page   uint32 `json:"page" d:"1"  v:"min:1" dc:"页码"`
 	Size   uint32 `json:"size" d:"10" v:"max:100" dc:"每页数量"`
+	IsHot  uint32 `json:"is_hot" d:"0"  dc:"热门推荐(1 开启)"`
 }
 
 type GoodsInfoGetListRes struct {
@@ -43,6 +44,7 @@ type GoodsInfoItem struct {
 	Sale             uint32                 `json:"sale" dc:"销量"`
 	Tags             string                 `json:"tags" dc:"标签"`
 	DetailInfo       string                 `json:"detail_info" dc:"详情"`
+	Sort             uint32                 `json:"sort" dc:"排序 倒序"`
 	CreatedAt        *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
 	UpdatedAt        *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
 }
@@ -62,6 +64,7 @@ type GoodsInfoCreateReq struct {
 	Sale             uint32 `json:"sale" d:"0" dc:"销量"`
 	Tags             string `json:"tags" dc:"标签"`
 	DetailInfo       string `json:"detail_info" dc:"详情"`
+	Sort             uint32 `json:"sort" dc:"排序 倒序"`
 }
 
 type GoodsInfoCreateRes struct {
@@ -84,6 +87,7 @@ type GoodsInfoUpdateReq struct {
 	Sale             uint32 `json:"sale" dc:"销量"`
 	Tags             string `json:"tags" dc:"标签"`
 	DetailInfo       string `json:"detail_info" dc:"详情"`
+	Sort             uint32 `json:"sort" dc:"排序 倒序"`
 }
 
 type GoodsInfoUpdateRes struct {

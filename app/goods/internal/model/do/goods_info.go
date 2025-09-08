@@ -28,4 +28,5 @@ type GoodsInfo struct {
 	CreatedAt        *gtime.Time //
 	UpdatedAt        *gtime.Time //
 	DeletedAt        *gtime.Time //
+	Sort             interface{} // 排序 倒序
 }

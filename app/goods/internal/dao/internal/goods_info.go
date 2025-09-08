@@ -37,6 +37,7 @@ type GoodsInfoColumns struct {
 	CreatedAt        string //
 	UpdatedAt        string //
 	DeletedAt        string //
+	Sort             string // 排序 倒序
 }
 
 // goodsInfoColumns holds the columns for the table goods_info.
@@ -57,6 +58,7 @@ var goodsInfoColumns = GoodsInfoColumns{
 	CreatedAt:        "created_at",
 	UpdatedAt:        "updated_at",
 	DeletedAt:        "deleted_at",
+	Sort:             "sort",
 }
 
 // NewGoodsInfoDao creates and returns a new DAO object for table data access.

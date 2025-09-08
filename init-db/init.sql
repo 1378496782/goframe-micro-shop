@@ -29,6 +29,7 @@ CREATE TABLE `goods_info` (
           `sale` INT NOT NULL DEFAULT 0 COMMENT '销量',
           `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标签',
           `detail_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '商品详情',
+          `sort` TINYINT NOT NULL DEFAULT 0 COMMENT '排序 倒序',
           `created_at` datetime DEFAULT NULL,
           `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           `deleted_at` datetime DEFAULT NULL,

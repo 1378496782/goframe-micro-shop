@@ -126,6 +126,7 @@ type GoodsInfoCreateReq struct {
 	Sale             uint32                 `protobuf:"varint,10,opt,name=sale,proto3" json:"sale,omitempty"`
 	Tags             string                 `protobuf:"bytes,11,opt,name=tags,proto3" json:"tags,omitempty"`
 	DetailInfo       string                 `protobuf:"bytes,12,opt,name=detail_info,json=detailInfo,proto3" json:"detail_info,omitempty"`
+	Sort             uint32                 `protobuf:"varint,13,opt,name=sort,proto3" json:"sort,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -244,6 +245,13 @@ func (x *GoodsInfoCreateReq) GetDetailInfo() string {
 	return ""
 }
 
+func (x *GoodsInfoCreateReq) GetSort() uint32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
+}
+
 type GoodsInfoCreateRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -303,6 +311,7 @@ type GoodsInfoUpdateReq struct {
 	Sale             uint32                 `protobuf:"varint,11,opt,name=sale,proto3" json:"sale,omitempty"`
 	Tags             string                 `protobuf:"bytes,12,opt,name=tags,proto3" json:"tags,omitempty"`
 	DetailInfo       string                 `protobuf:"bytes,13,opt,name=detail_info,json=detailInfo,proto3" json:"detail_info,omitempty"`
+	Sort             uint32                 `protobuf:"varint,14,opt,name=sort,proto3" json:"sort,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -426,6 +435,13 @@ func (x *GoodsInfoUpdateReq) GetDetailInfo() string {
 		return x.DetailInfo
 	}
 	return ""
+}
+
+func (x *GoodsInfoUpdateReq) GetSort() uint32 {
+	if x != nil {
+		return x.Sort
+	}
+	return 0
 }
 
 type GoodsInfoUpdateRes struct {
@@ -556,6 +572,7 @@ type GoodsInfoGetListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          uint32                 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"` // 修改：字段编号必须从1开始递增
+	IsHot         uint32                 `protobuf:"varint,3,opt,name=is_hot,json=isHot,proto3" json:"is_hot,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -600,6 +617,13 @@ func (x *GoodsInfoGetListReq) GetPage() uint32 {
 func (x *GoodsInfoGetListReq) GetSize() uint32 {
 	if x != nil {
 		return x.Size
+	}
+	return 0
+}
+
+func (x *GoodsInfoGetListReq) GetIsHot() uint32 {
+	if x != nil {
+		return x.IsHot
 	}
 	return 0
 }
@@ -724,7 +748,7 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x15GoodsInfoGetDetailReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"@\n" +
 	"\x15GoodsInfoGetDetailRes\x12'\n" +
-	"\x04data\x18\x01 \x01(\v2\x13.pbentity.GoodsInfoR\x04data\"\xed\x02\n" +
+	"\x04data\x18\x01 \x01(\v2\x13.pbentity.GoodsInfoR\x04data\"\x81\x03\n" +
 	"\x12GoodsInfoCreateReq\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05price\x18\x02 \x01(\x04R\x05price\x12\x16\n" +
@@ -739,9 +763,10 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	" \x01(\rR\x04sale\x12\x12\n" +
 	"\x04tags\x18\v \x01(\tR\x04tags\x12\x1f\n" +
 	"\vdetail_info\x18\f \x01(\tR\n" +
-	"detailInfo\"$\n" +
+	"detailInfo\x12\x12\n" +
+	"\x04sort\x18\r \x01(\rR\x04sort\"$\n" +
 	"\x12GoodsInfoCreateRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"\xfd\x02\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"\x91\x03\n" +
 	"\x12GoodsInfoUpdateReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
@@ -757,15 +782,17 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x04sale\x18\v \x01(\rR\x04sale\x12\x12\n" +
 	"\x04tags\x18\f \x01(\tR\x04tags\x12\x1f\n" +
 	"\vdetail_info\x18\r \x01(\tR\n" +
-	"detailInfo\"$\n" +
+	"detailInfo\x12\x12\n" +
+	"\x04sort\x18\x0e \x01(\rR\x04sort\"$\n" +
 	"\x12GoodsInfoUpdateRes\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"$\n" +
 	"\x12GoodsInfoDeleteReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"\x14\n" +
-	"\x12GoodsInfoDeleteRes\"=\n" +
+	"\x12GoodsInfoDeleteRes\"T\n" +
 	"\x13GoodsInfoGetListReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\rR\x04page\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\rR\x04size\"~\n" +
+	"\x04size\x18\x02 \x01(\rR\x04size\x12\x15\n" +
+	"\x06is_hot\x18\x03 \x01(\rR\x05isHot\"~\n" +
 	"\x15GoodsInfoListResponse\x12'\n" +
 	"\x04list\x18\x01 \x03(\v2\x13.pbentity.GoodsInfoR\x04list\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +

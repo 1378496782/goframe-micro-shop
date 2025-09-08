@@ -27,4 +27,5 @@ message GoodsInfo {
     google.protobuf.Timestamp CreatedAt        = 14; //
     google.protobuf.Timestamp UpdatedAt        = 15; //
     google.protobuf.Timestamp DeletedAt        = 16; //
+    uint32                     Sort             = 17; // 排序 倒序
 }
