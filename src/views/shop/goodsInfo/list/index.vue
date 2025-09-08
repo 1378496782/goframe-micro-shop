@@ -36,8 +36,8 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="支持单图,多图" prop="images">
-                    <el-select filterable v-model="tableData.param.images" placeholder="请选择支持单图,多图" clearable style="width:200px;">
+                  <el-form-item label="封面图" prop="picUrl">
+                    <el-select filterable v-model="tableData.param.picUrl" placeholder="请选择封面图" clearable style="width:200px;">
                         <el-option label="请选择字典生成" value="" />
                     </el-select>
                   </el-form-item>
@@ -129,13 +129,6 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="商品详情" prop="detailInfo">
-                    <el-select filterable v-model="tableData.param.detailInfo" placeholder="请选择商品详情" clearable style="width:200px;">
-                        <el-option label="请选择字典生成" value="" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
                   <el-form-item label="" prop="createdAt">
                     <el-date-picker
                         clearable  style="width: 200px"
@@ -145,6 +138,16 @@
                         type="datetime"
                         placeholder="选择"                    
                     ></el-date-picker>
+                  </el-form-item>
+                </el-col>                
+                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
+                  <el-form-item label="排序 倒叙" prop="sort">
+                    <el-input
+                        v-model="tableData.param.sort"
+                        placeholder="请输入排序 倒叙"
+                        clearable                        
+                        @keyup.enter.native="goodsInfoList"
+                    />                    
                   </el-form-item>
                 </el-col>            
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
@@ -208,9 +211,17 @@
           <el-table-column label="名称" align="center" prop="name"
             min-width="150px"            
              />          
-          <el-table-column label="支持单图,多图" align="center" prop="images"
+          <el-table-column align="center" label="封面图"
             min-width="150px"            
-             />          
+            >
+            <template #default="scope">
+              <el-image
+                style="width: 150px; height: 50px"
+                v-if="!proxy.isEmpty(scope.row.picUrl)"
+                :src="proxy.getUpFileUrl(scope.row.picUrl)"
+                fit="contain"></el-image>
+            </template>
+          </el-table-column>          
           <el-table-column label="价格(分)" align="center" prop="price"
             min-width="150px"            
              />          
@@ -235,16 +246,16 @@
           <el-table-column label="标签" align="center" prop="tags"
             min-width="150px"            
              />          
-          <el-table-column label="商品详情" align="center" prop="detailInfo"
-            min-width="150px"            
-             />          
           <el-table-column label="" align="center" prop="createdAt"
             min-width="150px"            
             >
             <template #default="scope">
                 <span>{{ proxy.parseTime(scope.row.createdAt, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
             </template>
-          </el-table-column>        
+          </el-table-column>          
+          <el-table-column label="排序 倒叙" align="center" prop="sort"
+            min-width="150px"            
+             />        
           <el-table-column label="操作" align="center" class-name="small-padding" min-width="200px" fixed="right">
             <template #default="scope">            
               <el-button
@@ -359,7 +370,7 @@ const state = reactive<GoodsInfoTableDataState>({
             pageSize: 10,            
             id: undefined,            
             name: undefined,            
-            images: undefined,            
+            picUrl: undefined,            
             price: undefined,            
             level1CategoryId: undefined,            
             level2CategoryId: undefined,            
@@ -368,8 +379,8 @@ const state = reactive<GoodsInfoTableDataState>({
             stock: undefined,            
             sale: undefined,            
             tags: undefined,            
-            detailInfo: undefined,            
             createdAt: undefined,            
+            sort: undefined,            
             dateRange: []
         },
     },

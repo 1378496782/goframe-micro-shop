@@ -1,7 +1,7 @@
 export interface GoodsInfoTableColumns {    
     id:number;  // ID    
     name:string;  // 名称    
-    images:any[];  // 支持单图,多图    
+    picUrl:string;  // 封面图    
     price:number;  // 价格(分)    
     level1CategoryId:number;  // 一级分类    
     linkedLevel1CategoryId?:LinkedGoodsInfoCategoryInfo; // 一级分类    
@@ -13,8 +13,8 @@ export interface GoodsInfoTableColumns {
     stock:number;  // 库存    
     sale:number;  // 销量    
     tags:string;  // 标签    
-    detailInfo:string;  // 商品详情    
     createdAt:string;  //    
+    sort:number;  // 排序 倒叙    
     linkedGoodsInfoCategoryInfo:LinkedGoodsInfoCategoryInfo;    
 }
 
@@ -22,7 +22,8 @@ export interface GoodsInfoTableColumns {
 export interface GoodsInfoInfoData {    
     id:number|undefined;        // ID    
     name:string|undefined; // 名称    
-    images:any[]; // 支持单图,多图    
+    images:any[]; // 多图    
+    picUrl:string|undefined; // 封面图    
     price:number|undefined; // 价格(分)    
     level1CategoryId:number|undefined; // 一级分类    
     linkedLevel1CategoryId?:LinkedGoodsInfoCategoryInfo; // 一级分类    
@@ -36,6 +37,7 @@ export interface GoodsInfoInfoData {
     tags:string|undefined; // 标签    
     detailInfo:string|undefined; // 商品详情    
     createdAt:string|undefined; //    
+    sort:number|undefined; // 排序 倒叙    
     updatedAt:string|undefined; //    
     deletedAt:string|undefined; //    
     linkedGoodsInfoCategoryInfo?:LinkedGoodsInfoCategoryInfo;    
@@ -59,7 +61,7 @@ export interface GoodsInfoTableDataState {
             pageSize: number;            
             id: number|undefined;            
             name: string|undefined;            
-            images: string|undefined;            
+            picUrl: string|undefined;            
             price: number|undefined;            
             level1CategoryId: number|undefined;            
             level2CategoryId: number|undefined;            
@@ -68,8 +70,8 @@ export interface GoodsInfoTableDataState {
             stock: number|undefined;            
             sale: number|undefined;            
             tags: string|undefined;            
-            detailInfo: string|undefined;            
             createdAt: string|undefined;            
+            sort: number|undefined;            
             dateRange: string[];
         };
     };

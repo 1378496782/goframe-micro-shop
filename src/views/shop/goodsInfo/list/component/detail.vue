@@ -1,9 +1,9 @@
 <template>
-  <!-- 商品表详情抽屉 -->  
+  <!-- 商品详情抽屉 -->  
   <div class="shop-goodsInfo-detail">
     <el-drawer v-model="isShowDialog" size="80%" direction="ltr">
       <template #header>
-        <h4>商品表详情</h4>
+        <h4>商品详情</h4>
       </template>
       <el-descriptions
               class="margin-top"
@@ -30,16 +30,14 @@
           <el-descriptions-item :span="1">
             <template #label>
               <div class="cell-item">
-                支持单图,多图
+                封面图
               </div>
             </template>
-            <div class="pic-block" v-for="(img,key) in formData.images" :key="'images-'+key">
-              <el-image
-                      style="width: 150px; height: 150px"
-                      v-if="!proxy.isEmpty(img.url)"
-                      :src="proxy.getUpFileUrl(img.url)"
-                      fit="contain"></el-image>
-            </div>
+            <el-image
+                    style="width: 150px; height: 150px"
+                    v-if="!proxy.isEmpty(formData.picUrl)"
+                    :src="proxy.getUpFileUrl(formData.picUrl)"
+                    fit="contain"></el-image>
           </el-descriptions-item>        
           <el-descriptions-item :span="1">            
               <template #label>
@@ -120,6 +118,14 @@
             </template>
             {{ proxy.parseTime(formData.createdAt, '{y}-{m}-{d} {h}:{i}:{s}') }}
           </el-descriptions-item>        
+          <el-descriptions-item :span="1">            
+              <template #label>
+                <div class="cell-item">
+                  排序 倒叙
+                </div>
+              </template>
+              {{ formData.sort }}            
+          </el-descriptions-item>        
       </el-descriptions>
     </el-drawer>
   </div>
@@ -135,6 +141,7 @@
     updateGoodsInfo,    
   } from "/@/api/shop/goodsInfo";  
   import GfUeditor from "/@/components/ueditor/index.vue"  
+  import {getToken} from "/@/utils/gfast"  
   import uploadImg from "/@/components/uploadImg/index.vue"  
   import {
     GoodsInfoTableColumns,
@@ -161,6 +168,10 @@
   const {proxy} = <any>getCurrentInstance()
   const formRef = ref<HTMLElement | null>(null);
   const menuRef = ref();  
+  //图片上传地址
+  const imageUrlPicUrl = ref('')
+  //上传加载
+  const upLoadingPicUrl = ref(false)  
   const state = reactive<GoodsInfoEditState>({
     loading:false,
     isShowDialog: false,
@@ -168,6 +179,7 @@
       id: undefined,      
       name: undefined,      
       images: [] ,      
+      picUrl: undefined,      
       price: undefined,      
       level1CategoryId: undefined,      
       linkedLevel1CategoryId:{id:undefined,name:undefined },      
@@ -181,6 +193,7 @@
       tags: undefined,      
       detailInfo: undefined,      
       createdAt: undefined,      
+      sort: undefined,      
       updatedAt: undefined,      
       deletedAt: undefined,      
       linkedGoodsInfoCategoryInfo: {        
@@ -195,9 +208,6 @@
       ],      
       name : [
           { required: true, message: "名称不能为空", trigger: "blur" }
-      ],      
-      images : [
-          { required: true, message: "支持单图,多图不能为空", trigger: "blur" }
       ],      
       price : [
           { required: true, message: "价格(分)不能为空", trigger: "blur" }
@@ -214,7 +224,8 @@
     if(row) {
       getGoodsInfo(row.id!).then((res:any)=>{
         const data = res.data;        
-        data.images =data.images?JSON.parse(data.images) : []        
+        //单图地址赋值
+        imageUrlPicUrl.value = data.picUrl ? proxy.getUpFileUrl(data.picUrl) : ''        
         state.formData = data;
       })
     }
@@ -236,6 +247,7 @@
       id: undefined,      
       name: undefined,      
       images: [] ,      
+      picUrl: undefined,      
       price: undefined,      
       level1CategoryId: undefined,      
       linkedLevel1CategoryId:{id:undefined,name:undefined },      
@@ -249,6 +261,7 @@
       tags: undefined,      
       detailInfo: undefined,      
       createdAt: undefined,      
+      sort: undefined,      
       updatedAt: undefined,      
       deletedAt: undefined,      
       linkedGoodsInfoCategoryInfo: {        
@@ -259,6 +272,23 @@
   };  
   const setUpImgListImages = (data:any)=>{
     state.formData.images = data
+  }  
+  //单图上传封面图
+  const handleAvatarSuccessPicUrl:UploadProps['onSuccess'] = (res, file) => {
+    if (res.code === 0) {
+      imageUrlPicUrl.value = URL.createObjectURL(file.raw!)
+      state.formData.picUrl = res.data.path
+    } else {
+      ElMessage.error(res.msg)
+    }
+    upLoadingPicUrl.value = false
+  }
+  const beforeAvatarUploadPicUrl = () => {
+    upLoadingPicUrl.value = true
+    return true
+  }  
+  const setUpData = () => {
+    return { token: getToken() }
   }  
   //关联category_info表选项
   const getCategoryInfoItemsLevel1CategoryId = () => {
@@ -290,6 +320,29 @@
   }  
 </script>
 <style scoped>  
+  .shop-goodsInfo-detail :deep(.avatar-uploader .avatar) {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+  .shop-goodsInfo-detail :deep(.avatar-uploader .el-upload) {
+    border: 1px dashed var(--el-border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
+  }
+  .shop-goodsInfo-detail :deep(.avatar-uploader .el-upload:hover) {
+    border-color: var(--el-color-primary);
+  }
+  .shop-goodsInfo-detail :deep(.el-icon.avatar-uploader-icon) {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    text-align: center;
+  }  
   .shop-goodsInfo-detail :deep(.el-form-item--large .el-form-item__label){
     font-weight: bolder;
   }
