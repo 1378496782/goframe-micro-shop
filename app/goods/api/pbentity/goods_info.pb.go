@@ -33,7 +33,7 @@ type GoodsInfo struct {
 	Name             string                 `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty" dc:"商品名字"`                            // 商品名字
 	PicUrl           string                 `protobuf:"bytes,3,opt,name=PicUrl,proto3" json:"PicUrl,omitempty" dc:"主图"`                          // 主图
 	Images           string                 `protobuf:"bytes,4,opt,name=Images,proto3" json:"Images,omitempty" dc:"支持单图,多图"`                     // 支持单图,多图
-	Price            uint64                 `protobuf:"varint,5,opt,name=Price,proto3" json:"Price,omitempty" dc:"价格(分)"`                        // 价格(分)
+	Price            uint32                 `protobuf:"varint,5,opt,name=Price,proto3" json:"Price,omitempty" dc:"价格(分)"`                        // 价格(分)
 	Level1CategoryId uint32                 `protobuf:"varint,6,opt,name=Level1CategoryId,proto3" json:"Level1CategoryId,omitempty" dc:"1级分类id"` // 1级分类id
 	Level2CategoryId uint32                 `protobuf:"varint,7,opt,name=Level2CategoryId,proto3" json:"Level2CategoryId,omitempty" dc:"2级分类id"` // 2级分类id
 	Level3CategoryId uint32                 `protobuf:"varint,8,opt,name=Level3CategoryId,proto3" json:"Level3CategoryId,omitempty" dc:"3级分类id"` // 3级分类id
@@ -108,7 +108,7 @@ func (x *GoodsInfo) GetImages() string {
 	return ""
 }
 
-func (x *GoodsInfo) GetPrice() uint64 {
+func (x *GoodsInfo) GetPrice() uint32 {
 	if x != nil {
 		return x.Price
 	}
@@ -209,7 +209,7 @@ const file_pbentity_goods_info_proto_rawDesc = "" +
 	"\x04Name\x18\x02 \x01(\tR\x04Name\x12\x16\n" +
 	"\x06PicUrl\x18\x03 \x01(\tR\x06PicUrl\x12\x16\n" +
 	"\x06Images\x18\x04 \x01(\tR\x06Images\x12\x14\n" +
-	"\x05Price\x18\x05 \x01(\x04R\x05Price\x12*\n" +
+	"\x05Price\x18\x05 \x01(\rR\x05Price\x12*\n" +
 	"\x10Level1CategoryId\x18\x06 \x01(\rR\x10Level1CategoryId\x12*\n" +
 	"\x10Level2CategoryId\x18\a \x01(\rR\x10Level2CategoryId\x12*\n" +
 	"\x10Level3CategoryId\x18\b \x01(\rR\x10Level3CategoryId\x12\x14\n" +

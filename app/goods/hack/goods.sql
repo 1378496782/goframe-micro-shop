@@ -62,3 +62,18 @@ INSERT INTO `category_info` VALUES (5, 1, '智慧屏电视', '', 3, 1, NULL, NUL
 INSERT INTO `category_info` VALUES (6, 0, '手机/数码', '', 1, 2, '2022-07-27 15:07:31', '2022-07-27 15:08:57', NULL);
 INSERT INTO `category_info` VALUES (7, 66, '111', 'http://dummyimage.com/400x400', 62, 26, '2022-07-27 15:08:41', '2023-01-13 21:25:55', NULL);
 INSERT INTO `category_info` VALUES (8, 9, '理收每从最想', 'http://dummyimage.com/400x400', 68, 99, '2023-01-13 21:17:33', '2023-01-13 21:17:33', '2023-01-13 21:19:07');
+
+
+-- ----------------------------
+-- Table structure for cart_info
+-- ----------------------------
+DROP TABLE IF EXISTS `cart_info`;
+CREATE TABLE `cart_info`  (
+      `id` int NOT NULL AUTO_INCREMENT COMMENT '购物车表',
+      `user_id` int NOT NULL DEFAULT 0,
+      `goods_id` int NOT NULL DEFAULT 0 COMMENT '商品id',
+      `count` int NOT NULL COMMENT '商品数量',
+      `created_at` datetime DEFAULT NULL,
+      `updated_at` datetime DEFAULT NULL,
+      PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
