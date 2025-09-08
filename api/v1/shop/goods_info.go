@@ -1,9 +1,9 @@
 // ==========================================================================
 // GFast自动生成api操作代码。
-// 生成日期：2025-09-05 12:04:34
+// 生成日期：2025-09-08 11:37:28
 // 生成路径: api/v1/shop/goods_info.go
 // 生成人：王中阳
-// desc:商品表相关参数
+// desc:商品相关参数
 // company:云南奇讯科技有限公司
 // ==========================================================================
 
@@ -18,7 +18,7 @@ import (
 
 // GoodsInfoSearchReq 分页请求参数
 type GoodsInfoSearchReq struct {
-	g.Meta `path:"/list" tags:"商品表" method:"get" summary:"商品表列表"`
+	g.Meta `path:"/list" tags:"商品" method:"get" summary:"商品列表"`
 	commonApi.Author
 	model.GoodsInfoSearchReq
 }
@@ -31,7 +31,7 @@ type GoodsInfoSearchRes struct {
 
 // GoodsInfoExportReq 导出请求
 type GoodsInfoExportReq struct {
-	g.Meta `path:"/export" tags:"商品表" method:"get" summary:"商品表导出"`
+	g.Meta `path:"/export" tags:"商品" method:"get" summary:"商品导出"`
 	commonApi.Author
 	model.GoodsInfoSearchReq
 }
@@ -41,14 +41,14 @@ type GoodsInfoExportRes struct {
 	commonApi.EmptyRes
 }
 type GoodsInfoExcelTemplateReq struct {
-	g.Meta `path:"/excelTemplate" tags:"商品表" method:"get" summary:"导出模板文件"`
+	g.Meta `path:"/excelTemplate" tags:"商品" method:"get" summary:"导出模板文件"`
 	commonApi.Author
 }
 type GoodsInfoExcelTemplateRes struct {
 	commonApi.EmptyRes
 }
 type GoodsInfoImportReq struct {
-	g.Meta `path:"/import" tags:"商品表" method:"post" summary:"商品表导入"`
+	g.Meta `path:"/import" tags:"商品" method:"post" summary:"商品导入"`
 	commonApi.Author
 	File *ghttp.UploadFile `p:"file" type:"file" dc:"选择上传文件"  v:"required#上传文件必须"`
 }
@@ -58,7 +58,7 @@ type GoodsInfoImportRes struct {
 
 // 相关连表查询数据
 type LinkedGoodsInfoDataSearchReq struct {
-	g.Meta `path:"/linkedData" tags:"商品表" method:"get" summary:"商品表关联表数据"`
+	g.Meta `path:"/linkedData" tags:"商品" method:"get" summary:"商品关联表数据"`
 	commonApi.Author
 }
 
@@ -70,7 +70,7 @@ type LinkedGoodsInfoDataSearchRes struct {
 
 // GoodsInfoAddReq 添加操作请求参数
 type GoodsInfoAddReq struct {
-	g.Meta `path:"/add" tags:"商品表" method:"post" summary:"商品表添加"`
+	g.Meta `path:"/add" tags:"商品" method:"post" summary:"商品添加"`
 	commonApi.Author
 	*model.GoodsInfoAddReq
 }
@@ -82,7 +82,7 @@ type GoodsInfoAddRes struct {
 
 // GoodsInfoEditReq 修改操作请求参数
 type GoodsInfoEditReq struct {
-	g.Meta `path:"/edit" tags:"商品表" method:"put" summary:"商品表修改"`
+	g.Meta `path:"/edit" tags:"商品" method:"put" summary:"商品修改"`
 	commonApi.Author
 	*model.GoodsInfoEditReq
 }
@@ -94,7 +94,7 @@ type GoodsInfoEditRes struct {
 
 // GoodsInfoGetReq 获取一条数据请求
 type GoodsInfoGetReq struct {
-	g.Meta `path:"/get" tags:"商品表" method:"get" summary:"获取商品表信息"`
+	g.Meta `path:"/get" tags:"商品" method:"get" summary:"获取商品信息"`
 	commonApi.Author
 	Id uint `p:"id" v:"required#主键必须"` //通过主键获取
 }
@@ -107,7 +107,7 @@ type GoodsInfoGetRes struct {
 
 // GoodsInfoDeleteReq 删除数据请求
 type GoodsInfoDeleteReq struct {
-	g.Meta `path:"/delete" tags:"商品表" method:"delete" summary:"删除商品表"`
+	g.Meta `path:"/delete" tags:"商品" method:"delete" summary:"删除商品"`
 	commonApi.Author
 	Ids []uint `p:"ids" v:"required#主键必须"` //通过主键删除
 }

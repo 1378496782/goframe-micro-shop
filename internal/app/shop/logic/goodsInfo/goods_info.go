@@ -1,9 +1,9 @@
 // ==========================================================================
 // GFast自动生成logic操作代码。
-// 生成日期：2025-09-05 12:04:35
+// 生成日期：2025-09-08 11:37:29
 // 生成路径: internal/app/shop/logic/goods_info.go
 // 生成人：王中阳
-// desc:商品表
+// desc:商品
 // company:云南奇讯科技有限公司
 // ==========================================================================
 
@@ -22,7 +22,6 @@ import (
 	"github.com/tiger1103/gfast/v3/internal/app/shop/model/do"
 	"github.com/tiger1103/gfast/v3/internal/app/shop/service"
 	"github.com/tiger1103/gfast/v3/internal/app/system/consts"
-	"github.com/tiger1103/gfast/v3/library/libUtils"
 	"github.com/tiger1103/gfast/v3/library/liberr"
 	"github.com/xuri/excelize/v2"
 )
@@ -47,8 +46,8 @@ func (s *sGoodsInfo) List(ctx context.Context, req *model.GoodsInfoSearchReq) (l
 		if req.Name != "" {
 			m = m.Where(dao.GoodsInfo.Columns().Name+" like ?", "%"+req.Name+"%")
 		}
-		if req.Images != "" {
-			m = m.Where(dao.GoodsInfo.Columns().Images+" = ?", req.Images)
+		if req.PicUrl != "" {
+			m = m.Where(dao.GoodsInfo.Columns().PicUrl+" = ?", req.PicUrl)
 		}
 		if req.Price != "" {
 			m = m.Where(dao.GoodsInfo.Columns().Price+" = ?", gconv.Int(req.Price))
@@ -74,11 +73,11 @@ func (s *sGoodsInfo) List(ctx context.Context, req *model.GoodsInfoSearchReq) (l
 		if req.Tags != "" {
 			m = m.Where(dao.GoodsInfo.Columns().Tags+" = ?", req.Tags)
 		}
-		if req.DetailInfo != "" {
-			m = m.Where(dao.GoodsInfo.Columns().DetailInfo+" = ?", req.DetailInfo)
-		}
 		if len(req.DateRange) != 0 {
 			m = m.Where(dao.GoodsInfo.Columns().CreatedAt+" >=? AND "+dao.GoodsInfo.Columns().CreatedAt+" <=?", req.DateRange[0], req.DateRange[1])
+		}
+		if req.Sort != "" {
+			m = m.Where(dao.GoodsInfo.Columns().Sort+" = ?", gconv.Int(req.Sort))
 		}
 		listRes.Total, err = m.Count()
 		liberr.ErrIsNil(ctx, err, "获取总行数失败")
@@ -101,7 +100,7 @@ func (s *sGoodsInfo) List(ctx context.Context, req *model.GoodsInfoSearchReq) (l
 			listRes.List[k] = &model.GoodsInfoListRes{
 				Id:                     v.Id,
 				Name:                   v.Name,
-				Images:                 v.Images,
+				PicUrl:                 v.PicUrl,
 				Price:                  v.Price,
 				Level1CategoryId:       v.Level1CategoryId,
 				LinkedLevel1CategoryId: v.LinkedLevel1CategoryId,
@@ -113,8 +112,8 @@ func (s *sGoodsInfo) List(ctx context.Context, req *model.GoodsInfoSearchReq) (l
 				Stock:                  v.Stock,
 				Sale:                   v.Sale,
 				Tags:                   v.Tags,
-				DetailInfo:             v.DetailInfo,
 				CreatedAt:              v.CreatedAt,
+				Sort:                   v.Sort,
 			}
 		}
 	})
@@ -130,8 +129,8 @@ func (s *sGoodsInfo) GetExportData(ctx context.Context, req *model.GoodsInfoSear
 		if req.Name != "" {
 			m = m.Where(dao.GoodsInfo.Columns().Name+" like ?", "%"+req.Name+"%")
 		}
-		if req.Images != "" {
-			m = m.Where(dao.GoodsInfo.Columns().Images+" = ?", req.Images)
+		if req.PicUrl != "" {
+			m = m.Where(dao.GoodsInfo.Columns().PicUrl+" = ?", req.PicUrl)
 		}
 		if req.Price != "" {
 			m = m.Where(dao.GoodsInfo.Columns().Price+" = ?", gconv.Int(req.Price))
@@ -157,11 +156,11 @@ func (s *sGoodsInfo) GetExportData(ctx context.Context, req *model.GoodsInfoSear
 		if req.Tags != "" {
 			m = m.Where(dao.GoodsInfo.Columns().Tags+" = ?", req.Tags)
 		}
-		if req.DetailInfo != "" {
-			m = m.Where(dao.GoodsInfo.Columns().DetailInfo+" = ?", req.DetailInfo)
-		}
 		if len(req.DateRange) != 0 {
 			m = m.Where(dao.GoodsInfo.Columns().CreatedAt+" >=? AND "+dao.GoodsInfo.Columns().CreatedAt+" <=?", req.DateRange[0], req.DateRange[1])
+		}
+		if req.Sort != "" {
+			m = m.Where(dao.GoodsInfo.Columns().Sort+" = ?", gconv.Int(req.Sort))
 		}
 		if req.PageNum == 0 {
 			req.PageNum = 1
@@ -218,8 +217,9 @@ func (s *sGoodsInfo) Import(ctx context.Context, file *ghttp.UploadFile) (err er
 				Tags:             d[8],
 				DetailInfo:       d[9],
 				CreatedAt:        gconv.GTime(d[10]),
-				UpdatedAt:        gconv.GTime(d[11]),
-				DeletedAt:        gconv.GTime(d[12]),
+				Sort:             gconv.Int64(d[11]),
+				UpdatedAt:        gconv.GTime(d[12]),
+				DeletedAt:        gconv.GTime(d[13]),
 			}
 		}
 		if len(data) > 0 {
@@ -251,13 +251,9 @@ func (s *sGoodsInfo) GetById(ctx context.Context, id uint) (res *model.GoodsInfo
 
 func (s *sGoodsInfo) Add(ctx context.Context, req *model.GoodsInfoAddReq) (err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
-		for _, obj := range req.Images {
-			obj.Url, err = libUtils.GetFilesPath(ctx, obj.Url)
-			liberr.ErrIsNil(ctx, err)
-		}
 		_, err = dao.GoodsInfo.Ctx(ctx).Insert(do.GoodsInfo{
 			Name:             req.Name,
-			Images:           req.Images,
+			PicUrl:           req.PicUrl,
 			Price:            req.Price,
 			Level1CategoryId: req.Level1CategoryId,
 			Level2CategoryId: req.Level2CategoryId,
@@ -267,6 +263,7 @@ func (s *sGoodsInfo) Add(ctx context.Context, req *model.GoodsInfoAddReq) (err e
 			Sale:             req.Sale,
 			Tags:             req.Tags,
 			DetailInfo:       req.DetailInfo,
+			Sort:             req.Sort,
 		})
 		liberr.ErrIsNil(ctx, err, "添加失败")
 	})
@@ -275,13 +272,9 @@ func (s *sGoodsInfo) Add(ctx context.Context, req *model.GoodsInfoAddReq) (err e
 
 func (s *sGoodsInfo) Edit(ctx context.Context, req *model.GoodsInfoEditReq) (err error) {
 	err = g.Try(ctx, func(ctx context.Context) {
-		for _, obj := range req.Images {
-			obj.Url, err = libUtils.GetFilesPath(ctx, obj.Url)
-			liberr.ErrIsNil(ctx, err)
-		}
 		_, err = dao.GoodsInfo.Ctx(ctx).WherePri(req.Id).Update(do.GoodsInfo{
 			Name:             req.Name,
-			Images:           req.Images,
+			PicUrl:           req.PicUrl,
 			Price:            req.Price,
 			Level1CategoryId: req.Level1CategoryId,
 			Level2CategoryId: req.Level2CategoryId,
@@ -291,6 +284,7 @@ func (s *sGoodsInfo) Edit(ctx context.Context, req *model.GoodsInfoEditReq) (err
 			Sale:             req.Sale,
 			Tags:             req.Tags,
 			DetailInfo:       req.DetailInfo,
+			Sort:             req.Sort,
 		})
 		liberr.ErrIsNil(ctx, err, "修改失败")
 	})

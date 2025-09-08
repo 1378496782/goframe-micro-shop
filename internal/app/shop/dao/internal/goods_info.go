@@ -1,9 +1,9 @@
 // ==========================================================================
 // GFast自动生成dao internal操作代码。
-// 生成日期：2025-09-05 12:04:34
+// 生成日期：2025-09-08 11:37:29
 // 生成路径: internal/app/shop/dao/internal/goods_info.go
 // 生成人：王中阳
-// desc:商品表
+// desc:商品
 // company:云南奇讯科技有限公司
 // ==========================================================================
 
@@ -27,7 +27,8 @@ type GoodsInfoDao struct {
 type GoodsInfoColumns struct {
 	Id               string // ID
 	Name             string // 名称
-	Images           string // 支持单图,多图
+	Images           string // 多图
+	PicUrl           string // 封面图
 	Price            string // 价格(分)
 	Level1CategoryId string // 一级分类
 	Level2CategoryId string // 二级分类
@@ -38,6 +39,7 @@ type GoodsInfoColumns struct {
 	Tags             string // 标签
 	DetailInfo       string // 商品详情
 	CreatedAt        string //
+	Sort             string // 排序 倒叙
 	UpdatedAt        string //
 	DeletedAt        string //
 }
@@ -46,6 +48,7 @@ var goodsInfoColumns = GoodsInfoColumns{
 	Id:               "id",
 	Name:             "name",
 	Images:           "images",
+	PicUrl:           "pic_url",
 	Price:            "price",
 	Level1CategoryId: "level1_category_id",
 	Level2CategoryId: "level2_category_id",
@@ -56,6 +59,7 @@ var goodsInfoColumns = GoodsInfoColumns{
 	Tags:             "tags",
 	DetailInfo:       "detail_info",
 	CreatedAt:        "created_at",
+	Sort:             "sort",
 	UpdatedAt:        "updated_at",
 	DeletedAt:        "deleted_at",
 }

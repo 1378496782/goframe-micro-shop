@@ -1,9 +1,9 @@
 // ==========================================================================
 // GFast自动生成controller操作代码。
-// 生成日期：2025-09-05 12:04:34
+// 生成日期：2025-09-08 11:37:29
 // 生成路径: internal/app/shop/controller/goods_info.go
 // 生成人：王中阳
-// desc:商品表
+// desc:商品
 // company:云南奇讯科技有限公司
 // ==========================================================================
 
@@ -44,7 +44,7 @@ func (c *goodsInfoController) Export(ctx context.Context, req *shop.GoodsInfoExp
 		r        = ghttp.RequestFromCtx(ctx)
 		listData []*model.GoodsInfoInfoRes
 		//表头
-		tableHead = []interface{}{"ID", "名称", "价格(分)", "一级分类", "二级分类", "三级分类", "品牌", "库存", "销量", "标签", "", "", ""}
+		tableHead = []interface{}{"ID", "名称", "价格(分)", "一级分类", "二级分类", "三级分类", "品牌", "库存", "销量", "标签", "", "排序 倒叙", "", ""}
 		excelData [][]interface{}
 		//字典选项处理
 	)
@@ -96,6 +96,7 @@ func (c *goodsInfoController) Export(ctx context.Context, req *shop.GoodsInfoExp
 				v.Sale,
 				v.Tags,
 				v.CreatedAt.Format("Y-m-d H:i:s"),
+				v.Sort,
 				v.UpdatedAt.Format("Y-m-d H:i:s"),
 				v.DeletedAt.Format("Y-m-d H:i:s"),
 			}
@@ -118,7 +119,7 @@ func (c *goodsInfoController) Export(ctx context.Context, req *shop.GoodsInfoExp
 	r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
 	r.Response.Header().Set("Accept-Ranges", "bytes")
 	r.Response.Header().Set("Access-Control-Expose-Headers", "*")
-	r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("商品表")+".xlsx")
+	r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("商品")+".xlsx")
 	r.Response.Buffer()
 	r.Exit()
 	return
@@ -127,7 +128,7 @@ func (c *goodsInfoController) ExcelTemplate(ctx context.Context, req *shop.Goods
 	var (
 		r = ghttp.RequestFromCtx(ctx)
 		//表头
-		tableHead = []interface{}{"名称", "价格(分)", "一级分类", "二级分类", "三级分类", "品牌", "库存", "销量", "标签", "商品详情", "", "", ""}
+		tableHead = []interface{}{"名称", "价格(分)", "一级分类", "二级分类", "三级分类", "品牌", "库存", "销量", "标签", "商品详情", "", "排序 倒叙", "", ""}
 		excelData = [][]interface{}{tableHead}
 	)
 	//创建excel处理对象
@@ -145,7 +146,7 @@ func (c *goodsInfoController) ExcelTemplate(ctx context.Context, req *shop.Goods
 	r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
 	r.Response.Header().Set("Accept-Ranges", "bytes")
 	r.Response.Header().Set("Access-Control-Expose-Headers", "*")
-	r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("商品表模板")+".xlsx")
+	r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("商品模板")+".xlsx")
 	r.Response.Buffer()
 	r.Exit()
 	return
@@ -166,26 +167,26 @@ func (c *goodsInfoController) LinkedGoodsInfoDataSearch(ctx context.Context, req
 	return
 }
 
-// Get 获取商品表
+// Get 获取商品
 func (c *goodsInfoController) Get(ctx context.Context, req *shop.GoodsInfoGetReq) (res *shop.GoodsInfoGetRes, err error) {
 	res = new(shop.GoodsInfoGetRes)
 	res.GoodsInfoInfoRes, err = service.GoodsInfo().GetById(ctx, req.Id)
 	return
 }
 
-// Add 添加商品表
+// Add 添加商品
 func (c *goodsInfoController) Add(ctx context.Context, req *shop.GoodsInfoAddReq) (res *shop.GoodsInfoAddRes, err error) {
 	err = service.GoodsInfo().Add(ctx, req.GoodsInfoAddReq)
 	return
 }
 
-// Edit 修改商品表
+// Edit 修改商品
 func (c *goodsInfoController) Edit(ctx context.Context, req *shop.GoodsInfoEditReq) (res *shop.GoodsInfoEditRes, err error) {
 	err = service.GoodsInfo().Edit(ctx, req.GoodsInfoEditReq)
 	return
 }
 
-// Delete 删除商品表
+// Delete 删除商品
 func (c *goodsInfoController) Delete(ctx context.Context, req *shop.GoodsInfoDeleteReq) (res *shop.GoodsInfoDeleteRes, err error) {
 	err = service.GoodsInfo().Delete(ctx, req.Ids)
 	return
