@@ -73,6 +73,7 @@ func createGoodsIndex(ctx context.Context) error {
 					"analyzer": "ik_max_word",
 					"search_analyzer": "ik_smart"
 				},
+				"pic_url": {"type": "keyword"},
 				"images": {"type": "keyword"},
 				"price": {"type": "long"},
 				"level1_category_id": {"type": "long"},

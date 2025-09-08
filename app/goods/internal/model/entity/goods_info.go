@@ -12,6 +12,7 @@ import (
 type GoodsInfo struct {
 	Id               uint        `json:"id"               orm:"id"                 description:""`        //
 	Name             string      `json:"name"             orm:"name"               description:"商品名字"`    // 商品名字
+	PicUrl           string      `json:"picUrl"           orm:"pic_url"            description:"主图"`      // 主图
 	Images           string      `json:"images"           orm:"images"             description:"支持单图,多图"` // 支持单图,多图
 	Price            int         `json:"price"            orm:"price"              description:"价格(分)"`   // 价格(分)
 	Level1CategoryId int         `json:"level1CategoryId" orm:"level1_category_id" description:"1级分类id"`  // 1级分类id

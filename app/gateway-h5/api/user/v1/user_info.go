@@ -38,7 +38,6 @@ type UserInfoRegisterRes struct {
 // 用户信息请求
 type UserInfoReq struct {
 	g.Meta `path:"/user/info" tags:"用户管理" method:"get" summary:"获取用户信息"`
-	Id     uint32 `json:"id" v:"required#用户ID不能为空" dc:"用户ID"`
 }
 
 // 用户信息响应
@@ -49,7 +48,6 @@ type UserInfoRes struct {
 // 修改密码请求
 type UserInfoUpdatePasswordReq struct {
 	g.Meta       `path:"/user/update/password" tags:"用户管理" method:"put" summary:"修改用户密码"`
-	Id           uint32 `json:"id" v:"required#用户ID不能为空" dc:"用户ID"`
 	Password     string `json:"password" v:"required#新密码不能为空" dc:"新密码"`
 	SecretAnswer string `json:"secret_answer" v:"required#密保问题的答案不能为空" dc:"密保问题的答案"`
 }

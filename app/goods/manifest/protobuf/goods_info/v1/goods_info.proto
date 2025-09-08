@@ -33,15 +33,16 @@ message GoodsInfoGetDetailRes {
 message GoodsInfoCreateReq {
   string name = 1;
   uint64 price = 2;
-  string Images = 3;
-  uint32 level1_category_id = 4;
-  uint32 level2_category_id = 5;
-  uint32 level3_category_id = 6;
-  string brand = 7;
-  uint32 stock = 8;
-  uint32 sale = 9;
-  string tags = 10;
-  string detail_info = 11;
+  string PicUrl = 3;  // 主图
+  string Images = 4;
+  uint32 level1_category_id = 5;
+  uint32 level2_category_id = 6;
+  uint32 level3_category_id = 7;
+  string brand = 8;
+  uint32 stock = 9;
+  uint32 sale = 10;
+  string tags = 11;
+  string detail_info = 12;
 }
 
 message GoodsInfoCreateRes {
@@ -52,15 +53,16 @@ message GoodsInfoUpdateReq {
   uint32 id = 1;
   string name = 2;
   uint64 price = 3;
-  string Images = 4;
-  uint32 level1_category_id = 5;
-  uint32 level2_category_id = 6;
-  uint32 level3_category_id = 7;
-  string brand = 8;
-  uint32 stock = 9;
-  uint32 sale = 10;
-  string tags = 11;
-  string detail_info = 12;
+  string PicUrl = 4;  // 主图
+  string Images = 5;
+  uint32 level1_category_id = 6;
+  uint32 level2_category_id = 7;
+  uint32 level3_category_id = 8;
+  string brand = 9;
+  uint32 stock = 10;
+  uint32 sale = 11;
+  string tags = 12;
+  string detail_info = 13;
 }
 
 message GoodsInfoUpdateRes {

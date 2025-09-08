@@ -43,9 +43,9 @@ func (*Controller) GetList(ctx context.Context, req *v1.ConsigneeInfoGetListReq)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 	response.Total = uint32(total)
-
 	// 查询当前页数据
 	consigneeRecords, err := dao.ConsigneeInfo.Ctx(ctx).
+		Where("user_id", req.UserId).
 		Page(int(req.Page), int(req.Size)).
 		All()
 	if err != nil {

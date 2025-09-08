@@ -13,17 +13,18 @@ import "google/protobuf/timestamp.proto";
 message GoodsInfo {
     uint32                    Id               = 1;  //
     string                    Name             = 2;  // 商品名字
-    string                    Images           = 3;  // 支持单图,多图
-    int32                     Price            = 4;  // 价格(分)
-    int32                     Level1CategoryId = 5;  // 1级分类id
-    int32                     Level2CategoryId = 6;  // 2级分类id
-    int32                     Level3CategoryId = 7;  // 3级分类id
-    string                    Brand            = 8;  // 品牌
-    int32                     Stock            = 9;  // 库存
-    int32                     Sale             = 10; // 销量
-    string                    Tags             = 11; // 标签
-    string                    DetailInfo       = 12; // 商品详情
-    google.protobuf.Timestamp CreatedAt        = 13; //
-    google.protobuf.Timestamp UpdatedAt        = 14; //
-    google.protobuf.Timestamp DeletedAt        = 15; //
+    string                    PicUrl           = 3;  // 主图
+    string                    Images           = 4;  // 支持单图,多图
+    uint64                     Price            = 5;  // 价格(分)
+    uint32                     Level1CategoryId = 6;  // 1级分类id
+    uint32                     Level2CategoryId = 7;  // 2级分类id
+    uint32                     Level3CategoryId = 8;  // 3级分类id
+    string                    Brand            = 9;  // 品牌
+    uint32                     Stock            = 10; // 库存
+    uint32                     Sale             = 11; // 销量
+    string                    Tags             = 12; // 标签
+    string                    DetailInfo       = 13; // 商品详情
+    google.protobuf.Timestamp CreatedAt        = 14; //
+    google.protobuf.Timestamp UpdatedAt        = 15; //
+    google.protobuf.Timestamp DeletedAt        = 16; //
 }
