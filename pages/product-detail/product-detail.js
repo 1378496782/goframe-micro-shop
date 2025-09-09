@@ -3,37 +3,11 @@ const constants = require('../../config/constants');
 
 Page({
   data: {
-    currentImageIndex: 0,
     selectedSpecs: {},
     product: null,
     loading: true
-      id: 1,
-      name: '高品质智能手机 8GB+256GB 全网通5G',
-      price: '2999.00',
-      originalPrice: '3999.00',
-      discount: '7.5',
-      sales: 12560,
-      reviews: 3489,
-      stock: 500,
-      images: [
-        'https://via.placeholder.com/400x400/19aecc/ffffff?text=主图1',
-        'https://via.placeholder.com/400x400/19aecc/ffffff?text=主图2',
-        'https://via.placeholder.com/400x400/19aecc/ffffff?text=主图3',
-        'https://via.placeholder.com/400x400/19aecc/ffffff?text=主图4'
-      ],
-      specs: [
-        {
-          name: '颜色',
-          values: ['黑色', '白色', '蓝色', '绿色']
-        },
-        {
-          name: '内存',
-          values: ['8GB+128GB', '8GB+256GB', '12GB+256GB', '12GB+512GB']
-        }
-      ]
-    }
   },
-
+ 
   async onLoad(options) {
     console.log('商品详情页面加载参数:', options)
     console.log('商品ID:', options.id)
@@ -63,7 +37,7 @@ Page({
   },
   
   // 加载商品详情
-  async loadProductDetail(product极速版Id) {
+  async loadProductDetail(productId) {
     console.log('开始加载商品详情，商品ID:', productId)
     if (!productId) {
       wx.showToast({
@@ -110,6 +84,10 @@ Page({
           product: formattedProduct,
           loading: false
         })
+        // 设置页面标题为商品名称
+        wx.setNavigationBarTitle({
+          title: formattedProduct.name
+        })
         console.log('页面数据更新完成')
       } else {
         throw new Error(res.message || '获取商品详情失败')
@@ -125,29 +103,9 @@ Page({
     }
   },
 
-  // 计算当前显示的图片
-  currentImage() {
-    return this.data.product.images[this.data.currentImageIndex]
-  },
 
-  // 选择图片
-  selectImage(e) {
-    const index = e.currentTarget.dataset.index
-    this.setData({
-      currentImageIndex: index
-    })
-  },
 
-  // 选择规格
-  selectSpec(e) {
-    const { specName, value } = e.currentTarget.dataset
-    const selectedSpecs = { ...this.data.selectedSpecs }
-    selectedSpecs[specName] = value
-    
-    this.setData({
-      selectedSpecs
-    })
-  },
+
 
   // 添加到收藏
   addToFavorites() {
@@ -166,34 +124,18 @@ Page({
 
   // 加入购物车
   addToCart() {
-    if (Object.keys(this.data.selectedSpecs).length === 0) {
-      wx.showToast({
-        title: '请选择规格',
-        icon: 'none'
-      })
-      return
-    }
-
     wx.showToast({
       title: '已加入购物车',
       icon: 'success'
     })
-    console.log('加入购物车', this.data.selectedSpecs)
+    console.log('加入购物车', this.data.product.id)
   },
 
   // 立即购买
   buyNow() {
-    if (Object.keys(this.data.selectedSpecs).length === 0) {
-      wx.showToast({
-        title: '请选择规格',
-        icon: 'none'
-      })
-      return
-    }
-
     wx.navigateTo({
       url: `/pages/order/confirm?productId=${this.data.product.id}`
     })
-    console.log('立即购买', this.data.selectedSpecs)
+    console.log('立即购买', this.data.product.id)
   }
 })

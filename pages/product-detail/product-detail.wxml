@@ -3,19 +3,9 @@
   <text>加载中...</text>
 </view>
 
-<!-- 商品图片轮播 -->
+<!-- 商品图片 -->
 <view class="product-gallery" wx:if="{{!loading && product}}">
-  <image src="{{currentImage}}" mode="aspectFit" class="main-image" />
-  <scroll-view class="thumbnail-list" scroll-x="true">
-    <image 
-      wx:for="{{product.images}}" 
-      wx:key="index" 
-      src="{{item}}" 
-      class="thumbnail {{currentImageIndex === index ? 'active' : ''}}"
-      bindtap="selectImage" 
-      data-index="{{index}}"
-    />
-  </scroll-view>
+  <image src="{{product.images[0]}}" mode="aspectFit" class="main-image" />
 </view>
 
 <!-- 商品信息 -->
@@ -37,21 +27,24 @@
 
 <!-- 规格选择 -->
 <view class="spec-section" wx:if="{{!loading && product}}">
-  <text class="section-title">选择规格</text>
+  <text class="section-title">商品信息</text>
   <view class="spec-options">
-    <view class="spec-item" wx:for="{{product.specs}}" wx:key="name">
-      <text class="spec-name">{{item.name}}</text>
+    <view class="spec-item">
+      <text class="spec-name">商品名称</text>
       <view class="spec-values">
-        <text 
-          wx:for="{{item.values}}" 
-          wx:key="*this" 
-          class="spec-value {{selectedSpecs[item.name] === item ? 'active' : ''}}"
-          bindtap="selectSpec" 
-          data-spec-name="{{item.name}}" 
-          data-value="{{item}}"
-        >
-          {{item}}
-        </text>
+        <text class="spec-value active">{{product.name}}</text>
+      </view>
+    </view>
+    <view class="spec-item" wx:if="{{product.brand}}">
+      <text class="spec-name">品牌</text>
+      <view class="spec-values">
+        <text class="spec-value active">{{product.brand}}</text>
+      </view>
+    </view>
+    <view class="spec-item" wx:if="{{product.tags}}">
+      <text class="spec-name">标签</text>
+      <view class="spec-values">
+        <text class="spec-value active">{{product.tags}}</text>
       </view>
     </view>
   </view>
@@ -65,21 +58,7 @@
   </view>
 </view>
 
-<!-- 商品标签 -->
-<view class="product-tags" wx:if="{{product.tags}}">
-  <text class="section-title">商品标签</text>
-  <view class="tags-content">
-    <text class="tag" wx:for="{{product.tags.split(',')}}" wx:key="*this">{{item}}</text>
-  </view>
-</view>
 
-<!-- 品牌信息 -->
-<view class="brand-info" wx:if="{{product.brand}}">
-  <text class="section-title">品牌</text>
-  <view class="brand-content">
-    <text>{{product.brand}}</text>
-  </view>
-</view>
 
 <!-- 底部操作栏 -->
 <view class="action-bar" wx:if="{{!loading && product}}">
