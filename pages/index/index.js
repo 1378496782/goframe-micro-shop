@@ -33,7 +33,7 @@ Page({
         this.setData({
           banners: bannersRes.data.list.map(item => ({
             id: item.id,
-            image: item.pic_url,
+            image: constants.IMAGE_BASE_URL + item.pic_url,
             url: item.link
           }))
         })
@@ -100,13 +100,6 @@ Page({
 
     wx.navigateTo({
       url: `/pages/search/search?keyword=${this.data.searchValue}`
-    })
-  },
-
-  onBannerClick(e) {
-    const url = e.currentTarget.dataset.url
-    wx.navigateTo({
-      url: url
     })
   },
 
