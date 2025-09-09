@@ -35,10 +35,12 @@ Page({
   },
 
   async onLoad(options) {
-    console.log('商品详情页面加载', options)
+    console.log('商品详情页面加载参数:', options)
+    console.log('商品ID:', options.id)
     
     // 检查用户是否登录
     const token = wx.getStorageSync('token')
+    console.log('用户token:', token)
     if (!token) {
       wx.showModal({
         title: '提示',
@@ -61,7 +63,8 @@ Page({
   },
   
   // 加载商品详情
-  async loadProductDetail(productId) {
+  async loadProductDetail(product极速版Id) {
+    console.log('开始加载商品详情，商品ID:', productId)
     if (!productId) {
       wx.showToast({
         title: '商品ID无效',
@@ -74,7 +77,9 @@ Page({
     this.setData({ loading: true })
     
     try {
+      console.log('调用API获取商品详情...')
       const res = await api.getGoodsDetail(productId)
+      console.log('API响应:', res)
       
       if (res.code === 0) {
         const product = res.data
@@ -100,10 +105,12 @@ Page({
           brand: product.brand || ''
         }
         
+        console.log('格式化后的商品数据:', formattedProduct)
         this.setData({
           product: formattedProduct,
           loading: false
         })
+        console.log('页面数据更新完成')
       } else {
         throw new Error(res.message || '获取商品详情失败')
       }
