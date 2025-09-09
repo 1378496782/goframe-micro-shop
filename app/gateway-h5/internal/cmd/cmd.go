@@ -26,7 +26,10 @@ var (
 					group.Bind(
 						user.NewV1().UserInfoRegister,
 						user.NewV1().UserInfoLogin,
-						goods.NewV1(),
+						goods.NewV1().CategoryInfoGetAll,
+						goods.NewV1().CategoryInfoGetList,
+						goods.NewV1().GoodsInfoGetDetail,
+						goods.NewV1().GoodsInfoGetList,
 						banner.NewV1(),
 					)
 				})
@@ -41,6 +44,9 @@ var (
 						user.NewV1().ConsigneeInfoUpdate,
 						user.NewV1().UserInfo,
 						user.NewV1().UserInfoUpdatePassword,
+						goods.NewV1().CartInfoGetList,
+						goods.NewV1().CartInfoCreate,
+						goods.NewV1().CartInfoDelete,
 						interaction.NewV1(),
 						order.NewV1(),
 					)

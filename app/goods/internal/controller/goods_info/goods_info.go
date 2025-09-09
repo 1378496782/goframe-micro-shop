@@ -37,8 +37,17 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 	}
 	// 错误类型
 	infoError := consts.InfoError(consts.GoodsInfo, consts.GetListFail)
+
+	// 构建查询条件
+	query := dao.GoodsInfo.Ctx(ctx)
+
+	// 根据IsHot参数添加筛选条件
+	if req.IsHot == 1 {
+		query = query.Where("sort > ?", 0)
+	}
+
 	// 查询总数
-	total, err := dao.GoodsInfo.Ctx(ctx).Count()
+	total, err := query.Count()
 	if err != nil {
 		// 记录错误日志
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
@@ -47,8 +56,10 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 	response.Total = uint32(total)
 
 	// 查询当前页数据
-	goodsRecords, err := dao.GoodsInfo.Ctx(ctx).
+	goodsRecords, err := query.
 		Page(int(req.Page), int(req.Size)).
+		// 如果是热门商品，按sort降序排列（越大越靠前）
+		OrderDesc("sort").
 		All()
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)

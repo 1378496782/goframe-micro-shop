@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package cart_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1";
+
+import "pbentity/cart_info.proto";
+
+service cart_info {
+  rpc GetList(CartInfoGetListReq) returns (CartInfoGetListRes) {}
+  rpc Create(CartInfoCreateReq) returns (CartInfoCreateRes) {}
+  rpc Delete(CartInfoDeleteReq) returns (CartInfoDeleteRes) {}
+}
+
+// 新增消息定义
+message CartInfoCreateReq {
+  uint32                     GoodsId = 1; // 商品id
+  uint32                     Count          = 2; // 商品数量
+  uint32 UserId = 3;
+}
+
+message CartInfoCreateRes {
+  uint32 id = 1;
+}
+
+
+message CartInfoDeleteReq {
+  uint32 id = 1;
+}
+
+message CartInfoDeleteRes {
+  uint32 id = 1;
+}
+
+message CartInfoGetListReq {
+  uint32 page = 1;
+  uint32 size = 2;
+  uint32 UserId = 3;
+}
+
+message CartInfoListResponse {
+  repeated pbentity.CartInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message CartInfoGetListRes {
+  CartInfoListResponse data = 1;
+}

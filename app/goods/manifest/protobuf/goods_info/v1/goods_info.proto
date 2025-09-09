@@ -43,6 +43,7 @@ message GoodsInfoCreateReq {
   uint32 sale = 10;
   string tags = 11;
   string detail_info = 12;
+  uint32 sort = 13;
 }
 
 message GoodsInfoCreateRes {
@@ -63,6 +64,7 @@ message GoodsInfoUpdateReq {
   uint32 sale = 11;
   string tags = 12;
   string detail_info = 13;
+  uint32 sort = 14;
 }
 
 message GoodsInfoUpdateRes {
@@ -80,6 +82,7 @@ message GoodsInfoDeleteRes {
 message GoodsInfoGetListReq {
   uint32 page = 1;
   uint32 size = 2;  // 修改：字段编号必须从1开始递增
+  uint32 is_hot = 3;
 }
 
 

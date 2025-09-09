@@ -26,4 +26,5 @@ type GoodsInfo struct {
 	CreatedAt        *gtime.Time `json:"createdAt"        orm:"created_at"         description:""`        //
 	UpdatedAt        *gtime.Time `json:"updatedAt"        orm:"updated_at"         description:""`        //
 	DeletedAt        *gtime.Time `json:"deletedAt"        orm:"deleted_at"         description:""`        //
+	Sort             int         `json:"sort"             orm:"sort"               description:"排序 倒序"`   // 排序 倒序
 }

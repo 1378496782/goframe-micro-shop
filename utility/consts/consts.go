@@ -26,6 +26,7 @@ const (
 	AdminInfo          = "AdminInfo"
 	PositionInfo       = "PositionInfo"
 	RotationInfo       = "RotationInfo"
+	CartInfo           = "CartInfo"
 )
 
 func InfoError(info string, fail string) string {
