@@ -7,8 +7,10 @@ import (
 	"google.golang.org/grpc"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/cart_info"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/category_info"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/coupon_info"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/goods_images"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/goods_info"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/user_coupon_info"
 )
 
 var (
@@ -28,6 +30,8 @@ var (
 			goods_images.Register(s)
 			category_info.Register(s)
 			cart_info.Register(s)
+			coupon_info.Register(s)
+			user_coupon_info.Register(s)
 			s.Run()
 			return nil
 		},

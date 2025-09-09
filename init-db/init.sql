@@ -78,6 +78,60 @@ INSERT INTO `category_info` VALUES (6, 0, '手机/数码', '', 1, 2, '2022-07-27
 INSERT INTO `category_info` VALUES (7, 66, '111', 'http://dummyimage.com/400x400', 62, 26, '2022-07-27 15:08:41', '2023-01-13 21:25:55', NULL);
 INSERT INTO `category_info` VALUES (8, 9, '理收每从最想', 'http://dummyimage.com/400x400', 68, 99, '2023-01-13 21:17:33', '2023-01-13 21:17:33', '2023-01-13 21:19:07');
 
+-- ----------------------------
+-- Table structure for cart_info
+-- ----------------------------
+DROP TABLE IF EXISTS `cart_info`;
+CREATE TABLE `cart_info`  (
+      `id` int NOT NULL AUTO_INCREMENT COMMENT '购物车表',
+      `user_id` int NOT NULL DEFAULT 0,
+      `goods_id` int NOT NULL DEFAULT 0 COMMENT '商品id',
+      `count` int NOT NULL COMMENT '商品数量',
+      `created_at` datetime DEFAULT NULL,
+      `updated_at` datetime DEFAULT NULL,
+      PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+-- 删除已存在的 coupon_info 表（如果存在）
+DROP TABLE IF EXISTS `coupon_info`;
+
+-- 创建 coupon_info 表
+CREATE TABLE `coupon_info` (
+       `id` int NOT NULL AUTO_INCREMENT,
+       `goods_id` int NOT NULL DEFAULT '0' COMMENT '关联商品id（0表示全场通用）',
+       `name` varchar(100) NOT NULL COMMENT '优惠券名称',
+       `type` tinyint NOT NULL DEFAULT '0' COMMENT '优惠券类型：0-新人券，1-活动券，2-其他',
+       `amount` int NOT NULL DEFAULT '0' COMMENT '优惠金额（单位：分）',
+       `deadline` datetime NOT NULL COMMENT '过期时间',
+       `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+       `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+       `deleted_at` datetime DEFAULT NULL COMMENT '删除时间（软删除）',
+       PRIMARY KEY (`id`),
+       KEY `idx_goods_id` (`goods_id`),
+       KEY `idx_deadline` (`deadline`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='优惠券信息表';
+
+-- 删除已存在的 user_coupon_info 表（如果存在）
+DROP TABLE IF EXISTS `user_coupon_info`;
+
+-- 创建 user_coupon_info 表
+CREATE TABLE `user_coupon_info` (
+        `id` int NOT NULL AUTO_INCREMENT,
+        `user_id` int NOT NULL DEFAULT '0' COMMENT '用户id',
+        `coupon_id` int NOT NULL COMMENT '优惠券id',
+        `status` tinyint NOT NULL DEFAULT '0' COMMENT '状态：0-待使用，1-已使用，2-已过期',
+        `amount` int NOT NULL DEFAULT '0' COMMENT '优惠金额（单位：分）',
+        `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+        `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+        `deleted_at` datetime DEFAULT NULL COMMENT '删除时间（软删除）',
+        PRIMARY KEY (`id`),
+        KEY `idx_user_id` (`user_id`),
+        KEY `idx_coupon_id` (`coupon_id`),
+        KEY `idx_status` (`status`),
+        UNIQUE KEY `uk_user_coupon` (`user_id`, `coupon_id`) COMMENT '同一用户不能重复领取同张优惠券'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户优惠券信息表';
+
+
 USE admin;
     
 -- ----------------------------

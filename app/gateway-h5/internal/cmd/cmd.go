@@ -20,35 +20,43 @@ var (
 		Brief: "start http gateway-h5 server",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
+			// 创建控制器实例一次，重复使用
+
+			userController := user.NewV1()
+			goodsController := goods.NewV1()
+			bannerController := banner.NewV1()
+			interactionController := interaction.NewV1()
+			orderController := order.NewV1()
+
 			s.Group("/frontend", func(group *ghttp.RouterGroup) {
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
+				// 无需认证的路由
 				group.Group("/", func(group *ghttp.RouterGroup) {
 					group.Bind(
-						user.NewV1().UserInfoRegister,
-						user.NewV1().UserInfoLogin,
-						goods.NewV1().CategoryInfoGetAll,
-						goods.NewV1().CategoryInfoGetList,
-						goods.NewV1().GoodsInfoGetDetail,
-						goods.NewV1().GoodsInfoGetList,
-						banner.NewV1(),
+						userController.UserInfoRegister,
+						userController.UserInfoLogin,
+						goodsController.CategoryInfoGetAll,
+						goodsController.CategoryInfoGetList,
+						goodsController.GoodsInfoGetDetail,
+						goodsController.GoodsInfoGetList,
+						bannerController,
 					)
 				})
 				// 需要JWT验证的路由
 				group.Group("/", func(group *ghttp.RouterGroup) {
 					group.Middleware(middleware.JWTAuth)
 					group.Bind(
-						// 需要认证的接口
-						user.NewV1().ConsigneeInfoCreate,
-						user.NewV1().ConsigneeInfoDelete,
-						user.NewV1().ConsigneeInfoGetList,
-						user.NewV1().ConsigneeInfoUpdate,
-						user.NewV1().UserInfo,
-						user.NewV1().UserInfoUpdatePassword,
-						goods.NewV1().CartInfoGetList,
-						goods.NewV1().CartInfoCreate,
-						goods.NewV1().CartInfoDelete,
-						interaction.NewV1(),
-						order.NewV1(),
+						userController.ConsigneeInfoCreate,
+						userController.ConsigneeInfoDelete,
+						userController.ConsigneeInfoGetList,
+						userController.ConsigneeInfoUpdate,
+						userController.UserInfo,
+						userController.UserInfoUpdatePassword,
+						goodsController.CartInfoGetList,
+						goodsController.CartInfoCreate,
+						goodsController.CartInfoDelete,
+						interactionController,
+						orderController,
 					)
 				})
 			})

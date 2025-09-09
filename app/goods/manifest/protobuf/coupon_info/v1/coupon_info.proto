@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package coupon_info;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/coupon_info/v1";
+
+import "pbentity/coupon_info.proto";
+import "google/protobuf/timestamp.proto";
+
+service coupon_info {
+  rpc GetList(CouponInfoGetListReq) returns (CouponInfoGetListRes) {}
+  rpc Create(CouponInfoCreateReq) returns (CouponInfoCreateRes) {}
+  rpc Update(CouponInfoUpdateReq) returns (CouponInfoUpdateRes) {}
+  rpc Delete(CouponInfoDeleteReq) returns (CouponInfoDeleteRes) {}
+}
+
+// 新增消息定义
+message CouponInfoCreateReq {
+  uint32                     GoodsId   = 1; // 关联商品id（0表示全场通用）
+  string                    Name      = 2; // 优惠券名称
+  uint32                     Type      = 3; // 优惠券类型：0-新人券，1-活动券，2-其他
+  uint64                     Amount    = 4; // 优惠金额（单位：分）
+  string                    Deadline  = 5; // 过期时间
+}
+
+message CouponInfoCreateRes {
+  uint32 id = 1;
+}
+
+message CouponInfoGetListReq {
+  uint32 page = 1;
+  uint32 size = 2;  // 修改：字段编号必须从1开始递增
+}
+
+message CouponInfoUpdateReq {
+  uint32                     Id        = 1; //
+  uint32                     GoodsId   = 2; // 关联商品id（0表示全场通用）
+  string                    Name      = 3; // 优惠券名称
+  uint32                     Type      = 4; // 优惠券类型：0-新人券，1-活动券，2-其他
+  uint64                     Amount    = 5; // 优惠金额（单位：分）
+  string                     Deadline  = 6; // 过期时间
+}
+
+message CouponInfoUpdateRes {
+  uint32 id = 1;
+}
+
+message CouponInfoDeleteReq {
+  uint32 id = 1;
+}
+
+message CouponInfoDeleteRes {
+
+}
+
+
+message CouponInfoListResponse {
+  repeated pbentity.CouponInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message CouponInfoGetListRes {
+  CouponInfoListResponse data = 1;
+}
