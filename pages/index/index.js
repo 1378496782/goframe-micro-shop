@@ -1,4 +1,5 @@
 const { api } = require('../../utils/api');
+const constants = require('../../config/constants');
 
 Page({
   data: {
@@ -22,11 +23,10 @@ Page({
     this.setData({ loading: true })
     
     try {
-      // 并行加载轮播图、分类和商品数据
-      const [bannersRes, categoriesRes, productsRes] = await Promise.all([
+      // 并行加载轮播图和商品数据
+      const [bannersRes, productsRes] = await Promise.all([
         api.getBanners(),
-        api.getCategories(),
-        api.getGoodsList({ page: 1, size: 10 })
+        api.getGoodsList({ page: 1, size: 10, is_hot: 1 })
       ])
       
       if (bannersRes.code === 0) {
@@ -39,31 +39,28 @@ Page({
         })
       }
       
-      if (categoriesRes.code === 0) {
-        this.setData({
-          categories: categoriesRes.data.map(item => ({
-            ...item,
-            icon: 'http://wangzhongyang.com/images/logo_removebg.png'
-          }))
-        })
-      }
-      
+
       if (productsRes.code === 0) {
         // 格式化商品数据：价格转换和图片提取
         const formattedProducts = productsRes.data.list.map(item => {
-          let imageUrl = ''
-          try {
-            const imagesObj = JSON.parse(item.images)
-            imageUrl = imagesObj.image || ''
-          } catch (e) {
-            console.warn('解析图片数据失败:', e)
-            imageUrl = ''
+          // 处理图片URL，优先使用pic_url字段，使用配置的图片域名
+          let mainImage = ''
+          if (item.pic_url) {
+            mainImage = constants.IMAGE_BASE_URL + item.pic_url
+          } else {
+            try {
+              const imagesObj = JSON.parse(item.images)
+              mainImage = imagesObj.image || ''
+            } catch (e) {
+              console.warn('解析图片数据失败:', e)
+              mainImage = ''
+            }
           }
           
           return {
             ...item,
             priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
-            mainImage: imageUrl || 'https://via.placeholder.com/200x200?text=商品图片'
+            mainImage: mainImage || 'https://via.placeholder.com/200x200?text=商品图片'
           }
         })
         
