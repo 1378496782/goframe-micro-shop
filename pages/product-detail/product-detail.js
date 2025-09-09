@@ -1,8 +1,12 @@
+const { api } = require('../../utils/api');
+const constants = require('../../config/constants');
+
 Page({
   data: {
     currentImageIndex: 0,
     selectedSpecs: {},
-    product: {
+    product: null,
+    loading: true
       id: 1,
       name: '高品质智能手机 8GB+256GB 全网通5G',
       price: '2999.00',
@@ -30,9 +34,88 @@ Page({
     }
   },
 
-  onLoad(options) {
-    // 可以根据options中的参数加载不同的商品数据
+  async onLoad(options) {
     console.log('商品详情页面加载', options)
+    
+    // 检查用户是否登录
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          } else {
+            wx.navigateBack()
+          }
+        }
+      })
+      return
+    }
+    
+    // 加载商品详情数据
+    await this.loadProductDetail(options.id)
+  },
+  
+  // 加载商品详情
+  async loadProductDetail(productId) {
+    if (!productId) {
+      wx.showToast({
+        title: '商品ID无效',
+        icon: 'none'
+      })
+      wx.navigateBack()
+      return
+    }
+    
+    this.setData({ loading: true })
+    
+    try {
+      const res = await api.getGoodsDetail(productId)
+      
+      if (res.code === 0) {
+        const product = res.data
+        // 处理图片URL
+        const images = []
+        if (product.pic_url) {
+          images.push(constants.IMAGE_BASE_URL + product.pic_url)
+        }
+        
+        // 格式化商品数据
+        const formattedProduct = {
+          id: product.id,
+          name: product.name,
+          price: (product.price / 100).toFixed(2),
+          originalPrice: ((product.price * 1.2) / 100).toFixed(2), // 模拟原价
+          discount: '8.3', // 模拟折扣
+          sales: product.sale || 0,
+          reviews: Math.floor((product.sale || 0) * 0.3), // 模拟评论数
+          stock: product.stock || 0,
+          images: images,
+          detailInfo: product.detail_info || '',
+          tags: product.tags || '',
+          brand: product.brand || ''
+        }
+        
+        this.setData({
+          product: formattedProduct,
+          loading: false
+        })
+      } else {
+        throw new Error(res.message || '获取商品详情失败')
+      }
+    } catch (error) {
+      console.error('加载商品详情失败:', error)
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+      this.setData({ loading: false })
+      wx.navigateBack()
+    }
   },
 
   // 计算当前显示的图片
