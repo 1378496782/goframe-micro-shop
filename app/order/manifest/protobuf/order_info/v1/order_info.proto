@@ -19,9 +19,9 @@ message OrderInfoCreateReq {
   uint32 price = 1;                       // 订单金额
   uint32 coupon_price = 2;                // 优惠券金额
   uint32 actual_price = 3;                // 实际支付金额
-  string consignee_name = 4;             // 收货人姓名
+//  string consignee_name = 4;             // 收货人姓名
   string consignee_phone = 5;            // 收货人手机号
-  string consignee_address = 6;          // 收货人详细地址
+//  string consignee_address = 6;          // 收货人详细地址
   string remark = 7;                     // 备注
   repeated OrderGoodsItem order_goods_info = 8; // 订单商品信息
 }
@@ -29,7 +29,7 @@ message OrderInfoCreateReq {
 // 订单商品项
 message OrderGoodsItem {
   uint32 goods_id = 1;            // 商品id
-  uint32 goods_options_id = 2;    // 商品规格id
+//  uint32 goods_options_id = 2;    // 商品规格id
   uint32 count = 3;               // 商品数量
   string remark = 4;             // 备注
   uint32 price = 5;               // 商品金额
