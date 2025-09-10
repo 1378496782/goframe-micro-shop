@@ -400,6 +400,96 @@ const mockData = {
         size: 10
       }
     }
+  },
+
+  // 拼团砍价相关Mock数据
+  '/frontend/group-buy': {
+    method: 'GET',
+    response: {
+      code: 0,
+      message: 'OK',
+      data: {
+        list: [
+          {
+            id: 101,
+            name: 'GoFrame微服务实战课程',
+            groupPrice: 9900, // 99元
+            originalPrice: 19900, // 199元
+            groupCount: 3,
+            mainImage: 'http://wangzhongyang.com/images/goframe-course.jpg',
+            participants: 128,
+            endTime: '2025-09-15 23:59:59'
+          },
+          {
+            id: 102,
+            name: 'UniApp跨端开发实战',
+            groupPrice: 7900, // 79元
+            originalPrice: 14900, // 149元
+            groupCount: 2,
+            mainImage: 'http://wangzhongyang.com/images/uniapp-course.jpg',
+            participants: 256,
+            endTime: '2025-09-20 23:59:59'
+          },
+          {
+            id: 103,
+            name: '微信小程序高级开发',
+            groupPrice: 12900, // 129元
+            originalPrice: 25900, // 259元
+            groupCount: 5,
+            mainImage: 'http://wangzhongyang.com/images/wxapp-course.jpg',
+            participants: 89,
+            endTime: '2025-09-18 23:59:59'
+          },
+          {
+            id: 104,
+            name: '分布式系统架构设计',
+            groupPrice: 19900, // 199元
+            originalPrice: 39900, // 399元
+            groupCount: 4,
+            mainImage: 'http://wangzhongyang.com/images/distributed-course.jpg',
+            participants: 67,
+            endTime: '2025-09-25 23:59:59'
+          },
+          {
+            id: 105,
+            name: '云原生DevOps实战',
+            groupPrice: 14900, // 149元
+            originalPrice: 29900, // 299元
+            groupCount: 3,
+            mainImage: 'http://wangzhongyang.com/images/devops-course.jpg',
+            participants: 182,
+            endTime: '2025-09-22 23:59:59'
+          }
+        ],
+        page: 1,
+        size: 5,
+        total: 15
+      }
+    }
+  },
+
+  // 砍价活动Mock数据
+  '/frontend/bargain': {
+    method: 'GET',
+    response: {
+      code: 0,
+      message: 'OK',
+      data: {
+        list: [
+          {
+            id: 201,
+            name: '全栈开发实战课程',
+            bargainPrice: 4900, // 当前砍价后价格
+            originalPrice: 9900, // 原价
+            minPrice: 100, // 最低砍到1元
+            mainImage: 'http://wangzhongyang.com/images/fullstack-course.jpg',
+            bargainCount: 23, // 已砍次数
+            totalBargainCount: 50, // 需要砍的总次数
+            participants: 342
+          }
+        ]
+      }
+    }
   }
 };
 
@@ -510,7 +600,15 @@ const api = {
   createOrder: (data) => request('/frontend/order', data, 'POST'),
   getOrders: (params) => request('/frontend/order', params, 'GET'),
   getOrderDetail: (id) => request('/frontend/order/detail', { id }, 'GET'),
-  cancelOrder: (id) => request('/frontend/order/cancel', { id }, 'PUT')
+  cancelOrder: (id) => request('/frontend/order/cancel', { id }, 'PUT'),
+
+  // 拼团砍价相关
+  getGroupBuyProducts: (params) => request('/frontend/group-buy', params, 'GET'),
+  getBargainProducts: (params) => request('/frontend/bargain', params, 'GET'),
+  createGroupOrder: (data) => request('/frontend/group-buy/order', data, 'POST'),
+  createBargainOrder: (data) => request('/frontend/bargain/order', data, 'POST'),
+  joinGroup: (data) => request('/frontend/group-buy/join', data, 'POST'),
+  helpBargain: (data) => request('/frontend/bargain/help', data, 'POST')
 };
 
 module.exports = {

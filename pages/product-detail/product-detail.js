@@ -123,12 +123,44 @@ Page({
   },
 
   // 加入购物车
-  addToCart() {
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success'
-    })
-    console.log('加入购物车', this.data.product.id)
+  async addToCart() {
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+
+    try {
+      const res = await api.addToCart({
+        goods_id: this.data.product.id,
+        count: 1
+      })
+
+      if (res.code === 0) {
+        wx.showToast({
+          title: '已加入购物车',
+          icon: 'success'
+        })
+      } else {
+        throw new Error(res.message || '加入购物车失败')
+      }
+    } catch (error) {
+      console.error('加入购物车失败:', error)
+      wx.showToast({
+        title: error.message || '加入购物车失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 立即购买

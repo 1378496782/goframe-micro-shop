@@ -10,7 +10,9 @@
     "pages/search/search",
     "pages/more-goods/more-goods",
     "pages/change-password/change-password",
-    "pages/webview/webview"
+    "pages/webview/webview",
+    "pages/group-buy/group-buy",
+    "pages/group-buy-list/group-buy-list"
   ],
   "window": {
     "navigationBarBackgroundColor": "#19aecc",

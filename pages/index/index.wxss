@@ -153,3 +153,76 @@
   font-size: 10px;
   color: #86909C;
 }
+
+/* 拼团砍价专区样式 */
+.group-buy-section {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+}
+
+.group-buy-section .section-title {
+  color: white;
+}
+
+.group-buy-section .section-more {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.group-buy-list {
+  white-space: nowrap;
+  padding-bottom: 10px;
+}
+
+.group-buy-item {
+  display: inline-block;
+  width: 280rpx;
+  background: white;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.group-buy-image {
+  width: 100%;
+  height: 280rpx;
+}
+
+.group-buy-info {
+  padding: 16rpx;
+}
+
+.group-buy-name {
+  font-size: 24rpx;
+  color: #1D2129;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 8rpx;
+  line-height: 1.4;
+}
+
+.group-buy-info .price-section {
+  margin-bottom: 8rpx;
+}
+
+.group-price {
+  font-size: 28rpx;
+  color: #F53F3F;
+  font-weight: bold;
+  margin-right: 8rpx;
+}
+
+.original-price {
+  font-size: 20rpx;
+  color: #86909C;
+  text-decoration: line-through;
+}
+
+.group-count {
+  font-size: 20rpx;
+  color: #19aecc;
+  background: rgba(25, 174, 204, 0.1);
+  padding: 4rpx 8rpx;
+  border-radius: 4rpx;
+}

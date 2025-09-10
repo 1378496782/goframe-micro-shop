@@ -31,6 +31,33 @@
     </view>
   </view>
 
+  <!-- 拼团砍价专区 -->
+  <view class="section group-buy-section">
+    <view class="section-header">
+      <text class="section-title">🔥 拼团砍价</text>
+      <text class="section-more" bindtap="onGroupBuyMore">更多活动 ></text>
+    </view>
+    <scroll-view class="group-buy-list" scroll-x="true">
+      <view 
+        class="group-buy-item" 
+        wx:for="{{groupBuyProducts}}" 
+        wx:key="id"
+        bindtap="onGroupBuyClick"
+        data-id="{{item.id}}"
+      >
+        <image src="{{item.mainImage}}" class="group-buy-image" mode="aspectFill"/>
+        <view class="group-buy-info">
+          <text class="group-buy-name">{{item.name}}</text>
+          <view class="price-section">
+            <text class="group-price">¥{{item.groupPrice}}</text>
+            <text class="original-price">¥{{item.originalPrice}}</text>
+          </view>
+          <text class="group-count">{{item.groupCount}}人团</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
   <!-- 推荐商品 -->
   <view class="section">
     <view class="section-header">
