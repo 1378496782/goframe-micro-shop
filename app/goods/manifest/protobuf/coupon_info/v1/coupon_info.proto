@@ -5,7 +5,6 @@ package coupon_info;
 option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/coupon_info/v1";
 
 import "pbentity/coupon_info.proto";
-import "google/protobuf/timestamp.proto";
 
 service coupon_info {
   rpc GetList(CouponInfoGetListReq) returns (CouponInfoGetListRes) {}

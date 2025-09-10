@@ -20,12 +20,23 @@ type CartInfoGetListRes struct {
 }
 
 type CartInfoItem struct {
-	Id        uint32                 `json:"id" dc:"购物车ID"`
-	UserId    int32                  `json:"user_id" dc:"用户ID"`
-	GoodsId   uint32                 `json:"goods_id" dc:"商品id"`
-	Count     uint32                 `json:"count" dc:"商品数量"`
-	CreatedAt *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
-	UpdatedAt *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
+	// 购物车字段
+	Id     uint32 `json:"id" dc:"购物车ID"`
+	UserId uint32 `json:"user_id" dc:"用户ID"`
+	Count  uint32 `json:"count" dc:"商品数量"`
+
+	// 商品字段
+	GoodsId        uint32                 `json:"goods_id" dc:"商品ID"`
+	GoodsName      string                 `json:"goods_name" dc:"商品名称"`
+	GoodsPicUrl    string                 `json:"goods_pic_url" dc:"商品图片"`
+	GoodsPrice     uint64                 `json:"goods_price" dc:"商品价格(分)"`
+	GoodsBrand     string                 `json:"goods_brand" dc:"商品品牌"`
+	GoodsStock     uint32                 `json:"goods_stock" dc:"商品库存"`
+	GoodsSale      uint32                 `json:"goods_sale" dc:"商品销量"`
+	GoodsTags      string                 `json:"goods_tags" dc:"商品标签"`
+	GoodsSort      uint32                 `json:"goods_sort" dc:"商品排序"`
+	GoodsCreatedAt *timestamppb.Timestamp `json:"goods_created_at" dc:"商品创建时间"`
+	GoodsUpdatedAt *timestamppb.Timestamp `json:"goods_updated_at" dc:"商品更新时间"`
 }
 
 // CartInfoCreateReq 创建购物车选项

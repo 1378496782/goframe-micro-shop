@@ -14,7 +14,6 @@ import (
 
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -521,7 +520,7 @@ var File_coupon_info_v1_coupon_info_proto protoreflect.FileDescriptor
 
 const file_coupon_info_v1_coupon_info_proto_rawDesc = "" +
 	"\n" +
-	" coupon_info/v1/coupon_info.proto\x12\vcoupon_info\x1a\x1apbentity/coupon_info.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8b\x01\n" +
+	" coupon_info/v1/coupon_info.proto\x12\vcoupon_info\x1a\x1apbentity/coupon_info.proto\"\x8b\x01\n" +
 	"\x13CouponInfoCreateReq\x12\x18\n" +
 	"\aGoodsId\x18\x01 \x01(\rR\aGoodsId\x12\x12\n" +
 	"\x04Name\x18\x02 \x01(\tR\x04Name\x12\x12\n" +

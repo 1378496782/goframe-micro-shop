@@ -2,18 +2,14 @@ package cart_info
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/util/gconv"
-	v1 "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
-	"shop-goframe-micro-service-refacotor/app/goods/api/pbentity"
-	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
-	"shop-goframe-micro-service-refacotor/app/goods/internal/model/entity"
-	"shop-goframe-micro-service-refacotor/utility"
-	"shop-goframe-micro-service-refacotor/utility/consts"
-
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
+	v1 "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/cart_info"
+	"shop-goframe-micro-service-refacotor/utility/consts"
 )
 
 type Controller struct {
@@ -24,52 +20,14 @@ func Register(s *grpcx.GrpcServer) {
 	v1.RegisterCartInfoServer(s.Server, &Controller{})
 }
 
-func (*Controller) GetList(ctx context.Context, req *v1.CartInfoGetListReq) (res *v1.CartInfoGetListRes, err error) {
-	// 初始化响应结构
-	response := &v1.CartInfoListResponse{
-		List:  make([]*pbentity.CartInfo, 0),
-		Page:  req.Page,
-		Size:  req.Size,
-		Total: 0,
-	}
+func (c *Controller) GetList(ctx context.Context, req *v1.CartInfoGetListReq) (res *v1.CartInfoGetListRes, err error) {
 	// 错误类型
 	infoError := consts.InfoError(consts.CartInfo, consts.GetListFail)
-	// 查询总数
-	total, err := dao.CartInfo.Ctx(ctx).Count()
-	if err != nil {
-		// 记录错误日志
-		g.Log().Errorf(ctx, "%v %v", infoError, err)
-		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
-	}
-	response.Total = uint32(total)
-
-	// 查询当前页数据
-	cartRecords, err := dao.CartInfo.Ctx(ctx).
-		Page(int(req.Page), int(req.Size)).
-		Where("user_id", req.UserId).
-		All()
+	// 调用逻辑层方法
+	response, err := cart_info.GetList(ctx, req)
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
-	}
-
-	// 数据转换
-	// 在循环中替换手动赋值
-	for _, record := range cartRecords {
-		var cart entity.CartInfo
-		if err := record.Struct(&cart); err != nil {
-			continue
-		}
-
-		var pbCart pbentity.CartInfo
-		if err := gconv.Struct(cart, &pbCart); err != nil {
-			continue
-		}
-
-		pbCart.CreatedAt = utility.SafeConvertTime(cart.CreatedAt)
-		pbCart.UpdatedAt = utility.SafeConvertTime(cart.UpdatedAt)
-
-		response.List = append(response.List, &pbCart)
 	}
 
 	return &v1.CartInfoGetListRes{Data: response}, nil
