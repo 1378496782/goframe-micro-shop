@@ -11,14 +11,16 @@ import (
 	category_info "shop-goframe-micro-service-refacotor/app/goods/api/category_info/v1"
 	goods_images "shop-goframe-micro-service-refacotor/app/goods/api/goods_images/v1"
 	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
+	user_coupon_info "shop-goframe-micro-service-refacotor/app/goods/api/user_coupon_info/v1"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 )
 
 type ControllerV1 struct {
-	GoodsInfoClient    goods_info.GoodsInfoClient
-	GoodsImagesClient  goods_images.GoodsImagesClient
-	CategoryInfoClient category_info.CategoryInfoClient
-	CartInfoClient     cart_info.CartInfoClient
+	GoodsInfoClient      goods_info.GoodsInfoClient
+	GoodsImagesClient    goods_images.GoodsImagesClient
+	CategoryInfoClient   category_info.CategoryInfoClient
+	CartInfoClient       cart_info.CartInfoClient
+	UserCouponInfoClient user_coupon_info.UserCouponInfoClient
 }
 
 func NewV1() goods.IGoodsV1 {
@@ -26,9 +28,10 @@ func NewV1() goods.IGoodsV1 {
 		middleware.GrpcClientTimeout,
 	))
 	return &ControllerV1{
-		GoodsInfoClient:    goods_info.NewGoodsInfoClient(conn),
-		GoodsImagesClient:  goods_images.NewGoodsImagesClient(conn),
-		CategoryInfoClient: category_info.NewCategoryInfoClient(conn),
-		CartInfoClient:     cart_info.NewCartInfoClient(conn),
+		GoodsInfoClient:      goods_info.NewGoodsInfoClient(conn),
+		GoodsImagesClient:    goods_images.NewGoodsImagesClient(conn),
+		CategoryInfoClient:   category_info.NewCategoryInfoClient(conn),
+		CartInfoClient:       cart_info.NewCartInfoClient(conn),
+		UserCouponInfoClient: user_coupon_info.NewUserCouponInfoClient(conn),
 	}
 }

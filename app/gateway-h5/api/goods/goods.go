@@ -19,4 +19,5 @@ type IGoodsV1 interface {
 	GoodsImagesGetList(ctx context.Context, req *v1.GoodsImagesGetListReq) (res *v1.GoodsImagesGetListRes, err error)
 	GoodsInfoGetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq) (res *v1.GoodsInfoGetDetailRes, err error)
 	GoodsInfoGetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (res *v1.GoodsInfoGetListRes, err error)
+	UserCouponInfoGetList(ctx context.Context, req *v1.UserCouponInfoGetListReq) (res *v1.UserCouponInfoGetListRes, err error)
 }

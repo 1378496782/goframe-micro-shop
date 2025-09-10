@@ -55,6 +55,7 @@ var (
 						goodsController.CartInfoGetList,
 						goodsController.CartInfoCreate,
 						goodsController.CartInfoDelete,
+						goodsController.UserCouponInfoGetList,
 						interactionController,
 						orderController,
 					)

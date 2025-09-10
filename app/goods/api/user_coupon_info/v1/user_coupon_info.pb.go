@@ -140,6 +140,7 @@ type UserCouponInfoGetListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          uint32                 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"` // 修改：字段编号必须从1开始递增
+	UserId        uint32                 `protobuf:"varint,3,opt,name=UserId,proto3" json:"UserId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -184,6 +185,13 @@ func (x *UserCouponInfoGetListReq) GetPage() uint32 {
 func (x *UserCouponInfoGetListReq) GetSize() uint32 {
 	if x != nil {
 		return x.Size
+	}
+	return 0
+}
+
+func (x *UserCouponInfoGetListReq) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
 	}
 	return 0
 }
@@ -511,10 +519,11 @@ const file_user_coupon_info_v1_user_coupon_info_proto_rawDesc = "" +
 	"\x06Status\x18\x03 \x01(\rR\x06Status\x12\x16\n" +
 	"\x06Amount\x18\x04 \x01(\x04R\x06Amount\")\n" +
 	"\x17UserCouponInfoCreateRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"B\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"Z\n" +
 	"\x18UserCouponInfoGetListReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\rR\x04page\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\rR\x04size\"\x8d\x01\n" +
+	"\x04size\x18\x02 \x01(\rR\x04size\x12\x16\n" +
+	"\x06UserId\x18\x03 \x01(\rR\x06UserId\"\x8d\x01\n" +
 	"\x17UserCouponInfoUpdateReq\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\rR\x02Id\x12\x16\n" +
 	"\x06UserId\x18\x02 \x01(\rR\x06UserId\x12\x1a\n" +

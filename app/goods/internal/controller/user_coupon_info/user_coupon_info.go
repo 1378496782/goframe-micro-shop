@@ -47,6 +47,7 @@ func (*Controller) GetList(ctx context.Context, req *v1.UserCouponInfoGetListReq
 	// 查询当前页数据
 	couponRecords, err := dao.UserCouponInfo.Ctx(ctx).
 		Page(int(req.Page), int(req.Size)).
+		Where("user_id", req.UserId).
 		All()
 	if err != nil {
 		// 记录错误日志
