@@ -15,7 +15,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	var address = conf.String()
 	grpcx.Resolver.Register(etcd.New(address))
 
