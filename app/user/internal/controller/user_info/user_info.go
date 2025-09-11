@@ -11,6 +11,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/user/internal/logic/user_info"
 	"shop-goframe-micro-service-refacotor/app/user/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility/consts"
+	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
 	"time"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
@@ -73,6 +74,8 @@ func (c *Controller) Register(ctx context.Context, req *v1.UserInfoRegisterReq) 
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
+
+	go rabbitmq.PublishUserRegisteredEvent(userInfo.Id)
 
 	// 返回响应
 	return &v1.UserInfoRegisterRes{
