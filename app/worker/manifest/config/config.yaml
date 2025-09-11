@@ -18,7 +18,7 @@ server:
 # RabbitMQ 配置
 rabbitmq:
   default:
-    address: "amqp://root:root@localhost:5672/"
+    address: "amqp://root:root@rabbitmq:5672/"
     exchange:
       orderDelayExchange: "order.delay.exchange"
     queue:
