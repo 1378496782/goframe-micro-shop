@@ -1,4 +1,0 @@
-2025-08-15 15:47:36.855 [DEBU] 公众号：王中阳：user-service service register: &{Head: Deployment: Namespace: Name:user Version: Endpoints:192.168.1.11:31001,172.29.64.1:31001,172.26.96.1:31001 Metadata:map[protocol:grpc]}
-2025-08-15 15:47:36.861 [INFO] 公众号：王中阳：user-service pid[3304]: grpc server started listening on [:31001]
-2025-08-15 15:50:45.020 [INFO] 公众号：王中阳：user-service signal received: interrupt, gracefully shutting down
-2025-08-15 15:50:45.020 [DEBU] 公众号：王中阳：user-service service deregister: &{Service:0xc0003456c0 Endpoints:192.168.1.11:31001,172.29.64.1:31001,172.26.96.1:31001 Metadata:map[protocol:grpc]}

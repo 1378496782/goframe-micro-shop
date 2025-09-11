@@ -1,3 +1,0 @@
-2025-08-14 10:41:57.342 [ERRO] {3c2205f5e8815b189d3eef5a449a070f} 公众号：王中阳：user-service /user_info.UserInfo/Register, 8.819ms, 52, "UserInfo Register 注册失败: 检查用户名失败", name:"koko"  password:"123456"  avatar:"https://avatars.githubusercontent.com/u/1744121"  sex:1  sign:"irure culpa "  secret_answer:"irure sint", <nil>, -1, "", "", rpc error: code = Code(52) desc = UserInfo Register 注册失败: 检查用户名失败
-2025-08-14 10:56:32.108 [ERRO] {b8147da1b4825b18a13eef5a34965e2e} 公众号：王中阳：user-service /user_info.UserInfo/UpdatePassword, 2.349ms, 0, "", , <nil>, -1, "", "", 用户不存在
-2025-08-14 10:56:57.069 [ERRO] {400d0e71ba825b18a33eef5a46f9aaba} 公众号：王中阳：user-service /user_info.UserInfo/Login, 6.494ms, 0, "", name:"koko"  password:"123456", <nil>, -1, "", "", 密码错误
