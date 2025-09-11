@@ -20,6 +20,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    restart: unless-stopped  # 添加重启策略
 
   # etcd 服务发现
   etcd:
@@ -32,6 +33,7 @@ services:
       - "2379:2379"
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   # Redis 服务
   redis:
@@ -44,6 +46,7 @@ services:
     networks:
       - app-network
     command: redis-server --appendonly yes
+    restart: unless-stopped  # 添加重启策略
 
   # RabbitMQ 服务（带延迟插件）
   rabbitmq:
@@ -71,6 +74,7 @@ services:
         rabbitmq-plugins enable rabbitmq_delayed_message_exchange
         # 启动服务
         exec rabbitmq-server
+    restart: unless-stopped  # 添加重启策略
 
 
   # Elasticsearch
@@ -101,6 +105,7 @@ services:
       - |
         ./bin/elasticsearch-plugin install --batch file:///tmp/ik-plugin/elasticsearch-analysis-ik-8.11.0.zip
         exec /usr/local/bin/docker-entrypoint.sh
+    restart: unless-stopped  # 添加重启策略
 
   # Kibana
   kibana:
@@ -119,6 +124,7 @@ services:
       - elasticsearch
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   # Go 服务 - 使用构建的镜像
   admin-service:
@@ -137,6 +143,7 @@ services:
       - mysql
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   goods-service:
     build: .
@@ -155,6 +162,7 @@ services:
       - redis
     networks:
         - app-network
+    restart: unless-stopped  # 添加重启策略
 
   order-service:
     build: .
@@ -173,6 +181,7 @@ services:
       - rabbitmq
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   user-service:
     build: .
@@ -190,6 +199,7 @@ services:
       - mysql
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   interaction-service:
     build: .
@@ -207,6 +217,7 @@ services:
       - mysql
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   worker-service:
     build: .
@@ -223,6 +234,7 @@ services:
       - rabbitmq
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   search-service:
     build: .
@@ -241,6 +253,7 @@ services:
       - elasticsearch
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   gateway-admin:
     build: .
@@ -257,6 +270,7 @@ services:
       - etcd
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   gateway-h5:
     build: .
@@ -273,6 +287,7 @@ services:
       - etcd
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   gateway-resource:
     build: .
@@ -292,6 +307,7 @@ services:
       - mysql
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
   banner-service:
     build: .
@@ -309,6 +325,7 @@ services:
       - mysql
     networks:
       - app-network
+    restart: unless-stopped  # 添加重启策略
 
 networks:
   app-network:
