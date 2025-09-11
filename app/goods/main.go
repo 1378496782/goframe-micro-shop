@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 	"os"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/cmd"
+	"shop-goframe-micro-service-refacotor/app/goods/utility/consumer"
 	"shop-goframe-micro-service-refacotor/app/goods/utility/goodsRedis"
 )
 
@@ -24,6 +25,8 @@ func main() {
 		g.Log().Fatal(ctx, "Redis初始化失败:", err)
 		os.Exit(1)
 	}
+	// 启动消费者
+	go consumer.StartUserRegisteredConsumer()
 
 	var address = conf.String()
 	grpcx.Resolver.Register(etcd.New(address))

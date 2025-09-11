@@ -34,3 +34,19 @@ redis:
     idle: 10
     connectTimeout: "5s"
     # 可以添加其他Redis配置参数
+
+rabbitmq:
+  default:
+    host: "127.0.0.1"
+    port: "5672"
+    user: "root"
+    password: "root"
+    vhost: "/"
+  exchange:
+    user: "user_events"
+  queue:
+    user:
+      registered: "user_registered_queue"
+  routingKey:
+    user:
+      registered: "user.registered"
