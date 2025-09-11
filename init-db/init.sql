@@ -4,7 +4,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 创建数据库并指定字符集
 CREATE DATABASE IF NOT EXISTS `goods` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- CREATE DATABASE IF NOT EXISTS `admin` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `admin` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE IF NOT EXISTS `user` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE IF NOT EXISTS `interaction` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE IF NOT EXISTS `order` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -187,7 +187,7 @@ CREATE TABLE `user_info`  (
           `updated_at` datetime DEFAULT NULL,
           `deleted_at` datetime DEFAULT NULL,
           PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '商品表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_info
@@ -464,7 +464,7 @@ INSERT INTO `position_info` VALUES (2, 'https://images.zsxq.com/FgdL08hVmh-40_e1
 /*
 下面是管理后台需要的数据表
 */
-
+USE admin;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
