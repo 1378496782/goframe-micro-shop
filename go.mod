@@ -12,6 +12,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/qiniu/go-sdk/v7 v7.25.4
 	github.com/rabbitmq/amqp091-go v1.10.0
+	github.com/streadway/amqp v1.1.0
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.7
 )
