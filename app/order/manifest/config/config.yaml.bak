@@ -15,12 +15,12 @@ grpc:
 
 database:
   default:
-    link:  "mysql:root:root@tcp(mysql:3306)/order"
+    link:  "mysql:root:root@tcp(127.0.0.1:3306)/order"
     debug:
 
 
 etcd:
-  address: "etcd:2379"
+  address: "127.0.0.1:2379"
 
 # RabbitMQ 配置
 rabbitmq:

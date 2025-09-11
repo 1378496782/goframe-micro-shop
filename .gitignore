@@ -9,6 +9,7 @@
 .vscode/
 bin/
 **/.DS_Store
+**/config.yaml
 gf
 main
 main.exe
