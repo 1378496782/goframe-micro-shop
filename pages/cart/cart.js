@@ -52,6 +52,7 @@ Page({
     const app = getApp()
     const { API, config } = app.globalData
     const { request } = require('../../utils/request')
+    const constants = require('../../config/constants')
     
     console.log('正在请求购物车数据:', {
       url: API.CART_LIST,
@@ -75,7 +76,7 @@ Page({
         spec: item.goods_brand || '默认规格',
         price: item.goods_price / 100, // 分转元
         originalPrice: (item.goods_price * 1.2) / 100, // 计算原价
-        image: `${config.BASE_URL}/${item.goods_pic_url}`,
+        image: `${constants.IMAGE_BASE_URL}${item.goods_pic_url}`,
         quantity: item.count,
         selected: false,
         stock: item.goods_stock,
