@@ -1,38 +1,116 @@
 Page({
   data: {
-    cartItems: [
-      {
-        id: 1,
-        name: '高品质智能手机 8GB+256GB',
-        spec: '黑色, 8GB+256GB',
-        price: '2999.00',
-        originalPrice: '3999.00',
-        image: 'https://via.placeholder.com/100x100/19aecc/ffffff?text=手机',
-        quantity: 1,
-        selected: true
-      },
-      {
-        id: 2,
-        name: '无线蓝牙耳机 降噪版',
-        spec: '白色',
-        price: '399.00',
-        originalPrice: '499.00',
-        image: 'https://via.placeholder.com/100x100/19aecc/ffffff?text=耳机',
-        quantity: 2,
-        selected: false
-      }
-    ],
-    allSelected: false
+    cartItems: [],
+    allSelected: false,
+    page: 1,
+    size: 10,
+    total: 0,
+    loading: false,
+    hasMore: true
   },
 
   onLoad() {
-    this.calculateTotal()
+    this.loadCartData()
+  },
+
+  onPullDownRefresh() {
+    // 下拉刷新
+    this.setData({
+      page: 1,
+      hasMore: true
+    })
+    this.loadCartData(true)
+  },
+
+  onReachBottom() {
+    // 上拉加载更多
+    if (this.data.hasMore && !this.data.loading) {
+      this.setData({
+        page: this.data.page + 1
+      })
+      this.loadCartData()
+    }
   },
 
   onShow() {
-    // 更新购物车数量
-    this.getTabBar().setData({
-      cartCount: this.data.cartItems.reduce((total, item) => total + item.quantity, 0)
+    // 页面显示时如果购物车为空，则加载数据
+    if (this.data.cartItems.length === 0) {
+      this.setData({
+        page: 1,
+        hasMore: true
+      })
+      this.loadCartData()
+    }
+  },
+
+  // 加载购物车数据
+  loadCartData(isRefresh = false) {
+    if (this.data.loading) return
+    
+    this.setData({ loading: true })
+    
+    const app = getApp()
+    const { API, config } = app.globalData
+    const { request } = require('../../utils/request')
+    
+    console.log('正在请求购物车数据:', {
+      url: API.CART_LIST,
+      page: this.data.page,
+      size: this.data.size
+    })
+    
+    request({
+      url: API.CART_LIST,
+      method: 'GET',
+      data: {
+        page: this.data.page,
+        size: this.data.size
+      }
+    }).then(cartData => {
+      console.log('购物车数据:', cartData)
+      const newItems = cartData.list.map(item => ({
+        id: item.id,
+        goods_id: item.goods_id,
+        name: item.goods_name,
+        spec: item.goods_brand || '默认规格',
+        price: item.goods_price / 100, // 分转元
+        originalPrice: (item.goods_price * 1.2) / 100, // 计算原价
+        image: `${config.BASE_URL}/${item.goods_pic_url}`,
+        quantity: item.count,
+        selected: false,
+        stock: item.goods_stock,
+        sale: item.goods_sale
+      }))
+      
+      console.log('转换后的商品列表:', newItems)
+      
+      if (isRefresh) {
+        this.setData({
+          cartItems: newItems,
+          total: cartData.total,
+          hasMore: this.data.page * this.data.size < cartData.total
+        })
+      } else {
+        this.setData({
+          cartItems: [...this.data.cartItems, ...newItems],
+          total: cartData.total,
+          hasMore: this.data.page * this.data.size < cartData.total
+        })
+      }
+      
+      this.calculateTotal()
+      this.updateCartCount()
+    }).catch(err => {
+      console.log('购物车请求失败:', err)
+      wx.showToast({
+        title: err.message || '加载失败',
+        icon: 'none'
+      })
+    }).finally(() => {
+      this.setData({ loading: false })
+      if (isRefresh) {
+        wx.stopPullDownRefresh()
+      }
     })
   },
 
