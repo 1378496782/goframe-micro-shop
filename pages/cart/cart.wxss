@@ -175,3 +175,33 @@
   padding: 10px 20px;
   margin-left: 15px;
 }
+
+/* 加载更多样式 */
+.load-more,
+.no-more {
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  color: #86909C;
+}
+
+.load-more text {
+  color: #19aecc;
+}
+
+.no-more text {
+  color: #86909C;
+}
+
+/* 加载状态样式 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.loading text {
+  font-size: 14px;
+  color: #86909C;
+}

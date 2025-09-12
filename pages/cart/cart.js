@@ -69,7 +69,35 @@ Page({
       }
     }).then(cartData => {
       console.log('购物车数据:', cartData)
-      const newItems = cartData.list.map(item => ({
+      
+      // 合并相同商品的数量
+      const itemMap = new Map()
+      
+      cartData.list.forEach(item => {
+        const key = `${item.goods_id}_${item.goods_brand || 'default'}`
+        if (itemMap.has(key)) {
+          // 相同商品，合并数量
+          const existingItem = itemMap.get(key)
+          existingItem.count += item.count
+          existingItem.id = item.id // 保留最新的ID
+        } else {
+          // 新商品，添加到map
+          itemMap.set(key, {
+            id: item.id,
+            goods_id: item.goods_id,
+            goods_name: item.goods_name,
+            goods_brand: item.goods_brand,
+            goods_price: item.goods_price,
+            goods_pic_url: item.goods_pic_url,
+            count: item.count,
+            goods_stock: item.goods_stock,
+            goods_sale: item.goods_sale
+          })
+        }
+      })
+      
+      // 转换为前端需要的格式
+      const newItems = Array.from(itemMap.values()).map(item => ({
         id: item.id,
         goods_id: item.goods_id,
         name: item.goods_name,
@@ -77,7 +105,7 @@ Page({
         price: item.goods_price / 100, // 分转元
         originalPrice: (item.goods_price * 1.2) / 100, // 计算原价
         image: `${constants.IMAGE_BASE_URL}${item.goods_pic_url}`,
-        quantity: item.count,
+        quantity: item.count, // 合并后的数量
         selected: false,
         stock: item.goods_stock,
         sale: item.goods_sale
@@ -203,13 +231,20 @@ Page({
   // 更新购物车数量
   updateCartCount() {
     const cartCount = this.data.cartItems.reduce((total, item) => total + item.quantity, 0)
-    this.getTabBar().setData({ cartCount })
+    const tabBar = this.getTabBar()
+    if (tabBar) {
+      tabBar.setData({ cartCount })
+    }
   },
 
   // 去结算
   goToSettlement() {
+    console.log('去结算按钮被点击')
     const selectedItems = this.data.cartItems.filter(item => item.selected)
+    console.log('选中的商品:', selectedItems)
+    
     if (selectedItems.length === 0) {
+      console.log('没有选中商品，显示提示')
       wx.showToast({
         title: '请选择要结算的商品',
         icon: 'none'
@@ -217,8 +252,25 @@ Page({
       return
     }
 
+    // 保存选中商品到全局数据，供订单确认页面使用
+    console.log('保存选中商品到全局数据:', selectedItems)
+    const app = getApp()
+    app.globalData.selectedCartItems = selectedItems
+    console.log('全局数据已设置:', app.globalData.selectedCartItems)
+
+    // 同时使用URL参数传递数据，确保数据不丢失
+    const queryParams = `?selectedItems=${encodeURIComponent(JSON.stringify(selectedItems))}`
+    
+    console.log('跳转到订单确认页面，URL:', `/pages/order-confirm/order-confirm${queryParams}`)
     wx.navigateTo({
-      url: '/pages/order/confirm'
+      url: `/pages/order-confirm/order-confirm${queryParams}`,
+      success: (res) => {
+        console.log('页面跳转成功:', res)
+      },
+      fail: (err) => {
+        console.error('页面跳转失败:', err)
+        console.error('错误详情:', err)
+      }
     })
   },
 

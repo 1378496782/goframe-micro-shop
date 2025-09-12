@@ -1,13 +1,13 @@
 // API配置和请求封装
 const config = require('../config/env');
 
-// 环境配置
-const isMock = config.features.useMock;
-const BASE_URL = isMock ? '' : config.api.baseURL;
+// 环境配置 - 使用硬编码配置，避免引用错误
+const isMock = false; // 禁用mock模式，使用真实API
+const BASE_URL = 'http://127.0.0.1:8199'; // 直接指向本地服务器
 
 // 错误状态模拟配置
 const errorSimulation = {
-  enabled: config.features.debug, // 仅在调试模式开启
+  enabled: false, // 禁用错误模拟
   rate: 0.1, // 10%的错误率
   errorCodes: [400, 401, 403, 404, 500],
   errorMessages: {
@@ -18,23 +18,6 @@ const errorSimulation = {
     500: '服务器内部错误'
   }
 };
-
-// 模拟错误响应
-function simulateError() {
-  if (!errorSimulation.enabled || Math.random() > errorSimulation.rate) {
-    return null;
-  }
-  
-  const errorCode = errorSimulation.errorCodes[
-    Math.floor(Math.random() * errorSimulation.errorCodes.length)
-  ];
-  
-  return {
-    code: errorCode,
-    message: errorSimulation.errorMessages[errorCode] || '未知错误',
-    data: null
-  };
-}
 
 // Mock数据
 const mockData = {
@@ -67,7 +50,7 @@ const mockData = {
   },
 
   // 首页相关 - 热门推荐商品
-  '/frontend/goods': {
+  '/goods': {
     method: 'GET',
     response: {
       code: 0,
@@ -250,7 +233,7 @@ const mockData = {
     }
   },
 
-  '/frontend/goods/detail': {
+  '/goods/detail': {
     method: 'GET',
     response: {
       code: 200,
