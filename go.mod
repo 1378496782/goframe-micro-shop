@@ -3,6 +3,7 @@ module shop-goframe-micro-service-refacotor
 go 1.24.5
 
 require (
+	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.9.0
 	github.com/gogf/gf/contrib/nosql/redis/v2 v2.9.0
 	github.com/gogf/gf/contrib/registry/etcd/v2 v2.9.0

@@ -22,8 +22,9 @@ type UserCouponInfoGetListRes struct {
 type UserCouponInfoItem struct {
 	Id        uint32                 `json:"id" dc:"优惠券ID"`
 	UserId    int32                  `json:"user_id" dc:"用户ID"`
-	GoodsId   uint32                 `json:"goods_id" dc:"商品id"`
-	Count     uint32                 `json:"count" dc:"商品数量"`
+	CouponId  uint32                 `json:"coupon_id" dc:"优惠券id"`
+	Status    uint32                 `json:"status" dc:"状态：0-待使用，1-已使用，2-已过期"`
+	Amount    uint64                 `json:"amount" dc:"优惠金额（单位：分）"`
 	CreatedAt *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
 	UpdatedAt *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
 }
