@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/cenkalti/backoff/v4"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/streadway/amqp"
+	"time"
 )
 
 type RabbitMQ struct {
@@ -14,8 +16,45 @@ type RabbitMQ struct {
 	ctx     context.Context
 }
 
-// NewRabbitMQ 创建RabbitMQ实例
+// NewRabbitMQ 创建RabbitMQ实例（带指数退避重试）
 func NewRabbitMQ(ctx context.Context) (*RabbitMQ, error) {
+	var rb *RabbitMQ
+	var err error
+
+	// 创建指数退避策略
+	expBackoff := backoff.NewExponentialBackOff()
+	// 初始重试间隔，第一次重试等待2秒
+	expBackoff.InitialInterval = 2 * time.Second
+	// 最大重试间隔，重试间隔不会超过30秒
+	expBackoff.MaxInterval = 30 * time.Second
+	// 最大总重试时间，5分钟后停止重试
+	expBackoff.MaxElapsedTime = 5 * time.Minute
+	// 随机化因子，添加随机性避免多个客户端同时重试（雪崩效应）
+	expBackoff.RandomizationFactor = 0.5
+
+	// 重试操作
+	operation := func() error {
+		rb, err = createConnection(ctx)
+		if err != nil {
+			g.Log().Warningf(ctx, "RabbitMQ连接失败，正在重试: %v", err)
+			return err
+		}
+		return nil
+	}
+
+	// 执行重试
+	g.Log().Info(ctx, "正在尝试连接RabbitMQ（带重试机制）...")
+	err = backoff.Retry(operation, expBackoff)
+	if err != nil {
+		return nil, fmt.Errorf("重试多次后仍无法连接到RabbitMQ: %v", err)
+	}
+
+	g.Log().Info(ctx, "RabbitMQ连接成功")
+	return rb, nil
+}
+
+// NewRabbitMQ 创建RabbitMQ实例
+func createConnection(ctx context.Context) (*RabbitMQ, error) {
 	host := g.Cfg().MustGet(ctx, "rabbitmq.default.host").String()
 	port := g.Cfg().MustGet(ctx, "rabbitmq.default.port").String()
 	user := g.Cfg().MustGet(ctx, "rabbitmq.default.user").String()

@@ -16,7 +16,7 @@ func StartUserRegisteredConsumer() {
 	// 初始化RabbitMQ连接
 	rb, err := rabbitmq.NewRabbitMQ(ctx)
 	if err != nil {
-		g.Log().Errorf(ctx, "Failed to connect to RabbitMQ: %v", err)
+		g.Log().Errorf(ctx, "无法连接到 RabbitMQ: %v", err)
 		return
 	}
 	defer rb.Close()

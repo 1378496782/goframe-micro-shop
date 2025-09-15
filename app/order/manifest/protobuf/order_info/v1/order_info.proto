@@ -24,6 +24,7 @@ message OrderInfoCreateReq {
 //  string consignee_address = 6;          // 收货人详细地址
   string remark = 7;                     // 备注
   repeated OrderGoodsItem order_goods_info = 8; // 订单商品信息
+  uint32 user_id = 9;                     // 用户id
 }
 
 // 订单商品项

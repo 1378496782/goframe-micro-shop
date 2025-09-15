@@ -51,9 +51,9 @@ type OrderInfoCreateReq struct {
 	Price            uint32            `json:"price" v:"required|min:0" dc:"订单金额"`
 	CouponPrice      uint32            `json:"coupon_price" d:"0" dc:"优惠券金额"`
 	ActualPrice      uint32            `json:"actual_price" v:"required|min:0" dc:"实际支付金额"`
-	ConsigneeName    string            `json:"consignee_name" v:"required" dc:"收货人姓名"`
-	ConsigneePhone   string            `json:"consignee_phone" v:"required" dc:"收货人手机号"`
-	ConsigneeAddress string            `json:"consignee_address" v:"required" dc:"收货人详细地址"`
+	ConsigneeName    string            `json:"consignee_name"  dc:"收货人姓名"`
+	ConsigneePhone   string            `json:"consignee_phone"  dc:"收货人手机号"`
+	ConsigneeAddress string            `json:"consignee_address"  dc:"收货人详细地址"`
 	Remark           string            `json:"remark" dc:"备注"`
 	OrderGoodsInfo   []*OrderGoodsItem `json:"order_goods_info" v:"required" dc:"订单商品信息"`
 }
