@@ -15,6 +15,8 @@ type UserInfo struct {
 	Avatar       string      `json:"avatar"       orm:"avatar"        description:"头像"`        // 头像
 	Password     string      `json:"password"     orm:"password"      description:""`          //
 	UserSalt     string      `json:"userSalt"     orm:"user_salt"     description:"加密盐 生成密码用"` // 加密盐 生成密码用
+	OpenId       string      `json:"openId"       orm:"open_id"       description:"微信openid"`  // 微信openid
+	Phone        string      `json:"phone"        orm:"phone"         description:"手机号"`       // 手机号
 	Sex          int         `json:"sex"          orm:"sex"           description:"1男 2女"`     // 1男 2女
 	Status       int         `json:"status"       orm:"status"        description:"1正常 2拉黑冻结"` // 1正常 2拉黑冻结
 	Sign         string      `json:"sign"         orm:"sign"          description:"个性签名"`      // 个性签名

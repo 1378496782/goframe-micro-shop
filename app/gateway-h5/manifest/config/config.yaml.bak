@@ -16,3 +16,7 @@ server:
 
 etcd:
   address: "127.0.0.1:2379"
+
+wxMiniConf:
+  appId: wx74d729ed5569980a
+  secret: 60442df9c3ef5baa67c72c22c85fdb3e

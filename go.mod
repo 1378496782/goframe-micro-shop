@@ -12,6 +12,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/qiniu/go-sdk/v7 v7.25.4
 	github.com/rabbitmq/amqp091-go v1.10.0
+	github.com/silenceper/wechat/v2 v2.1.9
 	github.com/streadway/amqp v1.1.0
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.7
@@ -19,14 +20,23 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
+	github.com/fatih/structs v1.1.0 // indirect
+	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/pingcap/errors v0.11.5-0.20250318082626-8f80e5cb09ec // indirect
 	github.com/pingcap/log v1.1.1-0.20241212030209-7e3ff8601a2a // indirect
 	github.com/pingcap/tidb/pkg/parser v0.0.0-20250421232622-526b2c79173d // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/spf13/cast v1.4.1 // indirect
+	github.com/tidwall/gjson v1.14.1 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	go.etcd.io/etcd/client/v3 v3.6.4 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
 
