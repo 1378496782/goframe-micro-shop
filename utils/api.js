@@ -581,6 +581,7 @@ const api = {
 
   // 订单相关
   createOrder: (data) => request('/frontend/order', data, 'POST'),
+  submitOrder: (data) => request('/frontend/order', data, 'POST'), // 提交订单
   getOrders: (params) => request('/frontend/order', params, 'GET'),
   getOrderDetail: (id) => request('/frontend/order/detail', { id }, 'GET'),
   cancelOrder: (id) => request('/frontend/order/cancel', { id }, 'PUT'),

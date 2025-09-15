@@ -1,5 +1,5 @@
 // 环境配置
-const isDev = false // 开发环境
+const isDev = true // 开发环境
 
 // 开发环境配置 - 使用HTTP并关闭域名校验
 const DEV_CONFIG = {

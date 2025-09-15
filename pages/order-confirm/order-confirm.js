@@ -201,10 +201,58 @@ Page({
   },
 
   // 提交订单
-  submitOrder() {
-    wx.showToast({
-      title: '订单提交成功',
-      icon: 'success'
-    })
+  async submitOrder() {
+    if (this.data.loading) return;
+    
+    this.setData({ loading: true });
+    
+    try {
+      // 构建请求参数
+      const orderData = {
+        price: this.data.totalPrice,
+        coupon_price: this.data.couponPrice,
+        actual_price: this.data.actualPrice,
+        remark: this.data.remark,
+        order_goods_info: this.data.orderItems.map(item => ({
+          goods_id: item.goods_id || item.id || 0,
+          count: item.quantity || item.count || 1,
+          price: item.price || item.goods_price || 0,
+          coupon_price: this.data.couponPrice, // 使用订单级别的优惠金额
+          actual_price: (item.price || item.goods_price || 0) * (item.quantity || item.count || 1) - this.data.couponPrice
+        }))
+      };
+      
+      console.log('提交订单参数:', orderData);
+      
+      // 调用提交订单接口
+      const res = await api.submitOrder(orderData);
+      
+      if (res.code === 0 && res.data && res.data.id) {
+        // 订单创建成功
+        wx.showToast({
+          title: '订单创建成功',
+          icon: 'success',
+          duration: 2000
+        });
+        
+        // 2秒后返回首页
+        setTimeout(() => {
+          wx.switchTab({
+            url: '/pages/index/index'
+          });
+        }, 2000);
+      } else {
+        // 订单创建失败
+        throw new Error(res.msg || '订单创建失败');
+      }
+    } catch (error) {
+      console.error('提交订单失败:', error);
+      wx.showToast({
+        title: error.message || '提交订单失败',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({ loading: false });
+    }
   }
 })
