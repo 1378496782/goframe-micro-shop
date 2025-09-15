@@ -1,9 +1,9 @@
 // API配置和请求封装
-const config = require('../config/env');
+const { config } = require('./env');
 
-// 环境配置 - 使用硬编码配置，避免引用错误
+// 使用统一环境配置
 const isMock = false; // 禁用mock模式，使用真实API
-const BASE_URL = 'http://127.0.0.1:8199'; // 直接指向本地服务器
+const BASE_URL = config.BASE_URL; // 使用统一配置的API地址
 
 // 错误状态模拟配置
 const errorSimulation = {

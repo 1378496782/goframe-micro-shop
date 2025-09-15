@@ -1,5 +1,5 @@
 // 环境配置
-const isDev = true // 开发环境
+const isDev = false // 开发环境
 
 // 开发环境配置 - 使用HTTP并关闭域名校验
 const DEV_CONFIG = {
@@ -7,11 +7,11 @@ const DEV_CONFIG = {
   SKIP_DOMAIN_CHECK: true
 } 
  
-// 生产环境配置 - 使用HTTPS
-// const PROD_CONFIG = {
-//   BASE_URL: 'https://101.42.249.106:8199',
-//   SKIP_DOMAIN_CHECK: false
-// }
+// 生产环境配置 - 使用HTTP
+const PROD_CONFIG = {
+  BASE_URL: 'http://101.42.249.106:8199',
+  SKIP_DOMAIN_CHECK: false
+}
 
 const config = isDev ? DEV_CONFIG : PROD_CONFIG
 

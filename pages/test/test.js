@@ -1,4 +1,5 @@
 const app = getApp()
+const { api } = require('../../utils/api')
 
 Page({
   data: {
@@ -9,31 +10,22 @@ Page({
   onTestRequest() {
     this.setData({ loading: true, result: '' })
     
-    // 直接使用wx.request测试
-    wx.request({
-      url: 'http://shop.dayu.club:8199/frontend/user/login',
-      method: 'POST',
-      data: {
-        name: 'testuser',
-        password: 'testpass'
-      },
-      success: (res) => {
-        console.log('请求成功:', res)
-        this.setData({ 
-          loading: false,
-          result: JSON.stringify(res, null, 2)
-        })
-      },
-      fail: (err) => {
-        console.log('请求失败:', err)
-        this.setData({ 
-          loading: false,
-          result: `请求失败: ${JSON.stringify(err, null, 2)}`
-        })
-      },
-      complete: () => {
-        console.log('请求完成')
-      }
+    // 使用统一的api方法测试
+    api.login({
+      name: 'testuser',
+      password: 'testpass'
+    }).then(res => {
+      console.log('请求成功:', res)
+      this.setData({ 
+        loading: false,
+        result: JSON.stringify(res, null, 2)
+      })
+    }).catch(err => {
+      console.log('请求失败:', err)
+      this.setData({ 
+        loading: false,
+        result: `请求失败: ${JSON.stringify(err, null, 2)}`
+      })
     })
   },
 
