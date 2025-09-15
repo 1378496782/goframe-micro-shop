@@ -3,9 +3,8 @@ package order
 import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
-	order_info "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
-
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/order/v1"
+	order_info "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 )
 
 func (c *ControllerV1) OrderInfoGetList(ctx context.Context, req *v1.OrderInfoGetListReq) (res *v1.OrderInfoGetListRes, err error) {
@@ -33,6 +32,5 @@ func (c *ControllerV1) OrderInfoGetList(ctx context.Context, req *v1.OrderInfoGe
 	if err := gconv.Structs(grpcRes.Data.List, &res.List); err != nil {
 		return nil, err
 	}
-
 	return res, nil
 }

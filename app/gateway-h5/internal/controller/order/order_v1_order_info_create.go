@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
 	order_info "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
+	"shop-goframe-micro-service-refacotor/utility/middleware"
 
 	"github.com/gogf/gf/v2/errors/gerror"
 
@@ -21,6 +22,14 @@ func (c *ControllerV1) OrderInfoCreate(ctx context.Context, req *v1.OrderInfoCre
 	if err := gconv.Struct(req, grpcReq); err != nil {
 		return nil, err
 	}
+
+	value := ctx.Value(middleware.CtxUserId)
+	userId, ok := value.(uint32)
+	if !ok {
+		// 处理类型不匹配的情况
+		panic("用户ID类型错误或不存在")
+	}
+	grpcReq.UserId = userId
 
 	// 转换商品信息列表
 	grpcReq.OrderGoodsInfo = make([]*order_info.OrderGoodsItem, len(req.OrderGoodsInfo))
