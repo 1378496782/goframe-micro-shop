@@ -45,18 +45,10 @@ Page({
       if (productsRes.code === 0) {
         // 格式化商品数据：价格转换和图片提取
         const formattedProducts = productsRes.data.list.map(item => {
-          // 处理图片URL，优先使用pic_url字段，使用配置的图片域名
-          let mainImage = ''
+          // 处理图片URL，直接使用pic_url字段（已经是完整URL）
+          let mainImage = '';
           if (item.pic_url) {
-            mainImage = constants.IMAGE_BASE_URL + item.pic_url
-          } else {
-            try {
-              const imagesObj = JSON.parse(item.images)
-              mainImage = imagesObj.image || ''
-            } catch (e) {
-              console.warn('解析图片数据失败:', e)
-              mainImage = ''
-            }
+            mainImage = item.pic_url;
           }
           
           return {

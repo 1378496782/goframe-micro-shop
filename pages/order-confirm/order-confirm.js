@@ -1,3 +1,5 @@
+const { api } = require('../../utils/api');
+
 Page({
   data: {
     orderItems: [],
@@ -8,7 +10,8 @@ Page({
     loading: false,
     coupons: [],
     selectedCoupon: null,
-    showCouponPopup: false
+    showCouponPopup: false,
+    loadingCoupons: false
   },
 
   onLoad(options) {
@@ -74,18 +77,69 @@ Page({
     this.setData({
       orderItems: processedItems,
       totalPrice: totalPrice,
-      actualPrice: actualPrice,
-      coupons: [
-        { id: 1, amount: 500, amountYuan: 5.00, desc: "满50减5" },
-        { id: 2, amount: 1000, amountYuan: 10.00, desc: "满100减10" },
-        { id: 3, amount: 2000, amountYuan: 20.00, desc: "满200减20" }
-      ]
+      actualPrice: actualPrice
     })
+    
+    // 加载用户优惠券
+    this.loadUserCoupons();
+  },
+
+  // 加载用户优惠券
+  async loadUserCoupons() {
+    this.setData({ loadingCoupons: true });
+    
+    try {
+      const res = await api.getUserCoupons({ page: 1, size: 10 });
+      
+      if (res.code === 0) {
+        // 格式化优惠券数据
+        const formattedCoupons = res.data.list
+          .filter(coupon => coupon.status === 0) // 只显示未使用的优惠券
+          .map(coupon => {
+            let desc = '';
+            let amountYuan = coupon.amount / 100; // 分转元
+            
+            // 根据coupon_id设置优惠券描述
+            if (coupon.coupon_id === 1) {
+              desc = `新人券 - 减${amountYuan.toFixed(2)}元`;
+            } else if (coupon.coupon_id === 2) {
+              desc = `满减券 - 减${amountYuan.toFixed(2)}元`;
+            } else {
+              desc = `优惠券 - 减${amountYuan.toFixed(2)}元`;
+            }
+            
+            return {
+              id: coupon.id,
+              coupon_id: coupon.coupon_id,
+              amount: coupon.amount,
+              amountYuan: amountYuan,
+              desc: desc
+            };
+          });
+        
+        this.setData({ coupons: formattedCoupons });
+      }
+    } catch (error) {
+      console.error('加载优惠券失败:', error);
+      wx.showToast({
+        title: '加载优惠券失败',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({ loadingCoupons: false });
+    }
   },
 
   // 打开优惠券选择弹窗
   openCouponPopup() {
-    this.setData({ showCouponPopup: true })
+    if (this.data.coupons.length === 0) {
+      wx.showToast({
+        title: '暂无可用优惠券',
+        icon: 'none'
+      });
+      return;
+    }
+    this.setData({ showCouponPopup: true });
   },
 
   // 关闭优惠券选择弹窗
@@ -109,12 +163,19 @@ Page({
       return
     }
     
-    const couponPrice = coupon.amountYuan // 直接使用元为单位
-    const actualPrice = this.data.totalPrice - couponPrice
+    let couponPrice = coupon.amountYuan; // 直接使用元为单位
+    let actualPrice = this.data.totalPrice - couponPrice;
+    
+    // 确保实际价格不会低于0
+    if (actualPrice < 0) {
+      actualPrice = 0;
+      // 如果优惠券金额超过商品总价，调整实际抵扣金额为商品总价
+      couponPrice = this.data.totalPrice;
+    }
     
     this.setData({
-      selectedCoupon: coupon,
-      couponPrice: couponPrice,
+      selectedCoupon: coupon, // 保持优惠券原始数据显示
+      couponPrice: couponPrice, // 使用调整后的实际抵扣金额
       actualPrice: actualPrice,
       showCouponPopup: false
     })

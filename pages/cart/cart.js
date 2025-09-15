@@ -102,9 +102,9 @@ Page({
         goods_id: item.goods_id,
         name: item.goods_name,
         spec: item.goods_brand || '默认规格',
-        price: item.goods_price / 100, // 分转元
-        originalPrice: (item.goods_price * 1.2) / 100, // 计算原价
-        image: `${constants.IMAGE_BASE_URL}${item.goods_pic_url}`,
+        price: (item.goods_price / 100).toFixed(2), // 分转元并格式化
+        originalPrice: ((item.goods_price * 1.2) / 100).toFixed(2), // 计算原价并格式化
+        image: item.goods_pic_url,
         quantity: item.count, // 合并后的数量
         selected: false,
         stock: item.goods_stock,

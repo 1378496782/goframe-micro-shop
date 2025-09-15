@@ -591,7 +591,10 @@ const api = {
   createGroupOrder: (data) => request('/frontend/group-buy/order', data, 'POST'),
   createBargainOrder: (data) => request('/frontend/bargain/order', data, 'POST'),
   joinGroup: (data) => request('/frontend/group-buy/join', data, 'POST'),
-  helpBargain: (data) => request('/frontend/bargain/help', data, 'POST')
+  helpBargain: (data) => request('/frontend/bargain/help', data, 'POST'),
+  
+  // 用户优惠券
+  getUserCoupons: (params) => request('/frontend/user_coupon', params, 'GET')
 };
 
 module.exports = {

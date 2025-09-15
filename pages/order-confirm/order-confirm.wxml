@@ -17,7 +17,7 @@
     <view class="section-title">优惠券</view>
     <view class="coupon-select">
       <text class="coupon-text">
-        {{selectedCoupon ? '已选择优惠券：¥' + couponPrice : '选择优惠券'}}
+        {{selectedCoupon ? '已选择优惠券：¥' + selectedCoupon.amountYuan : '选择优惠券'}}
       </text>
       <text class="coupon-arrow">›</text>
     </view>
@@ -69,8 +69,8 @@
         >
           <view class="coupon-amount">¥{{item.amountYuan}}</view>
           <view class="coupon-info">
-            <text class="coupon-desc">满减优惠券</text>
-            <text class="coupon-expire">有效期至 2025-12-31</text>
+            <text class="coupon-desc">{{item.desc}}</text>
+            <text class="coupon-expire">点击使用优惠券</text>
           </view>
         </view>
         <view wx:if="{{coupons.length === 0}}" class="empty-coupon">

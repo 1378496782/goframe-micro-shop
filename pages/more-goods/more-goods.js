@@ -34,14 +34,8 @@ Page({
       if (res.code === 0) {
         // 格式化商品数据
         const formattedProducts = res.data.list.map(item => {
-          let mainImage = '';
-          try {
-            const imagesData = JSON.parse(item.images);
-            mainImage = imagesData.image || '';
-          } catch (e) {
-            console.warn('解析图片数据失败:', e);
-            mainImage = '';
-          }
+          // 直接使用 pic_url 字段作为主图
+          const mainImage = item.pic_url || 'https://via.placeholder.com/200x200?text=商品图片';
           
           return {
             ...item,
