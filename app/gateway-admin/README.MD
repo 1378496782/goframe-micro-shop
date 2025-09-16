@@ -1,4 +1,4 @@
-# GoFrame Template For SingleRepo
+# 这是管理后台的网关服务
 
-Quick Start: 
-- https://goframe.org/quick
+- 所有管理后台的请求统一请求这个网关，和其他解耦。
+

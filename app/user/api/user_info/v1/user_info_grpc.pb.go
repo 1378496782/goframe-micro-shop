@@ -24,6 +24,7 @@ const (
 	UserInfo_WxMiniLogin_FullMethodName    = "/user_info.UserInfo/WxMiniLogin"
 	UserInfo_Register_FullMethodName       = "/user_info.UserInfo/Register"
 	UserInfo_UpdatePassword_FullMethodName = "/user_info.UserInfo/UpdatePassword"
+	UserInfo_UpdateInfo_FullMethodName     = "/user_info.UserInfo/UpdateInfo"
 	UserInfo_GetUserInfo_FullMethodName    = "/user_info.UserInfo/GetUserInfo"
 )
 
@@ -39,6 +40,8 @@ type UserInfoClient interface {
 	Register(ctx context.Context, in *UserInfoRegisterReq, opts ...grpc.CallOption) (*UserInfoRegisterRes, error)
 	// 修改密码
 	UpdatePassword(ctx context.Context, in *UserInfoUpdatePasswordReq, opts ...grpc.CallOption) (*UserInfoUpdatePasswordRes, error)
+	//修改用户信息
+	UpdateInfo(ctx context.Context, in *UserInfoUpdateReq, opts ...grpc.CallOption) (*UserInfoUpdateRes, error)
 	// 管理员信息
 	GetUserInfo(ctx context.Context, in *UserInfoReq, opts ...grpc.CallOption) (*UserInfoRes, error)
 }
@@ -87,6 +90,15 @@ func (c *userInfoClient) UpdatePassword(ctx context.Context, in *UserInfoUpdateP
 	return out, nil
 }
 
+func (c *userInfoClient) UpdateInfo(ctx context.Context, in *UserInfoUpdateReq, opts ...grpc.CallOption) (*UserInfoUpdateRes, error) {
+	out := new(UserInfoUpdateRes)
+	err := c.cc.Invoke(ctx, UserInfo_UpdateInfo_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userInfoClient) GetUserInfo(ctx context.Context, in *UserInfoReq, opts ...grpc.CallOption) (*UserInfoRes, error) {
 	out := new(UserInfoRes)
 	err := c.cc.Invoke(ctx, UserInfo_GetUserInfo_FullMethodName, in, out, opts...)
@@ -108,6 +120,8 @@ type UserInfoServer interface {
 	Register(context.Context, *UserInfoRegisterReq) (*UserInfoRegisterRes, error)
 	// 修改密码
 	UpdatePassword(context.Context, *UserInfoUpdatePasswordReq) (*UserInfoUpdatePasswordRes, error)
+	//修改用户信息
+	UpdateInfo(context.Context, *UserInfoUpdateReq) (*UserInfoUpdateRes, error)
 	// 管理员信息
 	GetUserInfo(context.Context, *UserInfoReq) (*UserInfoRes, error)
 	mustEmbedUnimplementedUserInfoServer()
@@ -128,6 +142,9 @@ func (UnimplementedUserInfoServer) Register(context.Context, *UserInfoRegisterRe
 }
 func (UnimplementedUserInfoServer) UpdatePassword(context.Context, *UserInfoUpdatePasswordReq) (*UserInfoUpdatePasswordRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePassword not implemented")
+}
+func (UnimplementedUserInfoServer) UpdateInfo(context.Context, *UserInfoUpdateReq) (*UserInfoUpdateRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateInfo not implemented")
 }
 func (UnimplementedUserInfoServer) GetUserInfo(context.Context, *UserInfoReq) (*UserInfoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
@@ -217,6 +234,24 @@ func _UserInfo_UpdatePassword_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserInfo_UpdateInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfoUpdateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserInfoServer).UpdateInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserInfo_UpdateInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserInfoServer).UpdateInfo(ctx, req.(*UserInfoUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserInfo_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserInfoReq)
 	if err := dec(in); err != nil {
@@ -257,6 +292,10 @@ var UserInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdatePassword",
 			Handler:    _UserInfo_UpdatePassword_Handler,
+		},
+		{
+			MethodName: "UpdateInfo",
+			Handler:    _UserInfo_UpdateInfo_Handler,
 		},
 		{
 			MethodName: "GetUserInfo",

@@ -1,4 +1,4 @@
-# GoFrame Template For SingleRepo
+# 这是H5客户端的网关服务
 
-Quick Start: 
-- https://goframe.org/quick
+- 服务于客户端项目，比如我们的H5客户端（或者客户端小程序）所请求的服务，统一以此为出口，客户端统一请求这里。
+
