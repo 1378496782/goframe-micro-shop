@@ -9,7 +9,7 @@ CREATE TABLE `user_info`  (
   `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
   `user_salt` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '加密盐 生成密码用',
   `open_id` varchar(64) NOT NULL DEFAULT '' COMMENT '微信openid',
-  `phone` varchar(20) NOT NULL DEFAULT '' COMMENT '手机号',
+  `phone` char(11) NOT NULL DEFAULT '' COMMENT '手机号',
   `sex` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1男 2女',
   `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1正常 2拉黑冻结',
   `sign` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '个性签名',
