@@ -57,6 +57,18 @@ type UserInfoUpdatePasswordRes struct {
 	Id uint32 `json:"id" dc:"用户ID"`
 }
 
+// 修改用户信息
+type UserInfoUpdateReq struct {
+	g.Meta `path:"/user/update" tags:"用户管理" method:"put" summary:"修改用户信息"`
+	Name   string `json:"name"  dc:"用户名"`
+	Avatar string `json:"avatar" dc:"头像"`
+}
+
+// 修改用户信息响应
+type UserInfoUpdateRes struct {
+	Id uint32 `json:"id" dc:"用户ID"`
+}
+
 // 公共结构体：用户基础信息
 type UserInfoBase struct {
 	Id     uint32 `json:"id" dc:"用户ID"`

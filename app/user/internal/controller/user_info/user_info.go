@@ -2,17 +2,19 @@ package user_info
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/errors/gcode"
-	"github.com/gogf/gf/v2/errors/gerror"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/util/gconv"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	v1 "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
+	"shop-goframe-micro-service-refacotor/app/user/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/user/internal/logic/user_info"
 	"shop-goframe-micro-service-refacotor/app/user/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility/consts"
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
 	"time"
+
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 )
@@ -122,4 +124,17 @@ func (*Controller) GetUserInfo(ctx context.Context, req *v1.UserInfoReq) (res *v
 			Status: uint32(userInfo.Status),
 		},
 	}, nil
+}
+
+func (*Controller) UpdateInfo(ctx context.Context, req *v1.UserInfoUpdateReq) (res *v1.UserInfoUpdateRes, err error) {
+	infoError := consts.InfoError(consts.UserInfo, consts.UpdateFail)
+	// 根据ID更新数据库中的信息
+	_, err = dao.UserInfo.Ctx(ctx).Where("id", req.Id).Update(req)
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+
+	// 返回更新成功响应，包含被更新ID
+	return &v1.UserInfoUpdateRes{Id: req.Id}, nil
 }

@@ -12,6 +12,8 @@ service UserInfo {
   rpc Register (UserInfoRegisterReq) returns (UserInfoRegisterRes) {}
   // 修改密码
   rpc UpdatePassword (UserInfoUpdatePasswordReq) returns (UserInfoUpdatePasswordRes) {}
+  //修改用户信息
+  rpc UpdateInfo(UserInfoUpdateReq) returns(UserInfoUpdateRes) {}
   // 管理员信息
   rpc GetUserInfo (UserInfoReq) returns (UserInfoRes) {}
 }
@@ -61,6 +63,17 @@ message UserInfoUpdatePasswordReq {
 
 message UserInfoUpdatePasswordRes {
   uint32 id = 1; // 用户ID
+}
+
+//修改用户信息
+message UserInfoUpdateReq {
+  uint32 id = 1; //用户id
+  string name = 2; //昵称
+  string avatar = 3; //头像
+}
+
+message UserInfoUpdateRes{
+  uint32 id = 1;  // 用户ID
 }
 
 // ========== 公共结构 ==========

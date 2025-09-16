@@ -19,4 +19,5 @@ type IUserV1 interface {
 	UserInfoRegister(ctx context.Context, req *v1.UserInfoRegisterReq) (res *v1.UserInfoRegisterRes, err error)
 	UserInfo(ctx context.Context, req *v1.UserInfoReq) (res *v1.UserInfoRes, err error)
 	UserInfoUpdatePassword(ctx context.Context, req *v1.UserInfoUpdatePasswordReq) (res *v1.UserInfoUpdatePasswordRes, err error)
+	UserInfoUpdate(ctx context.Context, req *v1.UserInfoUpdateReq) (res *v1.UserInfoUpdateRes, err error)
 }

@@ -52,6 +52,7 @@ var (
 						userController.ConsigneeInfoUpdate,
 						userController.UserInfo,
 						userController.UserInfoUpdatePassword,
+						userController.UserInfoUpdate,
 						goodsController.CartInfoGetList,
 						goodsController.CartInfoCreate,
 						goodsController.CartInfoDelete,
