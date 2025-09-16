@@ -156,9 +156,12 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 	if len(req.Avatar) == 0 {
 		req.Avatar = userData.AvatarURL
 	}
+	if len(req.Phone) == 0 {
+		req.Phone = userData.PhoneNumber
+	}
 
 	// 绑定用户或登录
-	token, expireIn, userInfo, err := user_info.WxMiniLogin(ctx, authResult.OpenID, req.Nickname, req.Avatar)
+	token, expireIn, userInfo, err := user_info.WxMiniLogin(ctx, authResult.OpenID, req)
 	// 错误类型
 	infoError := consts.InfoError(consts.UserInfo, consts.LoginFail)
 	if err != nil {
@@ -188,5 +191,4 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 			Status: uint32(userInfo.Status),
 		},
 	}, nil
-
 }

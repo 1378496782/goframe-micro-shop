@@ -52,6 +52,7 @@ message WxMiniLoginReq{
   string EncryptedData=3; // 密文
   string Nickname=4; // 用户昵称
   string Avatar=5; // 用户头像
+  string Phone=6; // 用户手机号
 }
 
 // ========== 用户信息 ==========

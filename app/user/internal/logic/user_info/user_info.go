@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
+	v1 "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
 	"shop-goframe-micro-service-refacotor/app/user/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/user/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility"
@@ -150,7 +151,7 @@ func GetUserInfo(ctx context.Context, userId int) (*entity.UserInfo, error) {
 	return &user, nil
 }
 
-func WxMiniLogin(ctx context.Context, openId, nickName, avatar string) (token string, expireIn int, userInfo *entity.UserInfo, err error) {
+func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (token string, expireIn int, userInfo *entity.UserInfo, err error) {
 	// 1. 参数校验
 	if openId == "" {
 		return "", 0, nil, errors.New("用登录凭证不能为空")
@@ -170,9 +171,10 @@ func WxMiniLogin(ctx context.Context, openId, nickName, avatar string) (token st
 	if userRecord.IsEmpty() {
 		// 3-1. 用户不存在，注册
 		user = entity.UserInfo{
-			Name:      nickName,
-			Avatar:    avatar,
+			Name:      req.Nickname,
+			Avatar:    req.Avatar,
 			OpenId:    openId,
+			Phone:     req.Phone,
 			CreatedAt: now,
 			UpdatedAt: now,
 			Status:    1,

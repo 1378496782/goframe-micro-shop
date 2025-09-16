@@ -35,6 +35,7 @@ var (
 					group.Bind(
 						userController.UserInfoRegister,
 						userController.UserInfoLogin,
+						userController.WxMiniLogin,
 						goodsController.CategoryInfoGetAll,
 						goodsController.CategoryInfoGetList,
 						goodsController.GoodsInfoGetDetail,
