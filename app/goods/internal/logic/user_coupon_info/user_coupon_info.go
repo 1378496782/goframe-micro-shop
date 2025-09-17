@@ -18,7 +18,7 @@ func IssueCouponToUser(ctx context.Context, userID int) error {
 	// 构建优惠券数据
 	userCouponData := &entity.UserCouponInfo{
 		UserId:   userID,
-		CouponId: 0,
+		CouponId: 1, //新人优惠券写死id为1
 		Status:   0, // 0表示未使用
 		Amount:   9999,
 	}
@@ -30,6 +30,5 @@ func IssueCouponToUser(ctx context.Context, userID int) error {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
-
 	return nil
 }
