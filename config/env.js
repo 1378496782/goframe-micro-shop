@@ -5,7 +5,7 @@ const config = {
    
   // API配置
   api: {
-    baseURL: 'http://101.42.249.106:8199', // 生产环境API地址
+    baseURL: 'http://127.0.0.1:8199', // 生产环境API地址
     mockBaseURL: '', // Mock模式不需要baseURL
     timeout: 10000,
     retryCount: 3,    // 请求重试次数

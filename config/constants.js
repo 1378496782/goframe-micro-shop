@@ -1,7 +1,7 @@
 // 公共常量配置
 const constants = {
   // 图片域名配置
-  IMAGE_BASE_URL: 'http://101.42.249.106:8808/',
+  IMAGE_BASE_URL: 'http://127.0.0.1:8399/',
   
   // 分页配置
   PAGINATION: {

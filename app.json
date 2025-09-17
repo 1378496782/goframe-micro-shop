@@ -47,5 +47,6 @@
     "downloadFile": 10000
   },
   "debug": true,
-  "requestLegacyDomain": true
+  "requestLegacyDomain": true,
+  "sitemapLocation": "sitemap.json"
 }

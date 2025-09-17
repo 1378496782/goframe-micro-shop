@@ -1,10 +1,12 @@
 <view class="container">
   <!-- 用户信息头部 -->
   <view class="user-header">
-    <image class="avatar" src="{{userInfo.avatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
-    <view class="user-info">
-      <text class="username">{{userInfo.name || userInfo.nickname || '未登录用户'}}</text>
-      <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
+    <view class="user-profile" bindtap="onProfileClick">
+      <image class="avatar" src="{{userInfo.avatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
+      <view class="user-info">
+        <text class="username">{{userInfo.name || userInfo.nickname || '未登录用户'}}</text>
+        <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
+      </view>
     </view>
     <button class="login-btn" wx:if="{{!isLoggedIn}}" bindtap="onLogin">登录/注册</button>
   </view>
@@ -46,9 +48,6 @@
 
   <!-- 功能菜单 -->
   <view class="menu-list">
-
-
-
     <view class="menu-item" bindtap="navigateTo" data-url="/pages/service/service">
       <image src="/images/icon-service.png" class="menu-icon" />
       <text>客服中心</text>
@@ -66,6 +65,42 @@
     </view>
   </view>
 
-  <!-- 退出登录 -->
   <button class="logout-btn" wx:if="{{isLoggedIn}}" bindtap="onLogout">退出登录</button>
+
+
+  <!-- 微信登录弹窗 -->
+  <view class="wx-login-popup {{showWxLogin ? 'show' : ''}}" catchtap="closeWxLoginPopup">
+    <view class="wx-login-content" catchtap="stopPropagation">
+      <view class="wx-login-header">
+        <text class="wx-login-title">微信一键登录</text>
+        <view class="wx-login-close" bindtap="closeWxLoginPopup">×</view>
+      </view>
+
+      <view class="wx-login-body">
+        <!-- 头像上传区域 -->
+        <view class="avatar-upload" bindtap="chooseAvatar">
+          <image class="preview-avatar" src="{{tempAvatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=头像'}}" />
+          <text class="upload-text">点击上传头像</text>
+        </view>
+
+        <!-- 昵称输入区域 -->
+        <view class="nickname-input">
+          <input
+            class="input-field"
+            placeholder="请输入昵称"
+            placeholder-class="placeholder"
+            value="{{tempNickname}}"
+            bindinput="onNicknameInput"
+            bindfocus="showNicknameToolbar"
+          />
+        </view>
+
+
+        <!-- 微信一键登录按钮 -->
+        <button class="wx-login-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
+          微信一键登录
+        </button>
+      </view>
+    </view>
+  </view>
 </view>
