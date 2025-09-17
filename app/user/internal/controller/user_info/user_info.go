@@ -63,7 +63,7 @@ func (*Controller) Login(ctx context.Context, req *v1.UserInfoLoginReq) (res *v1
 
 func (c *Controller) Register(ctx context.Context, req *v1.UserInfoRegisterReq) (*v1.UserInfoRegisterRes, error) {
 	var registerData *entity.UserInfo
-	// 将请求参数req转换为实体对象consigneeInfo
+	// 将请求参数req转换为实体对象UserInfo
 	if err := gconv.Struct(req, &registerData); err != nil {
 		return nil, err
 	}
