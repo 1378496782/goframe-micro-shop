@@ -35,6 +35,7 @@ type GoodsInfoItem struct {
 	Stock            uint32 `json:"stock" dc:"库存"`
 	Sale             uint32 `json:"sale" dc:"销量"`
 	Tags             string `json:"tags" dc:"标签"`
+	Sort             uint32 `json:"sort" dc:"排序"`
 	DetailInfo       string `json:"detail_info" dc:"详情"`
 	CreatedAt        string `json:"created_at" dc:"创建时间"` // 改为 string
 	UpdatedAt        string `json:"updated_at" dc:"更新时间"` // 改为 string

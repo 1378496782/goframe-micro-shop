@@ -119,7 +119,7 @@ func parseRowData(row []interface{}) map[string]interface{} {
 	fields := []string{
 		"id", "name", "pic_url", "images", "price", "level1_category_id",
 		"level2_category_id", "level3_category_id", "brand",
-		"stock", "sale", "tags", "detail_info",
+		"stock", "sale", "tags", "sort", "detail_info",
 		"created_at", "updated_at", "deleted_at",
 	}
 
@@ -158,6 +158,7 @@ func upsertToES(ctx context.Context, data map[string]interface{}) {
 			"stock":              gconv.Uint32(data["stock"]),
 			"sale":               gconv.Uint32(data["sale"]),
 			"tags":               gconv.String(data["tags"]),
+			"sort":               gconv.Uint32(data["sort"]),
 			"detail_info":        gconv.String(data["detail_info"]),
 			"created_at":         gconv.String(data["created_at"]),
 			"updated_at":         gconv.String(data["updated_at"]),

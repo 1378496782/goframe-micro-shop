@@ -17,6 +17,7 @@ type SyncGoodsReq struct {
 	Stock            uint32 `json:"stock"`
 	Sale             uint32 `json:"sale"`
 	Tags             string `json:"tags"`
+	Sort             string `json:"sort"`
 	DetailInfo       string `json:"detail_info"`
 	Operation        string `json:"operation" v:"required#操作类型不能为空" dc:"操作类型: create, update, delete"`
 	CreatedAt        string `json:"created_at" dc:"创建时间"`
