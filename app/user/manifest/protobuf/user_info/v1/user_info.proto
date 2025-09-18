@@ -8,6 +8,8 @@ option go_package = "shop-goframe-micro-service-refacotor/app/user/api/user_info
 service UserInfo {
   // 管理员登录
   rpc Login (UserInfoLoginReq) returns (UserInfoLoginRes) {}
+  // 微信登录
+  rpc WxMiniLogin(WxMiniLoginReq)returns(UserInfoLoginRes){}
   // 管理员注册
   rpc Register (UserInfoRegisterReq) returns (UserInfoRegisterRes) {}
   // 修改密码
@@ -43,6 +45,16 @@ message UserInfoLoginRes {
   string token = 2;     // token字符串
   uint32 expire_in = 3;  // 过期时间(秒)
   UserInfoBase user_info = 4; // 用户基础信息
+}
+
+// ========== 微信登录 ==========
+message WxMiniLoginReq{
+  string Code=1; // 登录凭证
+  string IV=2;// 初始向量
+  string EncryptedData=3; // 密文
+  string Nickname=4; // 用户昵称
+  string Avatar=5; // 用户头像
+  string Phone=6; // 用户手机号
 }
 
 // ========== 用户信息 ==========

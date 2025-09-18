@@ -26,6 +26,8 @@ type UserInfoColumns struct {
 	Avatar       string // 头像
 	Password     string //
 	UserSalt     string // 加密盐 生成密码用
+	OpenId       string // 微信openid
+	Phone        string // 手机号
 	Sex          string // 1男 2女
 	Status       string // 1正常 2拉黑冻结
 	Sign         string // 个性签名
@@ -42,6 +44,8 @@ var userInfoColumns = UserInfoColumns{
 	Avatar:       "avatar",
 	Password:     "password",
 	UserSalt:     "user_salt",
+	OpenId:       "open_id",
+	Phone:        "phone",
 	Sex:          "sex",
 	Status:       "status",
 	Sign:         "sign",
