@@ -57,10 +57,15 @@ Page({
       
       if (res.code === 0) {
         const product = res.data
-        // 处理图片URL
+        // 处理图片URL，直接使用pic_url字段（已经是完整URL）
         const images = []
         if (product.pic_url) {
-          images.push(constants.IMAGE_BASE_URL + product.pic_url)
+          images.push(product.pic_url)
+        }
+        
+        // 如果没有图片，添加默认占位图
+        if (images.length === 0) {
+          images.push('https://via.placeholder.com/400x400?text=商品图片');
         }
         
         // 格式化商品数据

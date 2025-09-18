@@ -1,6 +1,6 @@
 <view class="container">
   <!-- 购物车为空状态 -->
-  <view class="empty-cart" wx:if="{{cartItems.length === 0}}">
+  <view class="empty-cart" wx:if="{{cartItems.length === 0 && !loading}}">
     <image src="/images/empty-cart.png" class="empty-icon" />
     <text class="empty-text">购物车空空如也</text>
     <button class="browse-btn" bindtap="goToIndex">去逛逛</button>
@@ -30,6 +30,16 @@
       </view>
       
       <button class="btn-delete" bindtap="deleteItem" data-index="{{index}}">删除</button>
+    </view>
+    
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore && cartItems.length > 0}}">
+      <text wx:if="{{loading}}">加载中...</text>
+      <text wx:else>上拉加载更多</text>
+    </view>
+    
+    <view class="no-more" wx:if="{{!hasMore && cartItems.length > 0}}">
+      <text>没有更多商品了</text>
     </view>
   </view>
 

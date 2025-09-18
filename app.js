@@ -1,4 +1,4 @@
-const { API } = require('./utils/env')
+const { API, config } = require('./utils/env')
 const { checkLoginStatus } = require('./utils/request')
 
 App({
@@ -44,6 +44,7 @@ App({
     userInfo: null,
     systemInfo: null,
     cartCount: 0,
-    API
+    API,
+    config
   }
 })

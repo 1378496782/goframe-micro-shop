@@ -1,13 +1,13 @@
 // API配置和请求封装
-const config = require('../config/env');
+const { config } = require('./env');
 
-// 环境配置
-const isMock = config.features.useMock;
-const BASE_URL = isMock ? '' : config.api.baseURL;
+// 使用统一环境配置
+const isMock = false; // 禁用mock模式，使用真实API
+const BASE_URL = config.BASE_URL; // 使用统一配置的API地址
 
 // 错误状态模拟配置
 const errorSimulation = {
-  enabled: config.features.debug, // 仅在调试模式开启
+  enabled: false, // 禁用错误模拟
   rate: 0.1, // 10%的错误率
   errorCodes: [400, 401, 403, 404, 500],
   errorMessages: {
@@ -18,23 +18,6 @@ const errorSimulation = {
     500: '服务器内部错误'
   }
 };
-
-// 模拟错误响应
-function simulateError() {
-  if (!errorSimulation.enabled || Math.random() > errorSimulation.rate) {
-    return null;
-  }
-  
-  const errorCode = errorSimulation.errorCodes[
-    Math.floor(Math.random() * errorSimulation.errorCodes.length)
-  ];
-  
-  return {
-    code: errorCode,
-    message: errorSimulation.errorMessages[errorCode] || '未知错误',
-    data: null
-  };
-}
 
 // Mock数据
 const mockData = {
@@ -67,7 +50,7 @@ const mockData = {
   },
 
   // 首页相关 - 热门推荐商品
-  '/frontend/goods': {
+  '/goods': {
     method: 'GET',
     response: {
       code: 0,
@@ -250,7 +233,7 @@ const mockData = {
     }
   },
 
-  '/frontend/goods/detail': {
+  '/goods/detail': {
     method: 'GET',
     response: {
       code: 200,
@@ -598,6 +581,7 @@ const api = {
 
   // 订单相关
   createOrder: (data) => request('/frontend/order', data, 'POST'),
+  submitOrder: (data) => request('/frontend/order', data, 'POST'), // 提交订单
   getOrders: (params) => request('/frontend/order', params, 'GET'),
   getOrderDetail: (id) => request('/frontend/order/detail', { id }, 'GET'),
   cancelOrder: (id) => request('/frontend/order/cancel', { id }, 'PUT'),
@@ -608,7 +592,10 @@ const api = {
   createGroupOrder: (data) => request('/frontend/group-buy/order', data, 'POST'),
   createBargainOrder: (data) => request('/frontend/bargain/order', data, 'POST'),
   joinGroup: (data) => request('/frontend/group-buy/join', data, 'POST'),
-  helpBargain: (data) => request('/frontend/bargain/help', data, 'POST')
+  helpBargain: (data) => request('/frontend/bargain/help', data, 'POST'),
+  
+  // 用户优惠券
+  getUserCoupons: (params) => request('/frontend/user_coupon', params, 'GET')
 };
 
 module.exports = {

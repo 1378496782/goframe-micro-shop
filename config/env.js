@@ -1,8 +1,8 @@
 // 环境配置
 const config = {
-  // 当前环境
-  env: 'development', // development: 开发环境, production: 生产环境, test: 测试环境
-   
+  // 当前环境 
+  env: 'production', // development: 开发环境, production: 生产环境, test: 测试环境
+    
   // API配置
   api: {
     baseURL: 'http://127.0.0.1:8199', // 生产环境API地址

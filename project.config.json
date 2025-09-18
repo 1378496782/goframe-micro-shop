@@ -4,6 +4,7 @@
         "ignore": [],
         "include": []
     },
+<<<<<<< HEAD
     "setting": {
         "localPlugins": false,
         "urlCheck": false,
@@ -54,4 +55,26 @@
         "tabSize": 2
     },
     "condition": {}
+=======
+    "checkInvalidKey": true,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "compileWorklet": false,
+    "localPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.9.2",
+  "appid": "wxcf7fb9cb2c702399",
+  "projectname": "shop-miniprogram",
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {},
+  "condition": {},
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+>>>>>>> master
 }

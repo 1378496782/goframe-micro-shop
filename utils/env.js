@@ -4,12 +4,16 @@ const isDev = true // 开发环境
 // 开发环境配置 - 使用HTTP并关闭域名校验
 const DEV_CONFIG = {
   BASE_URL: 'http://192.168.1.5:8199',
+  UPLOAD_URL: 'http://192.168.1.5:8399',
+  SEARCH_URL: 'http://192.168.1.5:8499',
   SKIP_DOMAIN_CHECK: true
 } 
  
-// 生产环境配置 - 使用HTTPS
+// 生产环境配置 - 使用HTTP
 const PROD_CONFIG = {
-  BASE_URL: 'https://shop.dayu.club',
+  BASE_URL: 'http://101.42.249.106:8199',
+  UPLOAD_URL: 'http://101.42.249.106:8399',
+  SEARCH_URL: 'http://101.42.249.106:8499',
   SKIP_DOMAIN_CHECK: false
 }
 
@@ -24,24 +28,24 @@ const API = {
   USER_WX_LOGIN: `${config.BASE_URL}/frontend/user/wxMiniAuth`, // 微信小程序登录
   
   // 商品相关
-  PRODUCT_LIST: `${config.BASE_URL}/frontend/product/list`,
-  PRODUCT_DETAIL: `${config.BASE_URL}/frontend/product/detail`,
+  PRODUCT_LIST: `${config.BASE_URL}/goods`,
+  PRODUCT_DETAIL: `${config.BASE_URL}/goods/detail`,
   
   // 搜索相关   
-  SEARCH_GOODS: `http://101.42.249.106:8499/search/goods`,
+  SEARCH_GOODS: `${config.SEARCH_URL}/search/goods`,
   
   // 订单相关
   ORDER_LIST: `${config.BASE_URL}/frontend/order/list`,
   ORDER_CREATE: `${config.BASE_URL}/frontend/order/create`,
   
   // 购物车相关
-  CART_LIST: `${config.BASE_URL}/frontend/cart/list`,
+  CART_LIST: `${config.BASE_URL}/frontend/cart`,
   CART_ADD: `${config.BASE_URL}/frontend/cart/add`,
   CART_UPDATE: `${config.BASE_URL}/frontend/cart/update`,
   CART_DELETE: `${config.BASE_URL}/frontend/cart/delete`,
   
   // 文件上传
-  UPLOAD_IMAGE: `http://192.168.1.5:8399/upload/image` // 图片上传，使用端口8399
+  UPLOAD_IMAGE: `${config.UPLOAD_URL}/upload/image` // 图片上传
 }
 
 module.exports = {
