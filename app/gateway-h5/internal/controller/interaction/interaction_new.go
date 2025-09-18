@@ -6,6 +6,7 @@ package interaction
 
 import (
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
+	_ "github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/interaction"
 	collection_info "shop-goframe-micro-service-refacotor/app/interaction/api/collection_info/v1"
 	comment_info "shop-goframe-micro-service-refacotor/app/interaction/api/comment_info/v1"
