@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/os/gtime"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
@@ -80,8 +79,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 			}
 		}
 	}
-	glog.Info(ctx, itemsToAllocate)
-	glog.Info(ctx, orderGoodsList)
+
 	// 开启事务
 	db := g.DB()
 	tx, err := db.Begin(ctx)
