@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -17,6 +18,68 @@ import (
 
 // Create 创建订单（包含完整的事务处理）
 func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
+	//对订单请求进行校验
+	if len(req.OrderGoodsInfo) == 0 {
+		return 0, errors.New("订单必须至少包含一个商品")
+	}
+	//订单金额必须等于商品金额之和
+	var totalGoodsPrice uint32
+	var totalCouponPrice uint32
+	for _, item := range req.OrderGoodsInfo {
+		totalGoodsPrice += item.Price
+		totalCouponPrice += item.CouponPrice
+	}
+	if req.Price != totalGoodsPrice {
+		return 0, fmt.Errorf("订单总价[%d]与商品总价[%d]不符", req.Price, totalGoodsPrice)
+	}
+
+	if req.ActualPrice != req.Price-req.CouponPrice {
+		return 0, fmt.Errorf("订单实际支付价格[%d]不等于订单总价[%d]减去优惠券价格[%d]", req.ActualPrice, req.Price, req.CouponPrice)
+	}
+	if req.CouponPrice < totalCouponPrice {
+		return 0, fmt.Errorf("订单优惠券价格[%d]小于商品优惠券价格[%d]", req.CouponPrice, totalCouponPrice)
+	}
+
+	// 计算OrderGoodsItem中分摊的coupon_price
+	var preAssignedCouponPrice uint32
+	var orderGoodsList []entity.OrderGoodsInfo
+	var itemsToAllocate []*entity.OrderGoodsInfo
+	var allocatableItemsTotalPrice uint32
+
+	if err := gconv.Structs(req.OrderGoodsInfo, &orderGoodsList); err != nil {
+		return 0, fmt.Errorf("订单商品数据转换失败: %v", err)
+	}
+
+	for i := 0; i < len(orderGoodsList); i++ {
+		item := &orderGoodsList[i]
+		if item.CouponPrice > 0 {
+			preAssignedCouponPrice += uint32(item.CouponPrice)
+		} else {
+			itemsToAllocate = append(itemsToAllocate, item)
+			allocatableItemsTotalPrice += uint32(item.Price)
+		}
+	}
+
+	couponPriceToAllocate := req.CouponPrice - preAssignedCouponPrice
+
+	if couponPriceToAllocate > 0 && len(itemsToAllocate) > 0 {
+		if allocatableItemsTotalPrice > 0 {
+			var allocatedSoFar int = 0
+			for i, item := range itemsToAllocate {
+				if i == len(itemsToAllocate)-1 {
+					item.CouponPrice = int(couponPriceToAllocate) - allocatedSoFar
+					item.ActualPrice = item.Price - item.CouponPrice
+				} else {
+					// 使用uint64进行计算以防止溢出
+					share := (uint64(item.Price) * uint64(couponPriceToAllocate)) / uint64(allocatableItemsTotalPrice)
+					item.CouponPrice = int(share)
+					item.ActualPrice = item.Price - item.CouponPrice
+					allocatedSoFar += item.CouponPrice
+				}
+			}
+		}
+	}
+
 	// 开启事务
 	db := g.DB()
 	tx, err := db.Begin(ctx)
@@ -52,12 +115,6 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 		return 0, fmt.Errorf("插入订单失败: %v", err)
 	}
 	orderId := int32(result)
-
-	// 使用 gconv.Structs 批量转换订单商品
-	var orderGoodsList []entity.OrderGoodsInfo
-	if err := gconv.Structs(req.OrderGoodsInfo, &orderGoodsList); err != nil {
-		return 0, fmt.Errorf("订单商品数据转换失败: %v", err)
-	}
 
 	// 设置订单商品公共字段
 	for i := range orderGoodsList {

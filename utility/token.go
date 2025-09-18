@@ -55,8 +55,10 @@ func ParseToken(tokenString string) (*CustomClaims, error) {
 		return []byte(JWTSecretKey), nil
 	})
 
-	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
-		return claims, nil
+	if token != nil {
+		if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+			return claims, nil
+		}
 	}
 	return nil, err
 }
