@@ -1,8 +1,20 @@
- const app = getApp()
+ /**
+ * 用户中心页面
+ * 功能：处理用户登录、个人信息展示、头像上传等功能
+ */
+const app = getApp()
 const { checkLoginStatus, request } = require('../../utils/request')
 const { API } = require('../../utils/env')
 
 Page({
+  /**
+   * 页面数据对象
+   * isLoggedIn: 登录状态标识
+   * userInfo: 用户信息对象
+   * orderCounts: 订单状态统计
+   * tempAvatar: 临时头像路径
+   * uploadedAvatarUrl: 上传后的头像URL
+   */
   data: {
     isLoggedIn: false,
     userInfo: {},
@@ -17,15 +29,84 @@ Page({
     uploadedAvatarUrl: ''
   },
 
+  /**
+   * 页面加载生命周期
+   * 初始化时检查登录状态
+   */
   onLoad() {
     this.checkLoginStatus()
   },
 
+  /**
+   * 页面显示生命周期
+   * 每次页面显示时检查登录状态
+   * 已登录则获取用户信息，未登录显示引导提示
+   */
   onShow() {
     this.checkLoginStatus()
-    if (this.data.isLoggedIn) this.getUserInfo()
+    if (this.data.isLoggedIn) {
+      this.getUserInfo()
+    } else {
+      // 显示登录引导提示
+      wx.showToast({
+        title: '请点击头像登录',
+        icon: 'none',
+        duration: 2000
+      })
+    }
   },
 
+  /**
+   * 微信自动登录方法
+   * 调用微信登录接口获取code，然后获取用户信息
+   */
+  autoWxLogin() {
+    wx.showLoading({ title: '准备登录...' })
+    wx.login({
+      success: (loginRes) => {
+        if (!loginRes.code) {
+          wx.hideLoading()
+          return wx.showToast({ title: '获取code失败', icon: 'none' })
+        }
+        
+        // 获取用户信息
+        wx.getUserProfile({
+          desc: '用于完善会员资料',
+          success: (profileRes) => {
+            if (!profileRes.iv || !profileRes.encryptedData) {
+              wx.hideLoading()
+              return wx.showToast({ title: '获取用户信息不完整', icon: 'none' })
+            }
+            
+            const wxLoginData = {
+              code: loginRes.code,
+              iv: profileRes.iv,
+              encryptedData: profileRes.encryptedData,
+              phoneNumber: '',
+              nickname: profileRes.userInfo.nickName || '微信用户',
+              avatar: profileRes.userInfo.avatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=微信用户'
+            }
+            this.wxMiniLogin(wxLoginData)
+          },
+          fail: (err) => {
+            wx.hideLoading()
+            console.error('获取用户信息失败:', err)
+            wx.showToast({ title: '获取用户信息失败', icon: 'none' })
+          }
+        })
+      },
+      fail: (err) => {
+        wx.hideLoading()
+        console.error('微信登录失败:', err)
+        wx.showToast({ title: '微信登录失败', icon: 'none' })
+      }
+    })
+  },
+
+  /**
+   * 检查登录状态
+   * 从全局状态获取登录信息并更新页面数据
+   */
   checkLoginStatus() {
     const { isLoggedIn, userInfo } = checkLoginStatus()
     app.globalData.isLoggedIn = isLoggedIn
@@ -39,6 +120,10 @@ Page({
 
   stopPropagation() { return },
 
+  /**
+   * 选择头像方法
+   * 已登录用户可选择相册或拍照方式更换头像
+   */
   chooseAvatar() {
     if (!this.data.isLoggedIn) return;
     
@@ -70,6 +155,10 @@ Page({
     })
   },
 
+  /**
+   * 上传图片方法
+   * @param {string} filePath - 要上传的图片临时路径
+   */
   uploadImage(filePath) {
     wx.showLoading({ title: '上传中...' })
     wx.uploadFile({
@@ -116,6 +205,10 @@ Page({
     })
   },
 
+  /**
+   * 微信小程序登录方法
+   * @param {object} wxLoginData - 包含code、iv、encryptedData等登录数据
+   */
   wxMiniLogin(wxLoginData) {
     wx.showLoading({ title: '登录中...' })
     request({ url: API.USER_WX_LOGIN, method: 'POST', data: wxLoginData, needAuth: false })
@@ -130,19 +223,44 @@ Page({
       }).catch(() => { wx.hideLoading(); wx.showToast({ title: '登录失败', icon: 'none' }) })
   },
 
-  // 新增头像/昵称点击处理
-  onProfileClick() {
-    if (!this.data.isLoggedIn) {
-      wx.navigateTo({
-        url: '/pages/login/login?type=wechat'
-      })
+  // 获取用户信息回调
+  /**
+   * 获取用户信息回调
+   * @param {object} e - 事件对象，包含用户信息
+   */
+  onGetUserInfo(e) {
+    if (e.detail.errMsg !== 'getUserInfo:ok') {
+      return wx.showToast({ title: '获取用户信息失败', icon: 'none' })
     }
+    
+    wx.login({
+      success: (loginRes) => {
+        if (!loginRes.code) return wx.showToast({ title: '获取code失败', icon: 'none' })
+        
+        const wxLoginData = {
+          code: loginRes.code,
+          iv: e.detail.iv,
+          encryptedData: e.detail.encryptedData,
+          phoneNumber: '',
+          nickname: e.detail.userInfo.nickName,
+          avatar: e.detail.userInfo.avatarUrl
+        }
+        this.wxMiniLogin(wxLoginData)
+      }
+    })
   },
 
-  // 确保登录按钮功能
-  onLogin() {
-    wx.navigateTo({
-      url: '/pages/login/login'
-    })
+  // 头像/昵称点击处理
+  /**
+   * 头像/昵称点击处理
+   * 未登录用户点击时显示登录引导
+   */
+  onProfileClick() {
+    if (!this.data.isLoggedIn) {
+      wx.showToast({
+        title: '请点击"微信一键登录"按钮',
+        icon: 'none'
+      })
+    }
   }
 })

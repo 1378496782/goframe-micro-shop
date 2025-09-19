@@ -8,7 +8,14 @@
         <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
       </view>
     </view>
-    <button class="login-btn" wx:if="{{!isLoggedIn}}" bindtap="onLogin">登录/注册</button>
+    <button 
+      class="login-btn" 
+      wx:if="{{!isLoggedIn}}" 
+      open-type="getUserInfo" 
+      bindgetuserinfo="onGetUserInfo"
+    >
+      微信一键登录
+    </button>
   </view>
 
   <!-- 订单状态 -->
