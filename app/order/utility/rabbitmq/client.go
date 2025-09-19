@@ -11,6 +11,8 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+//没有使用，因为使用了通用的消费者管理器，所以不需要单独的消费者客户端
+
 // OrderRabbitMQClient 订单服务专用的RabbitMQ客户端
 type OrderRabbitMQClient struct {
 	conn    *amqp.Connection

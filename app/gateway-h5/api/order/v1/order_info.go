@@ -56,6 +56,7 @@ type OrderInfoCreateReq struct {
 	ConsigneeAddress string            `json:"consignee_address"  dc:"收货人详细地址"`
 	Remark           string            `json:"remark" dc:"备注"`
 	OrderGoodsInfo   []*OrderGoodsItem `json:"order_goods_info" v:"required" dc:"订单商品信息"`
+	CouponId         uint32            `json:"coupon_id" dc:"优惠券ID"`
 }
 
 type OrderInfoCreateRes struct {

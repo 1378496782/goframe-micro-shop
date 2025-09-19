@@ -100,6 +100,29 @@ func (r *RabbitMQ) Publish(exchange, routingKey string, message interface{}) err
 	)
 }
 
+// PublishWithDelay 发布延迟消息
+func (r *RabbitMQ) PublishWithDelay(exchange, routingKey string, message interface{}, delayMs int) error {
+	body, err := json.Marshal(message)
+	if err != nil {
+		return err
+	}
+
+	return r.channel.Publish(
+		exchange,
+		routingKey,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        body,
+			Headers: amqp.Table{
+				"x-delay": delayMs, // 延迟时间，单位毫秒
+			},
+			DeliveryMode: amqp.Persistent, // 持久化消息
+		},
+	)
+}
+
 // Consume 消费消息
 func (r *RabbitMQ) Consume(queue, consumer string, autoAck bool) (<-chan amqp.Delivery, error) {
 	return r.channel.Consume(
@@ -125,6 +148,13 @@ func (r *RabbitMQ) Close() {
 
 // DeclareExchange 声明交换机
 func (r *RabbitMQ) DeclareExchange(name, kind string) error {
+	args := amqp.Table{}
+	
+	// 如果是延迟交换机，需要设置特殊参数
+	if kind == "x-delayed-message" {
+		args["x-delayed-type"] = "direct" // 指定延迟交换机的底层类型
+	}
+	
 	return r.channel.ExchangeDeclare(
 		name,
 		kind,
@@ -132,7 +162,7 @@ func (r *RabbitMQ) DeclareExchange(name, kind string) error {
 		false, // autoDelete
 		false, // internal
 		false, // noWait
-		nil,   // args
+		args,  // arguments
 	)
 }
 
@@ -157,4 +187,9 @@ func (r *RabbitMQ) QueueBind(queue, key, exchange string) error {
 		false, // noWait
 		nil,   // args
 	)
+}
+
+// SetQoS 设置服务质量
+func (r *RabbitMQ) SetQoS(prefetchCount, prefetchSize int, global bool) error {
+	return r.channel.Qos(prefetchCount, prefetchSize, global)
 }

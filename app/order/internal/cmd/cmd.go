@@ -2,11 +2,18 @@ package cmd
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"syscall"
+	
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"google.golang.org/grpc"
 	"shop-goframe-micro-service-refacotor/app/order/internal/controller/order_info"
 	"shop-goframe-micro-service-refacotor/app/order/internal/controller/refund_info"
+	"shop-goframe-micro-service-refacotor/app/order/utility/consumer"
+	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
 )
 
 var (
@@ -15,6 +22,33 @@ var (
 		Usage: "main",
 		Brief: "order grpc service",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
+			// 创建消费者管理器
+			consumerManager, err := rabbitmq.NewConsumerManager(ctx)
+			if err != nil {
+				g.Log().Errorf(ctx, "创建消费者管理器失败: %v", err)
+				return err
+			}
+			
+			// 注册order服务的消费者
+			setupConsumers(ctx, consumerManager)
+			
+			// 启动消费者管理器
+			err = consumerManager.Start()
+			if err != nil {
+				g.Log().Errorf(ctx, "启动消费者管理器失败: %v", err)
+				return err
+			}
+			
+			// 设置优雅关闭
+			go func() {
+				quit := make(chan os.Signal, 1)
+				signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+				<-quit
+				g.Log().Info(ctx, "正在关闭消费者管理器...")
+				consumerManager.Stop()
+			}()
+			
+			// 启动gRPC服务
 			c := grpcx.Server.NewConfig()
 			c.Options = append(c.Options, []grpc.ServerOption{
 				grpcx.Server.ChainUnary(
@@ -29,3 +63,14 @@ var (
 		},
 	}
 )
+
+// setupConsumers 设置order服务的消费者
+func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
+	// 添加优惠券确认结果消费者
+	couponResultConsumer := consumer.NewCouponResultConsumer(ctx)
+	manager.AddConsumer(couponResultConsumer)
+	
+	// 可以继续添加更多消费者...
+	// anotherConsumer := consumer.NewAnotherConsumer(ctx)
+	// manager.AddConsumer(anotherConsumer)
+}

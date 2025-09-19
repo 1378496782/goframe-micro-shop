@@ -12,13 +12,13 @@ import (
 // RefundInfo is the golang structure of table refund_info for DAO operations like Where/Data.
 type RefundInfo struct {
 	g.Meta    `orm:"table:refund_info, do:true"`
-	Id        interface{} // 售后退款表
-	Number    interface{} // 售后订单号
-	OrderId   interface{} // 订单id
-	GoodsId   interface{} // 要售后的商品id
-	Reason    interface{} // 退款原因
-	Status    interface{} // 状态 1待处理 2同意退款 3拒绝退款
-	UserId    interface{} // 用户id
+	Id        any         // 售后退款表
+	Number    any         // 售后订单号
+	OrderId   any         // 订单id
+	GoodsId   any         // 要售后的商品id
+	Reason    any         // 退款原因
+	Status    any         // 状态 1待处理 2同意退款 3拒绝退款
+	UserId    any         // 用户id
 	CreatedAt *gtime.Time //
 	UpdatedAt *gtime.Time //
 	DeletedAt *gtime.Time //
