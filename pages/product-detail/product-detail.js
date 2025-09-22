@@ -1,4 +1,4 @@
-const { api } = require('../../utils/api');
+const api = require('../../utils/api').api;
 const constants = require('../../config/constants');
 
 Page({
@@ -9,30 +9,13 @@ Page({
   },
  
   async onLoad(options) {
-    console.log('商品详情页面加载参数:', options)
-    console.log('商品ID:', options.id)
-    
-    // 检查用户是否登录
-    const token = wx.getStorageSync('token')
-    console.log('用户token:', token)
-    if (!token) {
-      wx.showModal({
-        title: '提示',
-        content: '请先登录',
-        success: (res) => {
-          if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
-            })
-          } else {
-            wx.navigateBack()
-          }
-        }
-      })
+    if (!options.id) {
+      wx.showToast({ title: '商品ID无效', icon: 'none' })
+      wx.navigateBack()
       return
     }
-    
-    // 加载商品详情数据
+
+    // 直接加载商品详情，不检查登录状态
     await this.loadProductDetail(options.id)
   },
   
@@ -47,25 +30,31 @@ Page({
       wx.navigateBack()
       return
     }
+
+    // 移除此处的登录检查，允许未登录用户查看商品详情
     
     this.setData({ loading: true })
     
     try {
       console.log('调用API获取商品详情...')
       const res = await api.getGoodsDetail(productId)
+      
+      if (!res) {
+        throw new Error('获取商品详情失败，请检查网络连接')
+      }
       console.log('API响应:', res)
       
       if (res.code === 0) {
         const product = res.data
-        // 处理图片URL，直接使用pic_url字段（已经是完整URL）
+        // 处理图片URL，使用IMAGE_BASE_URL拼接
         const images = []
         if (product.pic_url) {
-          images.push(product.pic_url)
+          images.push(product.pic_url.startsWith('http') ? product.pic_url : constants.IMAGE_BASE_URL + product.pic_url)
         }
         
         // 如果没有图片，添加默认占位图
         if (images.length === 0) {
-          images.push('https://via.placeholder.com/400x400?text=商品图片');
+          images.push(constants.IMAGE_BASE_URL + 'default-product.png');
         }
         
         // 格式化商品数据
