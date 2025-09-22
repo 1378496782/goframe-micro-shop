@@ -48,13 +48,29 @@ Page({
         const product = res.data
         // 处理图片URL，使用IMAGE_BASE_URL拼接
         const images = []
+        
+        // 添加主图
         if (product.pic_url) {
           images.push(product.pic_url.startsWith('http') ? product.pic_url : constants.IMAGE_BASE_URL + product.pic_url)
         }
         
+        // 添加详情图
+        if (product.images) {
+          try {
+            const detailImages = JSON.parse(product.images)
+            detailImages.forEach(img => {
+              if (img.url) {
+                images.push(img.url.startsWith('http') ? img.url : constants.IMAGE_BASE_URL + img.url)
+              }
+            })
+          } catch (e) {
+            console.error('解析商品详情图片失败:', e)
+          }
+        }
+        
         // 如果没有图片，添加默认占位图
         if (images.length === 0) {
-          images.push(constants.IMAGE_BASE_URL + 'default-product.png');
+          images.push(constants.IMAGE_BASE_URL + 'default-product.png')
         }
         
         // 格式化商品数据
@@ -64,11 +80,9 @@ Page({
           price: (product.price / 100).toFixed(2),
           originalPrice: ((product.price * 1.2) / 100).toFixed(2), // 模拟原价
           discount: '8.3', // 模拟折扣
-          sales: product.sale || 0,
-          reviews: Math.floor((product.sale || 0) * 0.3), // 模拟评论数
+          sale: product.sale || 0,
           stock: product.stock || 0,
           images: images,
-          detailInfo: product.detail_info || '',
           tags: product.tags || '',
           brand: product.brand || ''
         }
