@@ -14,26 +14,27 @@ CREATE DATABASE IF NOT EXISTS `banner` CHARACTER SET utf8mb4 COLLATE utf8mb4_uni
 USE goods;
 -- 删除已存在的 goods_info 表（如果存在）
 DROP TABLE IF EXISTS `goods_info`;
-CREATE TABLE `goods_info` (
-          `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-          `name` VARCHAR(200) NOT NULL COMMENT '商品名字',
-          `pic_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '主图',
-          `images` JSON DEFAULT NULL COMMENT '支持单图,多图',
-          `price` INT NOT NULL COMMENT '价格(分)',
-          `level1_category_id` INT NOT NULL COMMENT '1级分类id',
-          `level2_category_id` INT NOT NULL DEFAULT 0 COMMENT '2级分类id',
-          `level3_category_id` INT NOT NULL DEFAULT 0 COMMENT '3级分类id',
-          `brand` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '品牌',
-          `stock` INT NOT NULL DEFAULT 0 COMMENT '库存',
-          `sale` INT NOT NULL DEFAULT 0 COMMENT '销量',
-          `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标签',
-          `detail_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '商品详情',
-          `sort` TINYINT NOT NULL DEFAULT 0 COMMENT '排序 倒序',
-          `created_at` datetime DEFAULT NULL,
-          `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          `deleted_at` datetime DEFAULT NULL,
-          PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
+CREATE TABLE `goods_info`  (
+                               `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+                               `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商品名字',
+                               `pic_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '主图',
+                               `images` json NULL COMMENT '支持单图,多图',
+                               `price` int NOT NULL COMMENT '价格(分)',
+                               `level1_category_id` int NOT NULL DEFAULT 0 COMMENT '1级分类id',
+                               `level2_category_id` int NOT NULL DEFAULT 0 COMMENT '2级分类id',
+                               `level3_category_id` int NOT NULL DEFAULT 0 COMMENT '3级分类id',
+                               `brand` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '品牌',
+                               `stock` int NOT NULL DEFAULT 0 COMMENT '库存',
+                               `sale` int NOT NULL DEFAULT 0 COMMENT '销量',
+                               `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '标签',
+                               `sort` tinyint NOT NULL DEFAULT 0 COMMENT '排序 倒叙',
+                               `detail_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '商品详情',
+                               `enable_bargain` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否允许砍价 1是 0否 默认0',
+                               `created_at` datetime NULL DEFAULT NULL,
+                               `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                               `deleted_at` datetime NULL DEFAULT NULL,
+                               PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品表' ROW_FORMAT = Dynamic;
 
 -- 商品详情图表
 DROP TABLE IF EXISTS `goods_images`;
@@ -1072,6 +1073,8 @@ INSERT INTO `sys_dict_data` VALUES (118, 0, '音频', 'audio', 'sys_upload_file_
 INSERT INTO `sys_dict_data` VALUES (119, 0, '视频', 'video', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:55:09', '2024-10-23 14:55:09');
 INSERT INTO `sys_dict_data` VALUES (120, 0, '压缩包', 'zip', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:55:22', '2024-10-23 14:55:22');
 INSERT INTO `sys_dict_data` VALUES (121, 0, '其它', 'other', 'sys_upload_file_type', '', '', 0, 1, 31, 0, '', '2024-10-23 14:55:40', '2024-10-23 14:55:40');
+INSERT INTO `sys_dict_data` VALUES (123, 0, '允许砍价', '1', 'shop_bargain_switch', '', '', 0, 1, 31, 0, '', '2025-09-22 16:28:42', '2025-09-22 16:28:42');
+INSERT INTO `sys_dict_data` VALUES (124, 0, '禁止砍价', '0', 'shop_bargain_switch', '', '', 1, 1, 31, 0, '', '2025-09-22 16:29:00', '2025-09-22 16:29:00');
 
 -- ----------------------------
 -- Table structure for sys_dict_type
@@ -1123,6 +1126,8 @@ INSERT INTO `sys_dict_type` VALUES (53, 54, '上传文件类型', 'sys_upload_fi
 INSERT INTO `sys_dict_type` VALUES (54, 0, '系统字典', 'sys', 1, 31, 31, '', '2025-06-06 15:57:36', '2025-06-09 09:14:45');
 INSERT INTO `sys_dict_type` VALUES (55, 0, 'cms字典', 'cms', 1, 31, 0, '', '2025-06-09 08:50:41', '2025-06-09 08:50:41');
 INSERT INTO `sys_dict_type` VALUES (56, 0, '工作流字典', 'flow', 1, 31, 31, '', '2025-06-09 11:01:37', '2025-06-09 11:01:59');
+INSERT INTO `sys_dict_type` VALUES (57, 0, '商城', 'shop', 1, 31, 0, '', '2025-09-22 16:25:07', '2025-09-22 16:25:07');
+INSERT INTO `sys_dict_type` VALUES (58, 57, '商品砍价', 'shop_bargain_switch', 1, 31, 0, '', '2025-09-22 16:25:50', '2025-09-22 16:25:50');
 
 -- ----------------------------
 -- Table structure for sys_job
