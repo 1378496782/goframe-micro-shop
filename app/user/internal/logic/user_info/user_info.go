@@ -158,7 +158,7 @@ func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (to
 	}
 
 	// 2. 查询用户
-	userRecord, err := dao.UserInfo.Ctx(ctx).Where(" open_id", openId).One()
+	userRecord, err := dao.UserInfo.Ctx(ctx).Where("open_id", openId).One()
 	if err != nil {
 		g.Log().Errorf(ctx, "查询用户失败: %v", err)
 		return "", 0, nil, errors.New("系统错误")
