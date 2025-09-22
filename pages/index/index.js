@@ -3,11 +3,7 @@ const constants = require('../../config/constants');
 
 Page({
   data: {
-    banners: [
-      { id: 1, image: 'http://wangzhongyang.com/images/logo_removebg.png', url: '/pages/category/category' },
-      { id: 2, image: 'http://wangzhongyang.com/images/logo极速版_removebg.png', url: '/pages/category/category' },
-      { id极速版: 3, image: 'http://wangzhongyang.com/images/logo_removebg.png', url: '/pages/category/category' }
-    ],
+    banners: [],
     categories: [],
     products: [],
     groupBuyProducts: [], // 拼团砍价商品
@@ -54,7 +50,7 @@ Page({
           return {
             ...item,
             priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
-            mainImage: mainImage || 'https://via.placeholder.com/200x200?text=商品图片'
+            mainImage: mainImage ? (mainImage.startsWith('http') ? mainImage : constants.IMAGE_BASE_URL + mainImage) : 'https://via.placeholder.com/200x200?text=商品图片'
           }
         })
         
@@ -69,7 +65,7 @@ Page({
           ...item,
           groupPrice: (item.groupPrice / 100).toFixed(2),
           originalPrice: (item.originalPrice / 100).toFixed(2),
-          mainImage: item.mainImage || 'https://via.placeholder.com/200x200?text=拼团商品'
+          mainImage: item.mainImage ? (item.mainImage.startsWith('http') ? item.mainImage : constants.IMAGE_BASE_URL + item.mainImage) : 'https://via.placeholder.com/200x200?text=拼团商品'
         }))
         
         this.setData({

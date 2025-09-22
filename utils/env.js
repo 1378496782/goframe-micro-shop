@@ -6,6 +6,7 @@ const DEV_CONFIG = {
   BASE_URL: 'http://192.168.1.5:8199',
   UPLOAD_URL: 'http://192.168.1.5:8399',
   SEARCH_URL: 'http://192.168.1.5:8499',
+  IMAGE_BASE_URL: 'http://192.168.1.5:8808/',
   SKIP_DOMAIN_CHECK: true
 } 
  
@@ -14,6 +15,7 @@ const PROD_CONFIG = {
   BASE_URL: 'http://101.42.249.106:8199',
   UPLOAD_URL: 'http://101.42.249.106:8399',
   SEARCH_URL: 'http://101.42.249.106:8499',
+  IMAGE_BASE_URL: 'http://101.42.249.106:8808/',
   SKIP_DOMAIN_CHECK: false
 }
 
