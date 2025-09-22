@@ -1,6 +1,6 @@
 // ==========================================================================
 // GFast自动生成model操作代码。
-// 生成日期：2025-09-09 17:28:51
+// 生成日期：2025-09-22 16:50:04
 // 生成路径: internal/app/shop/model/rotation_info.go
 // 生成人：gfast
 // desc:轮播图
@@ -18,13 +18,13 @@ import (
 // RotationInfoInfoRes is the golang structure for table rotation_info.
 type RotationInfoInfoRes struct {
 	gmeta.Meta `orm:"table:rotation_info"`
-	Id         int         `orm:"id,primary" json:"id" dc:"ID"`      // ID
-	PicUrl     string      `orm:"pic_url" json:"picUrl" dc:"图片"`     // 图片
-	Link       string      `orm:"link" json:"link" dc:"跳转链接"`        // 跳转链接
-	Sort       int         `orm:"sort" json:"sort" dc:"排序字段"`        // 排序字段
-	CreatedAt  *gtime.Time `orm:"created_at" json:"createdAt" dc:""` //
-	UpdatedAt  *gtime.Time `orm:"updated_at" json:"updatedAt" dc:""` //
-	DeletedAt  *gtime.Time `orm:"deleted_at" json:"deletedAt" dc:""` //
+	Id         int         `orm:"id,primary" json:"id" dc:"ID"`          // ID
+	PicUrl     string      `orm:"pic_url" json:"picUrl" dc:"图片"`         // 图片
+	Link       string      `orm:"link" json:"link" dc:"跳转链接"`            // 跳转链接
+	Sort       int         `orm:"sort" json:"sort" dc:"排序字段"`            // 排序字段
+	CreatedAt  *gtime.Time `orm:"created_at" json:"createdAt" dc:"创建时间"` // 创建时间
+	UpdatedAt  *gtime.Time `orm:"updated_at" json:"updatedAt" dc:""`     //
+	DeletedAt  *gtime.Time `orm:"deleted_at" json:"deletedAt" dc:""`     //
 }
 
 type RotationInfoListRes struct {
@@ -32,17 +32,17 @@ type RotationInfoListRes struct {
 	PicUrl    string      `json:"picUrl" dc:"图片"`
 	Link      string      `json:"link" dc:"跳转链接"`
 	Sort      int         `json:"sort" dc:"排序字段"`
-	CreatedAt *gtime.Time `json:"createdAt" dc:""`
+	CreatedAt *gtime.Time `json:"createdAt" dc:"创建时间"`
 }
 
 // RotationInfoSearchReq 分页请求参数
 type RotationInfoSearchReq struct {
 	comModel.PageReq
-	Id        string `p:"id" dc:"ID"`                                                     //ID
-	PicUrl    string `p:"picUrl" dc:"图片"`                                                 //图片
-	Link      string `p:"link" dc:"跳转链接"`                                                 //跳转链接
-	Sort      string `p:"sort" v:"sort@integer#排序字段需为整数" dc:"排序字段"`                       //排序字段
-	CreatedAt string `p:"createdAt" v:"createdAt@datetime#需为YYYY-MM-DD hh:mm:ss格式" dc:""` //
+	Id        string `p:"id" dc:"ID"`                                                             //ID
+	PicUrl    string `p:"picUrl" dc:"图片"`                                                         //图片
+	Link      string `p:"link" dc:"跳转链接"`                                                         //跳转链接
+	Sort      string `p:"sort" v:"sort@integer#排序字段需为整数" dc:"排序字段"`                               //排序字段
+	CreatedAt string `p:"createdAt" v:"createdAt@datetime#创建时间需为YYYY-MM-DD hh:mm:ss格式" dc:"创建时间"` //创建时间
 }
 
 // RotationInfoSearchRes 列表返回结果

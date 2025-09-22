@@ -1,6 +1,6 @@
 // ==========================================================================
 // GFast自动生成dao internal操作代码。
-// 生成日期：2025-09-09 17:28:51
+// 生成日期：2025-09-22 16:50:03
 // 生成路径: internal/app/shop/dao/internal/rotation_info.go
 // 生成人：gfast
 // desc:轮播图
@@ -29,7 +29,7 @@ type RotationInfoColumns struct {
 	PicUrl    string // 图片
 	Link      string // 跳转链接
 	Sort      string // 排序字段
-	CreatedAt string //
+	CreatedAt string // 创建时间
 	UpdatedAt string //
 	DeletedAt string //
 }

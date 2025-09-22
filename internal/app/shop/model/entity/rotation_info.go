@@ -1,6 +1,6 @@
 // ==========================================================================
 // GFast自动生成model entity操作代码。
-// 生成日期：2025-09-09 17:28:51
+// 生成日期：2025-09-22 16:50:04
 // 生成路径: internal/app/shop/model/entity/rotation_info.go
 // 生成人：gfast
 // desc:轮播图
@@ -21,7 +21,7 @@ type RotationInfo struct {
 	PicUrl     string      `orm:"pic_url" json:"picUrl"`       // 图片
 	Link       string      `orm:"link" json:"link"`            // 跳转链接
 	Sort       int         `orm:"sort" json:"sort"`            // 排序字段
-	CreatedAt  *gtime.Time `orm:"created_at" json:"createdAt"` //
+	CreatedAt  *gtime.Time `orm:"created_at" json:"createdAt"` // 创建时间
 	UpdatedAt  *gtime.Time `orm:"updated_at" json:"updatedAt"` //
 	DeletedAt  *gtime.Time `orm:"deleted_at" json:"deletedAt"` //
 }

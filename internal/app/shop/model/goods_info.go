@@ -1,6 +1,6 @@
 // ==========================================================================
 // GFast自动生成model操作代码。
-// 生成日期：2025-09-22 16:30:35
+// 生成日期：2025-09-22 16:48:52
 // 生成路径: internal/app/shop/model/goods_info.go
 // 生成人：gfast
 // desc:商品
@@ -48,7 +48,6 @@ type GoodsInfoListRes struct {
 	Sale          int         `json:"sale" dc:"销量"`
 	Tags          string      `json:"tags" dc:"标签"`
 	Sort          int         `json:"sort" dc:"排序 倒叙"`
-	DetailInfo    string      `json:"detailInfo" dc:"商品详情"`
 	EnableBargain int         `json:"enableBargain" dc:"允许砍价"`
 	CreatedAt     *gtime.Time `json:"createdAt" dc:""`
 }
@@ -65,7 +64,6 @@ type GoodsInfoSearchReq struct {
 	Sale          string `p:"sale" v:"sale@integer#销量需为整数" dc:"销量"`                           //销量
 	Tags          string `p:"tags" dc:"标签"`                                                   //标签
 	Sort          string `p:"sort" v:"sort@integer#排序 倒叙需为整数" dc:"排序 倒叙"`                     //排序 倒叙
-	DetailInfo    string `p:"detailInfo" dc:"商品详情"`                                           //商品详情
 	EnableBargain string `p:"enableBargain" v:"enableBargain@integer#允许砍价需为整数" dc:"允许砍价"`     //允许砍价
 	CreatedAt     string `p:"createdAt" v:"createdAt@datetime#需为YYYY-MM-DD hh:mm:ss格式" dc:""` //
 }
@@ -86,7 +84,6 @@ type GoodsInfoAddReq struct {
 	Sale          int                `p:"sale"  dc:"销量"`
 	Tags          string             `p:"tags"  dc:"标签"`
 	Sort          int                `p:"sort"  dc:"排序 倒叙"`
-	DetailInfo    string             `p:"detailInfo"  dc:"商品详情"`
 	EnableBargain int                `p:"enableBargain"  dc:"允许砍价"`
 }
 
@@ -101,6 +98,5 @@ type GoodsInfoEditReq struct {
 	Sale          int                `p:"sale"  dc:"销量"`
 	Tags          string             `p:"tags"  dc:"标签"`
 	Sort          int                `p:"sort"  dc:"排序 倒叙"`
-	DetailInfo    string             `p:"detailInfo"  dc:"商品详情"`
 	EnableBargain int                `p:"enableBargain"  dc:"允许砍价"`
 }

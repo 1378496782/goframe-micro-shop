@@ -1,6 +1,6 @@
 // ==========================================================================
 // GFast自动生成logic操作代码。
-// 生成日期：2025-09-22 16:30:35
+// 生成日期：2025-09-22 16:48:52
 // 生成路径: internal/app/shop/logic/goods_info.go
 // 生成人：gfast
 // desc:商品
@@ -64,9 +64,6 @@ func (s *sGoodsInfo) List(ctx context.Context, req *model.GoodsInfoSearchReq) (l
 		if req.Sort != "" {
 			m = m.Where(dao.GoodsInfo.Columns().Sort+" = ?", gconv.Int(req.Sort))
 		}
-		if req.DetailInfo != "" {
-			m = m.Where(dao.GoodsInfo.Columns().DetailInfo+" = ?", req.DetailInfo)
-		}
 		if req.EnableBargain != "" {
 			m = m.Where(dao.GoodsInfo.Columns().EnableBargain+" = ?", gconv.Int(req.EnableBargain))
 		}
@@ -101,7 +98,6 @@ func (s *sGoodsInfo) List(ctx context.Context, req *model.GoodsInfoSearchReq) (l
 				Sale:          v.Sale,
 				Tags:          v.Tags,
 				Sort:          v.Sort,
-				DetailInfo:    v.DetailInfo,
 				EnableBargain: v.EnableBargain,
 				CreatedAt:     v.CreatedAt,
 			}
@@ -133,7 +129,6 @@ func (s *sGoodsInfo) Add(ctx context.Context, req *model.GoodsInfoAddReq) (err e
 			Sale:          req.Sale,
 			Tags:          req.Tags,
 			Sort:          req.Sort,
-			DetailInfo:    req.DetailInfo,
 			EnableBargain: req.EnableBargain,
 		})
 		liberr.ErrIsNil(ctx, err, "添加失败")
@@ -156,7 +151,6 @@ func (s *sGoodsInfo) Edit(ctx context.Context, req *model.GoodsInfoEditReq) (err
 			Sale:          req.Sale,
 			Tags:          req.Tags,
 			Sort:          req.Sort,
-			DetailInfo:    req.DetailInfo,
 			EnableBargain: req.EnableBargain,
 		})
 		liberr.ErrIsNil(ctx, err, "修改失败")
