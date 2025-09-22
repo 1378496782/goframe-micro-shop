@@ -1,8 +1,8 @@
 // ==========================================================================
 // GFast自动生成api操作代码。
-// 生成日期：2025-09-08 11:37:28
+// 生成日期：2025-09-22 16:30:35
 // 生成路径: api/v1/shop/goods_info.go
-// 生成人：王中阳
+// 生成人：gfast
 // desc:商品相关参数
 // company:云南奇讯科技有限公司
 // ==========================================================================
@@ -11,7 +11,6 @@ package shop
 
 import (
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/net/ghttp"
 	commonApi "github.com/tiger1103/gfast/v3/api/v1/common"
 	"github.com/tiger1103/gfast/v3/internal/app/shop/model"
 )
@@ -27,45 +26,6 @@ type GoodsInfoSearchReq struct {
 type GoodsInfoSearchRes struct {
 	g.Meta `mime:"application/json"`
 	*model.GoodsInfoSearchRes
-}
-
-// GoodsInfoExportReq 导出请求
-type GoodsInfoExportReq struct {
-	g.Meta `path:"/export" tags:"商品" method:"get" summary:"商品导出"`
-	commonApi.Author
-	model.GoodsInfoSearchReq
-}
-
-// GoodsInfoExportRes 导出响应
-type GoodsInfoExportRes struct {
-	commonApi.EmptyRes
-}
-type GoodsInfoExcelTemplateReq struct {
-	g.Meta `path:"/excelTemplate" tags:"商品" method:"get" summary:"导出模板文件"`
-	commonApi.Author
-}
-type GoodsInfoExcelTemplateRes struct {
-	commonApi.EmptyRes
-}
-type GoodsInfoImportReq struct {
-	g.Meta `path:"/import" tags:"商品" method:"post" summary:"商品导入"`
-	commonApi.Author
-	File *ghttp.UploadFile `p:"file" type:"file" dc:"选择上传文件"  v:"required#上传文件必须"`
-}
-type GoodsInfoImportRes struct {
-	commonApi.EmptyRes
-}
-
-// 相关连表查询数据
-type LinkedGoodsInfoDataSearchReq struct {
-	g.Meta `path:"/linkedData" tags:"商品" method:"get" summary:"商品关联表数据"`
-	commonApi.Author
-}
-
-// 相关连表查询数据
-type LinkedGoodsInfoDataSearchRes struct {
-	g.Meta `mime:"application/json"`
-	*model.LinkedGoodsInfoDataSearchRes
 }
 
 // GoodsInfoAddReq 添加操作请求参数

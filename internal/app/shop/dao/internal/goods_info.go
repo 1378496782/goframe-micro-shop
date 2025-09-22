@@ -1,8 +1,8 @@
 // ==========================================================================
 // GFast自动生成dao internal操作代码。
-// 生成日期：2025-09-08 11:37:29
+// 生成日期：2025-09-22 16:30:35
 // 生成路径: internal/app/shop/dao/internal/goods_info.go
-// 生成人：王中阳
+// 生成人：gfast
 // desc:商品
 // company:云南奇讯科技有限公司
 // ==========================================================================
@@ -26,20 +26,21 @@ type GoodsInfoDao struct {
 // GoodsInfoColumns defines and stores column names for table goods_info.
 type GoodsInfoColumns struct {
 	Id               string // ID
-	Name             string // 名称
-	Images           string // 多图
-	PicUrl           string // 封面图
+	Name             string // 名字
+	PicUrl           string // 主图
+	Images           string // 详情配图
 	Price            string // 价格(分)
-	Level1CategoryId string // 一级分类
-	Level2CategoryId string // 二级分类
-	Level3CategoryId string // 三级分类
+	Level1CategoryId string // 1级分类id
+	Level2CategoryId string // 2级分类id
+	Level3CategoryId string // 3级分类id
 	Brand            string // 品牌
 	Stock            string // 库存
 	Sale             string // 销量
 	Tags             string // 标签
-	DetailInfo       string // 商品详情
-	CreatedAt        string //
 	Sort             string // 排序 倒叙
+	DetailInfo       string // 商品详情
+	EnableBargain    string // 允许砍价
+	CreatedAt        string //
 	UpdatedAt        string //
 	DeletedAt        string //
 }
@@ -47,8 +48,8 @@ type GoodsInfoColumns struct {
 var goodsInfoColumns = GoodsInfoColumns{
 	Id:               "id",
 	Name:             "name",
-	Images:           "images",
 	PicUrl:           "pic_url",
+	Images:           "images",
 	Price:            "price",
 	Level1CategoryId: "level1_category_id",
 	Level2CategoryId: "level2_category_id",
@@ -57,9 +58,10 @@ var goodsInfoColumns = GoodsInfoColumns{
 	Stock:            "stock",
 	Sale:             "sale",
 	Tags:             "tags",
-	DetailInfo:       "detail_info",
-	CreatedAt:        "created_at",
 	Sort:             "sort",
+	DetailInfo:       "detail_info",
+	EnableBargain:    "enable_bargain",
+	CreatedAt:        "created_at",
 	UpdatedAt:        "updated_at",
 	DeletedAt:        "deleted_at",
 }
