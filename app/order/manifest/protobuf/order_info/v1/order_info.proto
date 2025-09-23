@@ -25,6 +25,7 @@ message OrderInfoCreateReq {
   string remark = 7;                     // 备注
   repeated OrderGoodsItem order_goods_info = 8; // 订单商品信息
   uint32 user_id = 9;                     // 用户id
+  uint32 coupon_id = 10;                  // 优惠券id
 }
 
 // 订单商品项
@@ -63,7 +64,7 @@ message OrderInfoGetListReq {
   uint32 pay_type = 5;                    // 支付方式 1微信 2支付宝 3云闪付
   google.protobuf.Timestamp pay_at_gte = 6; // 支付时间>=
   google.protobuf.Timestamp pay_at_lte = 7; // 支付时间<=
-  uint32 status = 8;                      // 订单状态：1待支付 2已支付待发货 3已发货 4已收货待评价
+  uint32 status = 8;                      // 订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消
   string consignee_phone = 9;            // 收货人手机号
   uint32 price_gte = 10;                  // 订单金额>= 单位分
   uint32 price_lte = 11;                  // 订单金额<= 单位分

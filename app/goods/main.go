@@ -9,7 +9,6 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 	"os"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/cmd"
-	"shop-goframe-micro-service-refacotor/app/goods/utility/consumer"
 	"shop-goframe-micro-service-refacotor/app/goods/utility/goodsRedis"
 )
 
@@ -26,7 +25,7 @@ func main() {
 		os.Exit(1)
 	}
 	// 启动消费者
-	go consumer.StartUserRegisteredConsumer()
+	//go consumer.StartUserRegisteredConsumer()
 
 	var address = conf.String()
 	grpcx.Resolver.Register(etcd.New(address))

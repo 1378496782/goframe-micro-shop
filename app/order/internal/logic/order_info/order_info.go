@@ -12,6 +12,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
 	"shop-goframe-micro-service-refacotor/utility"
+	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
 
 	"github.com/gogf/gf/v2/util/gconv"
 )
@@ -105,7 +106,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 
 	// 设置订单特有字段
 	order.Number = utility.GenerateOrderNumber()
-	order.Status = 1
+	order.Status = 6 // 6待确认
 	order.CreatedAt = gtime.Now()
 	order.UpdatedAt = gtime.Now()
 
@@ -138,8 +139,14 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 
 	success = true
 
+	// 订单创建成功后，如果有优惠券使用，发送订单确认消息给goods服务进行优惠券扣减
+	if req.CouponId > 0 {
+		go grabbitmq.PublishCouponConfirmEvent(orderId, int32(req.UserId), int32(req.CouponId))
+	}
+
 	// 订单创建成功后，异步发送延迟消息
-	go sendOrderTimeoutMessage(ctx, orderId)
+	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
+	go grabbitmq.PublishOrderTimeoutEvent(int(orderId), delay)
 
 	return orderId, nil
 }
@@ -288,4 +295,52 @@ func GetList(ctx context.Context, req *v1.OrderInfoGetListReq) ([]*pbentity.Orde
 	}
 
 	return pbOrders, total, nil
+}
+
+// UpdateOrderStatus 更新订单状态
+func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
+	updateData := g.Map{
+		"status":     status,
+		"updated_at": gtime.Now(),
+	}
+	
+	// 只有当订单状态变为已支付(2)时才设置支付时间
+	if status == 2 {
+		updateData["pay_at"] = gtime.Now()
+	}
+	
+	_, err := dao.OrderInfo.Ctx(ctx).Where("id", orderId).Update(updateData)
+	if err != nil {
+		return fmt.Errorf("更新订单状态失败: %v", err)
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单ID: %d, 新状态: %d", orderId, status)
+	return nil
+}
+
+// HandleCouponResult 处理优惠券扣减结果
+// goods服务通过userid和couponid在user_coupon_info表中定位数据
+// 如果找到数据且状态为"待使用"，则修改为"已使用"并返回成功
+// 如果未找到数据或状态不是"待使用"，则返回失败
+func HandleCouponResult(ctx context.Context, orderId int, success bool, message string) error {
+
+	if success {
+		// 优惠券扣减成功，订单状态改为待支付(1)
+		err := UpdateOrderStatus(ctx, orderId, 1)
+		if err != nil {
+			g.Log().Errorf(ctx, "优惠券扣减成功，但更新订单状态失败, 订单ID: %d, 错误: %v", orderId, err)
+			return err
+		}
+		g.Log().Infof(ctx, "优惠券扣减成功，订单状态已更新为待支付, 订单ID: %d", orderId)
+	} else {
+		// 优惠券扣减失败（未找到数据或状态不是"待使用"），订单状态改为已取消(7)
+		err := UpdateOrderStatus(ctx, orderId, 7)
+		if err != nil {
+			g.Log().Errorf(ctx, "优惠券扣减失败，但更新订单状态失败, 订单ID: %d, 错误: %v", orderId, err)
+			return err
+		}
+		g.Log().Warningf(ctx, "优惠券扣减失败，订单状态已更新为已取消, 订单ID: %d, 原因: %s", orderId, message)
+	}
+
+	return nil
 }
