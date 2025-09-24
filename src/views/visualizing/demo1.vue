@@ -1,7 +1,8 @@
 <template>
 	<div class="visualizing-demo1">
-    <baidumap src="https://hm.baidu.com/hm.js?d9c8b87d10717013641458b300c552e4"></baidumap>
-    <baidumap src="https://api.map.baidu.com/api?v=3.0&ak=wsijQt8sLXrCW71YesmispvYHitfG9gv&s=1"></baidumap>
+    <!-- 注释掉baidumap组件，因为map2文件不存在 -->
+    <!-- <baidumap src="https://hm.baidu.com/hm.js?d9c8b87d10717013641458b300c552e4"></baidumap> -->
+    <!-- <baidumap src="https://api.map.baidu.com/api?v=3.0&ak=wsijQt8sLXrCW71YesmispvYHitfG9gv&s=1"></baidumap> -->
 		<!-- 地图 -->
 		<div ref="visualizingDemo1" style="height: 100%"></div>
 		<div class="visualizing-container">
@@ -97,7 +98,8 @@
 //大意：文档流加载完毕，无法再通过write插入脚本。
 //原因：百度地图api中有使用了document.write('<script src...'
 //暂时未解决
-import baidumap from '/@/views/demo/map2';
+// 注释掉baidumap导入，因为map2文件不存在
+// import baidumap from '/@/views/demo/map2';
 import { toRefs, reactive, onMounted, onUnmounted, getCurrentInstance, defineComponent } from 'vue';
 import * as echarts from 'echarts';
 import 'echarts/extension/bmap/bmap';
@@ -117,7 +119,8 @@ interface Demo1State {
 
 export default defineComponent({
 	name: 'visualizingLinkDemo1',
-  components:{baidumap},
+  // 注释掉baidumap组件注册，因为map2文件不存在
+  // components:{baidumap},
 	setup() {
 		const { proxy } = <any>getCurrentInstance();
 		const state = reactive<Demo1State>({

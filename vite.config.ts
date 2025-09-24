@@ -11,6 +11,7 @@ const pathResolve = (dir: string) => {
 const alias: Record<string, string> = {
 	'/@': pathResolve('./src/'),
 	'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
+	'/@/views/demo/map2': pathResolve('./src/views/demo/map2.vue'),
 };
 
 const viteConfig = defineConfig((mode: ConfigEnv) => {
