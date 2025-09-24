@@ -22,6 +22,9 @@ RUN npm run build
 # production stage
 FROM nginx:alpine
 
+# 设置Alpine镜像源为国内源，加速apk安装
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 # 安装必要的工具
 RUN apk add --no-cache tzdata curl
 
