@@ -466,6 +466,8 @@ services:
     volumes:
       - ./log/manage:/app/resource/log
       - /etc/localtime:/etc/localtime:ro
+      # 挂载前端构建产物 - 实现热更新无需重启服务
+      - ../shop-goframe-micro-service-manage-ui-gfast/dist:/app/resource/public:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -485,10 +487,10 @@ services:
       timeout: 10s
       retries: 3
 
-  # 前端管理服务 - 生产环境SSL证书配置（使用数据卷挂载，无需重新编译镜像）
-  manage-ui:
+  # 前端管理服务 - 纯代理转发，静态资源由manage-service提供
+  nginx-proxy:
     image: nginx:alpine
-    container_name: manage-ui
+    container_name: nginx-proxy
     environment:
       - TZ=Asia/Shanghai
       - NGINX_ENV=production
@@ -496,10 +498,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      # 挂载nginx配置文件
-      - ../shop-goframe-micro-service-manage-ui-gfast/nginx.conf:/etc/nginx/nginx.conf:ro
-      # 挂载前端构建产物 - 使用数据卷避免重新编译镜像
-      - ../shop-goframe-micro-service-manage-ui-gfast/dist:/usr/share/nginx/html:ro
+      # 挂载nginx配置文件 - 仅保留代理转发功能
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       # 生产环境证书路径 - 使用绝对路径挂载系统证书目录
       - /etc/ssl/certs:/etc/nginx/ssl/certs:ro
       - /etc/ssl/private:/etc/nginx/ssl/private:ro
