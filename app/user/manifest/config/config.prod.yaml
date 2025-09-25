@@ -35,3 +35,7 @@ rabbitmq:
   routingKey:
     user:
       registered: "user.registered"
+
+wxMiniConf:
+  appId: CHANGE_ME_WECHAT_APP_ID
+  secret: 1faee0008ac4456ba196289330c7b0f8
