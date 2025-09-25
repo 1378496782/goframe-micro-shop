@@ -1,32 +1,32 @@
 <template>
-  <div class="shop-goodsInfo-container">
+  <div class="shop-userInfo-container">
     <el-card shadow="hover">
-        <div class="shop-goodsInfo-search mb15">
+        <div class="shop-userInfo-search mb15">
             <el-form :model="tableData.param" ref="queryRef" :inline="true" label-width="100px">
             <el-row>                
                 <el-col :span="8" class="colBlock">
-                  <el-form-item label="ID" prop="id">
+                  <el-form-item label="" prop="id">
                     <el-input
                         v-model="tableData.param.id"
-                        placeholder="请输入ID"
+                        placeholder="请输入"
                         clearable                        
-                        @keyup.enter.native="goodsInfoList"
+                        @keyup.enter.native="userInfoList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" class="colBlock">
-                  <el-form-item label="名字" prop="name">
+                  <el-form-item label="用户名" prop="name">
                     <el-input
                         v-model="tableData.param.name"
-                        placeholder="请输入名字"
+                        placeholder="请输入用户名"
                         clearable                        
-                        @keyup.enter.native="goodsInfoList"
+                        @keyup.enter.native="userInfoList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="!showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
-                    <el-button type="primary"  @click="goodsInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button type="primary"  @click="userInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
                     <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
                     <el-button type="primary" link  @click="toggleSearch">
                       {{ word }}
@@ -36,79 +36,37 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="主图" prop="picUrl">
-                    <el-select filterable v-model="tableData.param.picUrl" placeholder="请选择主图" clearable style="width:200px;">
+                  <el-form-item label="头像" prop="avatar">
+                    <el-input
+                        v-model="tableData.param.avatar"
+                        placeholder="请输入头像"
+                        clearable                        
+                        @keyup.enter.native="userInfoList"
+                    />                    
+                  </el-form-item>
+                </el-col>                
+                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
+                  <el-form-item label="1男 2女" prop="sex">
+                    <el-select filterable v-model="tableData.param.sex" placeholder="请选择1男 2女" clearable style="width:200px;">
                         <el-option label="请选择字典生成" value="" />
                     </el-select>
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="详情配图" prop="images">
-                    <el-select filterable v-model="tableData.param.images" placeholder="请选择详情配图" clearable style="width:200px;">
+                  <el-form-item label="1正常 2拉黑冻结" prop="status">
+                    <el-select filterable v-model="tableData.param.status" placeholder="请选择1正常 2拉黑冻结" clearable style="width:200px;">
                         <el-option label="请选择字典生成" value="" />
                     </el-select>
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="价格(分)" prop="price">
+                  <el-form-item label="个性签名" prop="sign">
                     <el-input
-                        v-model="tableData.param.price"
-                        placeholder="请输入价格(分)"
+                        v-model="tableData.param.sign"
+                        placeholder="请输入个性签名"
                         clearable                        
-                        @keyup.enter.native="goodsInfoList"
+                        @keyup.enter.native="userInfoList"
                     />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="库存" prop="stock">
-                    <el-input
-                        v-model="tableData.param.stock"
-                        placeholder="请输入库存"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="销量" prop="sale">
-                    <el-input
-                        v-model="tableData.param.sale"
-                        placeholder="请输入销量"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="标签" prop="tags">
-                    <el-input
-                        v-model="tableData.param.tags"
-                        placeholder="请输入标签"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="排序 倒叙" prop="sort">
-                    <el-input
-                        v-model="tableData.param.sort"
-                        placeholder="请输入排序 倒叙"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="允许砍价" prop="enableBargain">
-                    <el-select filterable v-model="tableData.param.enableBargain" placeholder="请选择允许砍价" clearable style="width:200px;">
-                        <el-option
-                            v-for="dict in shop_bargain_switch"
-                            :key="dict.value"
-                            :label="dict.label"
-                            :value="dict.value"
-                        />
-                    </el-select>
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
@@ -125,7 +83,7 @@
                 </el-col>            
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
-                    <el-button type="primary"  @click="goodsInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button type="primary"  @click="userInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
                     <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
                     <el-button type="primary" link  @click="toggleSearch">
                         {{ word }}
@@ -141,7 +99,7 @@
                 <el-button
                   type="primary"
                   @click="handleAdd"
-                  v-auth="'api/v1/shop/goodsInfo/add'"
+                  v-auth="'api/v1/shop/userInfo/add'"
                 ><el-icon><ele-Plus /></el-icon>新增</el-button>
               </el-col>
               <el-col :span="1.5">
@@ -149,7 +107,7 @@
                   type="success"
                   :disabled="single"
                   @click="handleUpdate(null)"
-                  v-auth="'api/v1/shop/goodsInfo/edit'"
+                  v-auth="'api/v1/shop/userInfo/edit'"
                 ><el-icon><ele-Edit /></el-icon>修改</el-button>
               </el-col>
               <el-col :span="1.5">
@@ -157,49 +115,36 @@
                   type="danger"
                   :disabled="multiple"
                   @click="handleDelete(null)"
-                  v-auth="'api/v1/shop/goodsInfo/delete'"
+                  v-auth="'api/v1/shop/userInfo/delete'"
                 ><el-icon><ele-Delete /></el-icon>删除</el-button>
-              </el-col>            
+              </el-col>             
+             <el-col :span="1.5">
+                <el-button
+                        type="warning"
+                        @click="handleExport()"
+                        v-auth="'api/v1/shop/userInfo/export'"
+                ><el-icon><ele-Download /></el-icon>导出Excel</el-button>
+             </el-col>            
             </el-row>
         </div>
         <el-table v-loading="loading" :data="tableData.data" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />          
-          <el-table-column label="ID" align="center" prop="id"
+          <el-table-column label="" align="center" prop="id"
             min-width="150px"            
              />          
-          <el-table-column label="名字" align="center" prop="name"
+          <el-table-column label="用户名" align="center" prop="name"
             min-width="150px"            
              />          
-          <el-table-column align="center" label="主图"
-            min-width="150px"            
-            >
-            <template #default="scope">
-              <el-image
-                style="width: 150px; height: 50px"
-                v-if="!proxy.isEmpty(scope.row.picUrl)"
-                :src="proxy.getUpFileUrl(scope.row.picUrl)"
-                fit="contain"></el-image>
-            </template>
-          </el-table-column>          
-          <el-table-column label="详情配图" align="center" prop="images"
+          <el-table-column label="头像" align="center" prop="avatar"
             min-width="150px"            
              />          
-          <el-table-column label="价格(分)" align="center" prop="price"
+          <el-table-column label="1男 2女" align="center" prop="sex"
             min-width="150px"            
              />          
-          <el-table-column label="库存" align="center" prop="stock"
+          <el-table-column label="1正常 2拉黑冻结" align="center" prop="status"
             min-width="150px"            
              />          
-          <el-table-column label="销量" align="center" prop="sale"
-            min-width="150px"            
-             />          
-          <el-table-column label="标签" align="center" prop="tags"
-            min-width="150px"            
-             />          
-          <el-table-column label="排序 倒叙" align="center" prop="sort"
-            min-width="150px"            
-             />          
-          <el-table-column label="允许砍价" align="center" prop="enableBargain" :formatter="enableBargainFormat"
+          <el-table-column label="个性签名" align="center" prop="sign"
             min-width="150px"            
              />          
           <el-table-column label="" align="center" prop="createdAt"
@@ -215,19 +160,19 @@
                 type="primary"
                 link
                 @click="handleView(scope.row)"
-                v-auth="'api/v1/shop/goodsInfo/get'"
+                v-auth="'api/v1/shop/userInfo/get'"
               ><el-icon><ele-View /></el-icon>详情</el-button>              
               <el-button
                 type="primary"
                 link
                 @click="handleUpdate(scope.row)"
-                v-auth="'api/v1/shop/goodsInfo/edit'"
+                v-auth="'api/v1/shop/userInfo/edit'"
               ><el-icon><ele-EditPen /></el-icon>修改</el-button>
               <el-button
                 type="primary"
                 link
                 @click="handleDelete(scope.row)"
-                v-auth="'api/v1/shop/goodsInfo/delete'"
+                v-auth="'api/v1/shop/userInfo/delete'"
               ><el-icon><ele-DeleteFilled /></el-icon>删除</el-button>
             </template>
           </el-table-column>
@@ -237,19 +182,17 @@
             :total="tableData.total"
             v-model:page="tableData.param.pageNum"
             v-model:limit="tableData.param.pageSize"
-            @pagination="goodsInfoList"
+            @pagination="userInfoList"
         />
     </el-card>
-    <ApiV1ShopGoodsInfoEdit
+    <ApiV1ShopUserInfoEdit
        ref="editRef"       
-       :enableBargainOptions="shop_bargain_switch"       
-       @goodsInfoList="goodsInfoList"
-    ></ApiV1ShopGoodsInfoEdit>
-    <ApiV1ShopGoodsInfoDetail
+       @userInfoList="userInfoList"
+    ></ApiV1ShopUserInfoEdit>
+    <ApiV1ShopUserInfoDetail
       ref="detailRef"      
-      :enableBargainOptions="shop_bargain_switch"      
-      @goodsInfoList="goodsInfoList"
-    ></ApiV1ShopGoodsInfoDetail>    
+      @userInfoList="userInfoList"
+    ></ApiV1ShopUserInfoDetail>    
   </div>
 </template>
 <script setup lang="ts">
@@ -257,20 +200,21 @@ import {ItemOptions} from "/@/api/items";
 import {toRefs, reactive, onMounted, ref, defineComponent, computed,getCurrentInstance,toRaw} from 'vue';
 import {ElMessageBox, ElMessage, FormInstance} from 'element-plus';
 import {
-    listGoodsInfo,
-    getGoodsInfo,
-    delGoodsInfo,
-    addGoodsInfo,
-    updateGoodsInfo,    
-} from "/@/api/shop/goodsInfo";
+    listUserInfo,
+    getUserInfo,
+    delUserInfo,
+    addUserInfo,
+    updateUserInfo,    
+} from "/@/api/shop/userInfo";
 import {
-    GoodsInfoTableColumns,
-    GoodsInfoInfoData,
-    GoodsInfoTableDataState,    
-} from "/@/views/shop/goodsInfo/list/component/model"
-import ApiV1ShopGoodsInfoEdit from "/@/views/shop/goodsInfo/list/component/edit.vue"
-import ApiV1ShopGoodsInfoDetail from "/@/views/shop/goodsInfo/list/component/detail.vue"
-defineOptions({ name: "apiV1ShopGoodsInfoList"})
+    UserInfoTableColumns,
+    UserInfoInfoData,
+    UserInfoTableDataState,    
+} from "/@/views/shop/userInfo/list/component/model"
+import ApiV1ShopUserInfoEdit from "/@/views/shop/userInfo/list/component/edit.vue"
+import ApiV1ShopUserInfoDetail from "/@/views/shop/userInfo/list/component/detail.vue"
+import {downLoadXml} from "/@/utils/zipdownload";
+defineOptions({ name: "apiV1ShopUserInfoList"})
 const {proxy} = <any>getCurrentInstance()
 const loading = ref(false)
 const queryRef = ref()
@@ -292,11 +236,9 @@ const word = computed(()=>{
 })
 // 字典选项数据
 const {    
-    shop_bargain_switch,    
 } = proxy.useDict(    
-    'shop_bargain_switch',    
 )
-const state = reactive<GoodsInfoTableDataState>({
+const state = reactive<UserInfoTableDataState>({
     ids:[],
     tableData: {
         data: [],
@@ -307,14 +249,10 @@ const state = reactive<GoodsInfoTableDataState>({
             pageSize: 10,            
             id: undefined,            
             name: undefined,            
-            picUrl: undefined,            
-            images: undefined,            
-            price: undefined,            
-            stock: undefined,            
-            sale: undefined,            
-            tags: undefined,            
-            sort: undefined,            
-            enableBargain: undefined,            
+            avatar: undefined,            
+            sex: undefined,            
+            status: undefined,            
+            sign: undefined,            
             createdAt: undefined,            
             dateRange: []
         },
@@ -327,18 +265,18 @@ onMounted(() => {
 });
 // 初始化表格数据
 const initTableData = () => {    
-    goodsInfoList()
+    userInfoList()
 };
 /** 重置按钮操作 */
 const resetQuery = (formEl: FormInstance | undefined) => {
     if (!formEl) return
     formEl.resetFields()
-    goodsInfoList()
+    userInfoList()
 };
 // 获取列表数据
-const goodsInfoList = ()=>{
+const userInfoList = ()=>{
   loading.value = true
-  listGoodsInfo(state.tableData.param).then((res:any)=>{
+  listUserInfo(state.tableData.param).then((res:any)=>{
     let list = res.data.list??[];    
     state.tableData.data = list;
     state.tableData.total = res.data.total;
@@ -348,12 +286,8 @@ const goodsInfoList = ()=>{
 const toggleSearch = () => {
     showAll.value = !showAll.value;
 }
-// 允许砍价字典翻译
-const enableBargainFormat = (row:GoodsInfoTableColumns) => {
-    return proxy.selectDictLabel(shop_bargain_switch.value, row.enableBargain);
-}
 // 多选框选中数据
-const handleSelectionChange = (selection:Array<GoodsInfoInfoData>) => {
+const handleSelectionChange = (selection:Array<UserInfoInfoData>) => {
     state.ids = selection.map(item => item.id)
     single.value = selection.length!=1
     multiple.value = !selection.length
@@ -361,15 +295,15 @@ const handleSelectionChange = (selection:Array<GoodsInfoInfoData>) => {
 const handleAdd =  ()=>{
     editRef.value.openDialog()
 }
-const handleUpdate = (row: GoodsInfoTableColumns|null) => {
+const handleUpdate = (row: UserInfoTableColumns|null) => {
     if(!row){
-        row = state.tableData.data.find((item:GoodsInfoTableColumns)=>{
+        row = state.tableData.data.find((item:UserInfoTableColumns)=>{
             return item.id ===state.ids[0]
-        }) as GoodsInfoTableColumns
+        }) as UserInfoTableColumns
     }
     editRef.value.openDialog(toRaw(row));
 };
-const handleDelete = (row: GoodsInfoTableColumns|null) => {
+const handleDelete = (row: UserInfoTableColumns|null) => {
     let msg = '你确定要删除所选数据？';
     let id:number[] = [] ;
     if(row){
@@ -388,15 +322,19 @@ const handleDelete = (row: GoodsInfoTableColumns|null) => {
         type: 'warning',
     })
         .then(() => {
-            delGoodsInfo(id).then(()=>{
+            delUserInfo(id).then(()=>{
                 ElMessage.success('删除成功');
-                goodsInfoList();
+                userInfoList();
             })
         })
         .catch(() => {});
 }
-const handleView = (row:GoodsInfoTableColumns)=>{
+const handleView = (row:UserInfoTableColumns)=>{
     detailRef.value.openDialog(toRaw(row));
+}
+//导出excel
+const handleExport = ()=>{
+    downLoadXml('/api/v1/shop/userInfo/export',state.tableData.param,'get')
 }
 </script>
 <style lang="scss" scoped>

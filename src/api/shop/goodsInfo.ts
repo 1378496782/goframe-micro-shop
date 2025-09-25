@@ -43,10 +43,3 @@ export function delGoodsInfo(ids:number[]) {
     }
   })
 }
-//相关连表查询数据
-export function linkedDataSearch(){
-  return request({
-    url: '/api/v1/shop/goodsInfo/linkedData',
-    method: 'get'
-  })
-}
