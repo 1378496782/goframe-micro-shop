@@ -1,7 +1,7 @@
 <template>
-  <div class="shop-goodsInfo-container">
+  <div class="shop-rotationInfo-container">
     <el-card shadow="hover">
-        <div class="shop-goodsInfo-search mb15">
+        <div class="shop-rotationInfo-search mb15">
             <el-form :model="tableData.param" ref="queryRef" :inline="true" label-width="100px">
             <el-row>                
                 <el-col :span="8" class="colBlock">
@@ -10,23 +10,20 @@
                         v-model="tableData.param.id"
                         placeholder="请输入ID"
                         clearable                        
-                        @keyup.enter.native="goodsInfoList"
+                        @keyup.enter.native="rotationInfoList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" class="colBlock">
-                  <el-form-item label="名字" prop="name">
-                    <el-input
-                        v-model="tableData.param.name"
-                        placeholder="请输入名字"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
+                  <el-form-item label="图片" prop="picUrl">
+                    <el-select filterable v-model="tableData.param.picUrl" placeholder="请选择图片" clearable style="width:200px;">
+                        <el-option label="请选择字典生成" value="" />
+                    </el-select>
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="!showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
-                    <el-button type="primary"  @click="goodsInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button type="primary"  @click="rotationInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
                     <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
                     <el-button type="primary" link  @click="toggleSearch">
                       {{ word }}
@@ -36,96 +33,40 @@
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="主图" prop="picUrl">
-                    <el-select filterable v-model="tableData.param.picUrl" placeholder="请选择主图" clearable style="width:200px;">
-                        <el-option label="请选择字典生成" value="" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="详情配图" prop="images">
-                    <el-select filterable v-model="tableData.param.images" placeholder="请选择详情配图" clearable style="width:200px;">
-                        <el-option label="请选择字典生成" value="" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="价格(分)" prop="price">
+                  <el-form-item label="跳转链接" prop="link">
                     <el-input
-                        v-model="tableData.param.price"
-                        placeholder="请输入价格(分)"
+                        v-model="tableData.param.link"
+                        placeholder="请输入跳转链接"
                         clearable                        
-                        @keyup.enter.native="goodsInfoList"
+                        @keyup.enter.native="rotationInfoList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="库存" prop="stock">
-                    <el-input
-                        v-model="tableData.param.stock"
-                        placeholder="请输入库存"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="销量" prop="sale">
-                    <el-input
-                        v-model="tableData.param.sale"
-                        placeholder="请输入销量"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="标签" prop="tags">
-                    <el-input
-                        v-model="tableData.param.tags"
-                        placeholder="请输入标签"
-                        clearable                        
-                        @keyup.enter.native="goodsInfoList"
-                    />                    
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="排序 倒叙" prop="sort">
+                  <el-form-item label="排序字段" prop="sort">
                     <el-input
                         v-model="tableData.param.sort"
-                        placeholder="请输入排序 倒叙"
+                        placeholder="请输入排序字段"
                         clearable                        
-                        @keyup.enter.native="goodsInfoList"
+                        @keyup.enter.native="rotationInfoList"
                     />                    
                   </el-form-item>
                 </el-col>                
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="允许砍价" prop="enableBargain">
-                    <el-select filterable v-model="tableData.param.enableBargain" placeholder="请选择允许砍价" clearable style="width:200px;">
-                        <el-option
-                            v-for="dict in shop_bargain_switch"
-                            :key="dict.value"
-                            :label="dict.label"
-                            :value="dict.value"
-                        />
-                    </el-select>
-                  </el-form-item>
-                </el-col>                
-                <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
-                  <el-form-item label="" prop="createdAt">
+                  <el-form-item label="创建时间" prop="createdAt">
                     <el-date-picker
                         clearable  style="width: 200px"
                         v-model="tableData.param.createdAt"
                         format="YYYY-MM-DD HH:mm:ss"
                         value-format="YYYY-MM-DD HH:mm:ss"                    
                         type="datetime"
-                        placeholder="选择"                    
+                        placeholder="选择创建时间"                    
                     ></el-date-picker>
                   </el-form-item>
                 </el-col>            
                 <el-col :span="8" :class="showAll ? 'colBlock' : 'colNone'">
                   <el-form-item>
-                    <el-button type="primary"  @click="goodsInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
+                    <el-button type="primary"  @click="rotationInfoList"><el-icon><ele-Search /></el-icon>搜索</el-button>
                     <el-button  @click="resetQuery(queryRef)"><el-icon><ele-Refresh /></el-icon>重置</el-button>
                     <el-button type="primary" link  @click="toggleSearch">
                         {{ word }}
@@ -141,7 +82,7 @@
                 <el-button
                   type="primary"
                   @click="handleAdd"
-                  v-auth="'api/v1/shop/goodsInfo/add'"
+                  v-auth="'api/v1/shop/rotationInfo/add'"
                 ><el-icon><ele-Plus /></el-icon>新增</el-button>
               </el-col>
               <el-col :span="1.5">
@@ -149,7 +90,7 @@
                   type="success"
                   :disabled="single"
                   @click="handleUpdate(null)"
-                  v-auth="'api/v1/shop/goodsInfo/edit'"
+                  v-auth="'api/v1/shop/rotationInfo/edit'"
                 ><el-icon><ele-Edit /></el-icon>修改</el-button>
               </el-col>
               <el-col :span="1.5">
@@ -157,7 +98,7 @@
                   type="danger"
                   :disabled="multiple"
                   @click="handleDelete(null)"
-                  v-auth="'api/v1/shop/goodsInfo/delete'"
+                  v-auth="'api/v1/shop/rotationInfo/delete'"
                 ><el-icon><ele-Delete /></el-icon>删除</el-button>
               </el-col>            
             </el-row>
@@ -167,10 +108,7 @@
           <el-table-column label="ID" align="center" prop="id"
             min-width="150px"            
              />          
-          <el-table-column label="名字" align="center" prop="name"
-            min-width="150px"            
-             />          
-          <el-table-column align="center" label="主图"
+          <el-table-column align="center" label="图片"
             min-width="150px"            
             >
             <template #default="scope">
@@ -181,28 +119,13 @@
                 fit="contain"></el-image>
             </template>
           </el-table-column>          
-          <el-table-column label="详情配图" align="center" prop="images"
+          <el-table-column label="跳转链接" align="center" prop="link"
             min-width="150px"            
              />          
-          <el-table-column label="价格(分)" align="center" prop="price"
+          <el-table-column label="排序字段" align="center" prop="sort"
             min-width="150px"            
              />          
-          <el-table-column label="库存" align="center" prop="stock"
-            min-width="150px"            
-             />          
-          <el-table-column label="销量" align="center" prop="sale"
-            min-width="150px"            
-             />          
-          <el-table-column label="标签" align="center" prop="tags"
-            min-width="150px"            
-             />          
-          <el-table-column label="排序 倒叙" align="center" prop="sort"
-            min-width="150px"            
-             />          
-          <el-table-column label="允许砍价" align="center" prop="enableBargain" :formatter="enableBargainFormat"
-            min-width="150px"            
-             />          
-          <el-table-column label="" align="center" prop="createdAt"
+          <el-table-column label="创建时间" align="center" prop="createdAt"
             min-width="150px"            
             >
             <template #default="scope">
@@ -215,19 +138,19 @@
                 type="primary"
                 link
                 @click="handleView(scope.row)"
-                v-auth="'api/v1/shop/goodsInfo/get'"
+                v-auth="'api/v1/shop/rotationInfo/get'"
               ><el-icon><ele-View /></el-icon>详情</el-button>              
               <el-button
                 type="primary"
                 link
                 @click="handleUpdate(scope.row)"
-                v-auth="'api/v1/shop/goodsInfo/edit'"
+                v-auth="'api/v1/shop/rotationInfo/edit'"
               ><el-icon><ele-EditPen /></el-icon>修改</el-button>
               <el-button
                 type="primary"
                 link
                 @click="handleDelete(scope.row)"
-                v-auth="'api/v1/shop/goodsInfo/delete'"
+                v-auth="'api/v1/shop/rotationInfo/delete'"
               ><el-icon><ele-DeleteFilled /></el-icon>删除</el-button>
             </template>
           </el-table-column>
@@ -237,19 +160,17 @@
             :total="tableData.total"
             v-model:page="tableData.param.pageNum"
             v-model:limit="tableData.param.pageSize"
-            @pagination="goodsInfoList"
+            @pagination="rotationInfoList"
         />
     </el-card>
-    <ApiV1ShopGoodsInfoEdit
+    <ApiV1ShopRotationInfoEdit
        ref="editRef"       
-       :enableBargainOptions="shop_bargain_switch"       
-       @goodsInfoList="goodsInfoList"
-    ></ApiV1ShopGoodsInfoEdit>
-    <ApiV1ShopGoodsInfoDetail
+       @rotationInfoList="rotationInfoList"
+    ></ApiV1ShopRotationInfoEdit>
+    <ApiV1ShopRotationInfoDetail
       ref="detailRef"      
-      :enableBargainOptions="shop_bargain_switch"      
-      @goodsInfoList="goodsInfoList"
-    ></ApiV1ShopGoodsInfoDetail>    
+      @rotationInfoList="rotationInfoList"
+    ></ApiV1ShopRotationInfoDetail>    
   </div>
 </template>
 <script setup lang="ts">
@@ -257,20 +178,20 @@ import {ItemOptions} from "/@/api/items";
 import {toRefs, reactive, onMounted, ref, defineComponent, computed,getCurrentInstance,toRaw} from 'vue';
 import {ElMessageBox, ElMessage, FormInstance} from 'element-plus';
 import {
-    listGoodsInfo,
-    getGoodsInfo,
-    delGoodsInfo,
-    addGoodsInfo,
-    updateGoodsInfo,    
-} from "/@/api/shop/goodsInfo";
+    listRotationInfo,
+    getRotationInfo,
+    delRotationInfo,
+    addRotationInfo,
+    updateRotationInfo,    
+} from "/@/api/shop/rotationInfo";
 import {
-    GoodsInfoTableColumns,
-    GoodsInfoInfoData,
-    GoodsInfoTableDataState,    
-} from "/@/views/shop/goodsInfo/list/component/model"
-import ApiV1ShopGoodsInfoEdit from "/@/views/shop/goodsInfo/list/component/edit.vue"
-import ApiV1ShopGoodsInfoDetail from "/@/views/shop/goodsInfo/list/component/detail.vue"
-defineOptions({ name: "apiV1ShopGoodsInfoList"})
+    RotationInfoTableColumns,
+    RotationInfoInfoData,
+    RotationInfoTableDataState,    
+} from "/@/views/shop/rotationInfo/list/component/model"
+import ApiV1ShopRotationInfoEdit from "/@/views/shop/rotationInfo/list/component/edit.vue"
+import ApiV1ShopRotationInfoDetail from "/@/views/shop/rotationInfo/list/component/detail.vue"
+defineOptions({ name: "apiV1ShopRotationInfoList"})
 const {proxy} = <any>getCurrentInstance()
 const loading = ref(false)
 const queryRef = ref()
@@ -292,11 +213,9 @@ const word = computed(()=>{
 })
 // 字典选项数据
 const {    
-    shop_bargain_switch,    
 } = proxy.useDict(    
-    'shop_bargain_switch',    
 )
-const state = reactive<GoodsInfoTableDataState>({
+const state = reactive<RotationInfoTableDataState>({
     ids:[],
     tableData: {
         data: [],
@@ -306,15 +225,9 @@ const state = reactive<GoodsInfoTableDataState>({
             pageNum: 1,
             pageSize: 10,            
             id: undefined,            
-            name: undefined,            
             picUrl: undefined,            
-            images: undefined,            
-            price: undefined,            
-            stock: undefined,            
-            sale: undefined,            
-            tags: undefined,            
+            link: undefined,            
             sort: undefined,            
-            enableBargain: undefined,            
             createdAt: undefined,            
             dateRange: []
         },
@@ -327,18 +240,18 @@ onMounted(() => {
 });
 // 初始化表格数据
 const initTableData = () => {    
-    goodsInfoList()
+    rotationInfoList()
 };
 /** 重置按钮操作 */
 const resetQuery = (formEl: FormInstance | undefined) => {
     if (!formEl) return
     formEl.resetFields()
-    goodsInfoList()
+    rotationInfoList()
 };
 // 获取列表数据
-const goodsInfoList = ()=>{
+const rotationInfoList = ()=>{
   loading.value = true
-  listGoodsInfo(state.tableData.param).then((res:any)=>{
+  listRotationInfo(state.tableData.param).then((res:any)=>{
     let list = res.data.list??[];    
     state.tableData.data = list;
     state.tableData.total = res.data.total;
@@ -348,12 +261,8 @@ const goodsInfoList = ()=>{
 const toggleSearch = () => {
     showAll.value = !showAll.value;
 }
-// 允许砍价字典翻译
-const enableBargainFormat = (row:GoodsInfoTableColumns) => {
-    return proxy.selectDictLabel(shop_bargain_switch.value, row.enableBargain);
-}
 // 多选框选中数据
-const handleSelectionChange = (selection:Array<GoodsInfoInfoData>) => {
+const handleSelectionChange = (selection:Array<RotationInfoInfoData>) => {
     state.ids = selection.map(item => item.id)
     single.value = selection.length!=1
     multiple.value = !selection.length
@@ -361,15 +270,15 @@ const handleSelectionChange = (selection:Array<GoodsInfoInfoData>) => {
 const handleAdd =  ()=>{
     editRef.value.openDialog()
 }
-const handleUpdate = (row: GoodsInfoTableColumns|null) => {
+const handleUpdate = (row: RotationInfoTableColumns|null) => {
     if(!row){
-        row = state.tableData.data.find((item:GoodsInfoTableColumns)=>{
+        row = state.tableData.data.find((item:RotationInfoTableColumns)=>{
             return item.id ===state.ids[0]
-        }) as GoodsInfoTableColumns
+        }) as RotationInfoTableColumns
     }
     editRef.value.openDialog(toRaw(row));
 };
-const handleDelete = (row: GoodsInfoTableColumns|null) => {
+const handleDelete = (row: RotationInfoTableColumns|null) => {
     let msg = '你确定要删除所选数据？';
     let id:number[] = [] ;
     if(row){
@@ -388,14 +297,14 @@ const handleDelete = (row: GoodsInfoTableColumns|null) => {
         type: 'warning',
     })
         .then(() => {
-            delGoodsInfo(id).then(()=>{
+            delRotationInfo(id).then(()=>{
                 ElMessage.success('删除成功');
-                goodsInfoList();
+                rotationInfoList();
             })
         })
         .catch(() => {});
 }
-const handleView = (row:GoodsInfoTableColumns)=>{
+const handleView = (row:RotationInfoTableColumns)=>{
     detailRef.value.openDialog(toRaw(row));
 }
 </script>

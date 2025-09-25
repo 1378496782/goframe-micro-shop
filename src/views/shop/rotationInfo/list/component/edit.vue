@@ -1,15 +1,12 @@
 <template>  
-  <div class="shop-goodsInfo-edit">
-    <!-- 添加或修改商品对话框 -->
+  <div class="shop-rotationInfo-edit">
+    <!-- 添加或修改轮播图对话框 -->
     <el-dialog v-model="isShowDialog" width="800px" :close-on-click-modal="false" :destroy-on-close="true">
       <template #header>
-        <div v-drag="['.shop-goodsInfo-edit .el-dialog', '.shop-goodsInfo-edit .el-dialog__header']">{{(!formData.id || formData.id==0?'添加':'修改')+'商品'}}</div>
+        <div v-drag="['.shop-rotationInfo-edit .el-dialog', '.shop-rotationInfo-edit .el-dialog__header']">{{(!formData.id || formData.id==0?'添加':'修改')+'轮播图'}}</div>
       </template>
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px">        
-        <el-form-item label="名字" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入名字" />
-        </el-form-item>        
-        <el-form-item label="主图" prop="picUrl">
+        <el-form-item label="图片" prop="picUrl">
           <el-upload
             v-loading="upLoadingPicUrl"
             :action="baseURL+'api/v1/system/upload/singleImg'"
@@ -29,33 +26,11 @@
             <el-icon v-else class="avatar-uploader-icon"><ele-Plus /></el-icon>
           </el-upload>
         </el-form-item>        
-        <el-form-item label="详情配图" prop="images" >
-          <upload-img :action="baseURL+'api/v1/system/upload/singleImg'" v-model="formData.images" :limit="10"></upload-img>
+        <el-form-item label="跳转链接" prop="link">
+          <el-input v-model="formData.link" placeholder="请输入跳转链接" />
         </el-form-item>        
-        <el-form-item label="价格(分)" prop="price">
-          <el-input v-model="formData.price" placeholder="请输入价格(分)" />
-        </el-form-item>        
-        <el-form-item label="库存" prop="stock">
-          <el-input v-model="formData.stock" placeholder="请输入库存" />
-        </el-form-item>        
-        <el-form-item label="销量" prop="sale">
-          <el-input v-model="formData.sale" placeholder="请输入销量" />
-        </el-form-item>        
-        <el-form-item label="标签" prop="tags">
-          <el-input v-model="formData.tags" placeholder="请输入标签" />
-        </el-form-item>        
-        <el-form-item label="排序 倒叙" prop="sort">
-          <el-input v-model="formData.sort" placeholder="请输入排序 倒叙" />
-        </el-form-item>          
-        <el-form-item label="允许砍价" prop="enableBargain">
-          <el-select filterable clearable v-model="formData.enableBargain" placeholder="请选择允许砍价" >
-            <el-option
-              v-for="dict in enableBargainOptions"
-              :key="dict.value"
-              :label="dict.label"              
-                  :value="dict.value"              
-            ></el-option>
-          </el-select>
+        <el-form-item label="排序字段" prop="sort">
+          <el-input v-model="formData.sort" placeholder="请输入排序字段" />
         </el-form-item>       
       </el-form>
       <template #footer>
@@ -71,28 +46,21 @@
 import { reactive, toRefs, ref,unref,getCurrentInstance,computed } from 'vue';
 import {ElMessageBox, ElMessage, FormInstance,UploadProps} from 'element-plus';
 import {
-  listGoodsInfo,
-  getGoodsInfo,
-  delGoodsInfo,
-  addGoodsInfo,
-  updateGoodsInfo,  
-} from "/@/api/shop/goodsInfo";
+  listRotationInfo,
+  getRotationInfo,
+  delRotationInfo,
+  addRotationInfo,
+  updateRotationInfo,  
+} from "/@/api/shop/rotationInfo";
 import {getToken} from "/@/utils/gfast"
-import uploadImg from "/@/components/uploadImg/index.vue"
 import {
-  GoodsInfoTableColumns,
-  GoodsInfoInfoData,
-  GoodsInfoTableDataState,
-  GoodsInfoEditState
-} from "/@/views/shop/goodsInfo/list/component/model"
-defineOptions({ name: "ApiV1ShopGoodsInfoEdit"})
-const emit = defineEmits(['goodsInfoList'])
-  const props = defineProps({    
-    enableBargainOptions:{
-      type:Array,
-      default:()=>[]
-    },    
-  })
+  RotationInfoTableColumns,
+  RotationInfoInfoData,
+  RotationInfoTableDataState,
+  RotationInfoEditState
+} from "/@/views/shop/rotationInfo/list/component/model"
+defineOptions({ name: "ApiV1ShopRotationInfoEdit"})
+const emit = defineEmits(['rotationInfoList'])
 const baseURL:string|undefined|boolean = import.meta.env.VITE_API_URL
 const {proxy} = <any>getCurrentInstance()
 const formRef = ref<HTMLElement | null>(null);
@@ -101,25 +69,14 @@ const menuRef = ref();
 const imageUrlPicUrl = ref('')
 //上传加载
 const upLoadingPicUrl = ref(false)
-const state = reactive<GoodsInfoEditState>({
+const state = reactive<RotationInfoEditState>({
   loading:false,
   isShowDialog: false,
   formData: {    
     id: undefined,    
-    name: undefined,    
     picUrl: undefined,    
-    images: [] ,    
-    price: undefined,    
-    level1CategoryId: undefined,    
-    level2CategoryId: undefined,    
-    level3CategoryId: undefined,    
-    brand: undefined,    
-    stock: undefined,    
-    sale: undefined,    
-    tags: undefined,    
+    link: undefined,    
     sort: undefined,    
-    detailInfo: undefined,    
-    enableBargain: undefined,    
     createdAt: undefined,    
     updatedAt: undefined,    
     deletedAt: undefined,    
@@ -129,28 +86,17 @@ const state = reactive<GoodsInfoEditState>({
     id : [
         { required: true, message: "ID不能为空", trigger: "blur" }
     ],    
-    name : [
-        { required: true, message: "名字不能为空", trigger: "blur" }
-    ],    
-    price : [
-        { required: true, message: "价格(分)不能为空", trigger: "blur" }
-    ],    
-    level1CategoryId : [
-        { required: true, message: "1级分类id不能为空", trigger: "blur" }
-    ],    
   }
 });
 const { loading,isShowDialog,formData,rules } = toRefs(state);
 // 打开弹窗
-const openDialog = (row?: GoodsInfoInfoData) => {
+const openDialog = (row?: RotationInfoInfoData) => {
   resetForm();
   if(row) {
-    getGoodsInfo(row.id!).then((res:any)=>{
+    getRotationInfo(row.id!).then((res:any)=>{
       const data = res.data;      
       //单图地址赋值
       imageUrlPicUrl.value = data.picUrl ? proxy.getUpFileUrl(data.picUrl) : ''      
-      data.images =data.images?JSON.parse(data.images) : []      
-      data.enableBargain = ''+data.enableBargain      
       state.formData = data;
   })
 }
@@ -176,19 +122,19 @@ const onSubmit = () => {
       state.loading = true;
       if(!state.formData.id || state.formData.id===0){
         //添加
-      addGoodsInfo(state.formData).then(()=>{
+      addRotationInfo(state.formData).then(()=>{
           ElMessage.success('添加成功');
           closeDialog(); // 关闭弹窗
-          emit('goodsInfoList')
+          emit('rotationInfoList')
         }).finally(()=>{
           state.loading = false;
         })
       }else{
         //修改
-      updateGoodsInfo(state.formData).then(()=>{
+      updateRotationInfo(state.formData).then(()=>{
           ElMessage.success('修改成功');
           closeDialog(); // 关闭弹窗
-          emit('goodsInfoList')
+          emit('rotationInfoList')
         }).finally(()=>{
           state.loading = false;
         })
@@ -199,27 +145,16 @@ const onSubmit = () => {
 const resetForm = ()=>{
   state.formData = {    
     id: undefined,    
-    name: undefined,    
     picUrl: undefined,    
-    images: [] ,    
-    price: undefined,    
-    level1CategoryId: undefined,    
-    level2CategoryId: undefined,    
-    level3CategoryId: undefined,    
-    brand: undefined,    
-    stock: undefined,    
-    sale: undefined,    
-    tags: undefined,    
+    link: undefined,    
     sort: undefined,    
-    detailInfo: undefined,    
-    enableBargain: undefined,    
     createdAt: undefined,    
     updatedAt: undefined,    
     deletedAt: undefined,    
   }  
   imageUrlPicUrl.value = ''  
 };
-//单图上传主图
+//单图上传图片
 const handleAvatarSuccessPicUrl:UploadProps['onSuccess'] = (res, file) => {
   if (res.code === 0) {
     imageUrlPicUrl.value = URL.createObjectURL(file.raw!)
@@ -242,12 +177,12 @@ const deleteImageUrlPicUrl = ()=>{
 }
 </script>
 <style scoped>  
-  .shop-goodsInfo-edit :deep(.avatar-uploader .avatar) {
+  .shop-rotationInfo-edit :deep(.avatar-uploader .avatar) {
     width: 178px;
     height: 178px;
     display: block;
   }
-  .shop-goodsInfo-edit :deep(.avatar-uploader .el-upload) {
+  .shop-rotationInfo-edit :deep(.avatar-uploader .el-upload) {
     border: 1px dashed var(--el-border-color);
     border-radius: 6px;
     cursor: pointer;
@@ -255,10 +190,10 @@ const deleteImageUrlPicUrl = ()=>{
     overflow: hidden;
     transition: var(--el-transition-duration-fast);
   }
-  .shop-goodsInfo-edit :deep(.avatar-uploader .el-upload:hover) {
+  .shop-rotationInfo-edit :deep(.avatar-uploader .el-upload:hover) {
     border-color: var(--el-color-primary);
   }
-  .shop-goodsInfo-edit :deep(.el-icon.avatar-uploader-icon) {
+  .shop-rotationInfo-edit :deep(.el-icon.avatar-uploader-icon) {
     font-size: 28px;
     color: #8c939d;
     width: 178px;
