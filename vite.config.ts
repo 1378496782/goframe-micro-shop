@@ -44,22 +44,22 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 			},
 		},
 		build: {
-			outDir: 'dist',
-			chunkSizeWarningLimit: 1500,
-			rollupOptions: {
-				output: {
-					chunkFileNames: 'assets/js/[name]-[hash].js',
-					entryFileNames: 'assets/js/[name]-[hash].js',
-					assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
-					manualChunks(id) {
-						if (id.includes('node_modules')) {
-							return id.toString().match(/\/node_modules\/(?!.pnpm)(?<moduleName>[^\/]*)\//)?.groups!.moduleName ?? 'vender';
-						}
-					},
+		outDir: 'dist',
+		chunkSizeWarningLimit: 1500,
+		rollupOptions: {
+			output: {
+				chunkFileNames: 'assets/js/[name]-[hash].js',
+				entryFileNames: 'assets/js/[name]-[hash].js',
+				assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+				manualChunks(id) {
+					if (id.includes('node_modules')) {
+						return id.toString().match(/\/node_modules\/(?!.pnpm)(?<moduleName>[^\/]*)\//)?.groups!.moduleName ?? 'vender';
+					}
 				},
-				...(VITE_OPEN_CDN === 'true' ? { external: buildConfig.external } : {}),
 			},
+			...(VITE_OPEN_CDN === 'true' ? { external: buildConfig.external } : {}),
 		},
+	},
 		css: { preprocessorOptions: { css: { charset: false },scss:{api:"modern-compiler"} } },
 		define: {
 			__VUE_I18N_LEGACY_API__: JSON.stringify(false),
