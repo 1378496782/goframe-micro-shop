@@ -7,10 +7,12 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"shop-goframe-micro-service-refacotor/app/order/internal/cmd"
+	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 )
 
 func main() {
 	var ctx = gctx.New()
+	payment.InitWechatClient()
 	conf, err := g.Cfg().Get(ctx, "etcd.address")
 	if err != nil {
 		panic(err)

@@ -303,12 +303,12 @@ func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
 		"status":     status,
 		"updated_at": gtime.Now(),
 	}
-	
+
 	// 只有当订单状态变为已支付(2)时才设置支付时间
 	if status == 2 {
 		updateData["pay_at"] = gtime.Now()
 	}
-	
+
 	_, err := dao.OrderInfo.Ctx(ctx).Where("id", orderId).Update(updateData)
 	if err != nil {
 		return fmt.Errorf("更新订单状态失败: %v", err)
@@ -343,4 +343,15 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 	}
 
 	return nil
+}
+
+func IdempotentCheck(ctx context.Context, orderId int) (bool, error) {
+	exists, err := dao.OrderInfo.Ctx(ctx).
+		Where("id", orderId).
+		Where("status", 2).
+		Exist()
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
