@@ -27,20 +27,20 @@ Page({
         api.getGroupBuyProducts({ page: 1, size: 5 })
       ])
       
-      if (bannersRes.code === 0) {
+      if (bannersRes.code === 0 && bannersRes.data?.list) {
         this.setData({
-          banners: bannersRes.data.list.map(item => ({
+          banners: bannersRes.data.list?.map(item => ({
             id: item.id,
             image: constants.IMAGE_BASE_URL + item.pic_url,
             url: item.link
           }))
         })
       }
-      
+       
 
-      if (productsRes.code === 0) {
+      if (productsRes.code === 0 && productsRes.data?.list) {
         // 格式化商品数据：价格转换和图片提取
-        const formattedProducts = productsRes.data.list.map(item => {
+        const formattedProducts = productsRes.data.list?.map(item => {
           // 处理图片URL，直接使用pic_url字段（已经是完整URL）
           let mainImage = '';
           if (item.pic_url) {
@@ -60,8 +60,8 @@ Page({
       }
 
       // 处理拼团砍价数据
-      if (groupBuyRes.code === 0) {
-        const formattedGroupBuy = groupBuyRes.data.list.map(item => ({
+      if (groupBuyRes.code === 0 && groupBuyRes.data?.list) {
+        const formattedGroupBuy = groupBuyRes.data.list?.map(item => ({
           ...item,
           groupPrice: (item.groupPrice / 100).toFixed(2),
           originalPrice: (item.originalPrice / 100).toFixed(2),
