@@ -11,20 +11,28 @@ const pathResolve = (dir: string) => {
 const alias: Record<string, string> = {
 	'/@': pathResolve('./src/'),
 	'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
+	'/@/views/demo/map2': pathResolve('./src/views/demo/map2.vue'),
 };
 
 const viteConfig = defineConfig((mode: ConfigEnv) => {
 	const env = loadEnv(mode.mode, process.cwd());
+	
+	// 安全地获取环境变量，提供默认值
+	const VITE_PORT = env.VITE_PORT || '8888';
+	const VITE_OPEN = env.VITE_OPEN || 'false';
+	const VITE_PUBLIC_PATH = env.VITE_PUBLIC_PATH || '/';
+	const VITE_OPEN_CDN = env.VITE_OPEN_CDN || 'false';
+	
 	return {
 		plugins: [vue(), viteCompression({disable:true})],
 		root: process.cwd(),
 		resolve: { alias },
-		base: mode.command === 'serve' ? './' : env.VITE_PUBLIC_PATH,
+		base: mode.command === 'serve' ? './' : VITE_PUBLIC_PATH,
 		optimizeDeps: { exclude: ['vue-demi'] },
 		server: {
 			host: '0.0.0.0',
-			port: env.VITE_PORT as unknown as number,
-			open: JSON.parse(env.VITE_OPEN),
+			port: parseInt(VITE_PORT),
+			open: VITE_OPEN === 'true',
 			hmr: true,
 			proxy: {
 				'/gitee': {
@@ -49,7 +57,7 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 						}
 					},
 				},
-				...(JSON.parse(env.VITE_OPEN_CDN) ? { external: buildConfig.external } : {}),
+				...(VITE_OPEN_CDN === 'true' ? { external: buildConfig.external } : {}),
 			},
 		},
 		css: { preprocessorOptions: { css: { charset: false },scss:{api:"modern-compiler"} } },
