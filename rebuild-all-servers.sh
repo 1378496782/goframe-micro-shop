@@ -73,12 +73,22 @@ SERVICES=(
 )
 
 log "步骤1: 检查当前服务状态"
-docker-compose -f docker-compose.prod.yml ps | tee -a "$LOG_FILE"
+# 尝试使用 docker compose（新版本）或 docker-compose（旧版本）
+if command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+elif docker compose version &> /dev/null; then
+    COMPOSE_CMD="docker compose"
+else
+    log "错误：未找到 docker-compose 或 docker compose 命令"
+    exit 1
+fi
+
+$COMPOSE_CMD -f docker-compose.prod.yml ps | tee -a "$LOG_FILE"
 
 log "步骤2: 停止本项目的服务（如果存在）"
 for service in "${SERVICES[@]}"; do
     log "停止 $service 服务..."
-    docker-compose -f docker-compose.prod.yml stop "$service" 2>/dev/null || log "$service 服务未运行"
+    $COMPOSE_CMD -f docker-compose.prod.yml stop "$service" 2>/dev/null || log "$service 服务未运行"
 done
 
 log "步骤3: 安全清理 - 只删除本项目相关的镜像"
@@ -103,7 +113,7 @@ BUILD_SUCCESS=true
 
 for service in "${SERVICES[@]}"; do
     log "构建 $service 服务..."
-    if docker-compose -f docker-compose.prod.yml build --no-cache "$service" 2>>"$LOG_FILE"; then
+    if $COMPOSE_CMD -f docker-compose.prod.yml build --no-cache "$service" 2>>"$LOG_FILE"; then
         log "✅ $service 服务构建成功"
     else
         log "❌ $service 服务构建失败"
@@ -116,7 +126,7 @@ if [ "$BUILD_SUCCESS" = true ]; then
     log "步骤5: 启动所有服务"
     for service in "${SERVICES[@]}"; do
         log "启动 $service 服务..."
-        if docker-compose -f docker-compose.prod.yml up -d --force-recreate "$service" 2>>"$LOG_FILE"; then
+        if $COMPOSE_CMD -f docker-compose.prod.yml up -d --force-recreate "$service" 2>>"$LOG_FILE"; then
             log "✅ $service 服务启动成功"
         else
             log "❌ $service 服务启动失败"
@@ -126,14 +136,26 @@ if [ "$BUILD_SUCCESS" = true ]; then
 fi
 
 log "步骤6: 等待服务启动..."
+
 sleep 10
 
 log "步骤7: 最终状态检查"
-docker-compose -f docker-compose.prod.yml ps | tee -a "$LOG_FILE"
+$COMPOSE_CMD -f docker-compose.prod.yml ps | tee -a "$LOG_FILE"
 
 log "步骤8: 检查服务端口"
 log "检查端口监听状态："
-netstat -an | grep -E ":(8199|8399|8808|80|443|31001|31002|31004|31005|8499|31006)" || log "端口检查完成"
+# 检查 netstat 或 ss 命令
+if command -v netstat &> /dev/null; then
+    PORT_CHECK_CMD="netstat -tulnp"
+elif command -v ss &> /dev/null; then
+    PORT_CHECK_CMD="ss -tulnp"
+else
+    log "警告：未找到 netstat 或 ss 命令，跳过端口检查"
+fi
+
+if [ -n "$PORT_CHECK_CMD" ]; then
+    $PORT_CHECK_CMD 2>/dev/null | grep -E ":(8199|8399|8808|80|443|31001|31002|31004|31005|8499|31006)" | tee -a "$LOG_FILE"
+fi
 
 # 总结
 echo ""
