@@ -212,10 +212,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31004/"]
+      test: ["CMD", "nc", "-z", "localhost", "31004"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   order-service:
     build: .
@@ -247,10 +248,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31005/"]
+      test: ["CMD", "nc", "-z", "localhost", "31005"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   user-service:
     build: .
@@ -280,10 +282,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31001/"]
+      test: ["CMD", "nc", "-z", "localhost", "31001"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   interaction-service:
     build: .
@@ -313,10 +316,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31002/"]
+      test: ["CMD", "nc", "-z", "localhost", "31002"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   search-service:
     build: .
@@ -348,10 +352,11 @@ services:
           memory: 1G
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8499/"]
+      test: ["CMD", "nc", "-z", "localhost", "8499"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   gateway-h5:
     build: .
@@ -401,8 +406,6 @@ services:
     depends_on:
       etcd:
         condition: service_healthy
-      mysql:
-        condition: service_healthy
     networks:
       - app-network
     restart: always
@@ -412,10 +415,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8399/"]
+      test: ["CMD", "nc", "-z", "localhost", "8399"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   banner-service:
     build: .
@@ -445,10 +449,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31006/"]
+      test: ["CMD", "nc", "-z", "localhost", "31006"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   # 管理后台服务
   manage-service:
@@ -517,7 +522,7 @@ services:
       - app-network
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
