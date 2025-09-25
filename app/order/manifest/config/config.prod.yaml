@@ -1,0 +1,43 @@
+grpc:
+  name: "order"
+  address: ":31005"
+  logger:
+    path: "./log"
+    file: "{Y-m-d}.log"
+    prefix: "order-service"
+    level: "all"
+    stdout: true
+    rotateSize: 104857600
+    rotateBackupLimit: 7
+    ctxKeys: [ "traceId" ]
+    timeFormat: "2006-01-02 15:04:05.000"
+
+database:
+  default:
+    link: "mysql:root:root@tcp(mysql:3306)/order"
+    debug: false
+
+etcd:
+  address: "etcd:2379"
+
+rabbitmq:
+  default:
+    host: "rabbitmq"
+    port: "5672"
+    user: "root"
+    password: "root"
+    vhost: "/"
+  exchange:
+    orderDelayExchange: "order.delay.exchange"
+    couponConfirmExchange: "coupon.confirm.exchange"
+    couponConfirmResultExchange: "coupon.confirm.result.exchange"
+  queue:
+    orderTimeoutQueue: "order.timeout.queue"
+    couponConfirmResultQueue: "coupon.confirm.result.queue"
+  routingKey:
+    orderTimeout: "order.timeout"
+    couponConfirm: "coupon.confirm.request"
+    couponConfirmResult: "coupon.confirm.result"
+
+business:
+  orderTimeout: 1800000
