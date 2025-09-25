@@ -72,3 +72,35 @@ type OrderGoodsItem struct {
 	CouponPrice    uint32 `json:"coupon_price" d:"0" dc:"商品优惠券金额"`
 	ActualPrice    uint32 `json:"actual_price" v:"required|min:0" dc:"商品实际支付金额"`
 }
+
+// PaymentReq 支付请求体
+type PaymentReq struct {
+	g.Meta  `path:"/payment" method:"post" tags:"订单管理" sm:"发起支付"`
+	OpenId  string `json:"openId" v:"required" dc:"用户登录凭证"`
+	Amount  int64  `json:"amount" v:"required" dc:"金额，单位为分"`
+	OrderId uint32 `json:"orderId" v:"required" dc:"订单Id"`
+}
+
+// PaymentRes 支付响应体
+type PaymentRes struct {
+	TimeStamp  string `json:"timeStamp" dc:"时间戳，单位秒，字符串格式"`
+	NonceStr   string `json:"nonceStr" dc:"随机字符串，防重放攻击"`
+	Package    string `json:"package" dc:"统一下单接口返回的预支付交易会话标识，格式为 prepay_id=***"`
+	SignType   string `json:"signType" dc:"签名类型，微信支付 v3 常用 RSA"`
+	PaySign    string `json:"paySign" dc:"支付签名，商户后端使用私钥生成"`
+	OutTradeNo string `json:"out_trade_no" dc:"商户订单号，用于后续查单、退款"`
+}
+
+// NotifyReq 回调请求体
+type NotifyReq struct {
+	g.Meta `path:"/notify" method:"post" tags:"订单管理" sm:"支付回调"`
+	// 注意：这些字段不由框架自动绑定（因为微信是 POST 原始 JSON），需要手动读取 body 并赋值
+	RawBody string            `json:"-" dc:"回调原始body（由框架手动读取）"`
+	Headers map[string]string `json:"-" dc:"回调请求头（由框架手动读取）"`
+}
+
+// NotifyRes 回调响应体
+type NotifyRes struct {
+	Code    string `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+}
