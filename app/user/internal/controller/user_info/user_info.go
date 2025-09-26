@@ -132,7 +132,7 @@ func (*Controller) GetUserInfo(ctx context.Context, req *v1.UserInfoReq) (res *v
 	}, nil
 }
 
-func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res *v1.UserInfoLoginRes, err error) {
+func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res *v1.WxMiniLoginRes, err error) {
 	// 发起授权
 	miniprogram := wechat.NewWechat().GetMiniProgram(&miniConfig.Config{
 		AppID:     g.Cfg().MustGet(nil, "wxMiniConf.appId").String(),
@@ -179,10 +179,11 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 	}
 
 	// 返回响应
-	return &v1.UserInfoLoginRes{
+	return &v1.WxMiniLoginRes{
 		Type:     "Bearer",
 		Token:    token,
 		ExpireIn: uint32(expireIn),
+		OpenId:   authResult.OpenID,
 		UserInfo: &v1.UserInfoBase{
 			Id:     uint32(userInfo.Id),
 			Name:   userInfo.Name,

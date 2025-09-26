@@ -36,7 +36,6 @@ var (
 						userController.UserInfoRegister,
 						userController.UserInfoLogin,
 						userController.WxMiniLogin,
-						orderController.Payment,
 						orderController.Notify,
 						goodsController.CategoryInfoGetAll,
 						goodsController.CategoryInfoGetList,
@@ -61,7 +60,12 @@ var (
 						goodsController.CartInfoDelete,
 						goodsController.UserCouponInfoGetList,
 						interactionController,
-						//orderController,
+						orderController.Payment,
+						orderController.OrderInfoCreate,
+						orderController.OrderInfoGetList,
+						orderController.RefundInfoGetDetail,
+						orderController.RefundInfoGetList,
+						orderController.RefundInfoCreate,
 					)
 				})
 			})

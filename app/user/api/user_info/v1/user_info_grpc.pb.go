@@ -35,7 +35,7 @@ type UserInfoClient interface {
 	// 管理员登录
 	Login(ctx context.Context, in *UserInfoLoginReq, opts ...grpc.CallOption) (*UserInfoLoginRes, error)
 	// 微信登录
-	WxMiniLogin(ctx context.Context, in *WxMiniLoginReq, opts ...grpc.CallOption) (*UserInfoLoginRes, error)
+	WxMiniLogin(ctx context.Context, in *WxMiniLoginReq, opts ...grpc.CallOption) (*WxMiniLoginRes, error)
 	// 管理员注册
 	Register(ctx context.Context, in *UserInfoRegisterReq, opts ...grpc.CallOption) (*UserInfoRegisterRes, error)
 	// 修改密码
@@ -63,8 +63,8 @@ func (c *userInfoClient) Login(ctx context.Context, in *UserInfoLoginReq, opts .
 	return out, nil
 }
 
-func (c *userInfoClient) WxMiniLogin(ctx context.Context, in *WxMiniLoginReq, opts ...grpc.CallOption) (*UserInfoLoginRes, error) {
-	out := new(UserInfoLoginRes)
+func (c *userInfoClient) WxMiniLogin(ctx context.Context, in *WxMiniLoginReq, opts ...grpc.CallOption) (*WxMiniLoginRes, error) {
+	out := new(WxMiniLoginRes)
 	err := c.cc.Invoke(ctx, UserInfo_WxMiniLogin_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ type UserInfoServer interface {
 	// 管理员登录
 	Login(context.Context, *UserInfoLoginReq) (*UserInfoLoginRes, error)
 	// 微信登录
-	WxMiniLogin(context.Context, *WxMiniLoginReq) (*UserInfoLoginRes, error)
+	WxMiniLogin(context.Context, *WxMiniLoginReq) (*WxMiniLoginRes, error)
 	// 管理员注册
 	Register(context.Context, *UserInfoRegisterReq) (*UserInfoRegisterRes, error)
 	// 修改密码
@@ -134,7 +134,7 @@ type UnimplementedUserInfoServer struct {
 func (UnimplementedUserInfoServer) Login(context.Context, *UserInfoLoginReq) (*UserInfoLoginRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedUserInfoServer) WxMiniLogin(context.Context, *WxMiniLoginReq) (*UserInfoLoginRes, error) {
+func (UnimplementedUserInfoServer) WxMiniLogin(context.Context, *WxMiniLoginReq) (*WxMiniLoginRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WxMiniLogin not implemented")
 }
 func (UnimplementedUserInfoServer) Register(context.Context, *UserInfoRegisterReq) (*UserInfoRegisterRes, error) {
