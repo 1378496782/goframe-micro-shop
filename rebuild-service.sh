@@ -8,12 +8,11 @@ echo "微服务重新构建工具"
 echo "=========================================="
 echo ""
 
-# 服务列表
+# 服务列表（仅包含需要重新构建的服务，nginx-proxy 使用官方镜像，无需构建）
 VALID_SERVICES=(
     "gateway-h5"
     "gateway-resource"
     "manage-service"
-    "manage-ui"
     "user-service"
     "goods-service"
     "order-service"
@@ -188,9 +187,6 @@ get_service_image() {
         "manage-service")
             echo "shop-goframe-micro-manage"
             ;;
-        "manage-ui")
-            echo "shop-goframe-micro-service-manage-ui-gfast"
-            ;;
         *)
             echo "shop-goframe-micro-service-refacotor_${service}"
             ;;
@@ -209,9 +205,6 @@ get_health_check_url() {
             ;;
         "manage-service")
             echo "http://localhost:8808/"
-            ;;
-        "manage-ui")
-            echo "http://localhost/health"
             ;;
         "user-service")
             echo "http://localhost:31001/"
@@ -327,9 +320,6 @@ show_service_url() {
             ;;
         "manage-service")
             echo "  管理后台：http://localhost:8808"
-            ;;
-        "manage-ui")
-            echo "  管理UI：http://localhost"
             ;;
         "user-service")
             echo "  用户服务：http://localhost:31001"
@@ -491,7 +481,6 @@ else
     echo "  H5商城网关：http://localhost:8199"
     echo "  资源网关：http://localhost:8399"
     echo "  管理后台：http://localhost:8808"
-    echo "  管理UI：http://localhost"
     echo ""
     echo "🔍 检查命令："
     echo "  docker-compose -f docker-compose.prod.yml ps"

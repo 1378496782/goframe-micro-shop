@@ -212,10 +212,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31004/"]
+      test: ["CMD", "nc", "-z", "localhost", "31004"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   order-service:
     build: .
@@ -247,10 +248,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31005/"]
+      test: ["CMD", "nc", "-z", "localhost", "31005"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   user-service:
     build: .
@@ -280,10 +282,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31001/"]
+      test: ["CMD", "nc", "-z", "localhost", "31001"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   interaction-service:
     build: .
@@ -313,10 +316,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31002/"]
+      test: ["CMD", "nc", "-z", "localhost", "31002"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   search-service:
     build: .
@@ -348,10 +352,11 @@ services:
           memory: 1G
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8499/"]
+      test: ["CMD", "nc", "-z", "localhost", "8499"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   gateway-h5:
     build: .
@@ -401,8 +406,6 @@ services:
     depends_on:
       etcd:
         condition: service_healthy
-      mysql:
-        condition: service_healthy
     networks:
       - app-network
     restart: always
@@ -412,10 +415,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8399/"]
+      test: ["CMD", "nc", "-z", "localhost", "8399"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   banner-service:
     build: .
@@ -445,10 +449,11 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:31006/"]
+      test: ["CMD", "nc", "-z", "localhost", "31006"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
 
   # 管理后台服务
   manage-service:
@@ -466,6 +471,10 @@ services:
     volumes:
       - ./log/manage:/app/resource/log
       - /etc/localtime:/etc/localtime:ro
+      # 挂载前端构建产物 - 实现热更新无需重启服务
+      - ../shop-goframe-micro-service-manage-ui-gfast/dist:/app/resource/public:ro
+      # 【新增此行】为上传文件创建一个可写的独立挂载点
+      - ./uploads:/app/resource/public/upload_file
     depends_on:
       mysql:
         condition: service_healthy
@@ -485,12 +494,10 @@ services:
       timeout: 10s
       retries: 3
 
-  # 前端管理服务 - 生产环境SSL证书配置
-  manage-ui:
-    build:
-      context: ../shop-goframe-micro-service-manage-ui-gfast
-      dockerfile: Dockerfile
-    container_name: manage-ui
+  # 前端管理服务 - 纯代理转发，静态资源由manage-service提供
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-proxy
     environment:
       - TZ=Asia/Shanghai
       - NGINX_ENV=production
@@ -498,6 +505,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      # 挂载nginx配置文件 - 仅保留代理转发功能
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       # 生产环境证书路径 - 使用绝对路径挂载系统证书目录
       - /etc/ssl/certs:/etc/nginx/ssl/certs:ro
       - /etc/ssl/private:/etc/nginx/ssl/private:ro
@@ -515,7 +524,7 @@ services:
       - app-network
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -525,6 +534,36 @@ services:
         limits:
           memory: 512M
           cpus: '0.5'
+
+
+  # 新增的 MySQL 备份服务
+  mysql-backup:
+    image: mysql:8.0
+    container_name: mysql-backup
+    networks:
+      - app-network
+    volumes:
+      - ./backups:/backups  # 将宿主机的 backups 目录挂载到容器内
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: root # 与您的 mysql 服务密码保持一致
+      BACKUP_RETENTION_DAYS: 7 # 备份文件保留天数
+    command: >
+      /bin/sh -c "
+        while true; do
+          echo '--- Starting MySQL Backup for all application databases ---';
+          mysqldump -h mysql -u root -p$${MYSQL_ROOT_PASSWORD} --single-transaction --routines --triggers --databases goods admin user interaction order resource banner | gzip > /backups/backup-$$(date +%Y%m%d-%H%M%S).sql.gz;
+          echo '--- Backup Complete ---';
+          echo '--- Cleaning up old backups (older than $${BACKUP_RETENTION_DAYS} days) ---';
+          find /backups -name '*.sql.gz' -mtime +$${BACKUP_RETENTION_DAYS} -exec rm {} \;;
+          echo '--- Cleanup Complete, sleeping for 24 hours ---';
+          sleep 86400;
+        done
+      "
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
 
 networks:
   app-network:
