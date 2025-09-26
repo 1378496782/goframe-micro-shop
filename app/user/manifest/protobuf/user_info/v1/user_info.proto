@@ -9,7 +9,7 @@ service UserInfo {
   // 管理员登录
   rpc Login (UserInfoLoginReq) returns (UserInfoLoginRes) {}
   // 微信登录
-  rpc WxMiniLogin(WxMiniLoginReq)returns(UserInfoLoginRes){}
+  rpc WxMiniLogin(WxMiniLoginReq)returns(WxMiniLoginRes){}
   // 管理员注册
   rpc Register (UserInfoRegisterReq) returns (UserInfoRegisterRes) {}
   // 修改密码
@@ -56,6 +56,15 @@ message WxMiniLoginReq{
   string Avatar=5; // 用户头像
   string Phone=6; // 用户手机号
 }
+
+message WxMiniLoginRes {
+  string type = 1;      // token类型
+  string token = 2;     // token字符串
+  uint32 expire_in = 3;  // 过期时间(秒)
+  string openId=4;       // 用户唯一凭证
+  UserInfoBase user_info = 5; // 用户基础信息
+}
+
 
 // ========== 用户信息 ==========
 message UserInfoReq {

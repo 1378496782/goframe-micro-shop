@@ -2,6 +2,7 @@ package goods_info
 
 import (
 	"context"
+	"fmt"
 	v1 "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
 	"shop-goframe-micro-service-refacotor/app/goods/api/pbentity"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
@@ -48,6 +49,7 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 
 	// 查询总数
 	total, err := query.Count()
+	fmt.Println("total,", total)
 	if err != nil {
 		// 记录错误日志
 		g.Log().Errorf(ctx, "%v %v", infoError, err)

@@ -18,10 +18,10 @@ import (
 )
 
 // Create 创建订单（包含完整的事务处理）
-func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
+func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, error) {
 	//对订单请求进行校验
 	if len(req.OrderGoodsInfo) == 0 {
-		return 0, errors.New("订单必须至少包含一个商品")
+		return 0, "", errors.New("订单必须至少包含一个商品")
 	}
 	//订单金额必须等于商品金额之和
 	var totalGoodsPrice uint32
@@ -31,14 +31,14 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 		totalCouponPrice += item.CouponPrice
 	}
 	if req.Price != totalGoodsPrice {
-		return 0, fmt.Errorf("订单总价[%d]与商品总价[%d]不符", req.Price, totalGoodsPrice)
+		return 0, "", fmt.Errorf("订单总价[%d]与商品总价[%d]不符", req.Price, totalGoodsPrice)
 	}
 
 	if req.ActualPrice != req.Price-req.CouponPrice {
-		return 0, fmt.Errorf("订单实际支付价格[%d]不等于订单总价[%d]减去优惠券价格[%d]", req.ActualPrice, req.Price, req.CouponPrice)
+		return 0, "", fmt.Errorf("订单实际支付价格[%d]不等于订单总价[%d]减去优惠券价格[%d]", req.ActualPrice, req.Price, req.CouponPrice)
 	}
 	if req.CouponPrice < totalCouponPrice {
-		return 0, fmt.Errorf("订单优惠券价格[%d]小于商品优惠券价格[%d]", req.CouponPrice, totalCouponPrice)
+		return 0, "", fmt.Errorf("订单优惠券价格[%d]小于商品优惠券价格[%d]", req.CouponPrice, totalCouponPrice)
 	}
 
 	// 计算OrderGoodsItem中分摊的coupon_price
@@ -48,7 +48,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 	var allocatableItemsTotalPrice uint32
 
 	if err := gconv.Structs(req.OrderGoodsInfo, &orderGoodsList); err != nil {
-		return 0, fmt.Errorf("订单商品数据转换失败: %v", err)
+		return 0, "", fmt.Errorf("订单商品数据转换失败: %v", err)
 	}
 
 	for i := 0; i < len(orderGoodsList); i++ {
@@ -85,7 +85,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 	db := g.DB()
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("开启事务失败: %v", err)
+		return 0, "", fmt.Errorf("开启事务失败: %v", err)
 	}
 
 	// 确保事务回滚
@@ -101,7 +101,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 	// 使用 gconv.Struct 转换主订单
 	var order entity.OrderInfo
 	if err := gconv.Struct(req, &order); err != nil {
-		return 0, fmt.Errorf("订单数据转换失败: %v", err)
+		return 0, "", fmt.Errorf("订单数据转换失败: %v", err)
 	}
 
 	// 设置订单特有字段
@@ -113,7 +113,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 	// 使用事务插入主订单
 	result, err := dao.OrderInfo.Ctx(ctx).TX(tx).InsertAndGetId(order)
 	if err != nil {
-		return 0, fmt.Errorf("插入订单失败: %v", err)
+		return 0, "", fmt.Errorf("插入订单失败: %v", err)
 	}
 	orderId := int32(result)
 
@@ -128,13 +128,13 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 	if len(orderGoodsList) > 0 {
 		_, err = dao.OrderGoodsInfo.Ctx(ctx).TX(tx).Insert(orderGoodsList)
 		if err != nil {
-			return 0, fmt.Errorf("插入订单商品失败: %v", err)
+			return 0, "", fmt.Errorf("插入订单商品失败: %v", err)
 		}
 	}
 
 	// 提交事务
 	if err = tx.Commit(); err != nil {
-		return 0, fmt.Errorf("提交事务失败: %v", err)
+		return 0, "", fmt.Errorf("提交事务失败: %v", err)
 	}
 
 	success = true
@@ -148,7 +148,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, error) {
 	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
 	go grabbitmq.PublishOrderTimeoutEvent(int(orderId), delay)
 
-	return orderId, nil
+	return orderId, order.Number, nil
 }
 
 // sendOrderTimeoutMessage 发送订单超时消息
@@ -303,18 +303,34 @@ func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
 		"status":     status,
 		"updated_at": gtime.Now(),
 	}
-	
+
 	// 只有当订单状态变为已支付(2)时才设置支付时间
 	if status == 2 {
 		updateData["pay_at"] = gtime.Now()
 	}
-	
+
 	_, err := dao.OrderInfo.Ctx(ctx).Where("id", orderId).Update(updateData)
 	if err != nil {
 		return fmt.Errorf("更新订单状态失败: %v", err)
 	}
 
 	g.Log().Infof(ctx, "订单状态更新成功, 订单ID: %d, 新状态: %d", orderId, status)
+	return nil
+}
+
+// UpdateOrderStatus 更新订单状态
+func UpdateOrderStatusByNumber(ctx context.Context, number string, status int) error {
+	updateData := g.Map{
+		"status":     status,
+		"updated_at": gtime.Now(),
+	}
+
+	_, err := dao.OrderInfo.Ctx(ctx).Where("number", number).Update(updateData)
+	if err != nil {
+		return fmt.Errorf("更新订单状态失败: %v", err)
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单编号:{%s}, 新状态: %d", number, status)
 	return nil
 }
 
@@ -343,4 +359,15 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 	}
 
 	return nil
+}
+
+func IdempotentCheck(ctx context.Context, number string) (bool, error) {
+	exists, err := dao.OrderInfo.Ctx(ctx).
+		Where("number", number).
+		Where("status", 2).
+		Exist()
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
