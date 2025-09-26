@@ -30,64 +30,73 @@ database:
     stdout:  true
     Path: "resource/log/sql"
 
+  # MySQL 连接配置
+  mysql: &mysql_config
+    host: "mysql:3306"
+    user: "root"
+    password: "zK8!pW#s&t@5g$E7hN*d"
+    charset: "utf8mb4"
+    parseTime: "true"
+    loc: "Local"
+
   default:
-    link:   "mysql:root:root@tcp(mysql:3306)/admin?charset=utf8mb4&parseTime=true&loc=Local"
+    link:   "mysql:${database.mysql.user}:${database.mysql.password}@tcp(${database.mysql.host})/admin?charset=${database.mysql.charset}&parseTime=${database.mysql.parseTime}&loc=${database.mysql.loc}"
     debug:  true
-    charset: "utf8mb4" #数据库编码
+    charset: "${database.mysql.charset}" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   goods:
-    link: "mysql:root:root@tcp(mysql:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:${database.mysql.user}:${database.mysql.password}@tcp(${database.mysql.host})/goods?charset=${database.mysql.charset}&parseTime=${database.mysql.parseTime}&loc=${database.mysql.loc}"
     debug: true
-    charset: "utf8mb4" #数据库编码
+    charset: "${database.mysql.charset}" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   user:
-    link: "mysql:root:root@tcp(mysql:3306)/user?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:${database.mysql.user}:${database.mysql.password}@tcp(${database.mysql.host})/user?charset=${database.mysql.charset}&parseTime=${database.mysql.parseTime}&loc=${database.mysql.loc}"
     debug: true
-    charset: "utf8mb4" #数据库编码
+    charset: "${database.mysql.charset}" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   interaction:
-    link: "mysql:root:root@tcp(mysql:3306)/interaction?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:${database.mysql.user}:${database.mysql.password}@tcp(${database.mysql.host})/interaction?charset=${database.mysql.charset}&parseTime=${database.mysql.parseTime}&loc=${database.mysql.loc}"
     debug: true
-    charset: "utf8mb4" #数据库编码
+    charset: "${database.mysql.charset}" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   order:
-    link: "mysql:root:root@tcp(mysql:3306)/order?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:${database.mysql.user}:${database.mysql.password}@tcp(${database.mysql.host})/order?charset=${database.mysql.charset}&parseTime=${database.mysql.parseTime}&loc=${database.mysql.loc}"
     debug: true
-    charset: "utf8mb4" #数据库编码
+    charset: "${database.mysql.charset}" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   resource:
-    link: "mysql:root:root@tcp(mysql:3306)/resource?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:${database.mysql.user}:${database.mysql.password}@tcp(${database.mysql.host})/resource?charset=${database.mysql.charset}&parseTime=${database.mysql.parseTime}&loc=${database.mysql.loc}"
     debug: true
-    charset: "utf8mb4" #数据库编码
+    charset: "${database.mysql.charset}" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   banner:
-    link: "mysql:root:root@tcp(mysql:3306)/banner?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:${database.mysql.user}:${database.mysql.password}@tcp(${database.mysql.host})/banner?charset=${database.mysql.charset}&parseTime=${database.mysql.parseTime}&loc=${database.mysql.loc}"
     debug: true
-    charset: "utf8mb4" #数据库编码
+    charset: "${database.mysql.charset}" #数据库编码
     dryRun: false #空跑
     maxIdle: 10 #连接池最大闲置的连接数
     maxOpen: 10 #连接池最大打开的连接数
