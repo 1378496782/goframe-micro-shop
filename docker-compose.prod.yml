@@ -1,14 +1,27 @@
 version: '3.8'
 
+# 环境变量定义
+x-mysql-env: &mysql-env
+  MYSQL_ROOT_USERNAME: root
+  MYSQL_ROOT_PASSWORD: zK8!pW#s&t@5g$E7hN*d
+
+x-rabbitmq-env: &rabbitmq-env
+  RABBITMQ_DEFAULT_USER: root
+  RABBITMQ_DEFAULT_PASS: root
+
+x-common-env: &common-env
+  TZ: Asia/Shanghai
+  ENV: production
+  LOG_LEVEL: info
+
 services:
   # MySQL 数据库 - 生产环境配置
   mysql:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_USERNAME: root
-      MYSQL_ROOT_PASSWORD: root
-      TZ: Asia/Shanghai
+      <<: *mysql-env
+      <<: *common-env
     ports:
       - "3306:3306"
     volumes:
@@ -61,7 +74,7 @@ services:
     image: redis:7-alpine
     container_name: redis
     environment:
-      - TZ=Asia/Shanghai
+      <<: *common-env
     ports:
       - "6379:6379"
     volumes:
@@ -87,9 +100,8 @@ services:
     image: rabbitmq:4.1.0-management-alpine
     container_name: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: root
-      RABBITMQ_DEFAULT_PASS: root
-      TZ: Asia/Shanghai
+      <<: *rabbitmq-env
+      <<: *common-env
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -126,7 +138,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
-      - TZ=Asia/Shanghai
+      - TZ=${TZ:-Asia/Shanghai}
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -166,7 +178,7 @@ services:
       - SERVER_NAME=kibana
       - XPACK_SECURITY_ENABLED=false
       - XPACK_MONITORING_ENABLED=false
-      - TZ=Asia/Shanghai
+      - TZ=${TZ:-Asia/Shanghai}
     ports:
       - "5601:5601"
     depends_on:
@@ -187,9 +199,7 @@ services:
     container_name: goods-service
     command: ["./goods"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "31004:31004"
     volumes:
@@ -223,9 +233,7 @@ services:
     container_name: order-service
     command: ["./order"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "31005:31005"
     volumes:
@@ -259,9 +267,7 @@ services:
     container_name: user-service
     command: ["./user"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "31001:31001"
     volumes:
@@ -293,9 +299,7 @@ services:
     container_name: interaction-service
     command: ["./interaction"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "31002:31002"
     volumes:
@@ -327,9 +331,7 @@ services:
     container_name: search-service
     command: ["./search"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "8499:8499"
     volumes:
@@ -363,9 +365,7 @@ services:
     container_name: gateway-h5
     command: ["./gateway-h5"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "8199:8199"
     volumes:
@@ -394,9 +394,7 @@ services:
     container_name: gateway-resource
     command: ["./gateway-resource"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "8399:8399"
     volumes:
@@ -426,9 +424,7 @@ services:
     container_name: banner-service
     command: ["./banner"]
     environment:
-      - ENV=production
-      - TZ=Asia/Shanghai
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "31006:31006"
     volumes:
@@ -463,9 +459,7 @@ services:
     container_name: manage-service
     command: ["./main"]
     environment:
-      - TZ=Asia/Shanghai
-      - ENV=production
-      - LOG_LEVEL=info
+      <<: *common-env
     ports:
       - "8808:8808"
     volumes:
@@ -499,8 +493,8 @@ services:
     image: nginx:alpine
     container_name: nginx-proxy
     environment:
-      - TZ=Asia/Shanghai
-      - NGINX_ENV=production
+      TZ: ${TZ:-Asia/Shanghai}
+      NGINX_ENV: production
     ports:
       - "80:80"
       - "443:443"
@@ -546,7 +540,7 @@ services:
       - ./backups:/backups  # 将宿主机的 backups 目录挂载到容器内
       - /etc/localtime:/etc/localtime:ro
     environment:
-      MYSQL_ROOT_PASSWORD: root # 与您的 mysql 服务密码保持一致
+      <<: *mysql-env
       BACKUP_RETENTION_DAYS: 7 # 备份文件保留天数
     command: >
       /bin/sh -c "
@@ -555,7 +549,7 @@ services:
           mysqldump -h mysql -u root -p$${MYSQL_ROOT_PASSWORD} --single-transaction --routines --triggers --databases goods admin user interaction order resource banner | gzip > /backups/backup-$$(date +%Y%m%d-%H%M%S).sql.gz;
           echo '--- Backup Complete ---';
           echo '--- Cleaning up old backups (older than $${BACKUP_RETENTION_DAYS} days) ---';
-          find /backups -name '*.sql.gz' -mtime +$${BACKUP_RETENTION_DAYS} -exec rm {} \;;
+          find /backups -name '*.sql.gz' -mtime +$${BACKUP_RETENTION_DAYS} -exec rm {} \;
           echo '--- Cleanup Complete, sleeping for 24 hours ---';
           sleep 86400;
         done
