@@ -12,8 +12,8 @@ const DEV_CONFIG = {
  
 // 生产环境配置 - 使用HTTP
 const PROD_CONFIG = {
-  BASE_URL: 'http://101.42.249.106:8199',
-  UPLOAD_URL: 'http://101.42.249.106:8399',
+  BASE_URL: 'https://business.dayu.club',
+  UPLOAD_URL: 'https://business.dayu.club',
   SEARCH_URL: 'http://101.42.249.106:8499',
   IMAGE_BASE_URL: 'http://101.42.249.106:8808/',
   SKIP_DOMAIN_CHECK: false

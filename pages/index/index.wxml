@@ -32,7 +32,7 @@
   </view>
 
   <!-- 拼团砍价专区 -->
-  <view class="section group-buy-section">
+  <!-- <view class="section group-buy-section">
     <view class="section-header">
       <text class="section-title">🔥 拼团砍价</text>
       <text class="section-more" bindtap="onGroupBuyMore">更多活动 ></text>
@@ -56,7 +56,7 @@
         </view>
       </view>
     </scroll-view>
-  </view>
+  </view> -->
 
   <!-- 推荐商品 -->
   <view class="section">

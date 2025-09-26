@@ -5,7 +5,7 @@ const config = {
    
   // API配置 
   api: {
-    baseURL: 'https://shop.dayu.club', // 生产环境API地址
+    baseURL: 'https://business.dayu.club', // 生产环境API地址
     mockBaseURL: '', // Mock模式不需要baseURL
     timeout: 10000,
     retryCount: 3,    // 请求重试次数

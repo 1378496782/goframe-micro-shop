@@ -6,7 +6,6 @@ Page({
     banners: [],
     categories: [],
     products: [],
-    groupBuyProducts: [], // 拼团砍价商品
     searchValue: '',
     loading: false
   },
@@ -20,11 +19,10 @@ Page({
     this.setData({ loading: true })
     
     try {
-      // 并行加载轮播图、商品数据和拼团数据
-      const [bannersRes, productsRes, groupBuyRes] = await Promise.all([
+      // 并行加载轮播图和商品数据
+      const [bannersRes, productsRes] = await Promise.all([
         api.getBanners(),
-        api.getGoodsList({ page: 1, size: 10, is_hot: 1 }),
-        api.getGroupBuyProducts({ page: 1, size: 5 })
+        api.getGoodsList({ page: 1, size: 10, is_hot: 1 })
       ])
       
       if (bannersRes.code === 0 && bannersRes.data?.list) {
@@ -59,19 +57,7 @@ Page({
         })
       }
 
-      // 处理拼团砍价数据
-      if (groupBuyRes.code === 0 && groupBuyRes.data?.list) {
-        const formattedGroupBuy = groupBuyRes.data.list?.map(item => ({
-          ...item,
-          groupPrice: (item.groupPrice / 100).toFixed(2),
-          originalPrice: (item.originalPrice / 100).toFixed(2),
-          mainImage: item.mainImage ? (item.mainImage.startsWith('http') ? item.mainImage : constants.IMAGE_BASE_URL + item.mainImage) : 'https://via.placeholder.com/200x200?text=拼团商品'
-        }))
-        
-        this.setData({
-          groupBuyProducts: formattedGroupBuy
-        })
-      }
+
     } catch (error) {
       console.error('加载首页数据失败:', error)
       wx.showToast({
@@ -137,20 +123,6 @@ Page({
     })
   },
 
-  // 拼团砍价点击事件
-  onGroupBuyClick(e) {
-    const productId = e.currentTarget.dataset.id
-    wx.navigateTo({
-      url: `/pages/group-buy/group-buy?id=${productId}`
-    })
-  },
-
-  // 查看更多拼团活动
-  onGroupBuyMore() {
-    wx.navigateTo({
-      url: '/pages/group-buy-list/group-buy-list'
-    })
-  },
 
   onPullDownRefresh() {
     console.log('下拉刷新')
