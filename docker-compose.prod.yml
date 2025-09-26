@@ -1,9 +1,7 @@
-version: '3.8'
-
 # 环境变量定义
 x-mysql-env: &mysql-env
   MYSQL_ROOT_USERNAME: root
-  MYSQL_ROOT_PASSWORD: zK8!pW#s&t@5g$E7hN*d
+  MYSQL_ROOT_PASSWORD: zK8!pW#s&t@5g$$E7hN*d
 
 x-rabbitmq-env: &rabbitmq-env
   RABBITMQ_DEFAULT_USER: root
@@ -20,8 +18,7 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      <<: *mysql-env
-      <<: *common-env
+      <<: [*mysql-env, *common-env]
     ports:
       - "3306:3306"
     volumes:
@@ -100,8 +97,7 @@ services:
     image: rabbitmq:4.1.0-management-alpine
     container_name: rabbitmq
     environment:
-      <<: *rabbitmq-env
-      <<: *common-env
+      <<: [*rabbitmq-env, *common-env]
     ports:
       - "5672:5672"
       - "15672:15672"
