@@ -15,10 +15,21 @@ Page({
   },
 
   onLoad(options) {
+    console.log('当前用户token:', wx.getStorageSync('token'))
     let selectedItems = []
     
-    // 从URL参数获取数据
-    if (options.selectedItems) {
+    // 场景1：从商品详情页直接购买(单商品)
+    if (options.productId) {
+      selectedItems = [{
+        id: options.productId,
+        quantity: options.quantity || 1,
+        price: options.price || 0,
+        name: options.name || '',
+        image: options.image || ''
+      }]
+    } 
+    // 场景2：从购物车多商品下单
+    else if (options.selectedItems) {
       try {
         selectedItems = JSON.parse(decodeURIComponent(options.selectedItems))
       } catch (error) {
@@ -26,7 +37,7 @@ Page({
       }
     }
     
-    // 如果URL参数没有数据，使用全局数据
+    // 场景3：使用全局数据(兼容旧逻辑)
     if (selectedItems.length === 0) {
       const app = getApp()
       selectedItems = app.globalData.selectedCartItems || []

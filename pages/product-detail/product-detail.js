@@ -173,9 +173,23 @@ Page({
 
   // 立即购买
   buyNow() {
+    if (!wx.getStorageSync('token')) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+
     wx.navigateTo({
-      url: `/pages/order/confirm?productId=${this.data.product.id}`
+      url: `/pages/order-confirm/order-confirm?productId=${this.data.product.id}&quantity=1`
     })
-    console.log('立即购买', this.data.product.id)
   }
 })
