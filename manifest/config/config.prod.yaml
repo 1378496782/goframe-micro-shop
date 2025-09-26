@@ -30,14 +30,7 @@ database:
     stdout:  true
     Path: "resource/log/sql"
 
-  # MySQL 连接配置
-  mysql: &mysql_config
-    host: "mysql:3306"
-    user: "root"
-    password: "CHANGE_ME_MYSQL_ROOT_PASSWORD"
-    charset: "utf8mb4"
-    parseTime: "true"
-    loc: "Local"
+
 
   default:
     link:   "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/admin?charset=utf8mb4&parseTime=true&loc=Local"
