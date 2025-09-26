@@ -2,10 +2,10 @@
 const config = {
   // 当前环境 
   env: 'production', // development: 开发环境, production: 生产环境, test: 测试环境
-    
-  // API配置
+   
+  // API配置 
   api: {
-    baseURL: 'http://127.0.0.1:8199', // 生产环境API地址
+    baseURL: 'https://shop.dayu.club', // 生产环境API地址
     mockBaseURL: '', // Mock模式不需要baseURL
     timeout: 10000,
     retryCount: 3,    // 请求重试次数

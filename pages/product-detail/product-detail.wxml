@@ -19,8 +19,7 @@
   <text class="product-title">{{product.name}}</text>
   
   <view class="sales-info">
-    <text>销量: {{product.sales}}件</text>
-    <text>评价: {{product.reviews}}条</text>
+    <text>销量: {{product.sale}}件</text>
     <text>库存: {{product.stock}}件</text>
   </view>
 </view>
@@ -54,7 +53,9 @@
 <view class="product-description" wx:if="{{!loading && product}}">
   <text class="section-title">商品详情</text>
   <view class="description-content">
-    <rich-text nodes="{{product.detailInfo}}"></rich-text>
+    <block wx:for="{{product.images}}" wx:key="*this">
+      <image src="{{item}}" mode="widthFix" style="width:100%;margin-bottom:20rpx;" />
+    </block>
   </view>
 </view>
 

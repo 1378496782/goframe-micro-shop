@@ -2,10 +2,10 @@
 const { config } = require('../utils/env');
 
 const constants = {
-  // 图片域名配置
+  // 图片域名配置 
   IMAGE_BASE_URL: config.env === 'development' 
     ? 'http://127.0.0.1:8399/' 
-    : 'http://101.42.249.106:8808/',
+    : 'https://shopadmin.dayu.club/',
   
   // 分页配置
   PAGINATION: {
