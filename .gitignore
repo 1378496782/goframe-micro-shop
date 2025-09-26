@@ -17,4 +17,6 @@ output/
 temp/
 temp.yaml
 bin
+backups/
 !manifest/config/
+/uploads/

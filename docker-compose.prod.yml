@@ -473,6 +473,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       # 挂载前端构建产物 - 实现热更新无需重启服务
       - ../shop-goframe-micro-service-manage-ui-gfast/dist:/app/resource/public:ro
+      # 【新增此行】为上传文件创建一个可写的独立挂载点
+      - ./uploads:/app/resource/public/upload_file
     depends_on:
       mysql:
         condition: service_healthy
