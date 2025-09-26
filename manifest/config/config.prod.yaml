@@ -34,7 +34,7 @@ database:
   mysql: &mysql_config
     host: "mysql:3306"
     user: "root"
-    password: "zK8!pW#s&t@5g$$E7hN*d"
+    password: "CHANGE_ME_MYSQL_ROOT_PASSWORD"
     charset: "utf8mb4"
     parseTime: "true"
     loc: "Local"
