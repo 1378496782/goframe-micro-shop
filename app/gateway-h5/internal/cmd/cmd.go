@@ -36,6 +36,8 @@ var (
 						userController.UserInfoRegister,
 						userController.UserInfoLogin,
 						userController.WxMiniLogin,
+						orderController.Payment,
+						orderController.Notify,
 						goodsController.CategoryInfoGetAll,
 						goodsController.CategoryInfoGetList,
 						goodsController.GoodsInfoGetDetail,
@@ -59,11 +61,11 @@ var (
 						goodsController.CartInfoDelete,
 						goodsController.UserCouponInfoGetList,
 						interactionController,
-						orderController,
+						//orderController,
 					)
 				})
 			})
-
+			s.EnableHTTPS("D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.pem", "D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.key")
 			s.Run()
 			return nil
 		},

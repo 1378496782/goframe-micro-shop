@@ -60,7 +60,8 @@ type OrderInfoCreateReq struct {
 }
 
 type OrderInfoCreateRes struct {
-	Id uint32 `json:"id" dc:"订单ID"`
+	Id     uint32 `json:"id" dc:"订单ID"`
+	Number string `json:"number" dc:"订单编号"`
 }
 
 type OrderGoodsItem struct {
@@ -75,10 +76,10 @@ type OrderGoodsItem struct {
 
 // PaymentReq 支付请求体
 type PaymentReq struct {
-	g.Meta  `path:"/payment" method:"post" tags:"订单管理" sm:"发起支付"`
-	OpenId  string `json:"openId" v:"required" dc:"用户登录凭证"`
-	Amount  int64  `json:"amount" v:"required" dc:"金额，单位为分"`
-	OrderId uint32 `json:"orderId" v:"required" dc:"订单Id"`
+	g.Meta `path:"/payment" method:"post" tags:"订单管理" sm:"发起支付"`
+	OpenId string `json:"openId" v:"required" dc:"用户登录凭证"`
+	Amount int64  `json:"amount" v:"required" dc:"金额，单位为分"`
+	Number string `json:"number" v:"required" dc:"订单编号"`
 }
 
 // PaymentRes 支付响应体

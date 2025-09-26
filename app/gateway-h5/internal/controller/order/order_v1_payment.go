@@ -28,6 +28,6 @@ func (c *ControllerV1) Payment(ctx context.Context, req *v1.PaymentReq) (res *v1
 		return nil, err
 	}
 
-	g.Log().Info(ctx, "支付成功")
+	g.Log().Info(ctx, "发起支付成功")
 	return res, nil
 }

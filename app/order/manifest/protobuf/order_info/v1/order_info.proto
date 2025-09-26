@@ -44,6 +44,7 @@ message OrderGoodsItem {
 // 创建订单响应
 message OrderInfoCreateRes {
   uint32 id = 1;
+  string number=2;
 }
 
 // 根据ID查询请求
@@ -91,7 +92,7 @@ message OrderInfoGetListRes {
 message PaymentReq {
   string openId = 1;   // 用户登录凭证（微信 openid）
   int64 amount = 2;    // 金额，单位为分
-  uint32 orderId = 3;  // 订单Id
+  string number = 3;  // 订单Id
 }
 
 // 支付响应体
