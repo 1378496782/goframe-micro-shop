@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -134,28 +133,26 @@ func Notify(ctx context.Context, req *v1.NotifyReq, checkIdempotent IdempotentCh
 		httpReq.Header.Set(k, v)
 	}
 
-	// 测试代码
-	fmt.Println("map!!!")
-	fmt.Println(req.Headers)
-	if req.Headers["X-Bypass-Verify"] == "1" {
-		res := new(payments.Transaction)
-		if err := json.Unmarshal([]byte(req.RawBody), res); err != nil {
-			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析 transaction 失败")
-		}
-		if err != nil {
-			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "outTradeNo to int error")
-		}
-
-		// 幂等校验
-		alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
-		if err != nil {
-			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
-		}
-		if alreadyPaid {
-			return true, *res.OutTradeNo, nil
-		}
-		return false, *res.OutTradeNo, nil
-	}
+	//// 测试代码(本地测试用)
+	//if req.Headers["X-Bypass-Verify"] == "1" {
+	//	res := new(payments.Transaction)
+	//	if err := json.Unmarshal([]byte(req.RawBody), res); err != nil {
+	//		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析 transaction 失败")
+	//	}
+	//	if err != nil {
+	//		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "outTradeNo to int error")
+	//	}
+	//
+	//	// 幂等校验
+	//	alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
+	//	if err != nil {
+	//		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
+	//	}
+	//	if alreadyPaid {
+	//		return true, *res.OutTradeNo, nil
+	//	}
+	//	return false, *res.OutTradeNo, nil
+	//}
 
 	wxConf := loadConfigParam()
 

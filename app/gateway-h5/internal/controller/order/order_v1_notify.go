@@ -3,7 +3,6 @@ package order
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -34,14 +33,12 @@ func (c *ControllerV1) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.N
 	req.RawBody = string(body)
 
 	// 组织 headers（只取验签相关的）
-	fmt.Println("header!!")
-	fmt.Println(r.Header)
 	headers := map[string]string{
 		"Wechatpay-Signature": r.Header.Get("Wechatpay-Signature"),
 		"Wechatpay-Timestamp": r.Header.Get("Wechatpay-Timestamp"),
 		"Wechatpay-Nonce":     r.Header.Get("Wechatpay-Nonce"),
 		"Wechatpay-Serial":    r.Header.Get("Wechatpay-Serial"),
-		"X-Bypass-Verify":     r.Header.Get("X-Bypass-Verify"),
+		//"X-Bypass-Verify":     r.Header.Get("X-Bypass-Verify"), 测试代码，本地测试用
 	}
 	req.Headers = headers
 

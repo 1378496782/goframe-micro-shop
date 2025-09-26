@@ -69,7 +69,9 @@ var (
 					)
 				})
 			})
-			s.EnableHTTPS("D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.pem", "D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.key")
+
+			// 本地测试微信支付用
+			//s.EnableHTTPS("D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.pem", "D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.key")
 			s.Run()
 			return nil
 		},
