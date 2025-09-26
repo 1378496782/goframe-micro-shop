@@ -1,15 +1,19 @@
 package order_info
 
 import (
+	"bytes"
 	"context"
+	"net/http"
+	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
+	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
+	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
+	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
+	"shop-goframe-micro-service-refacotor/utility/consts"
+
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
-	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
-	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
-	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
-	"shop-goframe-micro-service-refacotor/utility/consts"
 )
 
 type Controller struct {
@@ -23,12 +27,12 @@ func Register(s *grpcx.GrpcServer) {
 func (*Controller) Create(ctx context.Context, req *v1.OrderInfoCreateReq) (res *v1.OrderInfoCreateRes, err error) {
 	infoError := consts.InfoError(consts.OrderInfo, consts.CreateFail)
 	// 调用login层创建订单
-	orderId, err := order_info.Create(ctx, req)
+	orderId, orderNumber, err := order_info.Create(ctx, req)
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
-	return &v1.OrderInfoCreateRes{Id: uint32(orderId)}, nil
+	return &v1.OrderInfoCreateRes{Id: uint32(orderId), Number: orderNumber}, nil
 }
 
 func (*Controller) GetDetail(ctx context.Context, req *v1.OrderInfoGetDetailReq) (res *v1.OrderInfoGetDetailRes, err error) {
@@ -80,4 +84,47 @@ func (c *Controller) GetList(ctx context.Context, req *v1.OrderInfoGetListReq) (
 	response.Size = req.Size
 
 	return &v1.OrderInfoGetListRes{Data: response}, nil
+}
+
+func (*Controller) Payment(ctx context.Context, req *v1.PaymentReq) (res *v1.PaymentRes, err error) {
+	return payment.WeChatPayment(ctx, req)
+}
+
+func (*Controller) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.NotifyRes, err error) {
+	// 1) 构造 http.Request 给 wechatpay SDK 使用
+	httpReq, err := http.NewRequest("POST", "", bytes.NewBuffer([]byte(req.RawBody)))
+	if err != nil {
+		return &v1.NotifyRes{Code: "FAIL", Message: "构造请求失败"}, nil
+	}
+	for k, v := range req.Headers {
+		httpReq.Header.Set(k, v)
+	}
+
+	// 2) 微信支付回调验证
+	flag, orderNumber, err := payment.Notify(ctx, req, order_info.IdempotentCheck)
+	if err != nil {
+		return res, err
+	}
+
+	// 3) 对应订单的状态已修改，不需要再修改
+	if flag {
+		g.Log().Infof(ctx, "{%s}订单的状态已修改，不需要再修改", orderNumber)
+		return &v1.NotifyRes{
+			Code:    "SUCCESS",
+			Message: "ok",
+		}, nil
+	}
+
+	// 4) 修改订单状态
+	if err = order_info.UpdateOrderStatusByNumber(ctx, orderNumber, 2); err != nil {
+		return &v1.NotifyRes{
+			Code:    "FAIL",
+			Message: "内部错误",
+		}, err
+	}
+
+	return &v1.NotifyRes{
+		Code:    "SUCCESS",
+		Message: "ok",
+	}, nil
 }
