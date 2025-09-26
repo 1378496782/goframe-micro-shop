@@ -216,6 +216,13 @@ Page({
         wx.hideLoading()
         wx.setStorageSync('token', loginData.token)
         wx.setStorageSync('userInfo', loginData.user_info)
+        
+        // 保存openId，用于微信支付
+        if (loginData.openId) {
+          wx.setStorageSync('openId', loginData.openId)
+          console.log('已保存openId:', loginData.openId)
+        }
+        
         app.globalData.isLoggedIn = true
         app.globalData.userInfo = loginData.user_info
         this.setData({ isLoggedIn: true, userInfo: loginData.user_info, showWxLogin: false })
@@ -277,6 +284,7 @@ Page({
           // 清空本地存储
           wx.removeStorageSync('token')
           wx.removeStorageSync('userInfo')
+          wx.removeStorageSync('openId') // 同时清除openId
           
           // 重置全局状态
           app.globalData.isLoggedIn = false
