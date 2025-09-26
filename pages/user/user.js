@@ -262,5 +262,43 @@ Page({
         icon: 'none'
       })
     }
+  },
+
+  /**
+   * 退出登录方法
+   * 清空本地缓存和全局状态，返回登录页面
+   */
+  logout() {
+    wx.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          // 清空本地存储
+          wx.removeStorageSync('token')
+          wx.removeStorageSync('userInfo')
+          
+          // 重置全局状态
+          app.globalData.isLoggedIn = false
+          app.globalData.userInfo = {}
+          
+          // 更新页面数据
+          this.setData({
+            isLoggedIn: false,
+            userInfo: {}
+          })
+          
+          wx.showToast({
+            title: '已退出登录',
+            icon: 'success'
+          })
+          
+          // 返回登录页面
+          wx.reLaunch({
+            url: '/pages/login/login'
+          })
+        }
+      }
+    })
   }
 })

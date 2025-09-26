@@ -70,9 +70,12 @@
       <text>修改密码</text>
       <text class="arrow">></text>
     </view>
+    <view class="menu-item" wx:if="{{isLoggedIn}}" bindtap="logout">
+      <image src="https://via.placeholder.com/40x40/19aecc/ffffff?text=🚪" class="menu-icon" />
+      <text>退出登录</text>
+      <text class="arrow">></text>
+    </view>
   </view>
-
-  <button class="logout-btn" wx:if="{{isLoggedIn}}" bindtap="onLogout">退出登录</button>
 
 
   <!-- 微信登录弹窗 -->
