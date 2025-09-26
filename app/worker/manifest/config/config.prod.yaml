@@ -15,7 +15,7 @@ server:
 
 rabbitmq:
   default:
-    address: "amqp://root:root@rabbitmq:5672/"
+    address: "amqp://root:zK8!pW#s&t@5g$E7hN*d@tcp"
     exchange:
       orderDelayExchange: "order.delay.exchange"
     queue:
