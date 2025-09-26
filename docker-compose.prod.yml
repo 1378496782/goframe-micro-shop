@@ -533,6 +533,36 @@ services:
           memory: 512M
           cpus: '0.5'
 
+
+  # 新增的 MySQL 备份服务
+  mysql-backup:
+    image: mysql:8.0
+    container_name: mysql-backup
+    networks:
+      - app-network
+    volumes:
+      - ./backups:/backups  # 将宿主机的 backups 目录挂载到容器内
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: root # 与您的 mysql 服务密码保持一致
+      BACKUP_RETENTION_DAYS: 7 # 备份文件保留天数
+    command: >
+      /bin/sh -c "
+        while true; do
+          echo '--- Starting MySQL Backup for all application databases ---';
+          mysqldump -h mysql -u root -p$${MYSQL_ROOT_PASSWORD} --single-transaction --routines --triggers --databases goods admin user interaction order resource banner | gzip > /backups/backup-$$(date +%Y%m%d-%H%M%S).sql.gz;
+          echo '--- Backup Complete ---';
+          echo '--- Cleaning up old backups (older than $${BACKUP_RETENTION_DAYS} days) ---';
+          find /backups -name '*.sql.gz' -mtime +$${BACKUP_RETENTION_DAYS} -exec rm {} \;;
+          echo '--- Cleanup Complete, sleeping for 24 hours ---';
+          sleep 86400;
+        done
+      "
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+
 networks:
   app-network:
     driver: bridge
