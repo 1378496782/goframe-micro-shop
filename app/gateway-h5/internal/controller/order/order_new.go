@@ -5,24 +5,36 @@
 package order
 
 import (
-	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/order"
+	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
 	order_info "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	refund_info "shop-goframe-micro-service-refacotor/app/order/api/refund_info/v1"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
+
+	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 )
 
 type ControllerV1 struct {
 	OrderInfoClient  order_info.OrderInfoClient
 	RefundInfoClient refund_info.RefundInfoClient
+	//调用goods服务 添加goods客户端
+	GoodsClient goods_info.GoodsInfoClient
 }
 
 func NewV1() order.IOrderV1 {
+	//order本身内部的微服务链接
 	var conn = grpcx.Client.MustNewGrpcClientConn("order", grpcx.Client.ChainUnary(
 		middleware.GrpcClientTimeout,
 	))
+
+	//goods调用的微服务链接 搭配超时组件
+	var goods_conn = grpcx.Client.MustNewGrpcClientConn("goods", grpcx.Client.ChainUnary(
+		middleware.GrpcClientTimeout,
+	))
+
 	return &ControllerV1{
 		OrderInfoClient:  order_info.NewOrderInfoClient(conn),
 		RefundInfoClient: refund_info.NewRefundInfoClient(conn),
+		GoodsClient:      goods_info.NewGoodsInfoClient(goods_conn),
 	}
 }
