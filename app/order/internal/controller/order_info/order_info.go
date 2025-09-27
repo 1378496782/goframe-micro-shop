@@ -5,7 +5,6 @@ import (
 	"context"
 	"net/http"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
-	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
 	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"shop-goframe-micro-service-refacotor/utility/consts"
@@ -51,10 +50,11 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.OrderInfoGetDetailReq)
 	}, nil
 }
 
+// getlist方法 v2
 func (c *Controller) GetList(ctx context.Context, req *v1.OrderInfoGetListReq) (res *v1.OrderInfoGetListRes, err error) {
 	// 初始化响应结构
 	response := &v1.OrderInfoListResponse{
-		List:  make([]*pbentity.OrderInfo, 0),
+		List:  make([]*v1.OrderListInfo, 0),
 		Page:  req.Page,
 		Size:  req.Size,
 		Total: 0,
