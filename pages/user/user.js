@@ -46,6 +46,8 @@ Page({
     this.checkLoginStatus()
     if (this.data.isLoggedIn) {
       this.getUserInfo()
+      // 获取订单数量统计
+      this.getOrderCounts()
     } else {
       // 显示登录引导提示
       wx.showToast({
@@ -307,6 +309,105 @@ Page({
           })
         }
       }
+    })
+  },
+
+  /**
+   * 获取用户信息
+   * 获取用户基本信息和订单统计数据
+   */
+  getUserInfo() {
+    request({
+      url: API.USER_INFO,
+      method: 'GET'
+    }).then(res => {
+      if (res.code === 0 && res.data) {
+        // 更新用户信息
+        this.setData({ userInfo: res.data })
+        // 保存到全局状态和本地存储
+        app.globalData.userInfo = res.data
+        wx.setStorageSync('userInfo', res.data)
+      }
+    }).catch(err => {
+      console.error('获取用户信息失败:', err)
+    })
+  },
+
+  /**
+   * 获取订单数量统计
+   * 获取各状态订单的数量
+   */
+  getOrderCounts() {
+    request({
+      url: API.ORDER_COUNT,
+      method: 'GET'
+    }).then(res => {
+      if (res.code === 0 && res.data) {
+        // 更新订单统计数据
+        this.setData({
+          orderCounts: {
+            pending: res.data.pending || 0,
+            shipping: res.data.shipping || 0,
+            delivered: res.data.delivered || 0,
+            completed: res.data.completed || 0,
+            afterSale: res.data.afterSale || 0
+          }
+        })
+      }
+    }).catch(err => {
+      console.error('获取订单统计失败:', err)
+    })
+  },
+
+  /**
+   * 查看指定状态的订单
+   * @param {object} e - 事件对象，包含订单状态
+   */
+  viewOrders(e) {
+    if (!this.data.isLoggedIn) {
+      return wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      })
+    }
+    
+    const status = e.currentTarget.dataset.status
+    wx.navigateTo({
+      url: `/pages/order-list/order-list?status=${status}&showTabs=false`
+    })
+  },
+
+  /**
+   * 查看全部订单
+   */
+  viewAllOrders() {
+    if (!this.data.isLoggedIn) {
+      return wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      })
+    }
+    
+    wx.navigateTo({
+      url: '/pages/order-list/order-list?showTabs=true'
+    })
+  },
+
+  /**
+   * 跳转到指定页面
+   * @param {object} e - 事件对象，包含页面URL
+   */
+  navigateTo(e) {
+    const url = e.currentTarget.dataset.url
+    wx.navigateTo({ url })
+  },
+
+  /**
+   * 修改密码
+   */
+  onChangePassword() {
+    wx.navigateTo({
+      url: '/pages/change-password/change-password'
     })
   }
 })

@@ -39,6 +39,11 @@ const API = {
   // 订单相关
   ORDER_LIST: `${config.BASE_URL}/frontend/order/list`,
   ORDER_CREATE: `${config.BASE_URL}/frontend/order/create`,
+  ORDER_DETAIL: `${config.BASE_URL}/frontend/order/detail`,
+  ORDER_CANCEL: `${config.BASE_URL}/frontend/order/cancel`,
+  ORDER_PAY: `${config.BASE_URL}/frontend/order/pay`,
+  ORDER_CONFIRM_RECEIVE: `${config.BASE_URL}/frontend/order/confirm`,
+  ORDER_COUNT: `${config.BASE_URL}/frontend/order/count`,
   
   // 购物车相关
   CART_LIST: `${config.BASE_URL}/frontend/cart`,
