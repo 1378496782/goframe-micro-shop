@@ -49,7 +49,7 @@ payment:
     serialNo: "CHANGE_ME_WECHAT_SERIAL_NO"    # 商户证书序列号
     apiV3Key: "CHANGE_ME_WECHAT_API_V3_KEY"            # APIv3 密钥
     appId: "CHANGE_ME_WECHAT_APP_ID"                             # 小程序 AppId
-    notifyUrl: "https://yourdomain.com/wechat/notify"       # 支付回调地址
+    notifyUrl: "https://business.dayu.club/frontend/notify"         # 支付回调地址
     privateKey: |
       CHANGE_ME_WECHAT_PRIVATE_KEY
       -----END PRIVATE KEY-----
