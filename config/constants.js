@@ -1,10 +1,10 @@
 // 公共常量配置
-const { config } = require('../utils/env');
+const { config, isDev } = require('../utils/env');
 
 const constants = {
   // 图片域名配置 
-  IMAGE_BASE_URL: config.env === 'development' 
-    ? 'http://127.0.0.1:8399/' 
+  IMAGE_BASE_URL: isDev 
+    ? 'http://127.0.0.1:8808/' 
     : 'https://shopadmin.dayu.club/',
   
   // 分页配置

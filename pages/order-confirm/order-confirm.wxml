@@ -25,15 +25,22 @@
 
   <!-- 备注输入框 -->
   <view class="remark-section">
-    <view class="section-title">备注信息</view>
+    <view class="section-title">
+      备注信息
+      <text class="required-mark">*</text>
+      <text class="remark-hint">（请填写微信号或手机号，方便客服联系）</text>
+    </view>
     <textarea 
-      class="remark-input" 
+      class="remark-input {{remarkError ? 'error' : ''}}" 
       placeholder="请填写微信号或者手机号" 
       placeholder-class="placeholder"
       value="{{remark}}"
       bindinput="onRemarkInput"
-      maxlength="100"
+      maxlength="50"
+      bindblur="onRemarkBlur"
     ></textarea>
+    <view wx:if="{{remarkError}}" class="error-message">{{remarkError}}</view>
+    <view class="char-count">{{remark.length}}/50</view>
   </view>
 
   <!-- 价格汇总 -->

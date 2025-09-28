@@ -207,14 +207,81 @@ Page({
 
   // 处理备注输入
   onRemarkInput(e) {
+    const value = e.detail.value
+    let error = ''
+    
+    // 实时校验
+    if (value.trim().length === 0) {
+      error = '备注信息不能为空'
+    } else if (value.length < 2) {
+      error = '备注信息至少需要2个字符'
+    } else if (!/^[\u4e00-\u9fa5a-zA-Z0-9_-]+$/.test(value.trim())) {
+      error = '只能包含中文、英文、数字、下划线和减号'
+    }
+    
     this.setData({
-      remark: e.detail.value
+      remark: value,
+      remarkError: error
+    })
+  },
+
+  // 备注输入框失去焦点时的校验
+  onRemarkBlur(e) {
+    const value = e.detail.value.trim()
+    let error = ''
+    
+    if (value.length === 0) {
+      error = '备注信息不能为空，请填写微信号或手机号'
+    } else if (value.length < 2) {
+      error = '备注信息至少需要2个字符'
+    } else if (!/^[\u4e00-\u9fa5a-zA-Z0-9_-]+$/.test(value)) {
+      error = '只能包含中文、英文、数字、下划线和减号'
+    }
+    
+    this.setData({
+      remarkError: error
     })
   },
 
   // 提交订单
   async submitOrder() {
     if (this.data.loading) return;
+    
+    // 必填校验
+    if (!this.data.remark || this.data.remark.trim().length === 0) {
+      this.setData({
+        remarkError: '备注信息不能为空，请填写微信号或手机号'
+      });
+      wx.showToast({
+        title: '请填写备注信息',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 格式校验
+    const remark = this.data.remark.trim();
+    if (remark.length < 2) {
+      this.setData({
+        remarkError: '备注信息至少需要2个字符'
+      });
+      wx.showToast({
+        title: '备注信息太短',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    if (!/^[\u4e00-\u9fa5a-zA-Z0-9_-]+$/.test(remark)) {
+      this.setData({
+        remarkError: '只能包含中文、英文、数字、下划线和减号'
+      });
+      wx.showToast({
+        title: '备注信息格式不正确',
+        icon: 'none'
+      });
+      return;
+    }
     
     this.setData({ loading: true });
     

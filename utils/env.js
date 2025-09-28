@@ -3,10 +3,10 @@ const isDev = false // 开发环境
 
 // 开发环境配置 - 使用HTTP并关闭域名校验
 const DEV_CONFIG = {
-  BASE_URL: 'http://192.168.1.5:8199',
-  UPLOAD_URL: 'http://192.168.1.5:8399',
-  SEARCH_URL: 'http://192.168.1.5:8499',
-  IMAGE_BASE_URL: 'http://192.168.1.5:8808/',
+  BASE_URL: 'http://127.0.0.1:8199',
+  UPLOAD_URL: 'http://127.0.0.1:8399',
+  SEARCH_URL: 'http://127.0.0.1:8499',
+  IMAGE_BASE_URL: 'http://127.0.0.1:8808/',
   SKIP_DOMAIN_CHECK: true
 } 
  

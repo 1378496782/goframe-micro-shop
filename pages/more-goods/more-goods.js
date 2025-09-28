@@ -1,4 +1,5 @@
 const { api } = require('../../utils/api');
+const constants = require('../../config/constants');
 
 Page({
   data: {
@@ -37,7 +38,7 @@ Page({
           // 处理图片URL，确保是完整URL
           let mainImage = item.pic_url || 'https://via.placeholder.com/200x200?text=商品图片';
           if (mainImage && !mainImage.startsWith('http')) {
-            mainImage = 'https://shopadmin.dayu.club/' + mainImage;
+            mainImage = constants.IMAGE_BASE_URL + mainImage;
           }
           
           return {

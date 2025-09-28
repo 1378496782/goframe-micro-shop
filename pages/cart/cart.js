@@ -96,20 +96,33 @@ Page({
         }
       })
       
+      // 获取图片基础URL
+      const constants = require('../../config/constants')
+      const imageBaseUrl = constants.IMAGE_BASE_URL
+      
       // 转换为前端需要的格式
-      const newItems = Array.from(itemMap.values()).map(item => ({
-        id: item.id,
-        goods_id: item.goods_id,
-        name: item.goods_name,
-        spec: item.goods_brand || '默认规格',
-        price: (item.goods_price / 100).toFixed(2), // 分转元并格式化
-        originalPrice: ((item.goods_price * 1.2) / 100).toFixed(2), // 计算原价并格式化
-        image: item.goods_pic_url,
-        quantity: item.count, // 合并后的数量
-        selected: false,
-        stock: item.goods_stock,
-        sale: item.goods_sale
-      }))
+      const newItems = Array.from(itemMap.values()).map(item => {
+        // 处理图片URL，确保使用完整的URL路径
+        let imageUrl = item.goods_pic_url
+        if (imageUrl && !imageUrl.startsWith('http')) {
+          // 如果URL不是完整的HTTP地址，拼接基础URL
+          imageUrl = imageBaseUrl + imageUrl.replace(/^\//, '')
+        }
+        
+        return {
+          id: item.id,
+          goods_id: item.goods_id,
+          name: item.goods_name,
+          spec: item.goods_brand || '默认规格',
+          price: (item.goods_price / 100).toFixed(2), // 分转元并格式化
+          originalPrice: ((item.goods_price * 1.2) / 100).toFixed(2), // 计算原价并格式化
+          image: imageUrl,
+          quantity: item.count, // 合并后的数量
+          selected: false,
+          stock: item.goods_stock,
+          sale: item.goods_sale
+        }
+      })
       
       console.log('转换后的商品列表:', newItems)
       

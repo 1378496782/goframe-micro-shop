@@ -1,4 +1,4 @@
- /**
+/**
  * 用户中心页面
  * 功能：处理用户登录、个人信息展示、头像上传等功能
  */
@@ -303,10 +303,7 @@ Page({
             icon: 'success'
           })
           
-          // 返回登录页面
-          wx.reLaunch({
-            url: '/pages/login/login'
-          })
+          // 留在当前用户页面，显示微信一键登录按钮
         }
       }
     })
@@ -400,14 +397,5 @@ Page({
   navigateTo(e) {
     const url = e.currentTarget.dataset.url
     wx.navigateTo({ url })
-  },
-
-  /**
-   * 修改密码
-   */
-  onChangePassword() {
-    wx.navigateTo({
-      url: '/pages/change-password/change-password'
-    })
   }
 })

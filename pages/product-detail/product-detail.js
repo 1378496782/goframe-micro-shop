@@ -139,8 +139,8 @@ Page({
         content: '请先登录',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
+            wx.switchTab({
+              url: '/pages/user/user'
             })
           }
         }
@@ -179,8 +179,8 @@ Page({
         content: '请先登录',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
+            wx.switchTab({
+              url: '/pages/user/user'
             })
           }
         }

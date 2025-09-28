@@ -172,6 +172,10 @@ Page({
    * @returns {Array} 格式化后的订单列表数据
    */
   formatOrderList: function (list) {
+    // 获取图片基础URL
+    const constants = require('../../config/constants')
+    const imageBaseUrl = constants.IMAGE_BASE_URL
+    
     return list.map(order => {
       // 计算订单总金额
       let totalAmount = 0;
@@ -179,6 +183,19 @@ Page({
         totalAmount = order.goods.reduce((sum, item) => {
           return sum + (item.price * item.quantity);
         }, 0);
+        
+        // 处理商品图片URL
+        order.goods = order.goods.map(item => {
+          let imageUrl = item.image || item.goods_pic_url
+          if (imageUrl && !imageUrl.startsWith('http')) {
+            // 如果URL不是完整的HTTP地址，拼接基础URL
+            imageUrl = imageBaseUrl + imageUrl.replace(/^\//, '')
+          }
+          return {
+            ...item,
+            image: imageUrl
+          }
+        })
       }
       
       // 格式化订单状态文本
