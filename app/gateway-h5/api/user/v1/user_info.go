@@ -35,6 +35,7 @@ type WxMiniLoginRes struct {
 	Type     string        `json:"type" dc:"token类型"`
 	Token    string        `json:"token" dc:"token字符串"`
 	ExpireIn uint32        `json:"expire_in" dc:"过期时间（秒）"`
+	OpenId   string        `json:"openId" dc:"用户唯一凭证"`
 	UserInfo *UserInfoBase `json:"user_info" dc:"用户基础信息"`
 }
 

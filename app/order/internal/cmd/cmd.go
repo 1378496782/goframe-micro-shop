@@ -4,8 +4,9 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"syscall"
-	
+
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcmd"
@@ -28,17 +29,22 @@ var (
 				g.Log().Errorf(ctx, "创建消费者管理器失败: %v", err)
 				return err
 			}
-			
+			// 创建支付客户端
+			if err := payment.InitWechatClient(); err != nil {
+				g.Log().Errorf(ctx, "支付客户端初始化失败:%v", err)
+				return err
+			}
+
 			// 注册order服务的消费者
 			setupConsumers(ctx, consumerManager)
-			
+
 			// 启动消费者管理器
 			err = consumerManager.Start()
 			if err != nil {
 				g.Log().Errorf(ctx, "启动消费者管理器失败: %v", err)
 				return err
 			}
-			
+
 			// 设置优雅关闭
 			go func() {
 				quit := make(chan os.Signal, 1)
@@ -47,7 +53,7 @@ var (
 				g.Log().Info(ctx, "正在关闭消费者管理器...")
 				consumerManager.Stop()
 			}()
-			
+
 			// 启动gRPC服务
 			c := grpcx.Server.NewConfig()
 			c.Options = append(c.Options, []grpc.ServerOption{
@@ -69,7 +75,7 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	// 添加优惠券确认结果消费者
 	couponResultConsumer := consumer.NewCouponResultConsumer(ctx)
 	manager.AddConsumer(couponResultConsumer)
-	
+
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)
 	// manager.AddConsumer(anotherConsumer)

@@ -14,7 +14,7 @@ grpc:
 
 database:
   default:
-    link: "mysql:root:root@tcp(mysql:3306)/banner"
+    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/banner"
     debug: false
 
 etcd:

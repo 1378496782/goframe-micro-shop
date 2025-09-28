@@ -14,7 +14,7 @@ grpc:
 
 database:
   default:
-    link: "mysql:root:root@tcp(mysql:3306)/admin"
+    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/admin"
     debug: false
 
 etcd:

@@ -12,6 +12,8 @@ service order_info {
   rpc Create(OrderInfoCreateReq) returns (OrderInfoCreateRes) {}
   rpc GetDetail(OrderInfoGetDetailReq) returns (OrderInfoGetDetailRes) {}
   rpc GetList(OrderInfoGetListReq) returns (OrderInfoGetListRes) {}
+  rpc Payment(PaymentReq)returns(PaymentRes){}
+  rpc Notify(NotifyReq)returns(NotifyRes){}
 }
 
 // 创建订单请求
@@ -42,6 +44,7 @@ message OrderGoodsItem {
 // 创建订单响应
 message OrderInfoCreateRes {
   uint32 id = 1;
+  string number=2;
 }
 
 // 根据ID查询请求
@@ -55,32 +58,105 @@ message OrderInfoGetDetailRes {
   repeated pbentity.OrderGoodsInfo order_goods_infos = 2;
 }
 
-// 分页查询请求
-message OrderInfoGetListReq {
-  uint32 page = 1;                        // 分页号码，默认1
-  uint32 size = 2;                        // 分页数量，最大50
-  string number = 3;                     // 订单编号
-  uint32 user_id = 4;                     // 用户id
-  uint32 pay_type = 5;                    // 支付方式 1微信 2支付宝 3云闪付
-  google.protobuf.Timestamp pay_at_gte = 6; // 支付时间>=
-  google.protobuf.Timestamp pay_at_lte = 7; // 支付时间<=
-  uint32 status = 8;                      // 订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消
-  string consignee_phone = 9;            // 收货人手机号
-  uint32 price_gte = 10;                  // 订单金额>= 单位分
-  uint32 price_lte = 11;                  // 订单金额<= 单位分
-  google.protobuf.Timestamp date_gte = 12; // 创建时间>=
-  google.protobuf.Timestamp date_lte = 13; // 创建时间<=
+// // 分页查询请求 ======= V1版本  ========
+//message OrderInfoGetListReq {
+//  uint32 page = 1;                        // 分页号码，默认1
+//  uint32 size = 2;                        // 分页数量，最大50
+//  string number = 3;                     // 订单编号
+//  uint32 user_id = 4;                     // 用户id
+//  uint32 pay_type = 5;                    // 支付方式 1微信 2支付宝 3云闪付
+//  google.protobuf.Timestamp pay_at_gte = 6; // 支付时间>=
+//  google.protobuf.Timestamp pay_at_lte = 7; // 支付时间<=
+//  uint32 status = 8;                      // 订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消
+//  string consignee_phone = 9;            // 收货人手机号
+//  uint32 price_gte = 10;                  // 订单金额>= 单位分
+//  uint32 price_lte = 11;                  // 订单金额<= 单位分
+//  google.protobuf.Timestamp date_gte = 12; // 创建时间>=
+//  google.protobuf.Timestamp date_lte = 13; // 创建时间<=
+//}
+
+
+//    =======分页查询请求 V2版本 模仿淘宝 order服务内改动 ========
+message OrderInfoGetListReq{
+    uint32 user_id = 1;                      // user_id 用户id 不确定该不该有 先写
+    uint32 page = 2;                        // 分页号码，默认1
+    uint32 size = 3;                        // 分页数量，最大50
+    uint32 status = 4;                        //订单支付状态 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消
+
 }
 
-// 分页数据响应
-message OrderInfoListResponse {
-  repeated pbentity.OrderInfo list = 1;
-  uint32 total = 2;
-  uint32 page = 3;
-  uint32 size = 4;
+
+//  分页数据响应 v1 版本
+// message OrderInfoListResponse {
+//   repeated pbentity.OrderInfo list = 1;
+//   uint32 total = 2;
+//   uint32 page = 3;
+//   uint32 size = 4;
+// }
+
+// 响应专用结构体
+message OrderListInfo{
+  int32 id =1; //order_info的 id字段 orderid
+  int32   userId    = 2;  //用户id，调接口测试用
+  string  number    = 3; //订单编号
+  int32   status    = 4; //支付状态
+  int32   price     = 5; //订单总金额
+  int32 actual_price =6; //  订单实际金额
+  repeated OrderListGoodsInfo goods_info = 7; // 关联的订单商品信息
 }
+
+
+//响应专供结构体 goodsInfo相关
+message OrderListGoodsInfo{
+  int32 goods_id =1;
+  int32 count=2;
+}
+
+
+// 分页数据响应 v2 版本
+message OrderInfoListResponse {
+  repeated OrderListInfo list = 1;
+  uint32 total = 2; // 总数量
+  uint32 page = 3; // 分页号码，默认1
+  uint32 size = 4; // 分页数量，最大50
+//  int32 status = 6; // 订单状态 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消 用于分类状态
+//  int32 price =7; // 订单总金额
+//  int32 actual_price =8; //  订单实际金额
+//  TimeStamp created_at =9; // 订单创建时间 倒序排列
+
+}
+
 
 // 分页查询响应
 message OrderInfoGetListRes {
   OrderInfoListResponse data = 1;
+}
+
+// 支付请求体
+message PaymentReq {
+  string openId = 1;   // 用户登录凭证（微信 openid）
+  int64 amount = 2;    // 金额，单位为分
+  string number = 3;  // 订单Id
+}
+
+// 支付响应体
+message PaymentRes {
+  string timeStamp = 1;   // 时间戳，单位秒，字符串格式
+  string nonceStr = 2;    // 随机字符串，防重放攻击
+  string package = 3;     // 统一下单接口返回的预支付交易会话标识，格式为 prepay_id=***
+  string signType = 4;    // 签名类型，微信支付 v3 常用 RSA
+  string paySign = 5;     // 支付签名，商户后端使用私钥生成
+  string out_trade_no = 6; // 商户订单号，用于后续查单、退款
+}
+
+// 回调请求体
+message NotifyReq {
+  string raw_body = 1; // 微信原始回调 body（JSON）
+  map<string, string> headers = 2; // 回调的 HTTP headers (Wechatpay-Signature, Wechatpay-Timestamp, Wechatpay-Nonce, Wechatpay-Serial)
+}
+
+// 回调响应体
+message NotifyRes{
+  string code = 1;    // SUCCESS / FAIL
+  string message = 2; // 返回信息
 }

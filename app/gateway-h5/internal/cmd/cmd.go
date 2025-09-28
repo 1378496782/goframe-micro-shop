@@ -36,6 +36,7 @@ var (
 						userController.UserInfoRegister,
 						userController.UserInfoLogin,
 						userController.WxMiniLogin,
+						orderController.Notify,
 						goodsController.CategoryInfoGetAll,
 						goodsController.CategoryInfoGetList,
 						goodsController.GoodsInfoGetDetail,
@@ -59,11 +60,18 @@ var (
 						goodsController.CartInfoDelete,
 						goodsController.UserCouponInfoGetList,
 						interactionController,
-						orderController,
+						orderController.Payment,
+						orderController.OrderInfoCreate,
+						orderController.OrderInfoGetList,
+						orderController.RefundInfoGetDetail,
+						orderController.RefundInfoGetList,
+						orderController.RefundInfoCreate,
 					)
 				})
 			})
 
+			// 本地测试微信支付用
+			//s.EnableHTTPS("D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.pem", "D:/goland/codes/exercise/paymentDemo/cert/shop.dayu.club.key")
 			s.Run()
 			return nil
 		},

@@ -15,6 +15,7 @@ require (
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/silenceper/wechat/v2 v2.1.9
 	github.com/streadway/amqp v1.1.0
+	github.com/wechatpay-apiv3/wechatpay-go v0.2.21
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.7
 )

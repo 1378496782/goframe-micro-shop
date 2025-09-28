@@ -154,7 +154,7 @@ func GetUserInfo(ctx context.Context, userId int) (*entity.UserInfo, error) {
 func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (token string, expireIn int, userInfo *entity.UserInfo, err error) {
 	// 1. 参数校验
 	if openId == "" {
-		return "", 0, nil, errors.New("用登录凭证不能为空")
+		return "", 0, nil, errors.New("用户登录凭证不能为空")
 	}
 
 	// 2. 查询用户
