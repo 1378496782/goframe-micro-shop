@@ -108,7 +108,7 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 
 	// 设置订单特有字段
 	order.Number = utility.GenerateOrderNumber()
-	order.Status = 6 // 6待确认
+	order.Status = 1 // 6待确认
 	order.CreatedAt = gtime.Now()
 	order.UpdatedAt = gtime.Now()
 
