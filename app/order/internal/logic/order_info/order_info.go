@@ -409,6 +409,7 @@ func GetList(ctx context.Context, req *v1.OrderInfoGetListReq) ([]*v1.OrderListI
 	if err != nil {
 		return nil, 0, gerror.Wrap(err, "查询订单失败")
 	}
+	fmt.Println("orders:", orders)
 
 	// 2. 查询总数
 	total, err := g.Model("order_info").

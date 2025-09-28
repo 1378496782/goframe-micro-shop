@@ -3,6 +3,7 @@ package order_info
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
@@ -69,6 +70,7 @@ func (c *Controller) GetList(ctx context.Context, req *v1.OrderInfoGetListReq) (
 	if req.Size <= 0 || req.Size > 50 {
 		req.Size = 10
 	}
+	fmt.Println("req!!!", req)
 
 	// 调用Service层获取数据
 	pbOrders, total, err := order_info.GetList(ctx, req)
