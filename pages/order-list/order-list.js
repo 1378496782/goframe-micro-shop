@@ -29,8 +29,7 @@ Page({
       { id: 1, name: '待付款' },
       { id: 2, name: '待发货' },
       { id: 3, name: '待收货' },
-      { id: 4, name: '已完成' },
-      { id: 5, name: '售后' }
+      { id: 4, name: '已完成' }
     ],
     statusTitles: {
       1: '待付款订单',
@@ -124,19 +123,20 @@ Page({
     // 构建请求参数
     const params = {
       page: page,
-      limit: this.data.limit,
-      status: this.data.activeTab
+      size: this.data.limit,
+      status: this.data.activeTab,
+      user_id: app.globalData.userInfo.id
     };
     
     // 调用订单列表接口
     request({
-      url: API.ORDER_LIST,
+      url: 'https://business.dayu.club/frontend/order/list',
       method: 'GET',
       data: params
     }).then(res => {
-      if (res.code === 0 && res.data) {
-        const newList = res.data.list || [];
-        const totalOrders = res.data.total || 0;
+      if (res && res.list) {
+        const newList = res.list || [];
+        const totalOrders = res.total || 0;
         
         // 格式化订单数据
         const formattedList = this.formatOrderList(newList);
@@ -173,25 +173,24 @@ Page({
    */
   formatOrderList: function (list) {
     return list.map(order => {
-      // 计算订单总金额
-      let totalAmount = 0;
-      if (order.goods && order.goods.length > 0) {
-        totalAmount = order.goods.reduce((sum, item) => {
-          return sum + (item.price * item.quantity);
-        }, 0);
-      }
-      
+      // 处理商品信息
+      const goods = (order.goods_info || []).map(item => ({
+        id: item.goods_id,
+        name: item.goods_name,
+        count: item.count,
+        price: item.price,
+        pic_url: item.pic_url ? `https://shopadmin.dayu.club/upload_file/${item.pic_url}` : ''
+      }));
+
       // 格式化订单状态文本
       const statusText = this.getStatusText(order.status);
       
-      // 格式化订单时间
-      const createTime = order.create_time ? this.formatTime(order.create_time) : '';
-      
       return {
         ...order,
-        totalAmount,
+        goods,
+        totalAmount: order.actual_price,
         statusText,
-        createTime
+        createTime: order.create_time ? this.formatTime(order.create_time) : ''
       };
     });
   },
@@ -203,11 +202,13 @@ Page({
    */
   getStatusText: function (status) {
     const statusMap = {
-      1: '待付款',
-      2: '待发货',
-      3: '待收货',
-      4: '已完成',
-      5: '售后处理中'
+      1: '待支付',
+      2: '已支付待发货',
+      3: '已发货',
+      4: '已收货待评价',
+      5: '已评价',
+      6: '待确认',
+      7: '已取消'
     };
     return statusMap[status] || '未知状态';
   },
