@@ -69,8 +69,11 @@ func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (st
 		return "", "", err
 	}
 
-	// 返回完整访问URL
-	return domain + "/" + key, key, nil
+	// 私有空间生成签名URL
+	deadline := time.Now().Add(time.Hour).Unix() // 1小时有效
+	privateURL := storage.MakePrivateURL(mac, domain, key, deadline)
+
+	return privateURL, key, nil
 }
 
 // generateUniqueFilename 生成保留原始文件名的唯一文件名
