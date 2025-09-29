@@ -121,40 +121,72 @@ Page({
     }
     
     // 构建请求参数
+    console.log('[loadOrderList] 用户信息:', app.globalData.userInfo);
     const params = {
       page: page,
       size: this.data.limit,
       status: this.data.activeTab,
       user_id: app.globalData.userInfo.id
     };
+    console.log('[loadOrderList] 请求参数:', params);
     
     // 调用订单列表接口
     request({
-      url: 'https://business.dayu.club/frontend/order/list',
+      url: API.ORDER_LIST,
       method: 'GET',
       data: params
     }).then(res => {
+      console.log('[loadOrderList] API响应:', res);
       if (res && res.list) {
         const newList = res.list || [];
         const totalOrders = res.total || 0;
         
+        console.log('[loadOrderList] 订单列表:', newList);
+        console.log('[loadOrderList] 总订单数:', totalOrders);
+        
+        // 如果没有订单数据，直接设置空数组
+        if (!newList || newList.length === 0) {
+          this.setData({
+            orderList: [],
+            page: page + 1,
+            hasMore: false
+          });
+          return;
+        }
+        
         // 格式化订单数据
         const formattedList = this.formatOrderList(newList);
+        
+        console.log('[loadOrderList] 格式化后的列表:', formattedList);
         
         // 更新页面数据
         this.setData({
           orderList: refresh ? formattedList : [...this.data.orderList, ...formattedList],
           page: page + 1,
           hasMore: (page * this.data.limit) < totalOrders
+        }, () => {
+          console.log('[loadOrderList] 页面数据更新完成:', this.data.orderList);
         });
       } else {
+        // 如果res.list为null，也显示空状态
+        this.setData({
+          orderList: [],
+          page: page + 1,
+          hasMore: false
+        });
         wx.showToast({
-          title: res.msg || '加载失败',
+          title: res.msg || '暂无订单数据',
           icon: 'none'
         });
       }
     }).catch(err => {
       console.error('加载订单列表失败:', err);
+      // 发生错误时也显示空状态
+      this.setData({
+        orderList: [],
+        page: page + 1,
+        hasMore: false
+      });
       wx.showToast({
         title: '加载失败，请重试',
         icon: 'none'
@@ -176,38 +208,49 @@ Page({
     const constants = require('../../config/constants')
     const imageBaseUrl = constants.IMAGE_BASE_URL
     
+    console.log('[formatOrderList] 原始数据:', list);
+    
     return list.map(order => {
-      // 计算订单总金额
-      let totalAmount = 0;
-      if (order.goods && order.goods.length > 0) {
-        totalAmount = order.goods.reduce((sum, item) => {
-          return sum + (item.price * item.quantity);
-        }, 0);
-        
-        // 处理商品图片URL
-        order.goods = order.goods.map(item => {
-          let imageUrl = item.image || item.goods_pic_url
+      console.log('[formatOrderList] 处理订单:', order);
+      
+      // 适配后端数据格式，将goods_info转换为goods
+      let goods = [];
+      if (order.goods_info && order.goods_info.length > 0) {
+        goods = order.goods_info.map(item => {
+          console.log('[formatOrderList] 处理商品项:', item);
+          let imageUrl = item.pic_url;
           if (imageUrl && !imageUrl.startsWith('http')) {
             // 如果URL不是完整的HTTP地址，拼接基础URL
             imageUrl = imageBaseUrl + imageUrl.replace(/^\//, '')
           }
+          console.log('[formatOrderList] 图片URL:', imageUrl);
           return {
-            ...item,
-            image: imageUrl
+            id: item.goods_id,
+            name: item.goods_name,
+            image: imageUrl,
+            goods_pic_url: imageUrl,
+            price: item.price || 0,
+            goods_price: item.price || 0,
+            quantity: item.count || 1,
+            count: item.count || 1
           }
-        })
+        });
       }
       
       // 格式化订单状态文本
       const statusText = this.getStatusText(order.status);
       
-      return {
+      const formattedOrder = {
         ...order,
-        goods,
-        totalAmount: order.actual_price,
+        goods: goods,
+        totalAmount: order.actual_price || order.price || 0,
         statusText,
-        createTime: order.create_time ? this.formatTime(order.create_time) : ''
+        createTime: order.created_at || order.create_time ? this.formatTime(order.created_at || order.create_time) : '',
+        order_number: order.number || order.order_number
       };
+      
+      console.log('[formatOrderList] 格式化后订单:', formattedOrder);
+      return formattedOrder;
     });
   },
 

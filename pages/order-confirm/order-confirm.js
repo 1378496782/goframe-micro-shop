@@ -175,6 +175,13 @@ Page({
       return
     }
     
+    // 如果点击的是已经选中的优惠券，则取消选中
+    if (this.data.selectedCoupon && this.data.selectedCoupon.id === coupon.id) {
+      console.log('取消选中优惠券')
+      this.removeCoupon()
+      return
+    }
+    
     let couponPrice = coupon.amountYuan; // 直接使用元为单位
     let actualPrice = this.data.totalPrice - couponPrice;
     
@@ -292,6 +299,7 @@ Page({
         coupon_price: this.data.couponPrice,
         actual_price: this.data.actualPrice,
         remark: this.data.remark,
+        coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.coupon_id : null, // 添加优惠券ID
         order_goods_info: this.data.orderItems.map(item => ({
           goods_id: item.goods_id || item.id || 0,
           count: item.quantity || item.count || 1,
@@ -313,8 +321,25 @@ Page({
         
         console.log('订单创建成功，订单ID:', orderId, '订单编号:', orderNumber);
         
-        // 调用微信支付接口
-        await this.requestWxPayment(orderNumber);
+        // 检查实际支付金额是否为0
+        if (this.data.actualPrice === 0) {
+          // 金额为0，直接跳转到订单列表页面
+          wx.showToast({
+            title: '订单创建成功',
+            icon: 'success',
+            duration: 2000
+          });
+          
+          // 2秒后跳转到订单列表页面
+          setTimeout(() => {
+            wx.navigateTo({
+              url: '/pages/order-list/order-list'
+            });
+          }, 2000);
+        } else {
+          // 金额不为0，调用微信支付接口
+          await this.requestWxPayment(orderNumber);
+        }
       } else {
         // 订单创建失败
         throw new Error(res.msg || '订单创建失败');
@@ -359,6 +384,9 @@ Page({
       const paymentData = {
         openId: openId,
         amount: Math.round(this.data.actualPrice * 100), // 转换为分
+        total_price: Math.round(this.data.totalPrice * 100), // 总价（分）
+        coupon_price: Math.round(this.data.couponPrice * 100), // 优惠价（分）
+        actual_price: Math.round(this.data.actualPrice * 100), // 实际金额（分）
         number: orderNumber
       };
       

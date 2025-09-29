@@ -13,13 +13,16 @@
   </view>
 
   <!-- 优惠券选择 -->
-  <view class="coupon-section" bindtap="openCouponPopup">
+  <view class="coupon-section">
     <view class="section-title">优惠券</view>
-    <view class="coupon-select">
+    <view class="coupon-select" bindtap="openCouponPopup">
       <text class="coupon-text">
-        {{selectedCoupon ? '已选择优惠券：¥' + selectedCoupon.amountYuan : '选择优惠券'}}
+        {{selectedCoupon ? '已选择优惠券：¥' + selectedCoupon.amountYuan + '（点击可取消）' : '选择优惠券'}}
       </text>
       <text class="coupon-arrow">›</text>
+    </view>
+    <view wx:if="{{selectedCoupon}}" class="coupon-cancel-btn" bindtap="removeCoupon">
+      <text class="cancel-text">取消使用</text>
     </view>
   </view>
 
@@ -77,13 +80,16 @@
           <view class="coupon-amount">¥{{item.amountYuan}}</view>
           <view class="coupon-info">
             <text class="coupon-desc">{{item.desc}}</text>
-            <text class="coupon-expire">点击使用优惠券</text>
+            <text class="coupon-expire">{{selectedCoupon && selectedCoupon.id === item.id ? '点击取消选择' : '点击使用优惠券'}}</text>
           </view>
         </view>
         <view wx:if="{{coupons.length === 0}}" class="empty-coupon">
           <text>暂无可用优惠券</text>
         </view>
       </scroll-view>
+      <view class="popup-footer">
+        <button class="cancel-coupon-btn" wx:if="{{selectedCoupon}}" bindtap="removeCoupon">取消使用优惠券</button>
+      </view>
     </view>
   </view>
 

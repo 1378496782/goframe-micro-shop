@@ -330,7 +330,7 @@ Page({
       }
       
       wx.request({
-        url: `https://business.dayu.club/frontend/payment`,
+        url: `${config.BASE_URL}/frontend/payment`,
         data: paymentData,
         method: 'POST',
         header: header,

@@ -129,25 +129,18 @@
         </view>
       </view>
       
-      <!-- 空状态 - 所有状态都显示3个空白订单 -->
-      <block wx:if="{{orderList.length === 0 && !loading}}">
-        <view class="empty-order-item grid-item" wx:for="{{[1,2,3]}}" wx:key="*this">
-          <view class="empty-goods-image"></view>
-          <view class="empty-goods-info">
-            <view class="empty-goods-name"></view>
-            <view class="empty-goods-spec"></view>
-            <view class="empty-goods-price"></view>
-          </view>
-          <view class="empty-order-actions">
-            <view class="empty-action-btn"></view>
-            <view class="empty-action-btn primary"></view>
-          </view>
+      <!-- 空状态 - 显示"没有订单"提示 -->
+      <view class="empty-state" wx:if="{{orderList.length === 0 && !loading}}">
+        <view class="empty-icon">
+          <text class="empty-text">📦</text>
         </view>
-        <!-- 空白订单提示 -->
-        <view class="empty-order-hint">
-          <text>暂无订单数据</text>
+        <view class="empty-message">
+          <text>没有订单</text>
         </view>
-      </block>
+        <view class="empty-sub-message">
+          <text>您还没有任何订单</text>
+        </view>
+      </view>
       
       <!-- 加载状态 -->
       <view class="loading-state" wx:if="{{loading && page > 1}}">

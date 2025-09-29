@@ -226,16 +226,58 @@ Page({
   // 删除商品
   deleteItem(e) {
     const index = e.currentTarget.dataset.index
+    const item = this.data.cartItems[index]
+    
+    console.log('删除商品:', item)
+    
     wx.showModal({
       title: '提示',
       content: '确定要删除这个商品吗？',
       success: (res) => {
         if (res.confirm) {
-          const cartItems = this.data.cartItems.filter((_, i) => i !== index)
-          this.setData({ cartItems }, () => {
-            this.calculateTotal()
-            this.updateCartCount()
-          })
+          // 调用后端接口删除商品
+          wx.showLoading({ title: '删除中...' })
+          
+          const app = getApp()
+          const { API } = app.globalData
+          const { request } = require('../../utils/request')
+          
+          console.log('调用删除接口:', API.CART_DELETE)
+          console.log('删除参数:', { id: item.id })
+          
+          request({
+            url: API.CART_DELETE, // 使用正确的接口路径
+            method: 'DELETE',
+            data: {
+              id: item.id // 使用购物车项的ID
+            }
+          }).then(data => {
+            wx.hideLoading()
+            console.log('删除接口返回数据:', data)
+            
+            // request.js在业务成功时(code:0)会resolve，直接进入成功处理
+            // 删除成功，从本地数组中移除
+            const cartItems = this.data.cartItems.filter((_, i) => i !== index)
+            this.setData({ cartItems }, () => {
+              this.calculateTotal()
+              this.updateCartCount()
+              wx.showToast({
+                title: '删除成功',
+                icon: 'success'
+              })
+            })
+
+          }).catch(err => {
+              wx.hideLoading()
+              console.error('删除商品失败:', err)
+              // 只有在用户取消确认框时不显示错误提示
+              if (err.message !== '取消删除') {
+                wx.showToast({
+                  title: err.message || '删除失败，请重试',
+                  icon: 'none'
+                })
+              }
+            })
         }
       }
     })

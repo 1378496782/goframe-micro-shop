@@ -39,7 +39,7 @@ const API = {
   // 订单相关
   ORDER_LIST: `${config.BASE_URL}/frontend/order/list`,
   ORDER_CREATE: `${config.BASE_URL}/frontend/order/create`,
-  ORDER_DETAIL: `${config.BASE_URL}/frontend/order/detail`,
+  ORDER_DETAIL: `${config.BASE_URL}/frontend/order`,
   ORDER_CANCEL: `${config.BASE_URL}/frontend/order/cancel`,
   ORDER_PAY: `${config.BASE_URL}/frontend/order/pay`,
   ORDER_CONFIRM_RECEIVE: `${config.BASE_URL}/frontend/order/confirm`,
@@ -49,7 +49,7 @@ const API = {
   CART_LIST: `${config.BASE_URL}/frontend/cart`,
   CART_ADD: `${config.BASE_URL}/frontend/cart/add`,
   CART_UPDATE: `${config.BASE_URL}/frontend/cart/update`,
-  CART_DELETE: `${config.BASE_URL}/frontend/cart/delete`,
+  CART_DELETE: `${config.BASE_URL}/frontend/cart`,
   
   // 文件上传
   UPLOAD_IMAGE: `${config.UPLOAD_URL}/upload/image` // 图片上传

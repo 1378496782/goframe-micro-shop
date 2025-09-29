@@ -26,29 +26,49 @@
     </view>
     <view class="status-items">
       <view class="status-item" bindtap="viewOrders" data-status="1">
-        <image src="/images/order-pending.png" class="status-icon" />
-        <text>待付款</text>
-        <text class="badge" wx:if="{{orderCounts.pending > 0}}">{{orderCounts.pending}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-pending.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.pending > 0}}">
+            <text class="badge">{{orderCounts.pending}}</text>
+          </view>
+        </view>
+        <text class="status-text">待付款</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="2">
-        <image src="/images/order-shipping.png" class="status-icon" />
-        <text>待发货</text>
-        <text class="badge" wx:if="{{orderCounts.shipping > 0}}">{{orderCounts.shipping}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-shipping.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.shipping > 0}}">
+            <text class="badge">{{orderCounts.shipping}}</text>
+          </view>
+        </view>
+        <text class="status-text">待发货</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="3">
-        <image src="/images/order-delivered.png" class="status-icon" />
-        <text>待收货</text>
-        <text class="badge" wx:if="{{orderCounts.delivered > 0}}">{{orderCounts.delivered}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-delivered.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.delivered > 0}}">
+            <text class="badge">{{orderCounts.delivered}}</text>
+          </view>
+        </view>
+        <text class="status-text">待收货</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="4">
-        <image src="/images/order-completed.png" class="status-icon" />
-        <text>已完成</text>
-        <text class="badge" wx:if="{{orderCounts.completed > 0}}">{{orderCounts.completed}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-completed.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.completed > 0}}">
+            <text class="badge">{{orderCounts.completed}}</text>
+          </view>
+        </view>
+        <text class="status-text">已完成</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="5">
-        <image src="/images/order-after-sale.png" class="status-icon" />
-        <text>售后</text>
-        <text class="badge" wx:if="{{orderCounts.afterSale > 0}}">{{orderCounts.afterSale}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-after-sale.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.afterSale > 0}}">
+            <text class="badge">{{orderCounts.afterSale}}</text>
+          </view>
+        </view>
+        <text class="status-text">售后</text>
       </view>
     </view>
   </view>

@@ -26,7 +26,15 @@ Page({
       afterSale: 0
     },
     tempAvatar: '',
-    uploadedAvatarUrl: ''
+    uploadedAvatarUrl: '',
+    hasShownLoginTip: false
+  },
+
+  /**
+   * 监听orderCounts数据变化
+   */
+  onOrderCountsChange(newOrderCounts) {
+    console.log('orderCounts数据发生变化:', newOrderCounts)
   },
 
   /**
@@ -43,18 +51,36 @@ Page({
    * 已登录则获取用户信息，未登录显示引导提示
    */
   onShow() {
+    console.log('user页面 onShow 开始执行')
     this.checkLoginStatus()
+    console.log('登录状态:', this.data.isLoggedIn)
     if (this.data.isLoggedIn) {
+      console.log('已登录，开始获取用户信息和订单数量')
       this.getUserInfo()
       // 获取订单数量统计
       this.getOrderCounts()
     } else {
-      // 显示登录引导提示
-      wx.showToast({
-        title: '请点击头像登录',
-        icon: 'none',
-        duration: 2000
-      })
+      console.log('未登录，显示登录引导')
+      // 只在首次进入页面时显示登录引导提示
+      if (!this.data.hasShownLoginTip) {
+        this.data.hasShownLoginTip = true
+        // 显示登录引导提示
+        wx.showToast({
+          title: '请点击头像登录',
+          icon: 'none',
+          duration: 2000
+        })
+      }
+    }
+  },
+
+  /**
+   * 数据监听器
+   */
+  observers: {
+    'orderCounts': function(orderCounts) {
+      console.log('orderCounts数据变化观察者 - 新值:', orderCounts)
+      this.onOrderCountsChange(orderCounts)
     }
   },
 
@@ -110,10 +136,13 @@ Page({
    * 从全局状态获取登录信息并更新页面数据
    */
   checkLoginStatus() {
+    console.log('开始检查登录状态')
     const { isLoggedIn, userInfo } = checkLoginStatus()
+    console.log('登录检查结果:', { isLoggedIn, userInfo })
     app.globalData.isLoggedIn = isLoggedIn
     app.globalData.userInfo = userInfo || {}
     this.setData({ isLoggedIn, userInfo: userInfo || {} })
+    console.log('页面数据已更新，登录状态:', this.data.isLoggedIn)
   },
 
   closeWxLoginPopup() {
@@ -310,23 +339,63 @@ Page({
   },
 
   /**
+   * 清除登录状态
+   * 当用户不存在或token失效时调用
+   */
+  clearLoginStatus() {
+    // 清空本地存储
+    wx.removeStorageSync('token')
+    wx.removeStorageSync('userInfo')
+    wx.removeStorageSync('openId')
+    
+    // 重置全局状态
+    app.globalData.isLoggedIn = false
+    app.globalData.userInfo = {}
+    
+    // 更新页面数据
+    this.setData({
+      isLoggedIn: false,
+      userInfo: {}
+    })
+  },
+
+  /**
    * 获取用户信息
    * 获取用户基本信息和订单统计数据
    */
   getUserInfo() {
+    console.log('开始获取用户信息')
     request({
       url: API.USER_INFO,
       method: 'GET'
     }).then(res => {
+      console.log('用户信息接口返回:', res)
       if (res.code === 0 && res.data) {
+        console.log('获取用户信息成功:', res.data)
         // 更新用户信息
         this.setData({ userInfo: res.data })
         // 保存到全局状态和本地存储
         app.globalData.userInfo = res.data
         wx.setStorageSync('userInfo', res.data)
+      } else {
+        console.log('获取用户信息失败，返回数据异常:', res)
       }
     }).catch(err => {
       console.error('获取用户信息失败:', err)
+      // 当获取用户信息失败时，设置为未登录状态
+      // 特别处理用户不存在的错误（code:52），不显示错误提示
+      if (err.message && err.message.includes('用户不存在')) {
+        // 用户不存在，清除登录状态
+        this.clearLoginStatus()
+      } else {
+        // 其他错误，只在开发模式下显示
+        if (app.globalData.isDev) {
+          wx.showToast({
+            title: '获取用户信息失败',
+            icon: 'none'
+          })
+        }
+      }
     })
   },
 
@@ -335,24 +404,49 @@ Page({
    * 获取各状态订单的数量
    */
   getOrderCounts() {
+    console.log('开始获取订单数量统计')
+    console.log('API.ORDER_COUNT:', API.ORDER_COUNT)
     request({
       url: API.ORDER_COUNT,
       method: 'GET'
     }).then(res => {
-      if (res.code === 0 && res.data) {
-        // 更新订单统计数据
-        this.setData({
-          orderCounts: {
-            pending: res.data.pending || 0,
-            shipping: res.data.shipping || 0,
-            delivered: res.data.delivered || 0,
-            completed: res.data.completed || 0,
-            afterSale: res.data.afterSale || 0
-          }
-        })
+      console.log('订单数量接口返回:', res)
+      // 检查返回数据格式
+      if (res && typeof res === 'object') {
+        let orderData = null;
+        
+        // 如果返回的是直接的订单数据对象
+        if (res.pending !== undefined || res.shipping !== undefined) {
+          orderData = res;
+          console.log('直接返回订单数据:', orderData)
+        } 
+        // 如果返回的是标准格式 {code: 0, data: {...}}
+        else if (res.code === 0 && res.data) {
+          orderData = res.data;
+          console.log('标准格式订单数据:', orderData)
+        }
+        
+        if (orderData) {
+          // 更新订单统计数据
+          this.setData({
+            orderCounts: {
+              pending: orderData.pending || 0,
+              shipping: orderData.shipping || 0,
+              delivered: orderData.delivered || 0,
+              completed: orderData.completed || 0,
+              afterSale: orderData.afterSale || 0
+            }
+          })
+          console.log('更新后的orderCounts:', this.data.orderCounts)
+        } else {
+          console.log('无法识别的数据格式:', res)
+        }
+      } else {
+        console.log('订单数量接口返回格式异常:', res)
       }
     }).catch(err => {
       console.error('获取订单统计失败:', err)
+      console.error('错误详情:', JSON.stringify(err))
     })
   },
 

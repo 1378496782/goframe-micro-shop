@@ -97,6 +97,20 @@
   color: #999;
 }
 
+.coupon-cancel-btn {
+  margin-top: 15rpx;
+  padding: 15rpx 20rpx;
+  background: #fff5f5;
+  border-radius: 8rpx;
+  border: 1rpx solid #ffe0e0;
+  text-align: center;
+}
+
+.cancel-text {
+  font-size: 26rpx;
+  color: #e64340;
+}
+
 /* 备注区域 */
 .remark-section {
   background: white;
@@ -334,6 +348,26 @@
   padding: 40rpx;
   color: #999;
   font-size: 28rpx;
+}
+
+.popup-footer {
+  padding: 20rpx 30rpx;
+  border-top: 1rpx solid #eee;
+  background: #f8f8f8;
+}
+
+.cancel-coupon-btn {
+  width: 100%;
+  background: #f5f5f5;
+  color: #666;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  border: 1rpx solid #ddd;
+}
+
+.cancel-coupon-btn:active {
+  background: #e8e8e8;
 }
 
 /* 阻止事件冒泡 */

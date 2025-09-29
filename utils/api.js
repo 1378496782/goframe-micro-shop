@@ -353,32 +353,46 @@ const mockData = {
   '/frontend/order': {
     method: 'GET',
     response: {
-      code: 200,
-      message: 'success',
+      code: 0,
+      message: 'OK',
       data: {
         list: [
           {
-            id: 'ORDER202401010001',
+            id: 1,
+            number: 'ORD202412010001',
+            user_id: 10,
             status: 2, // 1: 待付款, 2: 待发货, 3: 已发货, 4: 已完成, 5: 已取消
-            totalAmount: '11997.00',
-            createTime: '2024-01-01 10:00:00',
-            products: [
-              {
-                name: '高品质智能手机 8GB+256GB',
-                image: 'http://wangzhongyang.com/images/logo_removebg.png',
-                price: '2999.00',
-                quantity: 2
-              },
-              {
-                name: '轻薄笔记本电脑 i7处理器',
-                image: 'http://wangzhongyang.com/images/logo_removebg.png',
-                price: '5999.00',
-                quantity: 1
-              }
-            ]
+            price: 29900,
+            actual_price: 26900,
+            coupon_price: 3000,
+            pay_type: 1,
+            remark: '全栈开发课程',
+            consignee_name: '张三',
+            consignee_phone: '13800138000',
+            consignee_address: '北京市朝阳区某某街道某某小区1号楼1单元101室',
+            created_at: '2024-12-01 10:30:00',
+            updated_at: '2024-12-01 10:30:00',
+            pay_at: '2024-12-01 10:35:00'
+          },
+          {
+            id: 2,
+            number: 'ORD202412020002',
+            user_id: 10,
+            status: 1, // 待支付
+            price: 9900,
+            actual_price: 9900,
+            coupon_price: 0,
+            pay_type: 0,
+            remark: 'xxsaf测试一下乱填',
+            consignee_name: '',
+            consignee_phone: '',
+            consignee_address: '',
+            created_at: '2024-12-02 15:45:00',
+            updated_at: '2024-12-02 15:45:00',
+            pay_at: null
           }
         ],
-        total: 1,
+        total: 2,
         page: 1,
         size: 10
       }
@@ -469,6 +483,99 @@ const mockData = {
             bargainCount: 23, // 已砍次数
             totalBargainCount: 50, // 需要砍的总次数
             participants: 342
+          }
+        ]
+      }
+    }
+  },
+
+  // 订单详情Mock数据
+  '/frontend/order/1': {
+    method: 'GET',
+    response: {
+      code: 0,
+      message: 'OK',
+      data: {
+        order_info: {
+          id: 1,
+          number: 'ORD202412010001',
+          user_id: 10,
+          status: 2,
+          price: 29900, // 299元
+          actual_price: 26900, // 269元（优惠后）
+          coupon_price: 3000,
+          pay_type: 1,
+          remark: '全栈开发课程',
+          consignee_name: '张三',
+          consignee_phone: '13800138000',
+          consignee_address: '北京市朝阳区某某街道某某小区1号楼1单元101室',
+          created_at: '2024-12-01 10:30:00',
+          updated_at: '2024-12-01 10:30:00',
+          pay_at: '2024-12-01 10:35:00'
+        },
+        order_goods_infos: [
+          {
+            goods_id: 1,
+            goods_options_id: 0,
+            count: 1,
+            remark: '',
+            price: 9900, // 99元
+            coupon_price: 0,
+            actual_price: 9900,
+            goods_name: '全栈开发实战课程',
+            goods_pic_url: 'http://wangzhongyang.com/images/fullstack-course.jpg'
+          },
+          {
+            goods_id: 2,
+            goods_options_id: 0,
+            count: 1,
+            remark: '',
+            price: 12900, // 129元
+            coupon_price: 0,
+            actual_price: 12900,
+            goods_name: '微信小程序高级开发',
+            goods_pic_url: 'http://wangzhongyang.com/images/wxapp-course.jpg'
+          }
+        ]
+      }
+    }
+  },
+
+  // 订单详情Mock数据 - 待支付状态
+  '/frontend/order/2': {
+    method: 'GET',
+    response: {
+      code: 0,
+      message: 'OK',
+      data: {
+        order_info: {
+          id: 2,
+          number: 'ORD202412020002',
+          user_id: 10,
+          status: 1,
+          price: 9900, // 99元
+          actual_price: 9900,
+          coupon_price: 0,
+          pay_type: 0,
+          remark: 'xxsaf测试一下乱填',
+          consignee_name: '',
+          consignee_phone: '',
+          consignee_address: '',
+          created_at: '2024-12-02 15:45:00',
+          updated_at: '2024-12-02 15:45:00',
+          pay_at: null
+        },
+        order_goods_infos: [
+          {
+            goods_id: 4,
+            goods_options_id: 0,
+            count: 1,
+            remark: '',
+            price: 0,
+            coupon_price: 0,
+            actual_price: 0,
+            goods_name: '测试商品',
+            goods_pic_url: 'http://wangzhongyang.com/images/test-product.jpg'
           }
         ]
       }
@@ -583,7 +690,7 @@ const api = {
   createOrder: (data) => request('/frontend/order', data, 'POST'),
   submitOrder: (data) => request('/frontend/order', data, 'POST'), // 提交订单
   getOrders: (params) => request('/frontend/order', params, 'GET'),
-  getOrderDetail: (id) => request('/frontend/order/detail', { id }, 'GET'),
+  getOrderDetail: (id) => request(`/frontend/order/${id}`, {}, 'GET'),
   cancelOrder: (id) => request('/frontend/order/cancel', { id }, 'PUT'),
 
   // 拼团砍价相关
