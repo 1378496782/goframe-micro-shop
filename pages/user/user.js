@@ -527,10 +527,17 @@ Page({
           app.globalData.isLoggedIn = false
           app.globalData.userInfo = {}
           
-          // 更新页面数据
+          // 更新页面数据，包括重置订单统计数据
           this.setData({
             isLoggedIn: false,
-            userInfo: {}
+            userInfo: {},
+            orderCounts: {
+              pending: 0,
+              shipping: 0,
+              delivered: 0,
+              completed: 0,
+              afterSale: 0
+            }
           })
           
           wx.showToast({
@@ -558,10 +565,17 @@ Page({
     app.globalData.isLoggedIn = false
     app.globalData.userInfo = {}
     
-    // 更新页面数据
+    // 更新页面数据，包括重置订单统计数据
     this.setData({
       isLoggedIn: false,
-      userInfo: {}
+      userInfo: {},
+      orderCounts: {
+        pending: 0,
+        shipping: 0,
+        delivered: 0,
+        completed: 0,
+        afterSale: 0
+      }
     })
   },
 
