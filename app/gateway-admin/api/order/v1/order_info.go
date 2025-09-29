@@ -76,3 +76,32 @@ type OrderGoodsDetail struct {
 	CouponPrice    uint32 `json:"coupon_price" dc:"商品优惠券金额"`
 	ActualPrice    uint32 `json:"actual_price" dc:"商品实际支付金额"`
 }
+
+type RefundInfoGetListReq struct {
+	g.Meta `path:"/refund" method:"get" tags:"退款管理" sm:"退款分页列表"`
+	UserId string `json:"user_id" dc:"用户ID"`
+	Number string `json:"number" dc:"订单编号"`
+	Page   uint32 `json:"page" d:"1" v:"min:1" dc:"页码"`
+	Size   uint32 `json:"size" d:"10" v:"max:50" dc:"每页数量"`
+}
+
+type RefundInfoGetListRes struct {
+	List  []*RefundInfoItem `json:"list" dc:"退款列表"`
+	Page  uint32            `json:"page" dc:"当前页码"`
+	Size  uint32            `json:"size" dc:"每页数量"`
+	Total uint32            `json:"total" dc:"总数"`
+}
+
+type RefundInfoItem struct {
+	Id           uint32                 `json:"id" dc:"退款ID"`
+	Number       string                 `json:"number" dc:"退款单号"`
+	OrderId      uint32                 `json:"order_id" dc:"订单ID"`
+	GoodsId      uint32                 `json:"goods_id" dc:"商品ID"`
+	Reason       string                 `json:"reason" dc:"退款原因"`
+	Status       uint32                 `json:"status" dc:"状态 1待处理 2同意退款 3拒绝退款"`
+	RefundStatus uint32                 `json:"refund_status" dc:"退款状态 0未退款 1退款中 2退款成功 3退款失败"`
+	RefundAmount int64                  `json:"amount"  dc:"金额，单位为分"`
+	UserId       uint32                 `json:"user_id" dc:"用户ID"`
+	CreatedAt    *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
+	UpdatedAt    *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
+}
