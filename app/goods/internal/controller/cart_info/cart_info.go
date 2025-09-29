@@ -48,14 +48,23 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 }
 
 func (*Controller) Delete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *v1.CartInfoDeleteRes, err error) {
-	// 根据ID从数据库中删除对应信息
-	_, err = dao.CartInfo.Ctx(ctx).Where("id", req.Id).Delete()
+	// 根据ID和用户ID从数据库中删除对应信息
+	result, err := dao.CartInfo.Ctx(ctx).Where("id", req.Id).Where("user_id", req.UserId).Delete()
 	infoError := consts.InfoError(consts.CartInfo, consts.DeleteFail)
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to get rows affected: %v", err)
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "删除失败")
+	}
+	if rowsAffected == 0 {
+		return nil, gerror.NewCode(gcode.CodeNotFound, "购物车中没有该商品或无权删除")
+	}
+
 	// 返回删除成功的空响应
-	return &v1.CartInfoDeleteRes{}, nil // 返回空结构体
+	return &v1.CartInfoDeleteRes{}, nil
 }

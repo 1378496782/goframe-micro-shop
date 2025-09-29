@@ -162,13 +162,17 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 	}
 
 	// 绑定用户或登录
-	token, expireIn, userInfo, err := user_info.WxMiniLogin(ctx, authResult.OpenID, req)
+	token, expireIn, userInfo, isNewUser, err := user_info.WxMiniLogin(ctx, authResult.OpenID, req)
 	// 错误类型
 	infoError := consts.InfoError(consts.UserInfo, consts.LoginFail)
 	if err != nil {
 		// 记录错误日志
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+
+	if isNewUser {
+		go rabbitmq.PublishUserRegisteredEvent(userInfo.Id)
 	}
 
 	// 计算过期时间

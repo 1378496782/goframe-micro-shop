@@ -57,5 +57,4 @@ type CartInfoDeleteReq struct {
 }
 
 type CartInfoDeleteRes struct {
-	Id uint32 `json:"id" v:"required" dc:"购物车ID"`
 }

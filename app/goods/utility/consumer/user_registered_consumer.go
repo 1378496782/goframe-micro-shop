@@ -3,7 +3,7 @@ package consumer
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/user_coupon_info"
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
 )

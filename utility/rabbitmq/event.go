@@ -180,3 +180,46 @@ func PublishOrderTimeoutEvent(orderId int, delayMs int) {
 		g.Log().Infof(ctx, "Published orderTimeout event with %d ms delay: %+v", delayMs, event)
 	}
 }
+
+
+// OrderCreatedEvent 订单创建事件
+type OrderCreatedEvent struct {
+	UserId   uint32   `json:"user_id"`
+	GoodsIds []uint32 `json:"goods_ids"`
+}
+
+// PublishOrderCreatedEvent 发布订单创建事件
+func PublishOrderCreatedEvent(userId uint32, goodsIds []uint32) {
+	ctx := context.Background()
+
+	// 初始化RabbitMQ连接
+	rb, err := NewRabbitMQ(ctx)
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to connect to RabbitMQ: %v", err)
+		return
+	}
+	defer rb.Close()
+
+	// 声明交换机
+	exchange := g.Cfg().MustGet(ctx, "rabbitmq.exchange.orderExchange").String()
+	err = rb.DeclareExchange(exchange, "topic")
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to declare exchange: %v", err)
+		return
+	}
+
+	// 创建事件
+	event := OrderCreatedEvent{
+		UserId:   userId,
+		GoodsIds: goodsIds,
+	}
+
+	// 发布事件
+	routingKey := g.Cfg().MustGet(ctx, "rabbitmq.routingKey.orderCreated").String()
+	err = rb.Publish(exchange, routingKey, event)
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to publish OrderCreatedEvent: %v", err)
+	} else {
+		g.Log().Infof(ctx, "Published OrderCreatedEvent: %+v", event)
+	}
+}
