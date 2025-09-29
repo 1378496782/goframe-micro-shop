@@ -78,6 +78,148 @@ Page({
   },
 
   /**
+<<<<<<< HEAD
+   * 微信登录方法 - 立即显示用户信息填写表单，异步获取授权参数
+   */
+  autoWxLogin() {
+    // 立即显示用户信息填写表单，让用户可以开始操作
+    this.setData({ showUserInfoForm: true })
+    
+    
+    // 并行获取微信授权参数
+    Promise.all([
+      new Promise((resolve, reject) => {
+        wx.getUserProfile({
+          desc: '用于完善会员资料',
+          success: (res) => resolve(res),
+          fail: (err) => reject(err)
+        })
+      }),
+      new Promise((resolve, reject) => {
+        wx.login({
+          success: (res) => resolve(res),
+          fail: (err) => reject(err)
+        })
+      })
+    ]).then(([userRes, loginRes]) => {
+      wx.hideLoading()
+      
+      if (!loginRes.code) {
+        return wx.showToast({ title: '获取code失败', icon: 'none' })
+      }
+      
+      // 保存微信授权信息
+      this.setData({
+        wxLoginCode: loginRes.code,
+        wxIv: userRes.iv,
+        wxEncryptedData: userRes.encryptedData
+      })
+      
+      console.log('微信授权参数获取完成')
+    }).catch((err) => {
+      wx.hideLoading()
+      console.error('获取授权信息失败:', err)
+      // 不显示错误提示，让用户可以继续操作
+    })
+  },
+  
+  /**
+   * 关闭用户信息填写表单
+   */
+  closeUserInfoForm() {
+    this.setData({ showUserInfoForm: false })
+  },
+  
+  /**
+   * 用户选择头像回调
+   * 微信基础库 2.21.2 及以上版本支持
+   */
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail
+    this.setData({
+      tempAvatar: avatarUrl
+    })
+    // 上传头像
+    this.uploadImage(avatarUrl)
+  },
+  
+  /**
+   * 昵称输入处理
+   */
+  onNicknameInput(e) { 
+    this.setData({ tempNickname: e.detail.value }) 
+  },
+  
+  /**
+   * 提交用户信息
+   * 收集用户选择的头像和输入的昵称，然后进行登录
+   */
+  submitUserInfo() {
+    const { tempNickname, uploadedAvatarUrl, tempAvatar, wxLoginCode, wxIv, wxEncryptedData } = this.data
+    
+    if (!tempNickname) {
+      return wx.showToast({ title: '请输入昵称', icon: 'none' })
+    }
+    
+    if (!uploadedAvatarUrl && !tempAvatar) {
+      return wx.showToast({ title: '请选择头像', icon: 'none' })
+    }
+    
+    if (!wxLoginCode) {
+      return wx.showToast({ title: '登录状态已过期，请重试', icon: 'none' })
+    }
+    
+    // 如果有上传成功的头像URL，直接使用
+    // 如果只有临时头像路径但没有上传，先上传头像再登录
+    if (tempAvatar && !uploadedAvatarUrl) {
+      wx.showLoading({ title: '正在上传头像...' })
+      wx.uploadFile({
+        url: API.UPLOAD_IMAGE,
+        filePath: tempAvatar,
+        name: 'File',
+        formData: { 
+          uploader_id: 0, 
+          uploader_type: 1, // 1-H5用户
+          file_type: 1 // 1-图片
+        },
+        success: (res) => {
+          wx.hideLoading()
+          const data = JSON.parse(res.data)
+          if (data.code === 0 && data.data?.url) {
+            // 上传成功后，使用返回的URL进行登录
+            const wxLoginData = {
+              code: wxLoginCode,
+              iv: wxIv,
+              encryptedData: wxEncryptedData,
+              phoneNumber: '',
+              nickname: tempNickname,
+              avatar: data.data.url
+            }
+            this.wxMiniLogin(wxLoginData)
+          } else {
+            wx.showToast({ 
+              title: data.message || '头像上传失败', 
+              icon: 'none' 
+            })
+          }
+        },
+        fail: (err) => {
+          wx.hideLoading()
+          console.error('头像上传失败:', err)
+          wx.showToast({ title: '头像上传失败', icon: 'none' })
+        }
+      })
+    } else {
+      // 已有上传成功的头像URL，直接登录
+      const avatar = uploadedAvatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'
+      const wxLoginData = {
+        code: wxLoginCode,
+        iv: wxIv,
+        encryptedData: wxEncryptedData,
+        phoneNumber: '',
+        nickname: tempNickname,
+        avatar: avatar
+=======
    * 微信登录方法
    * 获取微信授权，然后显示用户信息填写表单
    */
@@ -115,8 +257,10 @@ Page({
         wx.hideLoading()
         console.error('获取用户信息失败:', err)
         wx.showToast({ title: '获取用户信息失败', icon: 'none' })
+>>>>>>> 533fd21365043e63d3abebb3ec683b083f901a94
       }
-    })
+      this.wxMiniLogin(wxLoginData)
+    }
   },
   
   /**
