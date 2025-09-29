@@ -1,0 +1,37 @@
+[2025-09-29 22:59:34] ==========================================
+[2025-09-29 22:59:34] 开始重新构建单个服务: goods-service
+[2025-09-29 22:59:34] ==========================================
+[2025-09-29 22:59:34] 步骤1: 检查服务当前状态
+NAME            IMAGE                                                COMMAND     SERVICE         CREATED        STATUS                  PORTS
+goods-service   shop-goframe-micro-service-refacotor-goods-service   "./goods"   goods-service   11 hours ago   Up 11 hours (healthy)   0.0.0.0:31004->31004/tcp, :::31004->31004/tcp
+[2025-09-29 22:59:34] 停止 goods-service 服务...
+ Container goods-service  Stopping
+ Container goods-service  Stopped
+[2025-09-29 22:59:36] ✅ goods-service 服务停止成功
+[2025-09-29 22:59:36] 查找 goods-service 相关的镜像...
+[2025-09-29 22:59:36] 找到以下相关镜像，将被删除：
+shop-goframe-micro-service-refacotor-goods-service:latest
+[2025-09-29 22:59:36] 删除镜像: shop-goframe-micro-service-refacotor-goods-service:latest
+[2025-09-29 22:59:36] 无法删除镜像 shop-goframe-micro-service-refacotor-goods-service:latest（可能正在被使用）
+[2025-09-29 22:59:36] 构建 goods-service 服务...
+[2025-09-29 23:06:07] ✅ goods-service 服务构建成功
+[2025-09-29 23:06:07] 启动 goods-service 服务...
+ Container etcd  Running
+ Container mysql  Running
+ Container redis  Running
+ Container goods-service  Recreate
+ Container goods-service  Recreated
+ Container mysql  Waiting
+ Container redis  Waiting
+ Container etcd  Waiting
+ Container redis  Healthy
+ Container mysql  Healthy
+ Container etcd  Healthy
+ Container goods-service  Starting
+ Container goods-service  Started
+[2025-09-29 23:06:09] ✅ goods-service 服务启动成功
+[2025-09-29 23:06:09] 步骤6: 等待服务启动...
+[2025-09-29 23:06:24] 步骤7: 最终状态检查
+NAME            IMAGE                                                COMMAND     SERVICE         CREATED          STATUS                             PORTS
+goods-service   shop-goframe-micro-service-refacotor-goods-service   "./goods"   goods-service   16 seconds ago   Up 15 seconds (health: starting)   0.0.0.0:31004->31004/tcp, :::31004->31004/tcp
+[2025-09-29 23:06:24] ✅ 健康检查通过: http://localhost:31004/

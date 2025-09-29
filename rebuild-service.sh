@@ -188,7 +188,7 @@ get_service_image() {
             echo "shop-goframe-micro-manage"
             ;;
         *)
-            echo "shop-goframe-micro-service-refacotor_${service}"
+            echo "shop-goframe-micro-service-refacotor-${service}"
             ;;
     esac
 }
