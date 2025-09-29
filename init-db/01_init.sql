@@ -346,7 +346,7 @@ CREATE TABLE `order_info`  (
            `pay_type` tinyint(1) NOT NULL DEFAULT 0 COMMENT '支付方式 1微信 2支付宝 3云闪付',
            `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
            `pay_at` datetime DEFAULT NULL COMMENT '支付时间',
-           `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消',
+           `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消 8发起退款',
            `consignee_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '收货人姓名',
            `consignee_phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '收货人手机号',
            `consignee_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '收货人详细地址',
@@ -383,23 +383,25 @@ INSERT INTO `order_info` VALUES (16, '1675925468868358000350', 15, 0, '备注', 
 -- ----------------------------
 DROP TABLE IF EXISTS `refund_info`;
 CREATE TABLE `refund_info`  (
-        `id` int NOT NULL AUTO_INCREMENT COMMENT '售后退款表',
-        `number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '售后订单号',
-        `order_id` int NOT NULL COMMENT '订单id',
-        `goods_id` int NOT NULL DEFAULT 0 COMMENT '要售后的商品id\n',
-        `reason` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '退款原因',
-        `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '状态 1待处理 2同意退款 3拒绝退款\n',
-        `user_id` int NOT NULL COMMENT '用户id',
-        `created_at` datetime DEFAULT NULL,
-        `updated_at` datetime DEFAULT NULL,
-        `deleted_at` datetime DEFAULT NULL,
-        PRIMARY KEY (`id`)
+                                `id` int NOT NULL AUTO_INCREMENT COMMENT '售后退款表',
+                                `number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '售后订单号',
+                                `order_id` int NOT NULL COMMENT '订单id',
+                                `goods_id` int NOT NULL DEFAULT 0 COMMENT '要售后的商品id',
+                                `reason` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '退款原因',
+                                `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '审核状态 1待处理 2同意退款 3拒绝退款',
+                                `refund_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '退款状态 0未退款 1退款中 2退款成功 3退款失败',
+                                `refund_amount` int NOT NULL DEFAULT 0 COMMENT '退款金额 单位分',
+                                `user_id` int NOT NULL COMMENT '用户id',
+                                `created_at` datetime DEFAULT NULL,
+                                `updated_at` datetime DEFAULT NULL,
+                                `deleted_at` datetime DEFAULT NULL,
+                                PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of refund_info
 -- ----------------------------
-INSERT INTO `refund_info` VALUES (1, 'refund1659247832739250000428', 1, 1, '不想要了', 1, 1, '2022-07-31 14:10:32', '2022-07-31 14:10:32', NULL);
+INSERT INTO `refund_info` VALUES (1, 'refund1659247832739250000428', 1, 1, '不想要了', 1, 1,1, '2022-07-31 14:10:32', '2022-07-31 14:10:32', NULL);
 
 USE resource;
 

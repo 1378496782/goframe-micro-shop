@@ -24,5 +24,5 @@ etcd:
 qiniu:
   accessKey: "${QINIU_ACCESS_KEY}"
   secretKey: "${QINIU_SECRET_KEY}"
-  bucket: "your-bucket-name"  # 请替换为您的七牛云存储桶名称
-  domain: "http://your-domain.com" # 请替换为您的七牛云访问域名
+  bucket: "shop-camp"  # 请替换为您的七牛云存储桶名称
+  domain: "shop-camp.dayu.club" # 请替换为您的七牛云访问域名
