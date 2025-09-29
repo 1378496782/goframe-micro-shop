@@ -35,11 +35,21 @@ func (*Controller) Create(ctx context.Context, req *v1.OrderInfoCreateReq) (res 
 }
 
 func (*Controller) GetDetail(ctx context.Context, req *v1.OrderInfoGetDetailReq) (res *v1.OrderInfoGetDetailRes, err error) {
-	infoError := consts.InfoError(consts.OrderInfo, consts.GetDetailFile)
+	infoError := consts.InfoError(consts.OrderInfo, consts.GetDetailFail)
 
 	// 调用Service层获取订单详情
-	pbOrder, pbGoodsList, err := order_info.GetDetail(ctx, req.Id)
+	pbOrder, pbGoodsList, err := order_info.GetDetail(ctx, req.Id, req.UserId)
 	if err != nil {
+		// Check for specific errors from logic layer
+		if gerror.Code(err) == gcode.CodeNotAuthorized {
+			g.Log().Warningf(ctx, "User %d attempted to access order %d without permission", req.UserId, req.Id)
+			return nil, err // Forward the permission denied error
+		}
+		if gerror.Code(err) == gcode.CodeNotFound {
+			g.Log().Debugf(ctx, "Order %d not found", req.Id)
+			return nil, err // Forward the not found error
+		}
+		// General error handling, same as Create
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
@@ -127,4 +137,14 @@ func (*Controller) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.Notif
 		Code:    "SUCCESS",
 		Message: "ok",
 	}, nil
+}
+
+func (*Controller) GetCount(ctx context.Context, req *v1.OrderInfoGetCountReq) (res *v1.OrderInfoGetCountRes, err error) {
+	infoError := consts.InfoError(consts.OrderInfo, consts.GetCountFail)
+	res, err = order_info.GetCount(ctx, req.UserId)
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+	return res, nil
 }

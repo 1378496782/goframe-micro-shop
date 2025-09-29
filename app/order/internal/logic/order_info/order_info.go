@@ -6,12 +6,14 @@ import (
 	"fmt"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
+	"shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
 	"shop-goframe-micro-service-refacotor/utility"
 	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
 
+	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -108,7 +110,12 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 
 	// 设置订单特有字段
 	order.Number = utility.GenerateOrderNumber()
-	order.Status = 1 // 6待确认
+	//order.Status = 1 // 6待确认
+	if req.CouponId > 0 {
+		order.Status = int(consts.OrderStatusPendingConfirm) // 使用优惠券，待确认
+	} else {
+		order.Status = int(consts.OrderStatusPendingPayment) // 不使用优惠券，待支付
+	}
 	order.CreatedAt = gtime.Now()
 	order.UpdatedAt = gtime.Now()
 
@@ -141,6 +148,13 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 
 	success = true
 
+	// 订单创建成功后，发布订单创建事件，用于后续操作（如删除购物车商品）
+	var goodsIds []uint32
+	for _, item := range req.OrderGoodsInfo {
+		goodsIds = append(goodsIds, item.GoodsId)
+	}
+	go grabbitmq.PublishOrderCreatedEvent(req.UserId, goodsIds)
+
 	// 订单创建成功后，如果有优惠券使用，发送订单确认消息给goods服务进行优惠券扣减
 	if req.CouponId > 0 {
 		go grabbitmq.PublishCouponConfirmEvent(orderId, int32(req.UserId), int32(req.CouponId))
@@ -166,12 +180,20 @@ func sendOrderTimeoutMessage(ctx context.Context, orderId int32) {
 }
 
 // GetDetail 获取订单详情
-func GetDetail(ctx context.Context, orderId uint32) (*pbentity.OrderInfo, []*pbentity.OrderGoodsInfo, error) {
+func GetDetail(ctx context.Context, orderId uint32, userId uint32) (*pbentity.OrderInfo, []*pbentity.OrderGoodsInfo, error) {
 	// 查询主订单
 	var order entity.OrderInfo
 	err := dao.OrderInfo.Ctx(ctx).WherePri(orderId).Scan(&order)
 	if err != nil {
 		return nil, nil, fmt.Errorf("查询订单失败: %v", err)
+	}
+	// 检查订单是否存在
+	if order.Id == 0 {
+		return nil, nil, gerror.NewCode(gcode.CodeNotFound, "订单不存在")
+	}
+	// 校验订单归属
+	if order.UserId != int(userId) {
+		return nil, nil, gerror.NewCode(gcode.CodeNotAuthorized, "无权访问此订单")
 	}
 
 	// 查询订单商品
@@ -469,7 +491,7 @@ func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
 	}
 
 	// 只有当订单状态变为已支付(2)时才设置支付时间
-	if status == 2 {
+	if status == int(consts.OrderStatusPaid) {
 		updateData["pay_at"] = gtime.Now()
 	}
 
@@ -506,7 +528,7 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 
 	if success {
 		// 优惠券扣减成功，订单状态改为待支付(1)
-		err := UpdateOrderStatus(ctx, orderId, 1)
+		err := UpdateOrderStatus(ctx, orderId, int(consts.OrderStatusPendingPayment))
 		if err != nil {
 			g.Log().Errorf(ctx, "优惠券扣减成功，但更新订单状态失败, 订单ID: %d, 错误: %v", orderId, err)
 			return err
@@ -514,7 +536,7 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 		g.Log().Infof(ctx, "优惠券扣减成功，订单状态已更新为待支付, 订单ID: %d", orderId)
 	} else {
 		// 优惠券扣减失败（未找到数据或状态不是"待使用"），订单状态改为已取消(7)
-		err := UpdateOrderStatus(ctx, orderId, 7)
+		err := UpdateOrderStatus(ctx, orderId, int(consts.OrderStatusCancelled))
 		if err != nil {
 			g.Log().Errorf(ctx, "优惠券扣减失败，但更新订单状态失败, 订单ID: %d, 错误: %v", orderId, err)
 			return err
@@ -528,10 +550,45 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 func IdempotentCheck(ctx context.Context, number string) (bool, error) {
 	exists, err := dao.OrderInfo.Ctx(ctx).
 		Where("number", number).
-		Where("status", 2).
+		Where("status", consts.OrderStatusPaid).
 		Exist()
 	if err != nil {
 		return false, err
 	}
 	return exists, nil
+}
+
+// GetCount 获取各类订单数量
+func GetCount(ctx context.Context, userId uint32) (*v1.OrderInfoGetCountRes, error) {
+	var results []struct {
+		Status int    `json:"status"`
+		Count  uint32 `json:"count"`
+	}
+	err := dao.OrderInfo.Ctx(ctx).
+		Fields("status, COUNT(*) as count").
+		Where("user_id", userId).
+		Group("status").
+		Scan(&results)
+	if err != nil {
+		return nil, gerror.Wrap(err, "查询订单数量失败")
+	}
+
+	res := &v1.OrderInfoGetCountRes{}
+	for _, item := range results {
+		switch consts.OrderStatus(item.Status) {
+		case consts.OrderStatusPendingPayment:
+			res.Pending += item.Count
+		case consts.OrderStatusPaid:
+			res.Shipping += item.Count
+		case consts.OrderStatusShipped:
+			res.Delivered += item.Count
+		case consts.OrderStatusReceived, consts.OrderStatusCompleted:
+			res.Completed += item.Count
+			//TODO 不代表售后
+			//case consts.OrderStatusCancelled:
+			//res.AfterSale += item.Count // Assuming cancelled orders are "afterSale" for now
+		}
+	}
+
+	return res, nil
 }

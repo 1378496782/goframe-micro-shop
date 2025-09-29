@@ -114,7 +114,7 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 		}
 	}
 	// 缓存未命中，查询数据库
-	infoError := consts.InfoError(consts.GoodsInfo, consts.GetDetailFile)
+	infoError := consts.InfoError(consts.GoodsInfo, consts.GetDetailFail)
 	record, err := dao.GoodsInfo.Ctx(ctx).Where("id", req.Id).One()
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)

@@ -151,17 +151,17 @@ func GetUserInfo(ctx context.Context, userId int) (*entity.UserInfo, error) {
 	return &user, nil
 }
 
-func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (token string, expireIn int, userInfo *entity.UserInfo, err error) {
+func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (token string, expireIn int, userInfo *entity.UserInfo, isNewUser bool, err error) {
 	// 1. 参数校验
 	if openId == "" {
-		return "", 0, nil, errors.New("用户登录凭证不能为空")
+		return "", 0, nil, false, errors.New("用户登录凭证不能为空")
 	}
 
 	// 2. 查询用户
 	userRecord, err := dao.UserInfo.Ctx(ctx).Where("open_id", openId).One()
 	if err != nil {
 		g.Log().Errorf(ctx, "查询用户失败: %v", err)
-		return "", 0, nil, errors.New("系统错误")
+		return "", 0, nil, false, errors.New("系统错误")
 	}
 
 	// 3. 注册 or 登录
@@ -169,6 +169,7 @@ func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (to
 	var userId int
 	var user entity.UserInfo
 	if userRecord.IsEmpty() {
+		isNewUser = true
 		// 3-1. 用户不存在，注册
 		user = entity.UserInfo{
 			Name:      req.Nickname,
@@ -183,14 +184,16 @@ func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (to
 		Id, err := dao.UserInfo.Ctx(ctx).InsertAndGetId(&user)
 		if err != nil {
 			g.Log().Errorf(ctx, "创建用户失败: %v", err)
-			return "", 0, nil, errors.New("创建用户失败")
+			return "", 0, nil, false, errors.New("创建用户失败")
 		}
 		userId = int(Id)
+		user.Id = userId
 	} else {
+		isNewUser = false
 		// 3-1. 用户存在，获取 userId
 		if err = userRecord.Struct(&user); err != nil {
 			g.Log().Errorf(ctx, "用户数据解析失败: %v", err)
-			return "", 0, nil, errors.New("系统错误")
+			return "", 0, nil, false, errors.New("系统错误")
 		}
 		userId = user.Id
 	}
@@ -198,8 +201,8 @@ func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (to
 	// 5. 生成JWT Token
 	token, expireTime, err := utility.GenerateToken(uint32(userId))
 	if err != nil {
-		return "", 0, nil, errors.New("生成token错误")
+		return "", 0, nil, false, errors.New("生成token错误")
 	}
 	expireIn = int(expireTime.Sub(time.Now()).Seconds())
-	return token, expireIn, &user, nil
+	return token, expireIn, &user, isNewUser, nil
 }

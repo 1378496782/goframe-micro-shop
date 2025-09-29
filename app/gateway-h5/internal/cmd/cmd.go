@@ -63,6 +63,8 @@ var (
 						orderController.Payment,
 						orderController.OrderInfoCreate,
 						orderController.OrderInfoGetList,
+						orderController.OrderInfoGetCount,
+						orderController.OrderInfoGetDetail,
 						orderController.RefundInfoGetDetail,
 						orderController.RefundInfoGetList,
 						orderController.RefundInfoCreate,
