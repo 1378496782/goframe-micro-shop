@@ -22,7 +22,7 @@ etcd:
   address: "etcd:2379"
 
 qiniu:
-  accessKey: "${QINIU_ACCESS_KEY}"
-  secretKey: "${QINIU_SECRET_KEY}"
+  accessKey: "CHANGE_ME_QINIU_ACCESS_KEY"
+  secretKey: "CHANGE_ME_QINIU_SECRET_KEY"
   bucket: "shop-camp"  # 请替换为您的七牛云存储桶名称
   domain: "shop-camp.dayu.club" # 请替换为您的七牛云访问域名
