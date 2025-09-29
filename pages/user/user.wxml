@@ -4,18 +4,10 @@
     <view class="user-profile" bindtap="onProfileClick">
       <image class="avatar" src="{{userInfo.avatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
       <view class="user-info">
-        <text class="username">{{userInfo.name || userInfo.nickname || '未登录用户'}}</text>
+        <text class="username">{{userInfo.name || userInfo.nickname || '点击登录'}}</text>
         <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
       </view>
     </view>
-    <button 
-      class="login-btn" 
-      wx:if="{{!isLoggedIn}}" 
-      open-type="getUserInfo" 
-      bindgetuserinfo="onGetUserInfo"
-    >
-      微信一键登录
-    </button>
   </view>
 
   <!-- 订单状态 -->
@@ -93,38 +85,46 @@
   </view>
 
 
-  <!-- 微信登录弹窗 -->
-  <view class="wx-login-popup {{showWxLogin ? 'show' : ''}}" catchtap="closeWxLoginPopup">
-    <view class="wx-login-content" catchtap="stopPropagation">
-      <view class="wx-login-header">
-        <text class="wx-login-title">微信一键登录</text>
-        <view class="wx-login-close" bindtap="closeWxLoginPopup">×</view>
+  <!-- 用户信息填写半页面 -->
+  <view class="user-info-form {{showUserInfoForm ? 'show' : ''}}">
+    <view class="form-overlay" catchtap="closeUserInfoForm"></view>
+    <view class="form-content">
+      <view class="form-header">
+        <text class="form-title">请登录授权头像昵称</text>
+        <view class="form-close" bindtap="closeUserInfoForm">×</view>
       </view>
-
-      <view class="wx-login-body">
-        <!-- 头像上传区域 -->
-        <view class="avatar-upload" bindtap="chooseAvatar">
-          <image class="preview-avatar" src="{{tempAvatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=头像'}}" />
-          <text class="upload-text">点击上传头像</text>
+      
+      <view class="form-body">
+        <!-- 头像选择区域 -->
+        <view class="avatar-section">
+          <text class="section-label">头像</text>
+          <view class="avatar-picker">
+            <image class="avatar-preview" src="{{tempAvatar || uploadedAvatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=头像'}}" />
+            <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+              选择头像
+            </button>
+          </view>
         </view>
 
         <!-- 昵称输入区域 -->
-        <view class="nickname-input">
+        <view class="nickname-section">
+          <text class="section-label">昵称</text>
           <input
-            class="input-field"
+            type="nickname"
+            class="nickname-input"
             placeholder="请输入昵称"
             placeholder-class="placeholder"
             value="{{tempNickname}}"
             bindinput="onNicknameInput"
-            bindfocus="showNicknameToolbar"
           />
         </view>
 
-
-        <!-- 微信一键登录按钮 -->
-        <button class="wx-login-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
-          微信一键登录
+        <!-- 提交按钮 -->
+        <button class="submit-btn" bindtap="submitUserInfo">
+          确认授权
         </button>
+        
+        <text class="form-tip">授权后我们将获取您的头像和昵称信息</text>
       </view>
     </view>
   </view>

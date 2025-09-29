@@ -52,7 +52,7 @@ const API = {
   CART_DELETE: `${config.BASE_URL}/frontend/cart`,
   
   // 文件上传
-  UPLOAD_IMAGE: `${config.UPLOAD_URL}/upload/image` // 图片上传
+  UPLOAD_IMAGE: `http://101.42.249.106:8399/upload/image` // 图片上传(暂且使用这个)
 }
 
 module.exports = {
