@@ -401,7 +401,7 @@ CREATE TABLE `refund_info`  (
 -- ----------------------------
 -- Records of refund_info
 -- ----------------------------
-INSERT INTO `refund_info` VALUES (1, 'refund1659247832739250000428', 1, 1, '不想要了', 1, 1,1, '2022-07-31 14:10:32', '2022-07-31 14:10:32', NULL);
+INSERT INTO `refund_info` VALUES (1, 'refund1659247832739250000428', 1, 1, '不想要了', 1,1, 1,1, '2022-07-31 14:10:32', '2022-07-31 14:10:32', NULL);
 
 USE resource;
 
