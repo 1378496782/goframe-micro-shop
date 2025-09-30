@@ -190,7 +190,9 @@ services:
 
   # Go 服务 - 生产环境配置
   goods-service:
-    build: .
+    build:
+      context: .
+      dockerfile: app/goods/Dockerfile
     container_name: goods-service
     command: ["./goods"]
     environment:
@@ -224,7 +226,9 @@ services:
       start_period: 60s
 
   order-service:
-    build: .
+    build:
+      context: .
+      dockerfile: app/order/Dockerfile
     container_name: order-service
     command: ["./order"]
     environment:
@@ -258,7 +262,9 @@ services:
       start_period: 60s
 
   user-service:
-    build: .
+    build:
+      context: .
+      dockerfile: app/user/Dockerfile
     container_name: user-service
     command: ["./user"]
     environment:
@@ -290,7 +296,9 @@ services:
       start_period: 60s
 
   interaction-service:
-    build: .
+    build:
+      context: .
+      dockerfile: app/interaction/Dockerfile
     container_name: interaction-service
     command: ["./interaction"]
     environment:
@@ -322,7 +330,9 @@ services:
       start_period: 60s
 
   search-service:
-    build: .
+    build:
+      context: .
+      dockerfile: app/search/Dockerfile
     container_name: search-service
     command: ["./search"]
     environment:
@@ -356,7 +366,9 @@ services:
       start_period: 60s
 
   gateway-h5:
-    build: .
+    build:
+      context: .
+      dockerfile: app/gateway-h5/Dockerfile
     container_name: gateway-h5
     command: ["./gateway-h5"]
     environment:
@@ -385,7 +397,9 @@ services:
       retries: 3
 
   gateway-resource:
-    build: .
+    build:
+      context: .
+      dockerfile: app/gateway-resource/Dockerfile
     container_name: gateway-resource
     command: ["./gateway-resource"]
     environment:
@@ -415,7 +429,9 @@ services:
       start_period: 60s
 
   banner-service:
-    build: .
+    build:
+      context: .
+      dockerfile: app/banner/Dockerfile
     container_name: banner-service
     command: ["./banner"]
     environment:
@@ -460,8 +476,8 @@ services:
     volumes:
       - ./log/manage:/app/resource/log
       - /etc/localtime:/etc/localtime:ro
-      - ../shop-goframe-micro-service-manage-ui-gfast/dist:/app/resource/public:ro
-      - ./uploads:/app/resource/public/upload_file
+      - ../shop-goframe-micro-service-manage-ui-gfast/dist:/app/resource/public
+      - ./uploads:/app/resource/public/uploads
     depends_on:
       mysql:
         condition: service_healthy
@@ -564,4 +580,6 @@ volumes:
   es_data:
     driver: local
   kibana_data:
+    driver: local
+  uploads_volume:
     driver: local
