@@ -12,4 +12,5 @@ import (
 
 type IFileV1 interface {
 	UploadImage(ctx context.Context, req *v1.UploadImageReq) (res *v1.UploadImageRes, err error)
+	GetAvatarImage(ctx context.Context, req *v1.GetAvatarImageReq) (res *v1.GetAvatarImageRes, err error)
 }
