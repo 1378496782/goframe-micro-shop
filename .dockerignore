@@ -1,0 +1,52 @@
+# 忽略日志文件
+*.log
+logs/
+
+# 忽略测试文件和缓存
+*.test
+*.prof
+*.exe
+*.exe~
+
+# 忽略IDE配置
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 忽略Git相关
+.git/
+.gitignore
+
+# 忽略Docker相关
+Dockerfile*
+.dockerignore
+
+# 忽略文档
+README*
+*.md
+
+# 忽略临时文件
+tmp/
+temp/
+
+# 忽略上传文件
+uploads/
+
+# 忽略配置文件（生产环境使用专门的配置文件）
+*.yaml
+*.yml
+*.json
+config/
+
+# 忽略开发工具
+Makefile
+hack/
+
+# 忽略测试相关
+test/
+*.test
+
+# 忽略编译产物（在Dockerfile中会重新构建）
+bin/
+*.exe
