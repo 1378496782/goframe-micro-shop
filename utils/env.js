@@ -13,7 +13,8 @@ const DEV_CONFIG = {
 // 生产环境配置 - 使用HTTP
 const PROD_CONFIG = {
   BASE_URL: 'https://business.dayu.club',
-  UPLOAD_URL: 'https://business.dayu.club',
+  UPLOAD_URL: 'http://101.42.249.106:8399',
+  // UPLOAD_URL: 'http://127.0.0.1:8399',
   SEARCH_URL: 'http://101.42.249.106:8499',
   IMAGE_BASE_URL: 'http://101.42.249.106:8808/',
   SKIP_DOMAIN_CHECK: false
@@ -28,6 +29,7 @@ const API = {
   USER_LOGIN: `${config.BASE_URL}/frontend/user/login`,
   USER_INFO: `${config.BASE_URL}/frontend/user/info`,
   USER_WX_LOGIN: `${config.BASE_URL}/frontend/user/wxMiniAuth`, // 微信小程序登录
+  USER_BIND_PHONE: `${config.BASE_URL}/frontend/user/bindPhone`, // 绑定手机号
   
   // 商品相关
   PRODUCT_LIST: `${config.BASE_URL}/goods`,
@@ -52,7 +54,7 @@ const API = {
   CART_DELETE: `${config.BASE_URL}/frontend/cart`,
   
   // 文件上传
-  UPLOAD_IMAGE: `http://101.42.249.106:8399/upload/image` // 图片上传(暂且使用这个)
+  UPLOAD_IMAGE: `${config.UPLOAD_URL}/upload/image` 
 }
 
 module.exports = {

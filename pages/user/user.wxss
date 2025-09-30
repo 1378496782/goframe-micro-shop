@@ -573,3 +573,154 @@
   line-height: 1.5;
   height: auto;
 }
+
+/* 手机号授权弹窗样式 */
+.phone-auth-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.phone-auth-popup.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border-radius: 12px;
+  width: 280px;
+  max-width: 90%;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.popup-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1D2129;
+  flex: 1;
+  text-align: center;
+}
+
+.popup-close {
+  font-size: 20px;
+  color: #86909C;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.popup-body {
+  text-align: center;
+}
+
+.popup-desc {
+  font-size: 14px;
+  color: #4E5969;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.auth-button {
+  background: #19aecc;
+  color: white;
+  border-radius: 6px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.popup-tip {
+  font-size: 11px;
+  color: #86909C;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* 小屏幕适配 */
+@media screen and (max-width: 375px) {
+  .popup-content {
+    width: 260px;
+    padding: 18px;
+  }
+  
+  .popup-title {
+    font-size: 15px;
+  }
+  
+  .popup-desc {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  
+  .auth-button {
+    height: 42px;
+    line-height: 42px;
+    font-size: 14px;
+  }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 320px) {
+  .popup-content {
+    width: 240px;
+    padding: 15px;
+  }
+  
+  .popup-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+  
+  .popup-title {
+    font-size: 14px;
+  }
+  
+  .popup-desc {
+    font-size: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .auth-button {
+    height: 40px;
+    line-height: 40px;
+    font-size: 13px;
+  }
+  
+  .popup-tip {
+    font-size: 10px;
+  }
+}

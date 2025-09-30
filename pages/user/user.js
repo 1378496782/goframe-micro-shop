@@ -32,7 +32,13 @@ Page({
     tempNickname: '',
     wxLoginCode: '',
     wxIv: '',
-    wxEncryptedData: ''
+    wxEncryptedData: '',
+    showPhoneAuthPopup: false,
+    phoneAuthData: {
+      code: '',
+      iv: '',
+      encryptedData: ''
+    }
   },
 
   /**
@@ -78,7 +84,6 @@ Page({
   },
 
   /**
-<<<<<<< HEAD
    * 微信登录方法 - 立即显示用户信息填写表单，异步获取授权参数
    */
   autoWxLogin() {
@@ -124,6 +129,176 @@ Page({
   },
   
   /**
+   * 触发手机号授权弹窗
+   */
+  // triggerPhoneAuth() {
+  //   if (!this.data.isLoggedIn) {
+  //     return wx.showToast({ title: '请先登录', icon: 'none' })
+  //   }
+    
+  //   this.setData({ showPhoneAuthPopup: true })
+  // },
+  
+  /**
+   * 关闭手机号授权弹窗
+   */
+  closePhoneAuthPopup() {
+    this.setData({ showPhoneAuthPopup: false })
+  },
+  
+  /**
+   * 获取手机号授权回调
+   * @param {object} e - 事件对象，包含手机号加密数据
+   */
+  onGetPhoneNumber(e) {
+    console.log('手机号授权回调:', e)
+    
+    // 先验证表单数据
+    const { tempNickname, uploadedAvatarUrl, tempAvatar, wxLoginCode } = this.data
+    
+    if (!tempNickname) {
+      return wx.showToast({ title: '请输入昵称', icon: 'none' })
+    }
+    
+    if (!uploadedAvatarUrl && !tempAvatar) {
+      return wx.showToast({ title: '请选择头像', icon: 'none' })
+    }
+    
+    if (!wxLoginCode) {
+      return wx.showToast({ title: '登录状态已过期，请重试', icon: 'none' })
+    }
+    
+    if (e.detail.errMsg === 'getPhoneNumber:ok') {
+      // 获取手机号授权成功
+      const { iv, encryptedData } = e.detail
+      
+      // 立即发起微信登录
+      this.completeLoginWithPhone(iv, encryptedData)
+    } else if (e.detail.errMsg === 'getPhoneNumber:fail user deny') {
+      // 用户拒绝授权
+      wx.showToast({ title: '已取消授权', icon: 'none' })
+    } else {
+      // 其他错误
+      console.error('手机号授权失败:', e.detail)
+      wx.showToast({ title: '授权失败，请重试', icon: 'none' })
+    }
+  },
+  
+  /**
+   * 使用手机号完成登录
+   * @param {string} iv - 加密算法的初始向量
+   * @param {string} encryptedData - 加密数据
+   */
+  completeLoginWithPhone(iv, encryptedData) {
+    const { tempNickname, uploadedAvatarUrl, tempAvatar, wxLoginCode } = this.data
+    
+    // 如果有上传成功的头像URL，直接使用
+    // 如果只有临时头像路径但没有上传，先上传头像再登录
+    if (tempAvatar && !uploadedAvatarUrl) {
+      wx.showLoading({ title: '正在上传头像...' })
+      wx.uploadFile({
+        url: API.UPLOAD_IMAGE,
+        filePath: tempAvatar,
+        name: 'File',
+        formData: { 
+          uploader_id: 0, 
+          uploader_type: 1, // 1-H5用户
+          file_type: 1 // 1-图片
+        },
+        success: (res) => {
+          wx.hideLoading()
+          const data = JSON.parse(res.data)
+          if (data.code === 0 && data.data?.url) {
+            // 上传成功后，使用返回的URL进行登录
+            const wxLoginData = {
+              code: wxLoginCode,
+              iv: iv,
+              encryptedData: encryptedData,
+              phoneNumber: '', // 后端会从加密数据中解密手机号
+              nickname: tempNickname,
+              avatar: data.data.url
+            }
+            this.wxMiniLogin(wxLoginData)
+          } else {
+            wx.showToast({ 
+              title: data.message || '头像上传失败', 
+              icon: 'none' 
+            })
+          }
+        },
+        fail: (err) => {
+          wx.hideLoading()
+          console.error('头像上传失败:', err)
+          wx.showToast({ title: '头像上传失败', icon: 'none' })
+        }
+      })
+    } else {
+      // 已有上传成功的头像URL，直接登录
+      const avatar = uploadedAvatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'
+      const wxLoginData = {
+        code: wxLoginCode,
+        iv: iv,
+        encryptedData: encryptedData,
+        phoneNumber: '', // 后端会从加密数据中解密手机号
+        nickname: tempNickname,
+        avatar: avatar
+      }
+      this.wxMiniLogin(wxLoginData)
+    }
+  },
+  
+  /**
+   * 绑定手机号到用户账户
+   */
+  bindPhoneNumber() {
+    const { phoneAuthData } = this.data
+    
+    if (!phoneAuthData.code || !phoneAuthData.iv || !phoneAuthData.encryptedData) {
+      wx.showToast({ title: '授权数据不完整', icon: 'none' })
+      return
+    }
+    
+    wx.showLoading({ title: '绑定中...' })
+    
+    const bindData = {
+      code: phoneAuthData.code,
+      iv: phoneAuthData.iv,
+      encryptedData: phoneAuthData.encryptedData
+    }
+    
+    request({
+      url: API.USER_BIND_PHONE,
+      method: 'POST',
+      data: bindData
+    }).then(res => {
+      wx.hideLoading()
+      
+      if (res.code === 0) {
+        wx.showToast({ title: '手机号绑定成功', icon: 'success' })
+        this.closePhoneAuthPopup()
+        
+        // 刷新用户信息
+        this.getUserInfo()
+        
+        // 重置手机号授权数据
+        this.setData({
+          phoneAuthData: {
+            code: '',
+            iv: '',
+            encryptedData: ''
+          }
+        })
+      } else {
+        wx.showToast({ title: res.message || '绑定失败', icon: 'none' })
+      }
+    }).catch(err => {
+      wx.hideLoading()
+      console.error('绑定手机号失败:', err)
+      wx.showToast({ title: '绑定失败，请重试', icon: 'none' })
+    })
+  },
+  
+  /**
    * 关闭用户信息填写表单
    */
   closeUserInfoForm() {
@@ -151,116 +326,11 @@ Page({
   },
   
   /**
-   * 提交用户信息
-   * 收集用户选择的头像和输入的昵称，然后进行登录
+   * 提交用户信息验证（已废弃，验证逻辑移到 onGetPhoneNumber 中）
    */
   submitUserInfo() {
-    const { tempNickname, uploadedAvatarUrl, tempAvatar, wxLoginCode, wxIv, wxEncryptedData } = this.data
-    
-    if (!tempNickname) {
-      return wx.showToast({ title: '请输入昵称', icon: 'none' })
-    }
-    
-    if (!uploadedAvatarUrl && !tempAvatar) {
-      return wx.showToast({ title: '请选择头像', icon: 'none' })
-    }
-    
-    if (!wxLoginCode) {
-      return wx.showToast({ title: '登录状态已过期，请重试', icon: 'none' })
-    }
-    
-    // 如果有上传成功的头像URL，直接使用
-    // 如果只有临时头像路径但没有上传，先上传头像再登录
-    if (tempAvatar && !uploadedAvatarUrl) {
-      wx.showLoading({ title: '正在上传头像...' })
-      wx.uploadFile({
-        url: API.UPLOAD_IMAGE,
-        filePath: tempAvatar,
-        name: 'File',
-        formData: { 
-          uploader_id: 0, 
-          uploader_type: 1, // 1-H5用户
-          file_type: 1 // 1-图片
-        },
-        success: (res) => {
-          wx.hideLoading()
-          const data = JSON.parse(res.data)
-          if (data.code === 0 && data.data?.url) {
-            // 上传成功后，使用返回的URL进行登录
-            const wxLoginData = {
-              code: wxLoginCode,
-              iv: wxIv,
-              encryptedData: wxEncryptedData,
-              phoneNumber: '',
-              nickname: tempNickname,
-              avatar: data.data.url
-            }
-            this.wxMiniLogin(wxLoginData)
-          } else {
-            wx.showToast({ 
-              title: data.message || '头像上传失败', 
-              icon: 'none' 
-            })
-          }
-        },
-        fail: (err) => {
-          wx.hideLoading()
-          console.error('头像上传失败:', err)
-          wx.showToast({ title: '头像上传失败', icon: 'none' })
-        }
-      })
-    } else {
-      // 已有上传成功的头像URL，直接登录
-      const avatar = uploadedAvatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'
-      const wxLoginData = {
-        code: wxLoginCode,
-        iv: wxIv,
-        encryptedData: wxEncryptedData,
-        phoneNumber: '',
-        nickname: tempNickname,
-        avatar: avatar
-=======
-   * 微信登录方法
-   * 获取微信授权，然后显示用户信息填写表单
-   */
-  autoWxLogin() {
-    wx.showLoading({ title: '准备登录...' })
-    
-    // 先获取微信授权
-    wx.getUserProfile({
-      desc: '用于完善会员资料',
-      success: (res) => {
-        // 用户授权成功后，获取登录code
-        wx.login({
-          success: (loginRes) => {
-            wx.hideLoading()
-            if (!loginRes.code) {
-              return wx.showToast({ title: '获取code失败', icon: 'none' })
-            }
-            
-            // 保存微信授权信息，显示用户信息填写表单
-            this.setData({
-              wxLoginCode: loginRes.code,
-              wxIv: res.iv,
-              wxEncryptedData: res.encryptedData,
-              showUserInfoForm: true
-            })
-          },
-          fail: (err) => {
-            wx.hideLoading()
-            console.error('微信登录失败:', err)
-            wx.showToast({ title: '微信登录失败', icon: 'none' })
-          }
-        })
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        console.error('获取用户信息失败:', err)
-        wx.showToast({ title: '获取用户信息失败', icon: 'none' })
->>>>>>> 533fd21365043e63d3abebb3ec683b083f901a94
-      }
-      this.wxMiniLogin(wxLoginData)
-    }
+    // 这个方法现在不需要了，因为验证逻辑在 onGetPhoneNumber 中处理
+    // 保留方法避免报错
   },
   
   /**
