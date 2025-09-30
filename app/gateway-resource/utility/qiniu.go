@@ -76,6 +76,27 @@ func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (st
 	return privateURL, key, nil
 }
 
+func GetFileUrl(ctx context.Context, key string) (string, error) {
+	cfg := g.Cfg().MustGet(ctx, "qiniu")
+	if cfg.IsEmpty() {
+		return "", errors.New("七牛云配置缺失")
+	}
+
+	// 解析配置
+	qiniuCfg := cfg.Map()
+	accessKey := qiniuCfg["accessKey"].(string)
+	secretKey := qiniuCfg["secretKey"].(string)
+	domain := qiniuCfg["domain"].(string)
+
+	mac := qbox.NewMac(accessKey, secretKey)
+
+	// 私有空间生成签名URL
+	deadline := time.Now().Add(time.Hour).Unix() // 1小时有效
+	privateURL := storage.MakePrivateURL(mac, domain, key, deadline)
+
+	return privateURL, nil
+}
+
 // generateUniqueFilename 生成保留原始文件名的唯一文件名
 func generateUniqueFilename(originalName string) string {
 	// 获取文件扩展名
