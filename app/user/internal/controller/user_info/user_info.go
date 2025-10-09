@@ -2,8 +2,7 @@ package user_info
 
 import (
 	"context"
-	"github.com/silenceper/wechat/v2"
-	"github.com/silenceper/wechat/v2/cache"
+	resource "shop-goframe-micro-service-refacotor/app/gateway-resource/utility"
 	v1 "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
 	"shop-goframe-micro-service-refacotor/app/user/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/user/internal/logic/user_info"
@@ -13,6 +12,9 @@ import (
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
 	"strings"
 	"time"
+
+	"github.com/silenceper/wechat/v2"
+	"github.com/silenceper/wechat/v2/cache"
 
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -164,11 +166,18 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 	// 绑定用户或登录
 	token, expireIn, userInfo, isNewUser, err := user_info.WxMiniLogin(ctx, authResult.OpenID, req)
 	// 错误类型
-	infoError := consts.InfoError(consts.UserInfo, consts.LoginFail)
+	infoError := consts.InfoError(consts.UserInfo, consts.WxMiniLoginFail)
 	if err != nil {
 		// 记录错误日志
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+
+	// 获取加了签名的头像 url
+	url, err := resource.GetFileUrl(ctx, userInfo.Avatar)
+	if err != nil {
+		// 记录错误日志
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "头像生成签名 URL失败")
 	}
 
 	if isNewUser {
@@ -184,14 +193,15 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 
 	// 返回响应
 	return &v1.WxMiniLoginRes{
-		Type:     "Bearer",
-		Token:    token,
-		ExpireIn: uint32(expireIn),
-		OpenId:   authResult.OpenID,
+		Type:          "Bearer",
+		Token:         token,
+		ExpireIn:      uint32(expireIn),
+		OpenId:        authResult.OpenID,
+		NeedPhoneAuth: isNewUser,
 		UserInfo: &v1.UserInfoBase{
 			Id:     uint32(userInfo.Id),
 			Name:   userInfo.Name,
-			Avatar: userInfo.Avatar,
+			Avatar: url,
 			Sex:    uint32(userInfo.Sex),
 			Sign:   userInfo.Sign,
 			Status: uint32(userInfo.Status),
@@ -210,4 +220,17 @@ func (*Controller) UpdateInfo(ctx context.Context, req *v1.UserInfoUpdateReq) (r
 
 	// 返回更新成功响应，包含被更新ID
 	return &v1.UserInfoUpdateRes{Id: req.Id}, nil
+}
+
+func (*Controller) FillPhone(ctx context.Context, req *v1.FillPhoneReq) (res *v1.FillPhoneRes, err error) {
+	infoError := consts.InfoError(consts.UserInfo, consts.FillPhoneFail)
+	// 填充数据库中的手机号
+	_, err = dao.UserInfo.Ctx(ctx).Where("id", req.Id).Update(req)
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+
+	// 返回更新成功响应，包含被更新ID
+	return &v1.FillPhoneRes{Id: req.Id}, nil
 }

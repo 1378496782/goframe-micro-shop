@@ -25,18 +25,29 @@ type WxMiniLoginReq struct {
 	Code          string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
 	IV            string `json:"iv" v:"required#初始向量不能为空" dc:"初始向量"`
 	EncryptedData string `json:"encryptedData" v:"required#密文不能为空" dc:"密文"`
-	PhoneNumber   string `json:"phoneNumber" dc:"用户手机号"`
 	Nickname      string `json:"nickname" dc:"用户昵称"`
 	Avatar        string `json:"avatar" dc:"用户头像"`
 }
 
 // 用户微信响应
 type WxMiniLoginRes struct {
-	Type     string        `json:"type" dc:"token类型"`
-	Token    string        `json:"token" dc:"token字符串"`
-	ExpireIn uint32        `json:"expire_in" dc:"过期时间（秒）"`
-	OpenId   string        `json:"openId" dc:"用户唯一凭证"`
-	UserInfo *UserInfoBase `json:"user_info" dc:"用户基础信息"`
+	Type          string        `json:"type" dc:"token类型"`
+	Token         string        `json:"token" dc:"token字符串"`
+	ExpireIn      uint32        `json:"expire_in" dc:"过期时间（秒）"`
+	OpenId        string        `json:"openId" dc:"用户唯一凭证"`
+	NeedPhoneAuth bool          `json:"need_phone_auth" dc:"是否需要授权手机号"`
+	UserInfo      *UserInfoBase `json:"user_info" dc:"用户基础信息"`
+}
+
+// 填写手机号请求
+type FillPhoneReq struct {
+	g.Meta      `path:"/user/fillPhone" tags:"用户管理" method:"post" summary:"填写手机号"`
+	PhoneNumber string `json:"phone" dc:"用户手机号"`
+}
+
+// 填写手机号响应
+type FillPhoneRes struct {
+	Id uint32 `json:"id" dc:"用户ID"`
 }
 
 // 用户注册请求
