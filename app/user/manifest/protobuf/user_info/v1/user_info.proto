@@ -10,6 +10,8 @@ service UserInfo {
   rpc Login (UserInfoLoginReq) returns (UserInfoLoginRes) {}
   // 微信登录
   rpc WxMiniLogin(WxMiniLoginReq)returns(WxMiniLoginRes){}
+  // 填写用户手机号
+  rpc FillPhone(FillPhoneReq)returns(FillPhoneRes){}
   // 管理员注册
   rpc Register (UserInfoRegisterReq) returns (UserInfoRegisterRes) {}
   // 修改密码
@@ -49,12 +51,12 @@ message UserInfoLoginRes {
 
 // ========== 微信登录 ==========
 message WxMiniLoginReq{
-  string Code=1; // 登录凭证
-  string IV=2;// 初始向量
-  string EncryptedData=3; // 密文
-  string Nickname=4; // 用户昵称
-  string Avatar=5; // 用户头像
-  string Phone=6; // 用户手机号
+  string code=1; // 登录凭证
+  string iV=2;// 初始向量
+  string encryptedData=3; // 密文
+  string nickname=4; // 用户昵称
+  string avatar=5; // 用户头像
+  string phone=6; // 用户手机号
 }
 
 message WxMiniLoginRes {
@@ -62,9 +64,19 @@ message WxMiniLoginRes {
   string token = 2;     // token字符串
   uint32 expire_in = 3;  // 过期时间(秒)
   string openId=4;       // 用户唯一凭证
-  UserInfoBase user_info = 5; // 用户基础信息
+  bool NeedPhoneAuth=5;   // 是否需要手机号授权
+  UserInfoBase user_info = 6; // 用户基础信息
 }
 
+// ========= 填写用户手机号 =========
+message FillPhoneReq{
+  uint32 id=1;
+  string phone=2;
+}
+
+message FillPhoneRes{
+  uint32 id = 1; // 用户ID
+}
 
 // ========== 用户信息 ==========
 message UserInfoReq {
