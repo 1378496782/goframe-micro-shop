@@ -24,6 +24,7 @@ var (
 			s := grpcx.Server.New(c)
 			consignee_info.Register(s)
 			user_info.Register(s)
+
 			s.Run()
 			return nil
 		},
