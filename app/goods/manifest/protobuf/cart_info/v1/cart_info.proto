@@ -27,10 +27,10 @@ message CartInfoCreateRes {
 
 message CartInfoDeleteReq {
   uint32 id = 1;
+  uint32 user_id = 2;
 }
 
 message CartInfoDeleteRes {
-  uint32 id = 1;
 }
 
 message CartInfoGetListReq {

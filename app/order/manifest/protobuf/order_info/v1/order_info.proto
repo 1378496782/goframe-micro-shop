@@ -12,6 +12,7 @@ service order_info {
   rpc Create(OrderInfoCreateReq) returns (OrderInfoCreateRes) {}
   rpc GetDetail(OrderInfoGetDetailReq) returns (OrderInfoGetDetailRes) {}
   rpc GetList(OrderInfoGetListReq) returns (OrderInfoGetListRes) {}
+  rpc GetCount(OrderInfoGetCountReq) returns (OrderInfoGetCountRes) {}
   rpc Payment(PaymentReq)returns(PaymentRes){}
   rpc Notify(NotifyReq)returns(NotifyRes){}
 }
@@ -50,6 +51,7 @@ message OrderInfoCreateRes {
 // 根据ID查询请求
 message OrderInfoGetDetailReq {
   uint32 id = 1;
+  uint32 user_id = 2; // 用户id
 }
 
 // 根据ID查询响应
@@ -159,4 +161,16 @@ message NotifyReq {
 message NotifyRes{
   string code = 1;    // SUCCESS / FAIL
   string message = 2; // 返回信息
+}
+
+message OrderInfoGetCountReq {
+  uint32 user_id = 1;
+}
+
+message OrderInfoGetCountRes {
+    uint32 pending = 1;
+    uint32 shipping = 2;
+    uint32 delivered = 3;
+    uint32 completed = 4;
+    uint32 afterSale = 5;
 }

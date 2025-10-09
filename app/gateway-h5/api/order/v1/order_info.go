@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
 )
 
 // 订单分页查询
@@ -100,4 +101,48 @@ type NotifyReq struct {
 type NotifyRes struct {
 	Code    string `json:"code,omitempty"`
 	Message string `json:"message,omitempty"`
+}
+
+// 获取订单详情
+type OrderInfoGetDetailReq struct {
+	g.Meta `path:"/order/{id}" method:"get" tags:"订单管理" sm:"获取订单详情"`
+	Id     uint32 `json:"id" v:"min:1" dc:"订单ID"`
+}
+
+// OrderInfoDetail 订单详情主信息
+type OrderInfoDetail struct {
+	Id               uint32      `json:"id" dc:"订单ID"`
+	UserId           uint32      `json:"user_id" dc:"用户ID"`
+	Number           string      `json:"number" dc:"订单编号"`
+	Price            uint32      `json:"price" dc:"订单金额"`
+	CouponPrice      uint32      `json:"coupon_price" dc:"优惠券金额"`
+	ActualPrice      uint32      `json:"actual_price" dc:"实际支付金额"`
+	PayType          uint32      `json:"pay_type" dc:"支付方式"`
+	Remark           string      `json:"remark" dc:"备注"`
+	Status           uint32      `json:"status" dc:"订单状态"`
+	ConsigneeName    string      `json:"consignee_name" dc:"收货人姓名"`
+	ConsigneePhone   string      `json:"consignee_phone" dc:"收货人手机号"`
+	ConsigneeAddress string      `json:"consignee_address" dc:"收货人地址"`
+	CreatedAt        *gtime.Time `json:"created_at" dc:"创建时间"`
+	UpdatedAt        *gtime.Time `json:"updated_at" dc:"更新时间"`
+	PayAt            *gtime.Time `json:"pay_at" dc:"支付时间"`
+}
+
+type OrderInfoGetDetailRes struct {
+	OrderInfo       *OrderInfoDetail  `json:"order_info" dc:"订单详情"`
+	OrderGoodsInfos []*OrderGoodsItem `json:"order_goods_infos" dc:"订单商品列表"`
+}
+
+// OrderInfoGetCountReq 获取订单数量请求
+type OrderInfoGetCountReq struct {
+	g.Meta `path:"/order/count" method:"get" tags:"订单管理" sm:"获取订单数量"`
+}
+
+// OrderInfoGetCountRes 获取订单数量响应
+type OrderInfoGetCountRes struct {
+	Pending   uint32 `json:"pending"`
+	Shipping  uint32 `json:"shipping"`
+	Delivered uint32 `json:"delivered"`
+	Completed uint32 `json:"completed"`
+	AfterSale uint32 `json:"afterSale"`
 }

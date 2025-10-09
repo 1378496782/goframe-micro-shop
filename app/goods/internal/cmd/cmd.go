@@ -81,6 +81,10 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	// 添加优惠券确认消费者
 	couponConsumer := consumer.NewCouponConfirmConsumer(ctx)
 	manager.AddConsumer(couponConsumer)
+
+	// 添加订单创建事件消费者
+	orderCreatedConsumer := consumer.NewOrderCreatedConsumer(ctx)
+	manager.AddConsumer(orderCreatedConsumer)
 	
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)

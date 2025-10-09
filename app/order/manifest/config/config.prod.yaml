@@ -31,6 +31,7 @@ rabbitmq:
     orderDelayExchange: "order.delay.exchange"
     couponConfirmExchange: "coupon.confirm.exchange"
     couponConfirmResultExchange: "coupon.confirm.result.exchange"
+    orderExchange: "order.events.exchange"
   queue:
     orderTimeoutQueue: "order.timeout.queue"
     couponConfirmResultQueue: "coupon.confirm.result.queue"
@@ -38,6 +39,7 @@ rabbitmq:
     orderTimeout: "order.timeout"
     couponConfirm: "coupon.confirm.request"
     couponConfirmResult: "coupon.confirm.result"
+    orderCreated: "order.created"
 
 business:
   orderTimeout: 1800000

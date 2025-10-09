@@ -16,3 +16,12 @@ type UploadImageReq struct {
 type UploadImageRes struct {
 	Url string `json:"url" dc:"图片访问URL"`
 }
+
+type GetAvatarImageReq struct {
+	g.Meta `path:"/image/url" tags:"获取文件 url" method:"get" summary:"获取文件 url"`
+	Key    string `json:"key" v:"required#key 不能为空" dc:"文件唯一标识"`
+}
+
+type GetAvatarImageRes struct {
+	Url string `json:"url" dc:"图片访问URL"`
+}
