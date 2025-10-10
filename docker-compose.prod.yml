@@ -513,6 +513,8 @@ services:
       - /etc/ssl/private:/etc/nginx/ssl/private:ro
       - ./log/nginx:/var/log/nginx
       - /etc/localtime:/etc/localtime:ro
+      - /home/lipeisen/docs:/home/lipeisen/docs:ro
+      - /home/frontend-ai-interview-agent-go/dist:/home/frontend-ai-interview-agent-go/dist:ro
     depends_on:
       manage-service:
         condition: service_healthy
@@ -520,6 +522,7 @@ services:
         condition: service_healthy
     networks:
       - app-network
+      - ai-gozero-agent_default # Connect to the external network
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
@@ -567,6 +570,8 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: 1450
+  ai-gozero-agent_default:
+    external: true
 
 volumes:
   mysql_data:
