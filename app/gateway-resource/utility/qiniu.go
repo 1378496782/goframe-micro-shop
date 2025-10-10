@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"github.com/gogf/gf/v2/util/gconv"
 	"strings"
 	"time"
 
@@ -15,11 +16,11 @@ import (
 )
 
 // UploadToQiniu 上传文件到七牛云
-func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (string, string, error) {
+func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (string, string, int64, error) {
 	// 读取配置
 	cfg := g.Cfg().MustGet(ctx, "qiniu")
 	if cfg.IsEmpty() {
-		return "", "", errors.New("七牛云配置缺失")
+		return "", "", 0, errors.New("七牛云配置缺失")
 	}
 
 	// 解析配置
@@ -28,6 +29,7 @@ func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (st
 	secretKey := qiniuCfg["secretKey"].(string)
 	bucket := qiniuCfg["bucket"].(string)
 	domain := qiniuCfg["domain"].(string)
+	expireTime := gconv.Int64(qiniuCfg["expireTime"])
 
 	// 生成上传凭证
 	putPolicy := storage.PutPolicy{Scope: bucket}
@@ -66,20 +68,20 @@ func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (st
 	)
 
 	if err != nil {
-		return "", "", err
+		return "", "", 0, err
 	}
 
 	// 私有空间生成签名URL
-	deadline := time.Now().Add(time.Hour).Unix() // 1小时有效
+	deadline := time.Now().Add(time.Second * time.Duration(expireTime)).Unix()
 	privateURL := storage.MakePrivateURL(mac, domain, key, deadline)
 
-	return privateURL, key, nil
+	return privateURL, key, deadline, nil
 }
 
-func GetFileUrl(ctx context.Context, key string) (string, error) {
+func GetFileUrl(ctx context.Context, key string) (string, int64, error) {
 	cfg := g.Cfg().MustGet(ctx, "qiniu")
 	if cfg.IsEmpty() {
-		return "", errors.New("七牛云配置缺失")
+		return "", 0, errors.New("七牛云配置缺失")
 	}
 
 	// 解析配置
@@ -87,14 +89,15 @@ func GetFileUrl(ctx context.Context, key string) (string, error) {
 	accessKey := qiniuCfg["accessKey"].(string)
 	secretKey := qiniuCfg["secretKey"].(string)
 	domain := qiniuCfg["domain"].(string)
+	expireTime := gconv.Int64(qiniuCfg["expireTime"])
 
 	mac := qbox.NewMac(accessKey, secretKey)
 
 	// 私有空间生成签名URL
-	deadline := time.Now().Add(time.Hour).Unix() // 1小时有效
+	deadline := time.Now().Add(time.Second * time.Duration(expireTime)).Unix() // 1小时有效
 	privateURL := storage.MakePrivateURL(mac, domain, key, deadline)
 
-	return privateURL, nil
+	return privateURL, deadline, nil
 }
 
 // generateUniqueFilename 生成保留原始文件名的唯一文件名

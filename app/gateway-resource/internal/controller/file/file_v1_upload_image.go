@@ -37,7 +37,7 @@ func (c *ControllerV1) UploadImage(ctx context.Context, req *v1.UploadImageReq) 
 	}
 
 	// 4. 上传到七牛云
-	url, fileName, err := utility.UploadToQiniu(ctx, fileContent, req.File.Filename)
+	url, fileName, expireTime, err := utility.UploadToQiniu(ctx, fileContent, req.File.Filename)
 	if err != nil {
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "上传到七牛云失败")
 	}
@@ -63,5 +63,9 @@ func (c *ControllerV1) UploadImage(ctx context.Context, req *v1.UploadImageReq) 
 	fmt.Println("上传七牛云 URL:", url)
 
 	// 5. 返回结果
-	return &v1.UploadImageRes{Url: url}, nil
+	return &v1.UploadImageRes{
+		Key:        fileName,
+		Url:        url,
+		ExpireTime: expireTime,
+	}, nil
 }
