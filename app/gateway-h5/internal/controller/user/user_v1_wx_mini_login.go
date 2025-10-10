@@ -25,6 +25,5 @@ func (c *ControllerV1) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) 
 	if err := gconv.Struct(grpcRes, res); err != nil {
 		return nil, err
 	}
-
 	return res, nil
 }

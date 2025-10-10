@@ -41,8 +41,10 @@ type WxMiniLoginRes struct {
 
 // 填写手机号请求
 type FillPhoneReq struct {
-	g.Meta      `path:"/user/fillPhone" tags:"用户管理" method:"post" summary:"填写手机号"`
-	PhoneNumber string `json:"phone" dc:"用户手机号"`
+	g.Meta        `path:"/user/fillPhone" tags:"用户管理" method:"post" summary:"填写手机号"`
+	Code          string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
+	IV            string `json:"iv" v:"required#初始向量不能为空" dc:"初始向量"`
+	EncryptedData string `json:"encryptedData" v:"required#密文不能为空" dc:"密文"`
 }
 
 // 填写手机号响应
