@@ -522,6 +522,7 @@ services:
         condition: service_healthy
     networks:
       - app-network
+      - ai-gozero-agent_default # Connect to the external network
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
@@ -569,6 +570,8 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: 1450
+  ai-gozero-agent_default:
+    external: true
 
 volumes:
   mysql_data:
