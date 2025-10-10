@@ -156,11 +156,7 @@ Page({
       wx.reLaunch({
         url: '/pages/user/user'
       })
-<<<<<<< HEAD
-    }, 200)
-=======
     }, 100)
->>>>>>> 8925dc9075b97bd953a7803cde326b1e1c6bc549
   },
   
   /**
@@ -172,8 +168,6 @@ Page({
     
     // 判断是哪种场景的手机号授权
     const { wxLoginTempData } = this.data
-<<<<<<< HEAD
-    
     if (wxLoginTempData) {
       // 微信登录后需要手机号授权的场景
       this.handleWxLoginPhoneAuth(e)
@@ -224,9 +218,57 @@ Page({
     
     // 先验证表单数据
     const { tempNickname, uploadedAvatarUrl, tempAvatar, wxLoginCode } = this.data
-=======
->>>>>>> 8925dc9075b97bd953a7803cde326b1e1c6bc549
     
+    if (wxLoginTempData) {
+      // 微信登录后需要手机号授权的场景
+      this.handleWxLoginPhoneAuth(e)
+    } else {
+      // 用户信息填写场景的手机号授权
+      this.handleUserInfoPhoneAuth(e)
+    }
+  },
+  
+  /**
+   * 处理微信登录后的手机号授权
+   * @param {object} e - 事件对象，包含手机号加密数据
+   */
+  handleWxLoginPhoneAuth(e) {
+    console.log('处理微信登录后的手机号授权:', e)
+    
+    if (e.detail.errMsg === 'getPhoneNumber:ok') {
+      // 用户同意授权，调用填写手机号接口
+      this.fillPhoneNumber(e)
+    } else if (e.detail.errMsg === 'getPhoneNumber:fail user deny') {
+      // 用户拒绝授权，立即退出弹窗页面，重新进入我的页面
+      this.setData({
+        showPhoneAuthPopup: false,
+        wxLoginTempData: null
+      })
+      
+      wx.showToast({ title: '已取消授权', icon: 'none' })
+      
+      // 立即重新启动到我的页面
+      setTimeout(() => {
+        wx.reLaunch({
+          url: '/pages/user/user'
+        })
+      }, 500)
+    } else {
+      // 其他错误
+      console.error('手机号授权失败:', e.detail)
+      wx.showToast({ title: '授权失败，请重试', icon: 'none' })
+    }
+  },
+  
+  /**
+   * 处理用户信息填写场景的手机号授权
+   * @param {object} e - 事件对象，包含手机号加密数据
+   */
+  handleUserInfoPhoneAuth(e) {
+    console.log('处理用户信息填写场景的手机号授权:', e)
+    
+    // 先验证表单数据
+    const { tempNickname, uploadedAvatarUrl, tempAvatar, wxLoginCode } = this.data    
     if (wxLoginTempData) {
       // 微信登录后需要手机号授权的场景
       this.handleWxLoginPhoneAuth(e)
