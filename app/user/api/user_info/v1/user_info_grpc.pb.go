@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	UserInfo_Login_FullMethodName          = "/user_info.UserInfo/Login"
 	UserInfo_WxMiniLogin_FullMethodName    = "/user_info.UserInfo/WxMiniLogin"
+	UserInfo_FillPhone_FullMethodName      = "/user_info.UserInfo/FillPhone"
 	UserInfo_Register_FullMethodName       = "/user_info.UserInfo/Register"
 	UserInfo_UpdatePassword_FullMethodName = "/user_info.UserInfo/UpdatePassword"
 	UserInfo_UpdateInfo_FullMethodName     = "/user_info.UserInfo/UpdateInfo"
@@ -36,6 +37,8 @@ type UserInfoClient interface {
 	Login(ctx context.Context, in *UserInfoLoginReq, opts ...grpc.CallOption) (*UserInfoLoginRes, error)
 	// 微信登录
 	WxMiniLogin(ctx context.Context, in *WxMiniLoginReq, opts ...grpc.CallOption) (*WxMiniLoginRes, error)
+	// 填写用户手机号
+	FillPhone(ctx context.Context, in *FillPhoneReq, opts ...grpc.CallOption) (*FillPhoneRes, error)
 	// 管理员注册
 	Register(ctx context.Context, in *UserInfoRegisterReq, opts ...grpc.CallOption) (*UserInfoRegisterRes, error)
 	// 修改密码
@@ -66,6 +69,15 @@ func (c *userInfoClient) Login(ctx context.Context, in *UserInfoLoginReq, opts .
 func (c *userInfoClient) WxMiniLogin(ctx context.Context, in *WxMiniLoginReq, opts ...grpc.CallOption) (*WxMiniLoginRes, error) {
 	out := new(WxMiniLoginRes)
 	err := c.cc.Invoke(ctx, UserInfo_WxMiniLogin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userInfoClient) FillPhone(ctx context.Context, in *FillPhoneReq, opts ...grpc.CallOption) (*FillPhoneRes, error) {
+	out := new(FillPhoneRes)
+	err := c.cc.Invoke(ctx, UserInfo_FillPhone_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,6 +128,8 @@ type UserInfoServer interface {
 	Login(context.Context, *UserInfoLoginReq) (*UserInfoLoginRes, error)
 	// 微信登录
 	WxMiniLogin(context.Context, *WxMiniLoginReq) (*WxMiniLoginRes, error)
+	// 填写用户手机号
+	FillPhone(context.Context, *FillPhoneReq) (*FillPhoneRes, error)
 	// 管理员注册
 	Register(context.Context, *UserInfoRegisterReq) (*UserInfoRegisterRes, error)
 	// 修改密码
@@ -136,6 +150,9 @@ func (UnimplementedUserInfoServer) Login(context.Context, *UserInfoLoginReq) (*U
 }
 func (UnimplementedUserInfoServer) WxMiniLogin(context.Context, *WxMiniLoginReq) (*WxMiniLoginRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WxMiniLogin not implemented")
+}
+func (UnimplementedUserInfoServer) FillPhone(context.Context, *FillPhoneReq) (*FillPhoneRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FillPhone not implemented")
 }
 func (UnimplementedUserInfoServer) Register(context.Context, *UserInfoRegisterReq) (*UserInfoRegisterRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
@@ -194,6 +211,24 @@ func _UserInfo_WxMiniLogin_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserInfoServer).WxMiniLogin(ctx, req.(*WxMiniLoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserInfo_FillPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FillPhoneReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserInfoServer).FillPhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserInfo_FillPhone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserInfoServer).FillPhone(ctx, req.(*FillPhoneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -284,6 +319,10 @@ var UserInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "WxMiniLogin",
 			Handler:    _UserInfo_WxMiniLogin_Handler,
+		},
+		{
+			MethodName: "FillPhone",
+			Handler:    _UserInfo_FillPhone_Handler,
 		},
 		{
 			MethodName: "Register",
