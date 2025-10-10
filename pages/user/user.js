@@ -156,7 +156,11 @@ Page({
       wx.reLaunch({
         url: '/pages/user/user'
       })
+<<<<<<< HEAD
+    }, 200)
+=======
     }, 100)
+>>>>>>> 8925dc9075b97bd953a7803cde326b1e1c6bc549
   },
   
   /**
@@ -168,6 +172,60 @@ Page({
     
     // 判断是哪种场景的手机号授权
     const { wxLoginTempData } = this.data
+<<<<<<< HEAD
+    
+    if (wxLoginTempData) {
+      // 微信登录后需要手机号授权的场景
+      this.handleWxLoginPhoneAuth(e)
+    } else {
+      // 用户信息填写场景的手机号授权
+      this.handleUserInfoPhoneAuth(e)
+    }
+  },
+  
+  /**
+   * 处理微信登录后的手机号授权
+   * @param {object} e - 事件对象，包含手机号加密数据
+   */
+  handleWxLoginPhoneAuth(e) {
+    console.log('处理微信登录后的手机号授权:', e)
+    
+    if (e.detail.errMsg === 'getPhoneNumber:ok') {
+      // 用户同意授权，调用填写手机号接口
+      this.fillPhoneNumber(e)
+    } else if (e.detail.errMsg === 'getPhoneNumber:fail user deny') {
+      // 用户拒绝授权，立即退出弹窗页面，重新进入我的页面
+      this.setData({
+        showPhoneAuthPopup: false,
+        wxLoginTempData: null
+      })
+      
+      wx.showToast({ title: '已取消授权', icon: 'none' })
+      
+      // 立即重新启动到我的页面
+      setTimeout(() => {
+        wx.reLaunch({
+          url: '/pages/user/user'
+        })
+      }, 500)
+    } else {
+      // 其他错误
+      console.error('手机号授权失败:', e.detail)
+      wx.showToast({ title: '授权失败，请重试', icon: 'none' })
+    }
+  },
+  
+  /**
+   * 处理用户信息填写场景的手机号授权
+   * @param {object} e - 事件对象，包含手机号加密数据
+   */
+  handleUserInfoPhoneAuth(e) {
+    console.log('处理用户信息填写场景的手机号授权:', e)
+    
+    // 先验证表单数据
+    const { tempNickname, uploadedAvatarUrl, tempAvatar, wxLoginCode } = this.data
+=======
+>>>>>>> 8925dc9075b97bd953a7803cde326b1e1c6bc549
     
     if (wxLoginTempData) {
       // 微信登录后需要手机号授权的场景
@@ -179,6 +237,65 @@ Page({
   },
 
 
+  
+  /**
+   * 处理登录成功逻辑
+   * @param {object} loginData - 登录数据
+   */
+  handleLoginSuccess(loginData) {
+    // 保存token到本地存储
+    if (loginData.token) {
+      wx.setStorageSync('token', loginData.token)
+      console.log('已保存token:', loginData.token)
+    }
+    
+    // 保存用户信息到本地存储
+    if (loginData.user_info) {
+      wx.setStorageSync('userInfo', loginData.user_info)
+      console.log('已保存userInfo:', loginData.user_info)
+    }
+    
+    // 保存openId，用于微信支付
+    if (loginData.openId) {
+      wx.setStorageSync('openId', loginData.openId)
+      console.log('已保存openId:', loginData.openId)
+    }
+    
+    // 保存token过期时间
+    if (loginData.expire_in) {
+      wx.setStorageSync('token_expire', Date.now() + loginData.expire_in * 1000)
+      console.log('token过期时间:', new Date(Date.now() + loginData.expire_in * 1000))
+    }
+    
+    // 更新全局状态
+    app.globalData.isLoggedIn = true
+    app.globalData.userInfo = loginData.user_info || {}
+    app.globalData.token = loginData.token
+    app.globalData.openId = loginData.openId
+    
+    // 更新页面数据
+    this.setData({ 
+      isLoggedIn: true, 
+      userInfo: loginData.user_info || {},
+      showUserInfoForm: false,
+      tempAvatar: '',
+      uploadedAvatarUrl: '',
+      tempNickname: '',
+      wxLoginCode: '',
+      wxIv: '',
+      wxEncryptedData: '',
+      showPhoneAuthPopup: false,
+      wxLoginTempData: null
+    })
+    
+    wx.showToast({ title: '登录成功', icon: 'success' })
+    
+    // 登录成功后获取最新的用户信息和订单统计
+    setTimeout(() => {
+      this.getUserInfo()
+      this.getOrderCounts()
+    }, 500)
+  },
   
   /**
    * 处理登录成功逻辑
