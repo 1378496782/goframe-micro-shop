@@ -171,6 +171,15 @@ const userAPI = {
       saveUserInfo(userInfo)
       return userInfo
     })
+  },
+
+  // 填写手机号
+  fillPhone(phoneData) {
+    return request({
+      url: API.USER_FILL_PHONE,
+      data: phoneData,
+      method: 'POST'
+    })
   }
 }
 

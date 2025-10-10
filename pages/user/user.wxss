@@ -663,6 +663,19 @@
   margin-bottom: 10px;
 }
 
+.auth-cancel-button {
+  background: #f8f8f8;
+  color: #4E5969;
+  border-radius: 6px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  border: 1px solid #E5E6EB;
+  margin-bottom: 10px;
+}
+
 .popup-tip {
   font-size: 11px;
   color: #86909C;

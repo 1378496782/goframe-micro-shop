@@ -90,7 +90,7 @@
     <view class="form-overlay" catchtap="closeUserInfoForm"></view>
     <view class="form-content">
       <view class="form-header">
-        <text class="form-title">请登录授权头像昵称</text>
+        <text class="form-title">请登录</text>
         <view class="form-close" bindtap="closeUserInfoForm">×</view>
       </view>
       
@@ -119,16 +119,15 @@
           />
         </view>
 
-        <!-- 提交按钮 - 直接触发手机号授权 -->
+        <!-- 提交按钮 - 先进行登录，再触发手机号授权 -->
         <button 
           class="submit-btn" 
-          open-type="getPhoneNumber" 
-          bindgetphonenumber="onGetPhoneNumber"
+          bindtap="submitUserInfo"
         >
-          确认授权
+          登录
         </button>
         
-        <text class="form-tip">授权后我们将获取您的头像、昵称和手机号信息</text>
+        <text class="form-tip">授权后我们将获取您的头像、昵称</text>
       </view>
     </view>
   </view>
@@ -138,22 +137,29 @@
     <view class="popup-overlay" catchtap="closePhoneAuthPopup"></view>
     <view class="popup-content">
       <view class="popup-header">
-        <text class="popup-title">绑定手机号</text>
+        <text class="popup-title">手机号授权</text>
         <view class="popup-close" bindtap="closePhoneAuthPopup">×</view>
       </view>
       
       <view class="popup-body">
-        <text class="popup-desc">为了更好的服务体验，请授权绑定您的手机号</text>
+        <text class="popup-desc">为了完成登录，请授权获取您的手机号</text>
         
         <button 
           class="auth-button" 
           open-type="getPhoneNumber" 
           bindgetphonenumber="onGetPhoneNumber"
         >
-          获取手机号
+          授权手机号
         </button>
         
-        <text class="popup-tip">授权后我们将获取您的手机号信息</text>
+        <button 
+          class="auth-cancel-button" 
+          bindtap="closePhoneAuthPopup"
+        >
+          拒绝授权
+        </button>
+        
+        <text class="popup-tip">拒绝授权将退出登录状态</text>
       </view>
     </view>
   </view>
