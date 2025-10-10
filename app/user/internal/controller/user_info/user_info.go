@@ -2,7 +2,8 @@ package user_info
 
 import (
 	"context"
-	resource "shop-goframe-micro-service-refacotor/app/gateway-resource/utility"
+	"errors"
+	"fmt"
 	v1 "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
 	"shop-goframe-micro-service-refacotor/app/user/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/user/internal/logic/user_info"
@@ -172,14 +173,6 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
-
-	// 获取加了签名的头像 url
-	url, err := resource.GetFileUrl(ctx, userInfo.Avatar)
-	if err != nil {
-		// 记录错误日志
-		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "头像生成签名 URL失败")
-	}
-
 	if isNewUser {
 		go rabbitmq.PublishUserRegisteredEvent(userInfo.Id)
 	}
@@ -201,7 +194,7 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 		UserInfo: &v1.UserInfoBase{
 			Id:     uint32(userInfo.Id),
 			Name:   userInfo.Name,
-			Avatar: url,
+			Avatar: userInfo.Avatar,
 			Sex:    uint32(userInfo.Sex),
 			Sign:   userInfo.Sign,
 			Status: uint32(userInfo.Status),
@@ -223,9 +216,33 @@ func (*Controller) UpdateInfo(ctx context.Context, req *v1.UserInfoUpdateReq) (r
 }
 
 func (*Controller) FillPhone(ctx context.Context, req *v1.FillPhoneReq) (res *v1.FillPhoneRes, err error) {
+	miniprogram := wechat.NewWechat().GetMiniProgram(&miniConfig.Config{
+		AppID:     g.Cfg().MustGet(nil, "wxMiniConf.appId").String(),
+		AppSecret: g.Cfg().MustGet(nil, "wxMiniConf.secret").String(),
+		Cache:     cache.NewMemory(),
+	})
+	authResult, err := miniprogram.GetAuth().Code2Session(req.Code)
+	if err != nil || authResult.ErrCode != 0 || authResult.OpenID == "" {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "发起授权请求失败")
+	}
+
+	// 解析微信返回数据
+	userData, err := miniprogram.GetEncryptor().Decrypt(authResult.SessionKey, req.EncryptedData, req.IV)
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "解析数据失败")
+	}
+
+	phone := userData.PhoneNumber
+	if phone == "" {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, errors.New("手机号不能为空"))
+	}
+	fmt.Println("phone", phone)
+
 	infoError := consts.InfoError(consts.UserInfo, consts.FillPhoneFail)
 	// 填充数据库中的手机号
-	_, err = dao.UserInfo.Ctx(ctx).Where("id", req.Id).Update(req)
+	_, err = dao.UserInfo.Ctx(ctx).Where("id", req.Id).Data(g.Map{
+		"phone": phone,
+	}).Update()
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
