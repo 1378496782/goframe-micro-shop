@@ -1,11 +1,11 @@
 server:
-  address: ":8299"
+  address: ":8199"
   openapiPath: "/api.json"
   swaggerPath: "/swagger"
   logger:
     path: "./log"
     file: "{Y-m-d}.log"
-    prefix: "gateway-admin"
+    prefix: "gateway-h5"
     level: "all"
     stdout: true
     rotateSize: 104857600

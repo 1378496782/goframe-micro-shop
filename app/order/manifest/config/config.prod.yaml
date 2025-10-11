@@ -1,0 +1,57 @@
+grpc:
+  name: "order"
+  address: ":31005"
+  logger:
+    path: "./log"
+    file: "{Y-m-d}.log"
+    prefix: "order-service"
+    level: "all"
+    stdout: true
+    rotateSize: 104857600
+    rotateBackupLimit: 7
+    ctxKeys: [ "traceId" ]
+    timeFormat: "2006-01-02 15:04:05.000"
+
+database:
+  default:
+    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/order"
+    debug: false
+
+etcd:
+  address: "etcd:2379"
+
+rabbitmq:
+  default:
+    host: "rabbitmq"
+    port: "5672"
+    user: "root"
+    password: "root"
+    vhost: "/"
+  exchange:
+    orderDelayExchange: "order.delay.exchange"
+    couponConfirmExchange: "coupon.confirm.exchange"
+    couponConfirmResultExchange: "coupon.confirm.result.exchange"
+    orderExchange: "order.events.exchange"
+  queue:
+    orderTimeoutQueue: "order.timeout.queue"
+    couponConfirmResultQueue: "coupon.confirm.result.queue"
+  routingKey:
+    orderTimeout: "order.timeout"
+    couponConfirm: "coupon.confirm.request"
+    couponConfirmResult: "coupon.confirm.result"
+    orderCreated: "order.created"
+
+business:
+  orderTimeout: 1800000
+
+# 微信支付
+payment:
+  wechat:
+    mchId: "CHANGE_ME_WECHAT_MCH_ID"                                     # 微信商户号
+    serialNo: "CHANGE_ME_WECHAT_SERIAL_NO"    # 商户证书序列号
+    apiV3Key: "CHANGE_ME_WECHAT_API_V3_KEY"            # APIv3 密钥
+    appId: "CHANGE_ME_WECHAT_APP_ID"                             # 小程序 AppId
+    notifyUrl: "https://business.dayu.club/frontend/notify"         # 支付回调地址
+    privateKey: |
+      CHANGE_ME_WECHAT_PRIVATE_KEY
+      -----END PRIVATE KEY-----

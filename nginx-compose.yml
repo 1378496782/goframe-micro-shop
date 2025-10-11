@@ -1,0 +1,50 @@
+# Nginx 全局服务配置
+version: '3.8'
+
+# 环境变量定义
+x-common-env: &common-env
+  TZ: Asia/Shanghai
+  NGINX_ENV: production
+
+services:
+  # 前端管理服务 - 纯代理转发
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    environment:
+      <<: *common-env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/ssl/certs:/etc/nginx/ssl/certs:ro
+      - /etc/ssl/private:/etc/nginx/ssl/private:ro
+      - ./log/nginx:/var/log/nginx
+      - /etc/localtime:/etc/localtime:ro
+      - /home/lipeisen/docs:/home/lipeisen/docs:ro
+      - /home/frontend-ai-interview-agent-go/dist:/home/frontend-ai-interview-agent-go/dist:ro
+    networks:
+      - shop-micro-network
+      - ai-agent-network # Connect to the external network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+networks:
+  shop-micro-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450
+    external: true
+  ai-agent-network:
+    external: true
