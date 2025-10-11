@@ -188,7 +188,7 @@ get_service_image() {
             echo "shop-goframe-micro-manage"
             ;;
         *)
-            echo "shop-goframe-micro-service-refacotor_${service}"
+            echo "shop-goframe-micro-service-refacotor-${service}"
             ;;
     esac
 }
@@ -238,6 +238,23 @@ stop_service() {
     fi
 }
 
+# 清理容器
+cleanup_containers() {
+    local service=$1
+    log "清理 $service 相关的容器..."
+    
+    # 停止并删除容器
+    $COMPOSE_CMD -f docker-compose.prod.yml stop "$service" 2>/dev/null
+    $COMPOSE_CMD -f docker-compose.prod.yml rm -f "$service" 2>/dev/null
+    
+    # 检查是否还有残留容器
+    local container_ids=$(docker ps -a --filter "name=$service" --format "{{.ID}}")
+    if [ -n "$container_ids" ]; then
+        log "强制删除残留容器: $container_ids"
+        echo "$container_ids" | xargs docker rm -f 2>/dev/null || true
+    fi
+}
+
 # 清理镜像
 cleanup_images() {
     local service=$1
@@ -252,7 +269,18 @@ cleanup_images() {
         echo "$PROJECT_IMAGES" | while read -r image; do
             if [ -n "$image" ]; then
                 log "删除镜像: $image"
-                docker rmi "$image" 2>/dev/null || log "无法删除镜像 $image（可能正在被使用）"
+                # 先尝试强制删除，如果失败则显示具体错误信息
+                if ! docker rmi -f "$image" 2>>"$LOG_FILE"; then
+                    log "⚠️  无法删除镜像 $image，尝试检查关联容器..."
+                    # 显示关联容器信息
+                    local container_info=$(docker ps -a --filter "ancestor=$image" --format "table {{.Names}}\t{{.Status}}\t{{.Image}}")
+                    if [ -n "$container_info" ]; then
+                        log "关联容器信息："
+                        echo "$container_info" | tee -a "$LOG_FILE"
+                    fi
+                else
+                    log "✅ 镜像删除成功: $image"
+                fi
             fi
         done
     else
@@ -354,6 +382,7 @@ fi
 if [ "$MODE" = "single" ]; then
     # 单个服务模式
     stop_service "$SERVICE_NAME"
+    cleanup_containers "$SERVICE_NAME"
     cleanup_images "$SERVICE_NAME"
     
     if build_service "$SERVICE_NAME"; then
@@ -409,7 +438,15 @@ else
         stop_service "$service"
     done
     
-    log "步骤3: 安全清理 - 只删除本项目相关的镜像"
+    log "步骤3: 安全清理 - 先清理容器再删除镜像"
+    
+    # 先清理所有服务的容器
+    log "清理所有服务的容器..."
+    for service in "${VALID_SERVICES[@]}"; do
+        cleanup_containers "$service"
+    done
+    
+    # 然后删除本项目相关的镜像
     log "查找本项目相关的镜像..."
     PROJECT_IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "shop-goframe-micro-service-refacotor" || echo "")
     
@@ -419,7 +456,18 @@ else
         echo "$PROJECT_IMAGES" | while read -r image; do
             if [ -n "$image" ]; then
                 log "删除镜像: $image"
-                docker rmi "$image" 2>/dev/null || log "无法删除镜像 $image（可能正在被使用）"
+                # 先尝试强制删除，如果失败则显示具体错误信息
+                if ! docker rmi -f "$image" 2>>"$LOG_FILE"; then
+                    log "⚠️  无法删除镜像 $image，尝试检查关联容器..."
+                    # 显示关联容器信息
+                    local container_info=$(docker ps -a --filter "ancestor=$image" --format "table {{.Names}}\t{{.Status}}\t{{.Image}}")
+                    if [ -n "$container_info" ]; then
+                        log "关联容器信息："
+                        echo "$container_info" | tee -a "$LOG_FILE"
+                    fi
+                else
+                    log "✅ 镜像删除成功: $image"
+                fi
             fi
         done
     else

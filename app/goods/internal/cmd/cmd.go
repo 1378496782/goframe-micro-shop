@@ -4,12 +4,9 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/add_goods_info"
 	"syscall"
-	
-	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gcmd"
-	"google.golang.org/grpc"
+
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/cart_info"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/category_info"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/coupon_info"
@@ -18,6 +15,11 @@ import (
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/user_coupon_info"
 	"shop-goframe-micro-service-refacotor/app/goods/utility/consumer"
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
+
+	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcmd"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -32,17 +34,17 @@ var (
 				g.Log().Errorf(ctx, "创建消费者管理器失败: %v", err)
 				return err
 			}
-			
+
 			// 注册goods服务的消费者
 			setupConsumers(ctx, consumerManager)
-			
+
 			// 启动消费者管理器
 			err = consumerManager.Start()
 			if err != nil {
 				g.Log().Errorf(ctx, "启动消费者管理器失败: %v", err)
 				return err
 			}
-			
+
 			// 设置优雅关闭
 			go func() {
 				quit := make(chan os.Signal, 1)
@@ -51,7 +53,7 @@ var (
 				g.Log().Info(ctx, "正在关闭消费者管理器...")
 				consumerManager.Stop()
 			}()
-			
+
 			// 启动gRPC服务
 			c := grpcx.Server.NewConfig()
 			c.Options = append(c.Options, []grpc.ServerOption{
@@ -66,6 +68,7 @@ var (
 			cart_info.Register(s)
 			coupon_info.Register(s)
 			user_coupon_info.Register(s)
+			add_goods_info.Register(s)
 			s.Run()
 			return nil
 		},
@@ -77,7 +80,7 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	// 添加用户注册事件消费者
 	userConsumer := consumer.NewUserRegisteredConsumer(ctx)
 	manager.AddConsumer(userConsumer)
-	
+
 	// 添加优惠券确认消费者
 	couponConsumer := consumer.NewCouponConfirmConsumer(ctx)
 	manager.AddConsumer(couponConsumer)
@@ -85,7 +88,7 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	// 添加订单创建事件消费者
 	orderCreatedConsumer := consumer.NewOrderCreatedConsumer(ctx)
 	manager.AddConsumer(orderCreatedConsumer)
-	
+
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)
 	// manager.AddConsumer(anotherConsumer)
