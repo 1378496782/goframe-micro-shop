@@ -32,7 +32,7 @@ Page({
         this.setData({
           banners: bannersRes.data.list?.map(item => ({
             id: item.id,
-            image: item.pic_url ? (item.pic_url.startsWith('http') ? item.pic_url : constants.IMAGE_BASE_URL + item.pic_url) : 'https://via.placeholder.com/300x150?text=轮播图',
+            image: item.pic_url ? (item.pic_url.startsWith('http') ? item.pic_url : CONSTANTS.IMAGE_BASE_URL + item.pic_url) : 'https://via.placeholder.com/300x150?text=轮播图',
             url: item.link
           }))
         })
@@ -59,7 +59,7 @@ Page({
           
           // 确保图片URL是完整的
           if (mainImage && !mainImage.startsWith('http')) {
-            mainImage = constants.IMAGE_BASE_URL + mainImage;
+            mainImage = CONSTANTS.IMAGE_BASE_URL + mainImage;
           }
           
           return {
