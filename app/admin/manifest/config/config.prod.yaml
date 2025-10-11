@@ -1,17 +1,21 @@
-server:
-  address: ":8299"
-  openapiPath: "/api.json"
-  swaggerPath: "/swagger"
+grpc:
+  name: "admin"
+  address: ":31003"
   logger:
     path: "./log"
     file: "{Y-m-d}.log"
-    prefix: "gateway-admin"
+    prefix: "admin-service"
     level: "all"
     stdout: true
     rotateSize: 104857600
     rotateBackupLimit: 7
     ctxKeys: [ "traceId" ]
     timeFormat: "2006-01-02 15:04:05.000"
+
+database:
+  default:
+    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/admin"
+    debug: false
 
 etcd:
   address: "etcd:2379"
