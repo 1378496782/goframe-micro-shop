@@ -38,7 +38,7 @@ func (c *ControllerV1) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.N
 		"Wechatpay-Timestamp": r.Header.Get("Wechatpay-Timestamp"),
 		"Wechatpay-Nonce":     r.Header.Get("Wechatpay-Nonce"),
 		"Wechatpay-Serial":    r.Header.Get("Wechatpay-Serial"),
-		//"X-Bypass-Verify":     r.Header.Get("X-Bypass-Verify"), 测试代码，本地测试用
+		"X-Bypass-Verify":     r.Header.Get("X-Bypass-Verify"), // 测试代码，本地测试用
 	}
 	req.Headers = headers
 

@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -24,6 +25,10 @@ import (
 	"sync"
 	"time"
 )
+
+/*
+	微信支付和微信退款相关的逻辑
+*/
 
 var (
 	wechatClient *core.Client
@@ -52,6 +57,8 @@ func loadConfigParam() weChatConfig {
 		notifyUrl:  g.Cfg().MustGet(nil, "payment.wechat.notifyUrl").String(),
 	}
 }
+
+// ================ 微信支付相关 ==================
 
 // InitWechatClient 初始化单例微信客户端
 func InitWechatClient() error {
@@ -133,26 +140,26 @@ func Notify(ctx context.Context, req *v1.NotifyReq, checkIdempotent IdempotentCh
 		httpReq.Header.Set(k, v)
 	}
 
-	//// 测试代码(本地测试用)
-	//if req.Headers["X-Bypass-Verify"] == "1" {
-	//	res := new(payments.Transaction)
-	//	if err := json.Unmarshal([]byte(req.RawBody), res); err != nil {
-	//		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析 transaction 失败")
-	//	}
-	//	if err != nil {
-	//		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "outTradeNo to int error")
-	//	}
-	//
-	//	// 幂等校验
-	//	alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
-	//	if err != nil {
-	//		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
-	//	}
-	//	if alreadyPaid {
-	//		return true, *res.OutTradeNo, nil
-	//	}
-	//	return false, *res.OutTradeNo, nil
-	//}
+	// 测试代码(本地测试用)
+	if req.Headers["X-Bypass-Verify"] == "1" {
+		res := new(payments.Transaction)
+		if err := json.Unmarshal([]byte(req.RawBody), res); err != nil {
+			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析 transaction 失败")
+		}
+		if err != nil {
+			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "outTradeNo to int error")
+		}
+
+		// 幂等校验
+		alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
+		if err != nil {
+			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
+		}
+		if alreadyPaid {
+			return true, *res.OutTradeNo, nil
+		}
+		return false, *res.OutTradeNo, nil
+	}
 
 	wxConf := loadConfigParam()
 
@@ -183,6 +190,58 @@ func Notify(ctx context.Context, req *v1.NotifyReq, checkIdempotent IdempotentCh
 
 	// 6) 订单状态未修改
 	return false, *res.OutTradeNo, nil
+}
+
+// ================ 微信退款相关 ==================
+func Refund() error {
+	return nil
+	//if wechatClient == nil {
+	//	return gerror.WrapCode(gcode.CodeOperationFailed, errors.New("客户端未初始化"))
+	//}
+	//wxConf := loadConfigParam()
+	//svc := refunds.RefundApiService{Client: wechatClient}
+	//prepayReq := jsapi.PrepayRequest{
+	//	Appid:       core.String(wxConf.appID),
+	//	Mchid:       core.String(wxConf.mchID),
+	//	Description: core.String("小程序商品"),
+	//	OutTradeNo:  core.String(req.Number),
+	//	NotifyUrl:   core.String(wxConf.notifyUrl),
+	//	Amount: &jsapi.Amount{
+	//		Total:    core.Int64(req.Amount),
+	//		Currency: core.String("CNY"),
+	//	},
+	//	Payer: &jsapi.Payer{
+	//		Openid: core.String(req.OpenId),
+	//	},
+	//}
+	//
+	//prepayResp, _, err := svc.Prepay(ctx, prepayReq)
+	//if err != nil {
+	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, err, "向微信发送请求失败")
+	//}
+	//if prepayResp == nil || prepayResp.PrepayId == nil {
+	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, errors.New("prepay_id 为空"))
+	//}
+	//nonceStr, err := genNonceStr(32)
+	//if err != nil {
+	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, err, "生成随机数失败")
+	//}
+	//timeStamp := strconv.FormatInt(time.Now().Unix(), 10)
+	//packageStr := "prepay_id=" + *prepayResp.PrepayId
+	//toSign := fmt.Sprintf("%s\n%s\n%s\n%s\n", wxConf.appID, timeStamp, nonceStr, packageStr)
+	//sigRes, err := wechatClient.Sign(ctx, toSign)
+	//if err != nil {
+	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, err, "sign failed")
+	//}
+	//
+	//return &v1.PaymentRes{
+	//	TimeStamp:  timeStamp,
+	//	NonceStr:   nonceStr,
+	//	Package:    packageStr,
+	//	SignType:   "RSA",
+	//	PaySign:    sigRes.Signature,
+	//	OutTradeNo: req.Number,
+	//}, nil
 }
 
 // 生成随机 nonce 字符串（hex）

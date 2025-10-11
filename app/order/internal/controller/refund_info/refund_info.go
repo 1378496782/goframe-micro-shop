@@ -2,9 +2,11 @@ package refund_info
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/refund_info/v1"
+	"shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility"
@@ -105,13 +107,47 @@ func (*Controller) Create(ctx context.Context, req *v1.RefundInfoCreateReq) (res
 		return nil, err
 	}
 
+	// 查询订单是否存在以及订单状态是否是已付款
+	var order *entity.OrderInfo
+	err = dao.OrderInfo.Ctx(ctx).WherePri(req.OrderId).Scan(order)
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "查询订单记录失败")
+	}
+	status := consts.OrderStatus(order.Status)
+	if order == nil && status == consts.OrderStatusPendingPayment && status == consts.OrderStatusCancelled {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "订单不存在")
+	}
+
 	// 售后订单号生成函数
 	refund.Number = utility.GenerateRefundNumber()
-	refund.Status = 1
+	switch status {
+	// 已支付未发货的情况
+	case consts.OrderStatusPaid:
+		refund.Status = int(consts.RefundStatusApproved)
+	default:
+		refund.Status = int(consts.RefundStatusPending)
+	}
 
 	id, err := dao.RefundInfo.Ctx(ctx).InsertAndGetId(refund)
 	if err != nil {
 		return nil, err
+	}
+
+	if refund.Status == int(consts.RefundStatusApproved) {
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+
+				}
+			}()
+			g.Log().Infof(ctx, "已向微信平台发送退款申请")
+			_, err = dao.OrderInfo.Ctx(ctx).Where("id", id).Data(g.Map{
+				"refundStatus": int(consts.RefundOrderStatusProcessing),
+			}).Update()
+			if err != nil {
+				g.Log().Errorf(ctx, "%v,%v", err, "更新退款状态失败")
+			}
+		}()
 	}
 
 	return &v1.RefundInfoCreateRes{Id: uint32(id)}, nil
