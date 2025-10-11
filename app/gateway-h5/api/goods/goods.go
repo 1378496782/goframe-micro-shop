@@ -11,6 +11,7 @@ import (
 )
 
 type IGoodsV1 interface {
+	AddGoodsInfoGetList(ctx context.Context, req *v1.AddGoodsInfoGetListReq) (res *v1.AddGoodsInfoGetListRes, err error)
 	CartInfoGetList(ctx context.Context, req *v1.CartInfoGetListReq) (res *v1.CartInfoGetListRes, err error)
 	CartInfoCreate(ctx context.Context, req *v1.CartInfoCreateReq) (res *v1.CartInfoCreateRes, err error)
 	CartInfoDelete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *v1.CartInfoDeleteRes, err error)

@@ -5,14 +5,16 @@
 package goods
 
 import (
-	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/goods"
+	add_goods_info "shop-goframe-micro-service-refacotor/app/goods/api/add_goods_info/v1"
 	cart_info "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
 	category_info "shop-goframe-micro-service-refacotor/app/goods/api/category_info/v1"
 	goods_images "shop-goframe-micro-service-refacotor/app/goods/api/goods_images/v1"
 	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
 	user_coupon_info "shop-goframe-micro-service-refacotor/app/goods/api/user_coupon_info/v1"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
+
+	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 )
 
 type ControllerV1 struct {
@@ -21,6 +23,7 @@ type ControllerV1 struct {
 	CategoryInfoClient   category_info.CategoryInfoClient
 	CartInfoClient       cart_info.CartInfoClient
 	UserCouponInfoClient user_coupon_info.UserCouponInfoClient
+	AddGoodsInfoClient   add_goods_info.AddGoodsInfoClient
 }
 
 func NewV1() goods.IGoodsV1 {
@@ -33,5 +36,6 @@ func NewV1() goods.IGoodsV1 {
 		CategoryInfoClient:   category_info.NewCategoryInfoClient(conn),
 		CartInfoClient:       cart_info.NewCartInfoClient(conn),
 		UserCouponInfoClient: user_coupon_info.NewUserCouponInfoClient(conn),
+		AddGoodsInfoClient:   add_goods_info.NewAddGoodsInfoClient(conn),
 	}
 }

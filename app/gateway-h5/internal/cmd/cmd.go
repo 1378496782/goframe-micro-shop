@@ -2,15 +2,16 @@ package cmd
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gcmd"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/banner"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/goods"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/interaction"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/order"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
+
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gcmd"
 )
 
 var (
@@ -42,6 +43,7 @@ var (
 						goodsController.GoodsInfoGetDetail,
 						goodsController.GoodsInfoGetList,
 						bannerController,
+						goodsController.AddGoodsInfoGetList,
 					)
 				})
 				// 需要JWT验证的路由
