@@ -1,7 +1,4 @@
-// 服务器域名配置
-const BASE_URL = 'https://business.dayu.club'
- 
-// 导出配置
-module.exports = {
-  BASE_URL
-}
+// 统一配置文件 - 已迁移到 config/index.js
+// 请使用 const { config } = require('../config/index') 来引用配置
+
+module.exports = require('../config/index').config;

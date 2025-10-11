@@ -1,5 +1,5 @@
 // API配置和请求封装
-const { config } = require('./env');
+const { config, API } = require('../config/index');
 
 // 使用统一环境配置
 const isMock = false; // 禁用mock模式，使用真实API

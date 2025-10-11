@@ -1,6 +1,6 @@
 const app = getApp();
 const { request } = require('../../utils/request');
-const { API } = require('../../utils/env');
+const { API } = require('../../config/index');
 
 Page({
   data: {

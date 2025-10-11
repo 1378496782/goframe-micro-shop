@@ -1,4 +1,4 @@
-const { API, config } = require('./utils/env')
+const { API, config } = require('./config/index')
 const { checkLoginStatus } = require('./utils/request')
 
 App({

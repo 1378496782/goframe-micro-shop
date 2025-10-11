@@ -1,5 +1,5 @@
 const { api } = require('../../utils/api');
-const constants = require('../../config/constants');
+const { CONSTANTS } = require('../../config/index');
 
 Page({
   data: {
@@ -25,11 +25,14 @@ Page({
         api.getGoodsList({ page: 1, size: 10, is_hot: 1 })
       ])
       
+      console.log('轮播图响应:', bannersRes)
+      console.log('商品列表响应:', productsRes)
+      
       if (bannersRes.code === 0 && bannersRes.data?.list) {
         this.setData({
           banners: bannersRes.data.list?.map(item => ({
             id: item.id,
-            image: constants.IMAGE_BASE_URL + item.pic_url,
+            image: item.pic_url ? (item.pic_url.startsWith('http') ? item.pic_url : constants.IMAGE_BASE_URL + item.pic_url) : 'https://via.placeholder.com/300x150?text=轮播图',
             url: item.link
           }))
         })
@@ -39,16 +42,30 @@ Page({
       if (productsRes.code === 0 && productsRes.data?.list) {
         // 格式化商品数据：价格转换和图片提取
         const formattedProducts = productsRes.data.list?.map(item => {
-          // 处理图片URL，直接使用pic_url字段（已经是完整URL）
+          // 处理图片URL，优先使用pic_url，如果没有则尝试从images字段解析
           let mainImage = '';
           if (item.pic_url) {
             mainImage = item.pic_url;
+          } else if (item.images) {
+            try {
+              const imagesObj = JSON.parse(item.images);
+              if (imagesObj.image) {
+                mainImage = imagesObj.image;
+              }
+            } catch (e) {
+              console.log('解析images字段失败:', e)
+            }
+          }
+          
+          // 确保图片URL是完整的
+          if (mainImage && !mainImage.startsWith('http')) {
+            mainImage = constants.IMAGE_BASE_URL + mainImage;
           }
           
           return {
             ...item,
             priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
-            mainImage: mainImage ? (mainImage.startsWith('http') ? mainImage : constants.IMAGE_BASE_URL + mainImage) : 'https://via.placeholder.com/200x200?text=商品图片'
+            mainImage: mainImage || 'https://via.placeholder.com/200x200?text=商品图片'
           }
         })
         

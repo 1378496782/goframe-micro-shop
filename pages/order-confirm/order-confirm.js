@@ -64,7 +64,7 @@ Page({
     console.log('第一个商品的详细数据:', selectedItems[0])
 
     // 处理图片URL，添加基础URL - 兼容不同字段名
-    const constants = require('../../config/constants')
+    const { CONSTANTS } = require('../../config/index')
     const processedItems = selectedItems.map(item => ({
       ...item,
       // 兼容不同字段名

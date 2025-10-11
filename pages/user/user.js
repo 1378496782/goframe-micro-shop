@@ -4,7 +4,7 @@
  */
 const app = getApp()
 const { checkLoginStatus, request } = require('../../utils/request')
-const { API } = require('../../utils/env')
+const { API } = require('../../config/index')
 
 Page({
   /**

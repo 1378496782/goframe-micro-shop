@@ -1,5 +1,5 @@
 // 统一的请求封装，包含token管理和错误处理
-const { API, isDev } = require('./env')
+const { API, isDev } = require('../config/index')
 
 // 获取token
 function getToken() {

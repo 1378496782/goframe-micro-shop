@@ -205,7 +205,7 @@ Page({
    */
   formatOrderList: function (list) {
     // 获取图片基础URL
-    const constants = require('../../config/constants')
+    const { CONSTANTS } = require('../../config/index')
     const imageBaseUrl = constants.IMAGE_BASE_URL
     
     console.log('[formatOrderList] 原始数据:', list);

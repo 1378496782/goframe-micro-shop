@@ -1,5 +1,5 @@
 const api = require('../../utils/api').api;
-const constants = require('../../config/constants');
+const { CONSTANTS } = require('../../config/index');
 
 Page({
   data: {

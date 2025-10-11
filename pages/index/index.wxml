@@ -9,7 +9,7 @@
     />
     <button class="search-btn" bindtap="onSearch">搜索</button>
   </view>
-
+  
   <!-- 轮播图 -->
   <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000">
     <swiper-item wx:for="{{banners}}" wx:key="id">

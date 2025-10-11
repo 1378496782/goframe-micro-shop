@@ -52,7 +52,7 @@ Page({
     const app = getApp()
     const { API, config } = app.globalData
     const { request } = require('../../utils/request')
-    const constants = require('../../config/constants')
+    const { CONSTANTS } = require('../../config/index')
     
     console.log('正在请求购物车数据:', {
       url: API.CART_LIST,
