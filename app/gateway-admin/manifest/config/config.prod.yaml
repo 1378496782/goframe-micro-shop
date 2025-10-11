@@ -14,4 +14,4 @@ server:
     timeFormat: "2006-01-02 15:04:05.000"
 
 etcd:
-  address: "etcd:2379"
+  address: "127.0.0.1:2379"

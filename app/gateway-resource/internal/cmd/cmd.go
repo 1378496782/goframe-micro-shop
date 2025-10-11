@@ -20,6 +20,7 @@ var (
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
 					file.NewV1().UploadImage,
+					file.NewV1().GetAvatarImage,
 				)
 			})
 			s.Run()

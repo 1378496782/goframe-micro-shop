@@ -20,6 +20,7 @@ const (
 	CategoryInfo       = "CategoryInfo"
 	GoodsImages        = "GoodsImages"
 	GoodsInfo          = "GoodsInfo"
+	AddGoodsInfo       = "AddGoodsInfo"
 	FileInfo           = "FileInfo"
 	ConsigneeInfo      = "ConsigneeInfo"
 	UserInfo           = "UserInfo"

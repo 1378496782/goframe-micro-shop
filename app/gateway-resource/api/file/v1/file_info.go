@@ -14,7 +14,9 @@ type UploadImageReq struct {
 }
 
 type UploadImageRes struct {
-	Url string `json:"url" dc:"图片访问URL"`
+	Key        string `json:"key" dc:"唯一文件名"`
+	Url        string `json:"url" dc:"图片访问URL"`
+	ExpireTime int64  `json:"expireTime" dc:"过期时间"`
 }
 
 type GetAvatarImageReq struct {
@@ -23,5 +25,6 @@ type GetAvatarImageReq struct {
 }
 
 type GetAvatarImageRes struct {
-	Url string `json:"url" dc:"图片访问URL"`
+	Url        string `json:"url" dc:"图片访问URL"`
+	ExpireTime int64  `json:"expireTime" dc:"过期时间"`
 }
