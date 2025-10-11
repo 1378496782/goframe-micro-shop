@@ -17,7 +17,7 @@ services:
     image: mysql:8.0
     container_name: mysql
     environment:
-      <<: [*mysql-env, *common-env]
+      <<: *mysql-env
     ports:
       - "3306:3306"
     volumes:
@@ -47,7 +47,7 @@ services:
     image: quay.io/coreos/etcd:v3.5.0
     container_name: etcd
     environment:
-      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379
       ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
       ETCD_NAME: etcd-node-1
       ETCD_DATA_DIR: /etcd-data
@@ -96,7 +96,7 @@ services:
     image: rabbitmq:4.1.0-management-alpine
     container_name: rabbitmq
     environment:
-      <<: [*rabbitmq-env, *common-env]
+      <<: *rabbitmq-env
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -151,7 +151,7 @@ services:
         exec /usr/local/bin/docker-entrypoint.sh
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9200/_cluster/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -183,7 +183,7 @@ services:
       - app-network
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5601/api/status"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:5601/api/status"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -200,7 +200,7 @@ services:
     ports:
       - "31004:31004"
     volumes:
-      - ./app/goods/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/goods/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -236,7 +236,7 @@ services:
     ports:
       - "31005:31005"
     volumes:
-      - ./app/order/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/order/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -272,7 +272,7 @@ services:
     ports:
       - "31001:31001"
     volumes:
-      - ./app/user/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/user/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -306,7 +306,7 @@ services:
     ports:
       - "31002:31002"
     volumes:
-      - ./app/interaction/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/interaction/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -323,7 +323,7 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "31002"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "31002"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -340,7 +340,7 @@ services:
     ports:
       - "8499:8499"
     volumes:
-      - ./app/search/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/search/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -359,7 +359,7 @@ services:
           memory: 1G
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "8499"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "8499"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -376,7 +376,7 @@ services:
     ports:
       - "8199:8199"
     volumes:
-      - ./app/gateway-h5/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/gateway-h5/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -391,7 +391,7 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8199/api.json"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8199/api.json"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -407,7 +407,7 @@ services:
     ports:
       - "8399:8399"
     volumes:
-      - ./app/gateway-resource/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/gateway-resource/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -439,7 +439,7 @@ services:
     ports:
       - "31006:31006"
     volumes:
-      - ./app/banner/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./app/banner/manifest/config/config.prod.yaml:/app/config/config.prod.yaml
       - ./log:/app/log
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -456,7 +456,7 @@ services:
           memory: 512M
           cpus: '0.5'
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "31006"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "31006"]
       interval: 30s
       timeout: 10s
       retries: 3
