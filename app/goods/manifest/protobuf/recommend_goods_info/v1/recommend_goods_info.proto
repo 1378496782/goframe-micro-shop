@@ -2,22 +2,25 @@ syntax = "proto3";
 
 package add_goods_info.v1;
 
-option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/add_goods_info/v1";
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/recommend_goods_info/v1";
 
 import "pbentity/goods_info.proto";
 import "google/protobuf/timestamp.proto";
 
-service AddGoodsInfo {
-  rpc GetList(AddGoodsInfoGetListReq) returns (AddGoodsInfoGetListRes) {}
+service RecommendGoodsInfo {
+  rpc GetList(RecommendGoodsInfoGetListReq) returns (RecommendGoodsInfoGetListRes) {}
 }
 
 // 新增消息定义
 
 
-message AddGoodsInfoGetListReq {
+message RecommendGoodsInfoGetListReq {
+  uint32 id = 1;
+  uint32 count = 2;
+
 }
 
-message AddGoodsItem {
+message RecommendGoodsItem {
   // 商品字段
   uint32 id = 1;
   string name = 2;
@@ -35,11 +38,11 @@ message AddGoodsItem {
   uint32 sort = 14;
 }
 
-message AddGoodsInfoListResponse {
+message RecommendGoodsInfoListResponse {
   repeated pbentity.GoodsInfo list = 1;
   uint32 total = 4;
 }
 
-message AddGoodsInfoGetListRes {
-  AddGoodsInfoListResponse data = 1;
+message RecommendGoodsInfoGetListRes {
+  RecommendGoodsInfoListResponse data = 1;
 }
