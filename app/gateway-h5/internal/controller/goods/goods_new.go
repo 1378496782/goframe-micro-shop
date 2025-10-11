@@ -6,7 +6,7 @@ package goods
 
 import (
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/goods"
-	add_goods_info "shop-goframe-micro-service-refacotor/app/goods/api/add_goods_info/v1"
+	recommend_goods_info "shop-goframe-micro-service-refacotor/app/goods/api/recommend_goods_info/v1"
 	cart_info "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
 	category_info "shop-goframe-micro-service-refacotor/app/goods/api/category_info/v1"
 	goods_images "shop-goframe-micro-service-refacotor/app/goods/api/goods_images/v1"
@@ -18,12 +18,12 @@ import (
 )
 
 type ControllerV1 struct {
-	GoodsInfoClient      goods_info.GoodsInfoClient
-	GoodsImagesClient    goods_images.GoodsImagesClient
-	CategoryInfoClient   category_info.CategoryInfoClient
-	CartInfoClient       cart_info.CartInfoClient
-	UserCouponInfoClient user_coupon_info.UserCouponInfoClient
-	AddGoodsInfoClient   add_goods_info.AddGoodsInfoClient
+	GoodsInfoClient          goods_info.GoodsInfoClient
+	GoodsImagesClient        goods_images.GoodsImagesClient
+	CategoryInfoClient       category_info.CategoryInfoClient
+	CartInfoClient           cart_info.CartInfoClient
+	UserCouponInfoClient     user_coupon_info.UserCouponInfoClient
+	RecommendGoodsInfoClient recommend_goods_info.RecommendGoodsInfoClient
 }
 
 func NewV1() goods.IGoodsV1 {
@@ -31,11 +31,11 @@ func NewV1() goods.IGoodsV1 {
 		middleware.GrpcClientTimeout,
 	))
 	return &ControllerV1{
-		GoodsInfoClient:      goods_info.NewGoodsInfoClient(conn),
-		GoodsImagesClient:    goods_images.NewGoodsImagesClient(conn),
-		CategoryInfoClient:   category_info.NewCategoryInfoClient(conn),
-		CartInfoClient:       cart_info.NewCartInfoClient(conn),
-		UserCouponInfoClient: user_coupon_info.NewUserCouponInfoClient(conn),
-		AddGoodsInfoClient:   add_goods_info.NewAddGoodsInfoClient(conn),
+		GoodsInfoClient:          goods_info.NewGoodsInfoClient(conn),
+		GoodsImagesClient:        goods_images.NewGoodsImagesClient(conn),
+		CategoryInfoClient:       category_info.NewCategoryInfoClient(conn),
+		CartInfoClient:           cart_info.NewCartInfoClient(conn),
+		UserCouponInfoClient:     user_coupon_info.NewUserCouponInfoClient(conn),
+		RecommendGoodsInfoClient: recommend_goods_info.NewRecommendGoodsInfoClient(conn),
 	}
 }
