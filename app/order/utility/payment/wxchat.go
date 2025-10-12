@@ -18,6 +18,7 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/core/option"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/jsapi"
+	"github.com/wechatpay-apiv3/wechatpay-go/services/refunddomestic"
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
 	"net/http"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
@@ -193,55 +194,67 @@ func Notify(ctx context.Context, req *v1.NotifyReq, checkIdempotent IdempotentCh
 }
 
 // ================ 微信退款相关 ==================
-func Refund() error {
+
+type RefundReq struct {
+	TransactionId string // 微信订单号
+	OutRefundNo   string // 商户退款单号（唯一）
+	Reason        string // 退款原因
+	TotalAmount   int64  // 原订单金额（分）
+	RefundAmount  int64  // 退款金额（分）
+}
+
+func Refund(ctx context.Context, req RefundReq) error {
+	// 1) 初始化微信客户端
+	if wechatClient == nil {
+		return gerror.WrapCode(gcode.CodeOperationFailed, errors.New("客户端未初始化"))
+	}
+
+	// 2) 加载配置
+	wxConf := loadConfigParam()
+	// 3) 构建退款请求
+	prepayReq := refunddomestic.CreateRequest{
+		TransactionId: core.String(""),               // 订单编号
+		OutRefundNo:   core.String(""),               // 退款编号
+		Reason:        core.String(""),               // 退货理由
+		NotifyUrl:     core.String(wxConf.notifyUrl), // 退款回调 url
+		Amount: &refunddomestic.AmountReq{
+			Total:    core.Int64(0), // 原订单支付金额，单位分
+			Refund:   core.Int64(0), // 退款金额，单位分
+			Currency: core.String("CNY"),
+		},
+	}
+
+	// 4) 调用退款接口
+	svc := refunddomestic.RefundsApiService{Client: wechatClient}
+	resp, apiResult, err := svc.Create(ctx, prepayReq)
+	if err != nil {
+		return gerror.WrapCode(gcode.CodeOperationFailed, err, "向微信发送请求失败")
+	}
+	// 5) 判断返回状态
+	if apiResult.Response.StatusCode != 200 && apiResult.Response.StatusCode != 201 {
+		return gerror.Newf("退款接口返回异常状态码：%d", apiResult.Response.StatusCode)
+	}
+
+	// 6) 解析退款结果（同步结果）
+	if resp.Status != nil {
+		status := *resp.Status
+		switch status {
+		case "SUCCESS":
+			fmt.Printf("✅ 退款成功，退款单号：%s\n", *resp.RefundId)
+			return nil
+		case "PROCESSING":
+			fmt.Printf("⏳ 退款处理中，请等待异步通知。退款单号：%s\n", *resp.RefundId)
+			return nil
+		case "ABNORMAL":
+			return gerror.Newf("⚠️ 退款异常，请人工介入，退款单号：%s", *resp.RefundId)
+		case "CLOSED":
+			return gerror.Newf("❌ 退款已关闭，退款单号：%s", *resp.RefundId)
+		default:
+			return gerror.Newf("未知退款状态：%s", status)
+		}
+	}
+
 	return nil
-	//if wechatClient == nil {
-	//	return gerror.WrapCode(gcode.CodeOperationFailed, errors.New("客户端未初始化"))
-	//}
-	//wxConf := loadConfigParam()
-	//svc := refunds.RefundApiService{Client: wechatClient}
-	//prepayReq := jsapi.PrepayRequest{
-	//	Appid:       core.String(wxConf.appID),
-	//	Mchid:       core.String(wxConf.mchID),
-	//	Description: core.String("小程序商品"),
-	//	OutTradeNo:  core.String(req.Number),
-	//	NotifyUrl:   core.String(wxConf.notifyUrl),
-	//	Amount: &jsapi.Amount{
-	//		Total:    core.Int64(req.Amount),
-	//		Currency: core.String("CNY"),
-	//	},
-	//	Payer: &jsapi.Payer{
-	//		Openid: core.String(req.OpenId),
-	//	},
-	//}
-	//
-	//prepayResp, _, err := svc.Prepay(ctx, prepayReq)
-	//if err != nil {
-	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, err, "向微信发送请求失败")
-	//}
-	//if prepayResp == nil || prepayResp.PrepayId == nil {
-	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, errors.New("prepay_id 为空"))
-	//}
-	//nonceStr, err := genNonceStr(32)
-	//if err != nil {
-	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, err, "生成随机数失败")
-	//}
-	//timeStamp := strconv.FormatInt(time.Now().Unix(), 10)
-	//packageStr := "prepay_id=" + *prepayResp.PrepayId
-	//toSign := fmt.Sprintf("%s\n%s\n%s\n%s\n", wxConf.appID, timeStamp, nonceStr, packageStr)
-	//sigRes, err := wechatClient.Sign(ctx, toSign)
-	//if err != nil {
-	//	return nil, gerror.WrapCode(gcode.CodeOperationFailed, err, "sign failed")
-	//}
-	//
-	//return &v1.PaymentRes{
-	//	TimeStamp:  timeStamp,
-	//	NonceStr:   nonceStr,
-	//	Package:    packageStr,
-	//	SignType:   "RSA",
-	//	PaySign:    sigRes.Signature,
-	//	OutTradeNo: req.Number,
-	//}, nil
 }
 
 // 生成随机 nonce 字符串（hex）
