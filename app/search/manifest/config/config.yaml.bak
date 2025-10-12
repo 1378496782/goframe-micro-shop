@@ -14,10 +14,10 @@ server:
     timeFormat: "2006-01-02 15:04:05.000"
 
 etcd:
-  address: "etcd:2379"
+  address: "127.0.0.1:2379"
 
 elasticsearch:
-  address: "http://elasticsearch:9200"
+  address: "http://127.0.0.1:9200"
   sniff: false
   healthcheck: true
   indices:
@@ -26,7 +26,7 @@ elasticsearch:
 binlog:
   goods:
     mysql:
-      host: "mysql"
+      host: "127.0.0.1"
       port: 3306
       username: "root"
-      password: "CHANGE_ME_MYSQL_ROOT_PASSWORD"
+      password: "root"
