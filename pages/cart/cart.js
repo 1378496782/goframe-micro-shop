@@ -52,7 +52,7 @@ Page({
     const app = getApp()
     const { API, config } = app.globalData
     const { request } = require('../../utils/request')
-    const constants = require('../../config/constants')
+    const { CONSTANTS } = require('../../config/index')
     
     console.log('正在请求购物车数据:', {
       url: API.CART_LIST,
@@ -96,20 +96,33 @@ Page({
         }
       })
       
+      // 获取图片基础URL
+      const constants = require('../../config/constants')
+      const imageBaseUrl = constants.IMAGE_BASE_URL
+      
       // 转换为前端需要的格式
-      const newItems = Array.from(itemMap.values()).map(item => ({
-        id: item.id,
-        goods_id: item.goods_id,
-        name: item.goods_name,
-        spec: item.goods_brand || '默认规格',
-        price: (item.goods_price / 100).toFixed(2), // 分转元并格式化
-        originalPrice: ((item.goods_price * 1.2) / 100).toFixed(2), // 计算原价并格式化
-        image: item.goods_pic_url,
-        quantity: item.count, // 合并后的数量
-        selected: false,
-        stock: item.goods_stock,
-        sale: item.goods_sale
-      }))
+      const newItems = Array.from(itemMap.values()).map(item => {
+        // 处理图片URL，确保使用完整的URL路径
+        let imageUrl = item.goods_pic_url
+        if (imageUrl && !imageUrl.startsWith('http')) {
+          // 如果URL不是完整的HTTP地址，拼接基础URL
+          imageUrl = imageBaseUrl + imageUrl.replace(/^\//, '')
+        }
+        
+        return {
+          id: item.id,
+          goods_id: item.goods_id,
+          name: item.goods_name,
+          spec: item.goods_brand || '默认规格',
+          price: (item.goods_price / 100).toFixed(2), // 分转元并格式化
+          originalPrice: ((item.goods_price * 1.2) / 100).toFixed(2), // 计算原价并格式化
+          image: imageUrl,
+          quantity: item.count, // 合并后的数量
+          selected: false,
+          stock: item.goods_stock,
+          sale: item.goods_sale
+        }
+      })
       
       console.log('转换后的商品列表:', newItems)
       
@@ -213,16 +226,58 @@ Page({
   // 删除商品
   deleteItem(e) {
     const index = e.currentTarget.dataset.index
+    const item = this.data.cartItems[index]
+    
+    console.log('删除商品:', item)
+    
     wx.showModal({
       title: '提示',
       content: '确定要删除这个商品吗？',
       success: (res) => {
         if (res.confirm) {
-          const cartItems = this.data.cartItems.filter((_, i) => i !== index)
-          this.setData({ cartItems }, () => {
-            this.calculateTotal()
-            this.updateCartCount()
-          })
+          // 调用后端接口删除商品
+          wx.showLoading({ title: '删除中...' })
+          
+          const app = getApp()
+          const { API } = app.globalData
+          const { request } = require('../../utils/request')
+          
+          console.log('调用删除接口:', API.CART_DELETE)
+          console.log('删除参数:', { id: item.id })
+          
+          request({
+            url: API.CART_DELETE, // 使用正确的接口路径
+            method: 'DELETE',
+            data: {
+              id: item.id // 使用购物车项的ID
+            }
+          }).then(data => {
+            wx.hideLoading()
+            console.log('删除接口返回数据:', data)
+            
+            // request.js在业务成功时(code:0)会resolve，直接进入成功处理
+            // 删除成功，从本地数组中移除
+            const cartItems = this.data.cartItems.filter((_, i) => i !== index)
+            this.setData({ cartItems }, () => {
+              this.calculateTotal()
+              this.updateCartCount()
+              wx.showToast({
+                title: '删除成功',
+                icon: 'success'
+              })
+            })
+
+          }).catch(err => {
+              wx.hideLoading()
+              console.error('删除商品失败:', err)
+              // 只有在用户取消确认框时不显示错误提示
+              if (err.message !== '取消删除') {
+                wx.showToast({
+                  title: err.message || '删除失败，请重试',
+                  icon: 'none'
+                })
+              }
+            })
         }
       }
     })

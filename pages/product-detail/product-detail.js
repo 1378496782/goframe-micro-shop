@@ -1,5 +1,5 @@
 const api = require('../../utils/api').api;
-const constants = require('../../config/constants');
+const { CONSTANTS } = require('../../config/index');
 
 Page({
   data: {
@@ -139,8 +139,8 @@ Page({
         content: '请先登录',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
+            wx.switchTab({
+              url: '/pages/user/user'
             })
           }
         }
@@ -172,10 +172,196 @@ Page({
   },
 
   // 立即购买
-  buyNow() {
-    wx.navigateTo({
-      url: `/pages/order/confirm?productId=${this.data.product.id}`
-    })
-    console.log('立即购买', this.data.product.id)
+  async buyNow() {
+    if (!wx.getStorageSync('token')) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({
+              url: '/pages/user/user'
+            })
+          }
+        }
+      })
+      return
+    }
+
+    // 获取商品信息
+    const product = this.data.product;
+    if (!product) {
+      wx.showToast({
+        title: '商品信息不完整',
+        icon: 'none'
+      })
+      return;
+    }
+
+    // 显示加载提示
+    wx.showLoading({
+      title: '处理中...',
+      mask: true
+    });
+
+    try {
+      // 构建订单数据
+      const orderData = {
+        price: parseFloat(product.price) * 100, // 转换为分
+        coupon_price: 0, // 不使用优惠券
+        actual_price: parseFloat(product.price) * 100, // 实际价格，转换为分
+        remark: '',
+        order_goods_info: [{
+          goods_id: product.id,
+          count: 1,
+          price: parseFloat(product.price) * 100, // 转换为分
+          coupon_price: 0,
+          actual_price: parseFloat(product.price) * 100 // 转换为分
+        }]
+      };
+
+      console.log('提交订单参数:', orderData);
+      
+      // 调用提交订单接口
+      const { api } = require('../../utils/api');
+      const res = await api.submitOrder(orderData);
+      
+      if (res.code === 0 && res.data && res.data.id) {
+        // 订单创建成功，获取订单编号
+        const orderId = res.data.id;
+        const orderNumber = res.data.number;
+        
+        console.log('订单创建成功，订单ID:', orderId, '订单编号:', orderNumber);
+        
+        // 调用微信支付接口
+        await this.requestWxPayment(orderNumber);
+      } else {
+        // 订单创建失败
+        throw new Error(res.msg || '订单创建失败');
+      }
+    } catch (error) {
+      console.error('提交订单失败:', error);
+      wx.showToast({
+        title: error.message || '提交订单失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+  
+  // 请求微信支付
+  async requestWxPayment(orderNumber) {
+    try {
+      // 获取用户openId
+      const openId = wx.getStorageSync('openId');
+      if (!openId) {
+        console.error('未找到openId，尝试重新获取');
+        
+        // 如果没有openId，提示用户重新登录
+        wx.showModal({
+          title: '登录信息不完整',
+          content: '需要重新登录以完成支付',
+          confirmText: '去登录',
+          success: (res) => {
+            if (res.confirm) {
+              // 跳转到用户页面进行登录
+              wx.switchTab({
+                url: '/pages/user/user'
+              });
+            }
+          }
+        });
+        throw new Error('未获取到用户openId，请重新登录');
+      }
+      
+      // 构建支付请求参数
+      const paymentData = {
+        openId: openId,
+        amount: Math.round(parseFloat(this.data.product.price) * 100), // 转换为分
+        number: orderNumber
+      };
+      
+      console.log('发起支付请求参数:', paymentData);
+      
+      // 调用支付接口
+      const paymentRes = await this.callPaymentAPI(paymentData);
+      
+      if (paymentRes.code === 0 && paymentRes.data) {
+        // 调起微信支付
+        await this.launchWxPayment(paymentRes.data);
+        
+        // 支付成功后跳转
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success',
+          duration: 2000
+        });
+        
+        // 2秒后返回首页
+        setTimeout(() => {
+          wx.switchTab({
+            url: '/pages/index/index'
+          });
+        }, 2000);
+      } else {
+        throw new Error(paymentRes.msg || '获取支付参数失败');
+      }
+    } catch (error) {
+      console.error('支付请求失败:', error);
+      wx.showToast({
+        title: error.message || '支付失败',
+        icon: 'none'
+      });
+    }
+  },
+  
+  // 调用支付API
+  callPaymentAPI(paymentData) {
+    return new Promise((resolve, reject) => {
+      // 获取token
+      const token = wx.getStorageSync('token') || '';
+      const { config } = require('../../utils/env');
+      
+      // 设置请求头
+      const header = {};
+      if (token) {
+        header['Authorization'] = `Bearer ${token}`;
+      }
+      
+      wx.request({
+        url: `${config.BASE_URL}/frontend/payment`,
+        data: paymentData,
+        method: 'POST',
+        header: header,
+        success: (res) => {
+          resolve(res.data);
+        },
+        fail: (err) => {
+          reject(err);
+        }
+      });
+    });
+  },
+  
+  // 调起微信支付
+  launchWxPayment(payParams) {
+    return new Promise((resolve, reject) => {
+      wx.requestPayment({
+        timeStamp: payParams.timeStamp,
+        nonceStr: payParams.nonceStr,
+        package: payParams.package,
+        signType: payParams.signType,
+        paySign: payParams.paySign,
+        success: (res) => {
+          console.log('支付成功:', res);
+          resolve(res);
+        },
+        fail: (err) => {
+          console.error('支付失败:', err);
+          reject(new Error('支付失败或已取消'));
+        }
+      });
+    });
   }
 })

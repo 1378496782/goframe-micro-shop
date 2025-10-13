@@ -1,5 +1,5 @@
 // 统一的请求封装，包含token管理和错误处理
-const { API, isDev } = require('./env')
+const { API, isDev } = require('../config/index')
 
 // 获取token
 function getToken() {
@@ -61,17 +61,25 @@ function request(options) {
           } else {
             // 业务错误
             const errorMsg = response.message || '操作失败'
-            if (isDev) {
-              wx.showModal({
-                title: '请求错误',
-                content: errorMsg,
-                showCancel: false
-              })
-            } else {
-              wx.showToast({
-                title: errorMsg,
-                icon: 'none'
-              })
+            
+            // 特殊处理：用户信息接口返回用户不存在错误时不显示错误提示
+            const isUserInfoApi = url.includes('/frontend/user/info')
+            const isUserNotExistError = response.code === 52 || errorMsg.includes('用户不存在')
+            
+            if (!(isUserInfoApi && isUserNotExistError)) {
+              // 只在非用户信息获取失败时显示错误提示
+              if (isDev) {
+                wx.showModal({
+                  title: '请求错误',
+                  content: errorMsg,
+                  showCancel: false
+                })
+              } else {
+                wx.showToast({
+                  title: errorMsg,
+                  icon: 'none'
+                })
+              }
             }
             reject(new Error(errorMsg))
           }
@@ -162,6 +170,15 @@ const userAPI = {
     }).then(userInfo => {
       saveUserInfo(userInfo)
       return userInfo
+    })
+  },
+
+  // 填写手机号
+  fillPhone(phoneData) {
+    return request({
+      url: API.USER_FILL_PHONE,
+      data: phoneData,
+      method: 'POST'
     })
   }
 }

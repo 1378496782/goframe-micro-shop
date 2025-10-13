@@ -44,12 +44,13 @@
     "ignoreUploadUnusedFiles": true,
     "compileWorklet": false,
     "swc": false,
-    "disableSWC": true
+    "disableSWC": true,
+    "condition": false
   },
   "compileType": "miniprogram",
   "libVersion": "3.9.2",
   "appid": "CHANGE_ME_WECHAT_APP_ID",
-  "projectname": "shop-miniprogram",
+  "projectname": "shop-goframe-micro-uniapp",
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "editorSetting": {

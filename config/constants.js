@@ -1,22 +1,4 @@
-// 公共常量配置
-const { config } = require('../utils/env');
+// 统一配置文件 - 已迁移到 config/index.js
+// 请使用 const { CONSTANTS } = require('./index') 来引用常量
 
-const constants = {
-  // 图片域名配置
-  IMAGE_BASE_URL: config.env === 'development' 
-    ? 'http://127.0.0.1:8399/' 
-    : 'http://101.42.249.106:8808/',
-  
-  // 分页配置
-  PAGINATION: {
-    DEFAULT_PAGE: 1,
-    DEFAULT_SIZE: 10
-  },
-  
-  // 商品相关配置
-  GOODS: {
-    HOT_RECOMMEND_SIZE: 10 // 热门推荐商品数量
-  }
-};
-
-module.exports = constants;
+module.exports = require('./index').CONSTANTS;

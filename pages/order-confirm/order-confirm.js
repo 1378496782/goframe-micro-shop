@@ -1,4 +1,5 @@
 const { api } = require('../../utils/api');
+const { config } = require('../../utils/env');
 
 Page({
   data: {
@@ -15,10 +16,21 @@ Page({
   },
 
   onLoad(options) {
+    console.log('当前用户token:', wx.getStorageSync('token'))
     let selectedItems = []
     
-    // 从URL参数获取数据
-    if (options.selectedItems) {
+    // 场景1：从商品详情页直接购买(单商品)
+    if (options.productId) {
+      selectedItems = [{
+        id: options.productId,
+        quantity: options.quantity || 1,
+        price: options.price || 0,
+        name: options.name || '',
+        image: options.image || ''
+      }]
+    } 
+    // 场景2：从购物车多商品下单
+    else if (options.selectedItems) {
       try {
         selectedItems = JSON.parse(decodeURIComponent(options.selectedItems))
       } catch (error) {
@@ -26,7 +38,7 @@ Page({
       }
     }
     
-    // 如果URL参数没有数据，使用全局数据
+    // 场景3：使用全局数据(兼容旧逻辑)
     if (selectedItems.length === 0) {
       const app = getApp()
       selectedItems = app.globalData.selectedCartItems || []
@@ -52,7 +64,7 @@ Page({
     console.log('第一个商品的详细数据:', selectedItems[0])
 
     // 处理图片URL，添加基础URL - 兼容不同字段名
-    const constants = require('../../config/constants')
+    const { CONSTANTS } = require('../../config/index')
     const processedItems = selectedItems.map(item => ({
       ...item,
       // 兼容不同字段名
@@ -163,6 +175,13 @@ Page({
       return
     }
     
+    // 如果点击的是已经选中的优惠券，则取消选中
+    if (this.data.selectedCoupon && this.data.selectedCoupon.id === coupon.id) {
+      console.log('取消选中优惠券')
+      this.removeCoupon()
+      return
+    }
+    
     let couponPrice = coupon.amountYuan; // 直接使用元为单位
     let actualPrice = this.data.totalPrice - couponPrice;
     
@@ -195,14 +214,81 @@ Page({
 
   // 处理备注输入
   onRemarkInput(e) {
+    const value = e.detail.value
+    let error = ''
+    
+    // 实时校验
+    if (value.trim().length === 0) {
+      error = '备注信息不能为空'
+    } else if (value.length < 2) {
+      error = '备注信息至少需要2个字符'
+    } else if (!/^[\u4e00-\u9fa5a-zA-Z0-9_-]+$/.test(value.trim())) {
+      error = '只能包含中文、英文、数字、下划线和减号'
+    }
+    
     this.setData({
-      remark: e.detail.value
+      remark: value,
+      remarkError: error
+    })
+  },
+
+  // 备注输入框失去焦点时的校验
+  onRemarkBlur(e) {
+    const value = e.detail.value.trim()
+    let error = ''
+    
+    if (value.length === 0) {
+      error = '备注信息不能为空，请填写微信号或手机号'
+    } else if (value.length < 2) {
+      error = '备注信息至少需要2个字符'
+    } else if (!/^[\u4e00-\u9fa5a-zA-Z0-9_-]+$/.test(value)) {
+      error = '只能包含中文、英文、数字、下划线和减号'
+    }
+    
+    this.setData({
+      remarkError: error
     })
   },
 
   // 提交订单
   async submitOrder() {
     if (this.data.loading) return;
+    
+    // 必填校验
+    if (!this.data.remark || this.data.remark.trim().length === 0) {
+      this.setData({
+        remarkError: '备注信息不能为空，请填写微信号或手机号'
+      });
+      wx.showToast({
+        title: '请填写备注信息',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 格式校验
+    const remark = this.data.remark.trim();
+    if (remark.length < 2) {
+      this.setData({
+        remarkError: '备注信息至少需要2个字符'
+      });
+      wx.showToast({
+        title: '备注信息太短',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    if (!/^[\u4e00-\u9fa5a-zA-Z0-9_-]+$/.test(remark)) {
+      this.setData({
+        remarkError: '只能包含中文、英文、数字、下划线和减号'
+      });
+      wx.showToast({
+        title: '备注信息格式不正确',
+        icon: 'none'
+      });
+      return;
+    }
     
     this.setData({ loading: true });
     
@@ -213,6 +299,7 @@ Page({
         coupon_price: this.data.couponPrice,
         actual_price: this.data.actualPrice,
         remark: this.data.remark,
+        coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.coupon_id : null, // 添加优惠券ID
         order_goods_info: this.data.orderItems.map(item => ({
           goods_id: item.goods_id || item.id || 0,
           count: item.quantity || item.count || 1,
@@ -228,19 +315,31 @@ Page({
       const res = await api.submitOrder(orderData);
       
       if (res.code === 0 && res.data && res.data.id) {
-        // 订单创建成功
-        wx.showToast({
-          title: '订单创建成功',
-          icon: 'success',
-          duration: 2000
-        });
+        // 订单创建成功，获取订单编号
+        const orderId = res.data.id;
+        const orderNumber = res.data.number;
         
-        // 2秒后返回首页
-        setTimeout(() => {
-          wx.switchTab({
-            url: '/pages/index/index'
+        console.log('订单创建成功，订单ID:', orderId, '订单编号:', orderNumber);
+        
+        // 检查实际支付金额是否为0
+        if (this.data.actualPrice === 0) {
+          // 金额为0，直接跳转到订单列表页面
+          wx.showToast({
+            title: '订单创建成功',
+            icon: 'success',
+            duration: 2000
           });
-        }, 2000);
+          
+          // 2秒后跳转到订单列表页面
+          setTimeout(() => {
+            wx.navigateTo({
+              url: '/pages/order-list/order-list'
+            });
+          }, 2000);
+        } else {
+          // 金额不为0，调用微信支付接口
+          await this.requestWxPayment(orderNumber);
+        }
       } else {
         // 订单创建失败
         throw new Error(res.msg || '订单创建失败');
@@ -254,5 +353,122 @@ Page({
     } finally {
       this.setData({ loading: false });
     }
+  },
+  
+  // 请求微信支付
+  async requestWxPayment(orderNumber) {
+    try {
+      // 获取用户openId
+      const openId = wx.getStorageSync('openId');
+      if (!openId) {
+        console.error('未找到openId，尝试重新获取');
+        
+        // 如果没有openId，提示用户重新登录
+        wx.showModal({
+          title: '登录信息不完整',
+          content: '需要重新登录以完成支付',
+          confirmText: '去登录',
+          success: (res) => {
+            if (res.confirm) {
+              // 跳转到用户页面进行登录
+              wx.switchTab({
+                url: '/pages/user/user'
+              });
+            }
+          }
+        });
+        throw new Error('未获取到用户openId，请重新登录');
+      }
+      
+      // 构建支付请求参数
+      const paymentData = {
+        openId: openId,
+        amount: Math.round(this.data.actualPrice * 100), // 转换为分
+        total_price: Math.round(this.data.totalPrice * 100), // 总价（分）
+        coupon_price: Math.round(this.data.couponPrice * 100), // 优惠价（分）
+        actual_price: Math.round(this.data.actualPrice * 100), // 实际金额（分）
+        number: orderNumber
+      };
+      
+      console.log('发起支付请求参数:', paymentData);
+      
+      // 调用支付接口
+      const paymentRes = await this.callPaymentAPI(paymentData);
+      
+      if (paymentRes.code === 0 && paymentRes.data) {
+        // 调起微信支付
+        await this.launchWxPayment(paymentRes.data);
+        
+        // 支付成功后跳转
+        wx.showToast({
+          title: '支付成功',
+          icon: 'success',
+          duration: 2000
+        });
+        
+        // 2秒后返回首页
+        setTimeout(() => {
+          wx.switchTab({
+            url: '/pages/index/index'
+          });
+        }, 2000);
+      } else {
+        throw new Error(paymentRes.msg || '获取支付参数失败');
+      }
+    } catch (error) {
+      console.error('支付请求失败:', error);
+      wx.showToast({
+        title: error.message || '支付失败',
+        icon: 'none'
+      });
+    }
+  },
+  
+  // 调用支付API
+  callPaymentAPI(paymentData) {
+    return new Promise((resolve, reject) => {
+      // 获取token
+      const token = wx.getStorageSync('token') || '';
+      
+      // 设置请求头
+      const header = {};
+      if (token) {
+        header['Authorization'] = `Bearer ${token}`;
+      }
+      
+      wx.request({
+        url: `${config.BASE_URL}/frontend/payment`,
+        data: paymentData,
+        method: 'POST',
+        header: header,
+        success: (res) => {
+          resolve(res.data);
+        },
+        fail: (err) => {
+          reject(err);
+        }
+      });
+    });
+  },
+  
+  // 调起微信支付
+  launchWxPayment(payParams) {
+    return new Promise((resolve, reject) => {
+      wx.requestPayment({
+        timeStamp: payParams.timeStamp,
+        nonceStr: payParams.nonceStr,
+        package: payParams.package,
+        signType: payParams.signType,
+        paySign: payParams.paySign,
+        success: (res) => {
+          console.log('支付成功:', res);
+          resolve(res);
+        },
+        fail: (err) => {
+          console.error('支付失败:', err);
+          reject(new Error('支付失败或已取消'));
+        }
+      });
+    });
   }
 })

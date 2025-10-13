@@ -45,6 +45,17 @@
   border-radius: 10px;
 }
 
+.auth-tip {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: 15px;
+  margin-top: 5px;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
 .login-btn {
   background: rgba(255, 255, 255, 0.2);
   color: white;
@@ -91,28 +102,42 @@
   position: relative;
 }
 
-.status-icon {
-  width: 24px;
-  height: 24px;
+.status-icon-wrapper {
+  position: relative;
   margin-bottom: 5px;
 }
 
-.status-item text {
+.status-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.status-text {
   font-size: 12px;
   color: #4E5969;
 }
 
-.badge {
+.badge-wrapper {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -8px;
+  right: -8px;
   background: #F53F3F;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.badge {
   color: white;
   font-size: 10px;
-  padding: 1px 4px;
-  border-radius: 8px;
-  min-width: 12px;
+  font-weight: bold;
   text-align: center;
+  line-height: 1;
 }
 
 .menu-list {
@@ -157,35 +182,49 @@
   border-radius: 6px;
 }
 
-/* 微信登录弹窗样式 */
-.wx-login-popup {
+/* 用户信息填写半页面样式 */
+.user-info-form {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   visibility: hidden;
   opacity: 0;
   transition: all 0.3s ease;
 }
 
-.wx-login-popup.show {
+.user-info-form.show {
   visibility: visible;
   opacity: 1;
 }
 
-.wx-login-content {
+.form-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.form-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background-color: #fff;
   border-radius: 16px 16px 0 0;
-  height: 50vh;
-  padding: 20px;
-  position: relative;
+  max-height: 75vh;
+  min-height: 350rpx;
+  padding: 20px 15px;
   animation: slideUp 0.3s ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 @keyframes slideUp {
@@ -197,85 +236,310 @@
   }
 }
 
-.wx-login-header {
+.form-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #f0f0f0;
+  width: 100%;
 }
 
-.wx-login-title {
-  font-size: 18px;
+.form-title {
+  font-size: 16px;
   font-weight: bold;
   color: #1D2129;
+  text-align: center;
+  flex: 1;
 }
 
-.wx-login-close {
-  font-size: 24px;
+.form-close {
+  font-size: 22px;
   color: #86909C;
-  padding: 5px;
+  padding: 4px;
 }
 
-.wx-login-body {
+.form-body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
+  width: 100%;
+  padding: 0 5px;
 }
 
-.avatar-upload {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.avatar-section {
   margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.preview-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+.nickname-section {
+  margin-bottom: 25px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-label {
+  display: block;
+  font-size: 14px;
+  color: #4E5969;
   margin-bottom: 10px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+}
+
+.avatar-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-preview {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
   border: 2px solid #19aecc;
 }
 
-.upload-text {
-  font-size: 14px;
-  color: #86909C;
+.avatar-btn {
+  background: #19aecc;
+  color: white;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  line-height: 1.2;
 }
 
 .nickname-input {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.input-field {
-  height: 44px;
+  height: 40px;
   background: #f8f8f8;
-  border-radius: 8px;
-  padding: 0 15px;
-  font-size: 16px;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 15px;
   border: 1px solid #E5E6EB;
   width: 100%;
+  max-width: 240px;
   box-sizing: border-box;
+  text-align: center;
 }
 
-.wx-login-btn {
-  background: #07c160;
+.submit-btn {
+  background: #19aecc;
   color: white;
-  border-radius: 8px;
-  height: 48px;
-  line-height: 48px;
-  font-size: 16px;
+  border-radius: 6px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 15px;
   font-weight: 500;
   width: 100%;
-  margin-top: 10px;
+  max-width: 280px;
+  margin-top: 8px;
+  border: none;
+}
+
+.form-tip {
+  font-size: 11px;
+  color: #86909C;
+  text-align: center;
+  margin-top: 12px;
+  width: 100%;
+  line-height: 1.4;
 }
 
 .placeholder {
   color: #86909C;
-  font-size: 14px;
+  font-size: 15px;
+  text-align: center;
+}
+
+/* 小屏幕适配 */
+@media screen and (max-width: 375px) {
+  .form-content {
+    padding: 15px 12px;
+    max-height: 80vh;
+    min-height: 320rpx;
+  }
+  
+  .form-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+  
+  .form-title {
+    font-size: 15px;
+  }
+  
+  .form-close {
+    font-size: 20px;
+  }
+  
+  .avatar-preview {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .avatar-btn {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+  
+  .nickname-input {
+    height: 38px;
+    font-size: 14px;
+    max-width: 220px;
+  }
+  
+  .submit-btn {
+    height: 42px;
+    line-height: 42px;
+    font-size: 14px;
+    max-width: 260px;
+  }
+  
+  .form-tip {
+    font-size: 10px;
+  }
+}
+
+/* 超小屏幕适配 (iPhone 5/SE) */
+@media screen and (max-width: 320px) {
+  .form-content {
+    padding: 12px 10px;
+    max-height: 85vh;
+    min-height: 300rpx;
+  }
+  
+  .form-body {
+    padding: 0 2px;
+  }
+  
+  .avatar-section {
+    margin-bottom: 15px;
+  }
+  
+  .nickname-section {
+    margin-bottom: 20px;
+  }
+  
+  .avatar-preview {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .avatar-btn {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+  
+  .nickname-input {
+    height: 36px;
+    font-size: 13px;
+    max-width: 200px;
+  }
+  
+  .submit-btn {
+    height: 40px;
+    line-height: 40px;
+    font-size: 13px;
+    max-width: 240px;
+  }
+  
+  .form-tip {
+    font-size: 9px;
+  }
+}
+
+/* 小屏幕适配 */
+@media screen and (max-width: 375px) {
+  .wx-login-content {
+    padding: 15px;
+    max-height: 85vh;
+    min-height: 350rpx;
+  }
+  
+  .wx-login-header {
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+  }
+  
+  .wx-login-title {
+    font-size: 16px;
+  }
+  
+  .wx-login-close {
+    font-size: 20px;
+  }
+  
+  .preview-avatar {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .avatar-btn {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+  
+  .input-field {
+    height: 36px;
+    font-size: 13px;
+    padding: 0 10px;
+  }
+  
+  .submit-btn {
+    height: 38px;
+    line-height: 38px;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+}
+
+/* iPhone 5 特别适配 (320px) */
+@media screen and (max-width: 320px) {
+  .wx-login-content {
+    padding: 12px;
+    max-height: 90vh;
+    min-height: 300rpx;
+  }
+  
+  .wx-login-body {
+    padding: 5px 0;
+    min-height: 250rpx;
+  }
+  
+  .avatar-section {
+    margin-bottom: 10px;
+  }
+  
+  .preview-avatar {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 5px;
+  }
+  
+  .nickname-input {
+    margin-bottom: 10px;
+  }
+  
+  .input-field {
+    height: 34px;
+    font-size: 12px;
+  }
+  
+  .submit-btn {
+    height: 36px;
+    line-height: 36px;
+    font-size: 12px;
+    margin-top: 10px;
+  }
 }
 
 /* 昵称输入工具栏样式 */
@@ -308,4 +572,168 @@
   border: none;
   line-height: 1.5;
   height: auto;
+}
+
+/* 手机号授权弹窗样式 */
+.phone-auth-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.phone-auth-popup.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border-radius: 12px;
+  width: 280px;
+  max-width: 90%;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.popup-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1D2129;
+  flex: 1;
+  text-align: center;
+}
+
+.popup-close {
+  font-size: 20px;
+  color: #86909C;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.popup-body {
+  text-align: center;
+}
+
+.popup-desc {
+  font-size: 14px;
+  color: #4E5969;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.auth-button {
+  background: #19aecc;
+  color: white;
+  border-radius: 6px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.auth-cancel-button {
+  background: #f8f8f8;
+  color: #4E5969;
+  border-radius: 6px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  border: 1px solid #E5E6EB;
+  margin-bottom: 10px;
+}
+
+.popup-tip {
+  font-size: 11px;
+  color: #86909C;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* 小屏幕适配 */
+@media screen and (max-width: 375px) {
+  .popup-content {
+    width: 260px;
+    padding: 18px;
+  }
+  
+  .popup-title {
+    font-size: 15px;
+  }
+  
+  .popup-desc {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  
+  .auth-button {
+    height: 42px;
+    line-height: 42px;
+    font-size: 14px;
+  }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 320px) {
+  .popup-content {
+    width: 240px;
+    padding: 15px;
+  }
+  
+  .popup-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+  
+  .popup-title {
+    font-size: 14px;
+  }
+  
+  .popup-desc {
+    font-size: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .auth-button {
+    height: 40px;
+    line-height: 40px;
+    font-size: 13px;
+  }
+  
+  .popup-tip {
+    font-size: 10px;
+  }
 }

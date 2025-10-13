@@ -9,7 +9,7 @@
     />
     <button class="search-btn" bindtap="onSearch">搜索</button>
   </view>
-
+  
   <!-- 轮播图 -->
   <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000">
     <swiper-item wx:for="{{banners}}" wx:key="id">
@@ -32,7 +32,7 @@
   </view>
 
   <!-- 拼团砍价专区 -->
-  <view class="section group-buy-section">
+  <!-- <view class="section group-buy-section">
     <view class="section-header">
       <text class="section-title">🔥 拼团砍价</text>
       <text class="section-more" bindtap="onGroupBuyMore">更多活动 ></text>
@@ -56,7 +56,7 @@
         </view>
       </view>
     </scroll-view>
-  </view>
+  </view> -->
 
   <!-- 推荐商品 -->
   <view class="section">

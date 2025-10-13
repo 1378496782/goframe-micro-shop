@@ -4,18 +4,10 @@
     <view class="user-profile" bindtap="onProfileClick">
       <image class="avatar" src="{{userInfo.avatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
       <view class="user-info">
-        <text class="username">{{userInfo.name || userInfo.nickname || '未登录用户'}}</text>
+        <text class="username">{{userInfo.name || userInfo.nickname || '点击登录'}}</text>
         <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
       </view>
     </view>
-    <button 
-      class="login-btn" 
-      wx:if="{{!isLoggedIn}}" 
-      open-type="getUserInfo" 
-      bindgetuserinfo="onGetUserInfo"
-    >
-      微信一键登录
-    </button>
   </view>
 
   <!-- 订单状态 -->
@@ -26,29 +18,49 @@
     </view>
     <view class="status-items">
       <view class="status-item" bindtap="viewOrders" data-status="1">
-        <image src="/images/order-pending.png" class="status-icon" />
-        <text>待付款</text>
-        <text class="badge" wx:if="{{orderCounts.pending > 0}}">{{orderCounts.pending}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-pending.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.pending > 0}}">
+            <text class="badge">{{orderCounts.pending}}</text>
+          </view>
+        </view>
+        <text class="status-text">待付款</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="2">
-        <image src="/images/order-shipping.png" class="status-icon" />
-        <text>待发货</text>
-        <text class="badge" wx:if="{{orderCounts.shipping > 0}}">{{orderCounts.shipping}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-shipping.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.shipping > 0}}">
+            <text class="badge">{{orderCounts.shipping}}</text>
+          </view>
+        </view>
+        <text class="status-text">待发货</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="3">
-        <image src="/images/order-delivered.png" class="status-icon" />
-        <text>待收货</text>
-        <text class="badge" wx:if="{{orderCounts.delivered > 0}}">{{orderCounts.delivered}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-delivered.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.delivered > 0}}">
+            <text class="badge">{{orderCounts.delivered}}</text>
+          </view>
+        </view>
+        <text class="status-text">待收货</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="4">
-        <image src="/images/order-completed.png" class="status-icon" />
-        <text>已完成</text>
-        <text class="badge" wx:if="{{orderCounts.completed > 0}}">{{orderCounts.completed}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-completed.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.completed > 0}}">
+            <text class="badge">{{orderCounts.completed}}</text>
+          </view>
+        </view>
+        <text class="status-text">已完成</text>
       </view>
       <view class="status-item" bindtap="viewOrders" data-status="5">
-        <image src="/images/order-after-sale.png" class="status-icon" />
-        <text>售后</text>
-        <text class="badge" wx:if="{{orderCounts.afterSale > 0}}">{{orderCounts.afterSale}}</text>
+        <view class="status-icon-wrapper">
+          <image src="/images/order/order-after-sale.svg" class="status-icon" />
+          <view class="badge-wrapper" wx:if="{{orderCounts.afterSale > 0}}">
+            <text class="badge">{{orderCounts.afterSale}}</text>
+          </view>
+        </view>
+        <text class="status-text">售后</text>
       </view>
     </view>
   </view>
@@ -65,48 +77,89 @@
       <text>设置</text>
       <text class="arrow">></text>
     </view>
-    <view class="menu-item" bindtap="onChangePassword">
-      <image src="https://via.placeholder.com/40x40/19aecc/ffffff?text=🔒" class="menu-icon" />
-      <text>修改密码</text>
+    <view class="menu-item" wx:if="{{isLoggedIn}}" bindtap="logout">
+      <image src="https://via.placeholder.com/40x40/19aecc/ffffff?text=🚪" class="menu-icon" />
+      <text>退出登录</text>
       <text class="arrow">></text>
     </view>
   </view>
 
-  <button class="logout-btn" wx:if="{{isLoggedIn}}" bindtap="onLogout">退出登录</button>
 
-
-  <!-- 微信登录弹窗 -->
-  <view class="wx-login-popup {{showWxLogin ? 'show' : ''}}" catchtap="closeWxLoginPopup">
-    <view class="wx-login-content" catchtap="stopPropagation">
-      <view class="wx-login-header">
-        <text class="wx-login-title">微信一键登录</text>
-        <view class="wx-login-close" bindtap="closeWxLoginPopup">×</view>
+  <!-- 用户信息填写半页面 -->
+  <view class="user-info-form {{showUserInfoForm ? 'show' : ''}}">
+    <view class="form-overlay" catchtap="closeUserInfoForm"></view>
+    <view class="form-content">
+      <view class="form-header">
+        <text class="form-title">请登录</text>
+        <view class="form-close" bindtap="closeUserInfoForm">×</view>
       </view>
-
-      <view class="wx-login-body">
-        <!-- 头像上传区域 -->
-        <view class="avatar-upload" bindtap="chooseAvatar">
-          <image class="preview-avatar" src="{{tempAvatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=头像'}}" />
-          <text class="upload-text">点击上传头像</text>
+      
+      <view class="form-body">
+        <!-- 头像选择区域 -->
+        <view class="avatar-section">
+          <text class="section-label">头像</text>
+          <view class="avatar-picker">
+            <image class="avatar-preview" src="{{tempAvatar || uploadedAvatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=头像'}}" />
+            <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+              选择头像
+            </button>
+          </view>
         </view>
 
         <!-- 昵称输入区域 -->
-        <view class="nickname-input">
+        <view class="nickname-section">
+          <text class="section-label">昵称</text>
           <input
-            class="input-field"
+            type="nickname"
+            class="nickname-input"
             placeholder="请输入昵称"
             placeholder-class="placeholder"
             value="{{tempNickname}}"
             bindinput="onNicknameInput"
-            bindfocus="showNicknameToolbar"
           />
         </view>
 
-
-        <!-- 微信一键登录按钮 -->
-        <button class="wx-login-btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
-          微信一键登录
+        <!-- 提交按钮 - 先进行登录，再触发手机号授权 -->
+        <button 
+          class="submit-btn" 
+          bindtap="submitUserInfo"
+        >
+          登录
         </button>
+        
+        <text class="form-tip">授权后我们将获取您的头像、昵称</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 手机号授权弹窗 -->
+  <view class="phone-auth-popup {{showPhoneAuthPopup ? 'show' : ''}}">
+    <view class="popup-overlay" catchtap="closePhoneAuthPopup"></view>
+    <view class="popup-content">
+      <view class="popup-header">
+        <text class="popup-title">手机号授权</text>
+        <view class="popup-close" bindtap="closePhoneAuthPopup">×</view>
+      </view>
+      
+      <view class="popup-body">
+        <text class="popup-desc">为了完成登录，请授权获取您的手机号</text>
+        
+        <button 
+          class="auth-button" 
+          open-type="getPhoneNumber" 
+          bindgetphonenumber="onGetPhoneNumber"
+        >
+          授权手机号
+        </button>
+        
+        <button 
+          class="auth-cancel-button" 
+          bindtap="closePhoneAuthPopup"
+        >
+          拒绝授权
+        </button>
+        
+        <text class="popup-tip">拒绝授权将退出登录状态</text>
       </view>
     </view>
   </view>

@@ -1,4 +1,5 @@
 const { api } = require('../../utils/api');
+const { CONSTANTS } = require('../../config/index');
 
 Page({
   data: {
@@ -34,8 +35,11 @@ Page({
       if (res.code === 0) {
         // 格式化商品数据
         const formattedProducts = res.data.list.map(item => {
-          // 直接使用 pic_url 字段作为主图
-          const mainImage = item.pic_url || 'https://via.placeholder.com/200x200?text=商品图片';
+          // 处理图片URL，确保是完整URL
+          let mainImage = item.pic_url || 'https://via.placeholder.com/200x200?text=商品图片';
+          if (mainImage && !mainImage.startsWith('http')) {
+            mainImage = constants.IMAGE_BASE_URL + mainImage;
+          }
           
           return {
             ...item,

@@ -13,7 +13,9 @@
     "pages/webview/webview",
     "pages/group-buy/group-buy",
     "pages/group-buy-list/group-buy-list",
-    "pages/order-confirm/order-confirm"
+    "pages/order-confirm/order-confirm",
+    "pages/order-list/order-list",
+    "pages/order-detail/order-detail"
   ],
   "window": {
     "navigationBarBackgroundColor": "#19aecc",

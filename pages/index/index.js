@@ -1,12 +1,11 @@
 const { api } = require('../../utils/api');
-const constants = require('../../config/constants');
+const { CONSTANTS } = require('../../config/index');
 
 Page({
   data: {
     banners: [],
     categories: [],
     products: [],
-    groupBuyProducts: [], // 拼团砍价商品
     searchValue: '',
     loading: false
   },
@@ -20,37 +19,53 @@ Page({
     this.setData({ loading: true })
     
     try {
-      // 并行加载轮播图、商品数据和拼团数据
-      const [bannersRes, productsRes, groupBuyRes] = await Promise.all([
+      // 并行加载轮播图和商品数据
+      const [bannersRes, productsRes] = await Promise.all([
         api.getBanners(),
-        api.getGoodsList({ page: 1, size: 10, is_hot: 1 }),
-        api.getGroupBuyProducts({ page: 1, size: 5 })
+        api.getGoodsList({ page: 1, size: 10, is_hot: 1 })
       ])
       
-      if (bannersRes.code === 0) {
+      console.log('轮播图响应:', bannersRes)
+      console.log('商品列表响应:', productsRes)
+      
+      if (bannersRes.code === 0 && bannersRes.data?.list) {
         this.setData({
-          banners: bannersRes.data.list.map(item => ({
+          banners: bannersRes.data.list?.map(item => ({
             id: item.id,
-            image: constants.IMAGE_BASE_URL + item.pic_url,
+            image: item.pic_url ? (item.pic_url.startsWith('http') ? item.pic_url : CONSTANTS.IMAGE_BASE_URL + item.pic_url) : 'https://via.placeholder.com/300x150?text=轮播图',
             url: item.link
           }))
         })
       }
-      
+       
 
-      if (productsRes.code === 0) {
+      if (productsRes.code === 0 && productsRes.data?.list) {
         // 格式化商品数据：价格转换和图片提取
-        const formattedProducts = productsRes.data.list.map(item => {
-          // 处理图片URL，直接使用pic_url字段（已经是完整URL）
+        const formattedProducts = productsRes.data.list?.map(item => {
+          // 处理图片URL，优先使用pic_url，如果没有则尝试从images字段解析
           let mainImage = '';
           if (item.pic_url) {
             mainImage = item.pic_url;
+          } else if (item.images) {
+            try {
+              const imagesObj = JSON.parse(item.images);
+              if (imagesObj.image) {
+                mainImage = imagesObj.image;
+              }
+            } catch (e) {
+              console.log('解析images字段失败:', e)
+            }
+          }
+          
+          // 确保图片URL是完整的
+          if (mainImage && !mainImage.startsWith('http')) {
+            mainImage = CONSTANTS.IMAGE_BASE_URL + mainImage;
           }
           
           return {
             ...item,
             priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
-            mainImage: mainImage ? (mainImage.startsWith('http') ? mainImage : constants.IMAGE_BASE_URL + mainImage) : 'https://via.placeholder.com/200x200?text=商品图片'
+            mainImage: mainImage || 'https://via.placeholder.com/200x200?text=商品图片'
           }
         })
         
@@ -59,19 +74,7 @@ Page({
         })
       }
 
-      // 处理拼团砍价数据
-      if (groupBuyRes.code === 0) {
-        const formattedGroupBuy = groupBuyRes.data.list.map(item => ({
-          ...item,
-          groupPrice: (item.groupPrice / 100).toFixed(2),
-          originalPrice: (item.originalPrice / 100).toFixed(2),
-          mainImage: item.mainImage ? (item.mainImage.startsWith('http') ? item.mainImage : constants.IMAGE_BASE_URL + item.mainImage) : 'https://via.placeholder.com/200x200?text=拼团商品'
-        }))
-        
-        this.setData({
-          groupBuyProducts: formattedGroupBuy
-        })
-      }
+
     } catch (error) {
       console.error('加载首页数据失败:', error)
       wx.showToast({
@@ -137,20 +140,6 @@ Page({
     })
   },
 
-  // 拼团砍价点击事件
-  onGroupBuyClick(e) {
-    const productId = e.currentTarget.dataset.id
-    wx.navigateTo({
-      url: `/pages/group-buy/group-buy?id=${productId}`
-    })
-  },
-
-  // 查看更多拼团活动
-  onGroupBuyMore() {
-    wx.navigateTo({
-      url: '/pages/group-buy-list/group-buy-list'
-    })
-  },
 
   onPullDownRefresh() {
     console.log('下拉刷新')
