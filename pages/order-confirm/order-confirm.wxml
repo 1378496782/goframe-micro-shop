@@ -12,6 +12,30 @@
     </view>
   </view>
 
+  <!-- 推荐商品 -->
+  <view class="recommend-section" wx:if="{{recommendGoods.length > 0}}">
+    <view class="section-title">顺手买</view>
+    <scroll-view class="recommend-list" scroll-x>
+      <view wx:for="{{recommendGoods}}" wx:key="id" class="recommend-item">
+        <image class="recommend-image" src="{{item.image}}" mode="aspectFill" />
+        <view class="recommend-info">
+          <view class="recommend-name">{{item.name}}</view>
+          <view class="recommend-price">
+            <text class="current-price">¥{{item.price}}</text>
+            <text class="original-price">¥{{item.originalPrice}}</text>
+          </view>
+          <button 
+            class="add-btn" 
+            bindtap="addRecommendToCart" 
+            data-id="{{item.id}}"
+          >
+            加入购物车
+          </button>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
   <!-- 优惠券选择 -->
   <view class="coupon-section">
     <view class="section-title">优惠券</view>
@@ -45,6 +69,7 @@
     <view wx:if="{{remarkError}}" class="error-message">{{remarkError}}</view>
     <view class="char-count">{{remark.length}}/50</view>
   </view>
+
 
   <!-- 价格汇总 -->
   <view class="price-section">

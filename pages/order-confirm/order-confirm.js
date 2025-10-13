@@ -1,5 +1,5 @@
 const { api } = require('../../utils/api');
-const { config } = require('../../utils/env');
+const { config, CONSTANTS } = require('../../utils/env');
 
 Page({
   data: {
@@ -12,7 +12,10 @@ Page({
     coupons: [],
     selectedCoupon: null,
     showCouponPopup: false,
-    loadingCoupons: false
+    loadingCoupons: false,
+    // 新增推荐商品相关状态
+    recommendGoods: [],
+    loadingRecommend: false
   },
 
   onLoad(options) {
@@ -94,6 +97,9 @@ Page({
     
     // 加载用户优惠券
     this.loadUserCoupons();
+    
+    // 加载推荐商品
+    this.loadRecommendGoods();
   },
 
   // 加载用户优惠券
@@ -210,6 +216,83 @@ Page({
       couponPrice: 0,
       actualPrice: this.data.totalPrice
     })
+  },
+
+  // 加载推荐商品
+  async loadRecommendGoods() {
+    if (this.data.loadingRecommend || this.data.orderItems.length === 0) return;
+    
+    this.setData({ loadingRecommend: true });
+    
+    try {
+      const currentGoodsId = this.data.orderItems[0].id;
+      const res = await api.getRecommendGoods({
+        id: currentGoodsId,
+        count: 3
+      });
+
+      if (res.code === 0 && res.data && res.data.list) {
+        // 格式化推荐商品数据
+        const formattedGoods = res.data.list.map(item => {
+          // 处理图片URL
+          let mainImage = '';
+          try {
+            const images = JSON.parse(item.images);
+            mainImage = images[0]?.url || item.pic_url;
+          } catch (e) {
+            mainImage = item.pic_url;
+          }
+          
+          return {
+            id: item.id,
+            name: item.name,
+            price: (item.price / 100).toFixed(2), // 转换为元
+            image: mainImage.startsWith('http') ? mainImage : CONSTANTS.IMAGE_BASE_URL + mainImage,
+            originalPrice: ((item.price * 1.2) / 100).toFixed(2) // 模拟原价
+          };
+        });
+
+        this.setData({ recommendGoods: formattedGoods });
+      }
+    } catch (error) {
+      console.error('加载推荐商品失败:', error);
+    } finally {
+      this.setData({ loadingRecommend: false });
+    }
+  },
+
+  // 添加推荐商品到购物车
+  async addRecommendToCart(e) {
+    const { id } = e.currentTarget.dataset;
+    const goods = this.data.recommendGoods.find(item => item.id === id);
+    
+    if (!goods) return;
+    
+    try {
+      wx.showLoading({ title: '添加中...', mask: true });
+      
+      const res = await api.addToCart({
+        goods_id: id,
+        count: 1
+      });
+
+      if (res.code === 0) {
+        wx.showToast({
+          title: '已添加到购物车',
+          icon: 'success'
+        });
+      } else {
+        throw new Error(res.message || '添加失败');
+      }
+    } catch (error) {
+      console.error('添加推荐商品失败:', error);
+      wx.showToast({
+        title: error.message || '添加失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 处理备注输入
