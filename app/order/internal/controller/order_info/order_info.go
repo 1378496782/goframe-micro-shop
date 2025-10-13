@@ -1,10 +1,9 @@
 package order_info
 
 import (
-	"bytes"
 	"context"
-	"net/http"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
+	orderStatus "shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"shop-goframe-micro-service-refacotor/utility/consts"
@@ -101,42 +100,18 @@ func (*Controller) Payment(ctx context.Context, req *v1.PaymentReq) (res *v1.Pay
 }
 
 func (*Controller) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.NotifyRes, err error) {
-	// 1) 构造 http.Request 给 wechatpay SDK 使用
-	httpReq, err := http.NewRequest("POST", "", bytes.NewBuffer([]byte(req.RawBody)))
+	// 1) 微信支付回调验证
+	orderNumber, err := payment.Notify(ctx, req)
 	if err != nil {
-		return &v1.NotifyRes{Code: "FAIL", Message: "构造请求失败"}, nil
-	}
-	for k, v := range req.Headers {
-		httpReq.Header.Set(k, v)
+		return nil, err
 	}
 
-	// 2) 微信支付回调验证
-	flag, orderNumber, err := payment.Notify(ctx, req, order_info.IdempotentCheck)
-	if err != nil {
-		return res, err
+	// 2) 修改订单状态
+	if err = order_info.UpdateOrderStatusByNumber(ctx, orderNumber, int(orderStatus.OrderStatusPaid)); err != nil {
+		return nil, err
 	}
 
-	// 3) 对应订单的状态已修改，不需要再修改
-	if flag {
-		g.Log().Infof(ctx, "{%s}订单的状态已修改，不需要再修改", orderNumber)
-		return &v1.NotifyRes{
-			Code:    "SUCCESS",
-			Message: "ok",
-		}, nil
-	}
-
-	// 4) 修改订单状态
-	if err = order_info.UpdateOrderStatusByNumber(ctx, orderNumber, 2); err != nil {
-		return &v1.NotifyRes{
-			Code:    "FAIL",
-			Message: "内部错误",
-		}, err
-	}
-
-	return &v1.NotifyRes{
-		Code:    "SUCCESS",
-		Message: "ok",
-	}, nil
+	return nil, nil
 }
 
 func (*Controller) GetCount(ctx context.Context, req *v1.OrderInfoGetCountReq) (res *v1.OrderInfoGetCountRes, err error) {

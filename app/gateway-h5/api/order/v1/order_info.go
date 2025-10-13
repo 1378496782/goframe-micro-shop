@@ -97,10 +97,7 @@ type NotifyReq struct {
 	Headers map[string]string `json:"-" dc:"回调请求头（由框架手动读取）"`
 }
 
-// NotifyRes 回调响应体
 type NotifyRes struct {
-	Code    string `json:"code,omitempty"`
-	Message string `json:"message,omitempty"`
 }
 
 // 获取订单详情

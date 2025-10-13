@@ -10,6 +10,7 @@ service refund_info {
   rpc GetList(RefundInfoGetListReq) returns (RefundInfoGetListRes) {}
   rpc GetDetail(RefundInfoGetDetailReq) returns (RefundInfoGetDetailRes) {}
   rpc Create(RefundInfoCreateReq) returns (RefundInfoCreateRes) {}
+  rpc Refund(RefundNotifyReq)returns(RefundNotifyRes){}
 }
 
 // 新增消息定义
@@ -49,4 +50,16 @@ message RefundInfoListResponse {
 
 message RefundInfoGetListRes {
   RefundInfoListResponse data = 1;
+}
+
+// 回调请求体
+message RefundNotifyReq {
+  string raw_body = 1; // 微信原始回调 body（JSON）
+  map<string, string> headers = 2; // 回调的 HTTP headers (Wechatpay-Signature, Wechatpay-Timestamp, Wechatpay-Nonce, Wechatpay-Serial)
+}
+
+// 回调响应体
+message RefundNotifyRes{
+  string code = 1;    // SUCCESS / FAIL
+  string message = 2; // 返回信息
 }

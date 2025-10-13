@@ -15,8 +15,7 @@ const (
 	OrderStatusRefund                     // 8 发起退款
 )
 
-// RefundStatus 售后订单审核状态枚举
-// 对应字段：refund_info.status
+// RefundStatus 对应字段：refund_info.status。审核状态
 type RefundStatus int
 
 const (
@@ -26,8 +25,7 @@ const (
 	RefundStatusRejected              // 3 拒绝退款（审核驳回）
 )
 
-// RefundOrderStatus 售后订单退款状态枚举
-// 对应字段：refund_info.refund_status
+// RefundOrderStatus 对应字段：refund_info.refund_status。退款状态
 type RefundOrderStatus int
 
 const (

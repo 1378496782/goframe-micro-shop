@@ -159,8 +159,6 @@ message NotifyReq {
 
 // 回调响应体
 message NotifyRes{
-  string code = 1;    // SUCCESS / FAIL
-  string message = 2; // 返回信息
 }
 
 message OrderInfoGetCountReq {

@@ -22,6 +22,7 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
 	"net/http"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
+	v2 "shop-goframe-micro-service-refacotor/app/order/api/refund_info/v1"
 	"strconv"
 	"sync"
 	"time"
@@ -40,22 +41,24 @@ var (
 type IdempotentCheckFunc func(context.Context, string) (bool, error)
 
 type weChatConfig struct {
-	mchID      string
-	serialNo   string
-	apiV3Key   string
-	privateKey string
-	appID      string
-	notifyUrl  string
+	mchID           string
+	serialNo        string
+	apiV3Key        string
+	privateKey      string
+	appID           string
+	notifyUrl       string
+	refundNotifyUrl string
 }
 
 func loadConfigParam() weChatConfig {
 	return weChatConfig{
-		mchID:      g.Cfg().MustGet(nil, "payment.wechat.mchId").String(),
-		serialNo:   g.Cfg().MustGet(nil, "payment.wechat.serialNo").String(),
-		apiV3Key:   g.Cfg().MustGet(nil, "payment.wechat.apiV3Key").String(),
-		privateKey: g.Cfg().MustGet(nil, "payment.wechat.privateKey").String(),
-		appID:      g.Cfg().MustGet(nil, "payment.wechat.appId").String(),
-		notifyUrl:  g.Cfg().MustGet(nil, "payment.wechat.notifyUrl").String(),
+		mchID:           g.Cfg().MustGet(nil, "payment.wechat.mchId").String(),
+		serialNo:        g.Cfg().MustGet(nil, "payment.wechat.serialNo").String(),
+		apiV3Key:        g.Cfg().MustGet(nil, "payment.wechat.apiV3Key").String(),
+		privateKey:      g.Cfg().MustGet(nil, "payment.wechat.privateKey").String(),
+		appID:           g.Cfg().MustGet(nil, "payment.wechat.appId").String(),
+		notifyUrl:       g.Cfg().MustGet(nil, "payment.wechat.notifyUrl").String(),
+		refundNotifyUrl: g.Cfg().MustGet(nil, "payment.wechat.refundNotifyUrl").String(),
 	}
 }
 
@@ -131,66 +134,43 @@ func WeChatPayment(ctx context.Context, req *v1.PaymentReq) (*v1.PaymentRes, err
 	}, nil
 }
 
-func Notify(ctx context.Context, req *v1.NotifyReq, checkIdempotent IdempotentCheckFunc) (bool, string, error) {
-	// 1) 构造 http.Request 给 wechatpay SDK 使用
+func Notify(ctx context.Context, req *v1.NotifyReq) (string, error) {
+	// 测试代码(本地测试用)
+	if req.Headers["X-Bypass-Verify"] == "1" {
+		res := new(payments.Transaction)
+		if err := json.Unmarshal([]byte(req.RawBody), res); err != nil {
+			return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析 transaction 失败")
+		}
+		return *res.OutTradeNo, nil
+	}
+
+	// 1) 获取配置文件
+	wxConf := loadConfigParam()
+	// 2) 使用下载管理器获取平台证书访问器
+	certVisitor := downloader.MgrInstance().GetCertificateVisitor(wxConf.mchID)
+	// 3) 初始化 notify.Handler （使用平台证书验签 + apiv3 Key 解密）
+	handler := notify.NewNotifyHandler(wxConf.apiV3Key, verifiers.NewSHA256WithRSAVerifier(certVisitor))
+
+	// 4) 将原始回调内容构造成 *http.Request 给 wechatpay SDK 使用
 	httpReq, err := http.NewRequest("POST", "", bytes.NewBuffer([]byte(req.RawBody)))
 	if err != nil {
-		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "构造 http 请求失败")
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "构造 http 请求失败")
 	}
 	for k, v := range req.Headers {
 		httpReq.Header.Set(k, v)
 	}
 
-	// 测试代码(本地测试用)
-	if req.Headers["X-Bypass-Verify"] == "1" {
-		res := new(payments.Transaction)
-		if err := json.Unmarshal([]byte(req.RawBody), res); err != nil {
-			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析 transaction 失败")
-		}
-		if err != nil {
-			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "outTradeNo to int error")
-		}
-
-		// 幂等校验
-		alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
-		if err != nil {
-			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
-		}
-		if alreadyPaid {
-			return true, *res.OutTradeNo, nil
-		}
-		return false, *res.OutTradeNo, nil
-	}
-
-	wxConf := loadConfigParam()
-
-	// 2) SDK 的证书访问器 + notify handler（自动使用平台证书）
-	certVisitor := downloader.MgrInstance().GetCertificateVisitor(wxConf.mchID)
-	handler := notify.NewNotifyHandler(wxConf.apiV3Key, verifiers.NewSHA256WithRSAVerifier(certVisitor))
-
-	// 3) 解析并解密 resource 到 PayScoreResource
+	// 5) 解析并验证通知签名与加密数据
 	res := new(payments.Transaction)
 	_, err = handler.ParseNotifyRequest(ctx, httpReq, res)
 	if err != nil {
-		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "ParseNotifyRequest 验签/解密失败")
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "ParseNotifyRequest 验签/解密失败")
+	}
+	if res == nil || res.OutTradeNo == nil {
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, errors.New("回调有误"))
 	}
 
-	if err != nil {
-		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "outTradeNo to int error")
-	}
-	// 4) 幂等性校验，避免重复修改同一个订单而引发的数据不一致问题
-	alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
-	if err != nil {
-		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
-	}
-
-	// 5) 订单状态已修改
-	if alreadyPaid {
-		return true, *res.OutTradeNo, nil
-	}
-
-	// 6) 订单状态未修改
-	return false, *res.OutTradeNo, nil
+	return *res.OutTradeNo, nil
 }
 
 // ================ 微信退款相关 ==================
@@ -203,7 +183,7 @@ type RefundReq struct {
 	RefundAmount  int64  // 退款金额（分）
 }
 
-func Refund(ctx context.Context, req RefundReq) error {
+func Refund(ctx context.Context, req *RefundReq) error {
 	// 1) 初始化微信客户端
 	if wechatClient == nil {
 		return gerror.WrapCode(gcode.CodeOperationFailed, errors.New("客户端未初始化"))
@@ -213,13 +193,13 @@ func Refund(ctx context.Context, req RefundReq) error {
 	wxConf := loadConfigParam()
 	// 3) 构建退款请求
 	prepayReq := refunddomestic.CreateRequest{
-		TransactionId: core.String(""),               // 订单编号
-		OutRefundNo:   core.String(""),               // 退款编号
-		Reason:        core.String(""),               // 退货理由
-		NotifyUrl:     core.String(wxConf.notifyUrl), // 退款回调 url
+		TransactionId: core.String(req.TransactionId),      // 订单编号
+		OutRefundNo:   core.String(req.OutRefundNo),        // 退款编号
+		Reason:        core.String(req.Reason),             // 退货理由
+		NotifyUrl:     core.String(wxConf.refundNotifyUrl), // 退款回调 url
 		Amount: &refunddomestic.AmountReq{
-			Total:    core.Int64(0), // 原订单支付金额，单位分
-			Refund:   core.Int64(0), // 退款金额，单位分
+			Total:    core.Int64(req.TotalAmount),  // 原订单支付金额，单位分
+			Refund:   core.Int64(req.RefundAmount), // 退款金额，单位分
 			Currency: core.String("CNY"),
 		},
 	}
@@ -253,8 +233,66 @@ func Refund(ctx context.Context, req RefundReq) error {
 			return gerror.Newf("未知退款状态：%s", status)
 		}
 	}
-
 	return nil
+}
+
+func RefundNotify(ctx context.Context, req *v2.RefundNotifyReq, checkIdempotent IdempotentCheckFunc) (bool, string, error) {
+	// 1) 构造 http.Request 给 wechatpay SDK 使用
+	httpReq, err := http.NewRequest("POST", "", bytes.NewBuffer([]byte(req.RawBody)))
+	if err != nil {
+		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "构造 http 请求失败")
+	}
+	for k, v := range req.Headers {
+		httpReq.Header.Set(k, v)
+	}
+
+	// 测试代码(本地测试用)
+	if req.Headers["X-Bypass-Verify"] == "1" {
+		res := new(payments.Transaction)
+		if err := json.Unmarshal([]byte(req.RawBody), res); err != nil {
+			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析 transaction 失败")
+		}
+		if err != nil {
+			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "outTradeNo to int error")
+		}
+
+		// 幂等校验
+		alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
+		if err != nil {
+			return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
+		}
+		if alreadyPaid {
+			return true, *res.OutTradeNo, nil
+		}
+		return false, *res.OutTradeNo, nil
+	}
+
+	wxConf := loadConfigParam()
+	// 2) 获取证书访问器
+	certificateVisitor := downloader.MgrInstance().GetCertificateVisitor(wxConf.mchID)
+	// 3) 初始化 notify handler
+	handler := notify.NewNotifyHandler(wxConf.apiV3Key, verifiers.NewSHA256WithRSAVerifier(certificateVisitor))
+
+	// 4) 解析并验签
+	res := new(refunddomestic.Refund)
+	_, err = handler.ParseNotifyRequest(ctx, httpReq, res)
+	if err != nil {
+		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "验签失败")
+	}
+
+	// 5) 幂等性校验，避免重复修改同一个订单而引发的数据不一致问题
+	alreadyPaid, err := checkIdempotent(ctx, *res.OutTradeNo)
+	if err != nil {
+		return false, "", gerror.WrapCode(gcode.CodeOperationFailed, err, "checkIdempotent 幂等性校验失败")
+	}
+
+	// 6) 订单状态已修改
+	if alreadyPaid {
+		return true, *res.OutTradeNo, nil
+	}
+
+	// 6) 订单状态未修改
+	return false, *res.OutTradeNo, nil
 }
 
 // 生成随机 nonce 字符串（hex）
