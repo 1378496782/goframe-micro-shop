@@ -55,99 +55,96 @@
   padding: 20rpx;
 }
 
-/* 网格布局 - 用于所有订单状态 */
-.order-list.grid-layout {
-  display: grid;
-  grid-template-rows: repeat(3, 1fr);
-  gap: 20rpx;
+/* 订单列表 - 列表布局 */
+.order-list {
   padding: 20rpx;
-  height: calc(100vh - 200rpx);
 }
 
-/* 网格布局中的订单项 */
-.order-item.grid-item {
-  margin: 0;
-  width: auto;
-  height: 320rpx;
+/* 订单项 */
+.order-item {
+  margin-bottom: 20rpx;
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 订单头部 */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+/* 商品列表 */
+.goods-list {
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.goods-item {
+  display: flex;
+  padding: 20rpx 0;
+}
+
+.goods-item:not(:last-child) {
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.goods-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  background-color: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.goods-info {
+  flex: 1;
+  margin-left: 20rpx;
   display: flex;
   flex-direction: column;
-  padding: 20rpx;
-  box-sizing: border-box;
-  border: 1rpx solid #e0e0e0;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
-  position: relative;
+  justify-content: space-between;
 }
 
-/* 网格布局中的分隔线 */
-.order-item.grid-item:after {
-  content: "";
-  position: absolute;
-  right: -10rpx;
-  top: 0;
-  height: 100%;
-  width: 1rpx;
-  background-color: #f0f0f0;
+/* 订单底部 */
+.order-footer {
+  padding: 20rpx 30rpx;
 }
 
-.order-item.grid-item:last-child:after {
-  display: none;
+/* 订单操作按钮 */
+.order-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-/* 网格布局中的订单头部 */
-.order-item.grid-item .order-header {
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 0;
-  border-bottom: none;
+.action-btn {
+  margin-left: 20rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  padding: 0 30rpx;
+  font-size: 26rpx;
+  border-radius: 30rpx;
+  background-color: #ffffff;
 }
 
-/* 网格布局中的订单商品列表 */
-.order-item.grid-item .goods-list {
-  flex: 1;
-  padding: 0;
-  border-bottom: none;
+.action-btn.default {
+  color: #666;
+  border: 1rpx solid #ddd;
 }
 
-/* 网格布局中的商品项 */
-.order-item.grid-item .goods-item {
-  padding: 0;
-  margin-bottom: 10rpx;
-  flex-direction: column;
+.action-btn.primary {
+  color: #ffffff;
+  background-color: #19aecc;
+  border: 1rpx solid #19aecc;
 }
 
-/* 网格布局中的商品图片 */
-.order-item.grid-item .goods-image {
-  width: 100%;
-  height: 160rpx;
-  margin-bottom: 10rpx;
-}
-
-/* 网格布局中的商品信息 */
-.order-item.grid-item .goods-info {
-  margin-left: 0;
-  width: 100%;
-}
-
-/* 网格布局中的订单底部 */
-.order-item.grid-item .order-footer {
-  padding: 0;
-  margin-top: 10rpx;
-}
-
-/* 网格布局中的订单操作按钮 */
-.order-item.grid-item .order-actions {
-  justify-content: center;
-  margin-top: 10rpx;
-}
-
-/* 网格布局中的操作按钮 */
-.order-item.grid-item .action-btn {
-  margin: 0 5rpx;
-  padding: 0 15rpx;
-  font-size: 24rpx;
-  height: 50rpx;
-  line-height: 50rpx;
+.action-btn.cancel {
+  color: #666;
+  border: 1rpx solid #ddd;
 }
 
 /* 订单项 */
