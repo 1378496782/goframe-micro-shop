@@ -25,7 +25,7 @@ services:
       - ./init-db:/docker-entrypoint-initdb.d
       - /etc/localtime:/etc/localtime:ro  # 同步宿主机时间
     networks:
-      - app-network
+      - shop-micro-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -57,7 +57,7 @@ services:
       - etcd_data:/etcd-data
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     healthcheck:
       test: ["CMD", "etcdctl", "endpoint", "health"]
@@ -77,7 +77,7 @@ services:
       - redis_data:/data
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - app-network
+      - shop-micro-network
     command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
     restart: always
     healthcheck:
@@ -105,7 +105,7 @@ services:
       - ./rabbitmq/plugins/rabbitmq_delayed_message_exchange-4.1.0.ez:/opt/rabbitmq/plugins/rabbitmq_delayed_message_exchange.ez
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - app-network
+      - shop-micro-network
     command:
       - /bin/sh
       - -c
@@ -142,7 +142,7 @@ services:
       - ./elasticsearch/plugins/ik:/tmp/ik-plugin
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - app-network
+      - shop-micro-network
     command:
       - /bin/sh
       - -c
@@ -180,7 +180,7 @@ services:
       elasticsearch:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601/api/status"]
@@ -211,7 +211,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -247,7 +247,7 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -281,7 +281,7 @@ services:
       mysql:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -315,7 +315,7 @@ services:
       mysql:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -351,7 +351,7 @@ services:
       elasticsearch:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -383,7 +383,7 @@ services:
       etcd:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -414,7 +414,7 @@ services:
       etcd:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -448,7 +448,7 @@ services:
       mysql:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -484,7 +484,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - app-network
+      - shop-micro-network
     restart: always
     deploy:
       resources:
@@ -497,51 +497,12 @@ services:
       timeout: 10s
       retries: 3
 
-  # 前端管理服务 - 纯代理转发
-  nginx-proxy:
-    image: nginx:alpine
-    container_name: nginx-proxy
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      NGINX_ENV: production
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - /etc/ssl/certs:/etc/nginx/ssl/certs:ro
-      - /etc/ssl/private:/etc/nginx/ssl/private:ro
-      - ./log/nginx:/var/log/nginx
-      - /etc/localtime:/etc/localtime:ro
-      - /home/lipeisen/docs:/home/lipeisen/docs:ro
-      - /home/frontend-ai-interview-agent-go/dist:/home/frontend-ai-interview-agent-go/dist:ro
-    depends_on:
-      manage-service:
-        condition: service_healthy
-      gateway-h5:
-        condition: service_healthy
-    networks:
-      - app-network
-      - ai-gozero-agent_default # Connect to the external network
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.5'
-
   # MySQL 备份服务
   mysql-backup:
     image: mysql:8.0
     container_name: mysql-backup
     networks:
-      - app-network
+      - shop-micro-network
     volumes:
       - ./backups:/backups
       - /etc/localtime:/etc/localtime:ro
@@ -566,12 +527,11 @@ services:
         condition: service_healthy
 
 networks:
-  app-network:
+  shop-micro-network:
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: 1450
-  ai-gozero-agent_default:
-    external: true
+    name: shop-micro-network
 
 volumes:
   mysql_data:

@@ -43,7 +43,7 @@ var (
 						goodsController.GoodsInfoGetDetail,
 						goodsController.GoodsInfoGetList,
 						bannerController,
-						goodsController.AddGoodsInfoGetList,
+						goodsController.RecommendGoodsInfoGetList,
 					)
 				})
 				// 需要JWT验证的路由

@@ -6,16 +6,18 @@ import (
 )
 
 // 商品分页查询
-type AddGoodsInfoGetListReq struct {
-	g.Meta `path:"/add/goods" method:"get" tags:"加购商品" sm:"加购商品列表"`
+type RecommendGoodsInfoGetListReq struct {
+	g.Meta `path:"/recommend/goods" method:"get" tags:"商品管理" sm:"加购商品列表"`
+	Id     uint32 `json:"id" dc:"商品ID"`
+	Count  uint32 `json:"count" dc:"商品数量"`
 }
 
-type AddGoodsInfoGetListRes struct {
-	List  []*AddGoodsInfoItem `json:"list" dc:"商品列表"`
-	Total uint32              `json:"total" dc:"总数"`
+type RecommendGoodsInfoGetListRes struct {
+	List  []*RecommendGoodsInfoItem `json:"list" dc:"商品列表"`
+	Total uint32                    `json:"total" dc:"总数"`
 }
 
-type AddGoodsInfoItem struct {
+type RecommendGoodsInfoItem struct {
 	Id               uint32                 `json:"id" dc:"商品ID"`
 	PicUrl           string                 `json:"pic_url" dc:"主图"`
 	Images           string                 `json:"images" dc:"支持单图,多图"`

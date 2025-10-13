@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/add_goods_info"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/recommend_goods_info"
 	"syscall"
 
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/cart_info"
@@ -68,7 +68,7 @@ var (
 			cart_info.Register(s)
 			coupon_info.Register(s)
 			user_coupon_info.Register(s)
-			add_goods_info.Register(s)
+			recommend_goods_info.Register(s)
 			s.Run()
 			return nil
 		},
