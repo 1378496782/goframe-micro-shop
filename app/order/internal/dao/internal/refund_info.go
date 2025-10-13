@@ -21,30 +21,34 @@ type RefundInfoDao struct {
 
 // RefundInfoColumns defines and stores column names for the table refund_info.
 type RefundInfoColumns struct {
-	Id        string // 售后退款表
-	Number    string // 售后订单号
-	OrderId   string // 订单id
-	GoodsId   string // 要售后的商品id
-	Reason    string // 退款原因
-	Status    string // 状态 1待处理 2同意退款 3拒绝退款
-	UserId    string // 用户id
-	CreatedAt string //
-	UpdatedAt string //
-	DeletedAt string //
+	Id           string // 售后退款表
+	Number       string // 售后订单号
+	OrderId      string // 订单id
+	GoodsId      string // 要售后的商品id
+	Reason       string // 退款原因
+	Status       string // 审核状态 1待处理 2同意退款 3拒绝退款
+	RefundStatus string // 退款状态 0未退款 1退款中 2退款成功 3退款失败
+	RefundAmount string // 退款金额 单位分
+	UserId       string // 用户id
+	CreatedAt    string //
+	UpdatedAt    string //
+	DeletedAt    string //
 }
 
 // refundInfoColumns holds the columns for the table refund_info.
 var refundInfoColumns = RefundInfoColumns{
-	Id:        "id",
-	Number:    "number",
-	OrderId:   "order_id",
-	GoodsId:   "goods_id",
-	Reason:    "reason",
-	Status:    "status",
-	UserId:    "user_id",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
-	DeletedAt: "deleted_at",
+	Id:           "id",
+	Number:       "number",
+	OrderId:      "order_id",
+	GoodsId:      "goods_id",
+	Reason:       "reason",
+	Status:       "status",
+	RefundStatus: "refund_status",
+	RefundAmount: "refund_amount",
+	UserId:       "user_id",
+	CreatedAt:    "created_at",
+	UpdatedAt:    "updated_at",
+	DeletedAt:    "deleted_at",
 }
 
 // NewRefundInfoDao creates and returns a new DAO object for table data access.

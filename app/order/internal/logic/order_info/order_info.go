@@ -506,14 +506,27 @@ func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
 
 // UpdateOrderStatus 更新订单状态
 func UpdateOrderStatusByNumber(ctx context.Context, number string, status int) error {
+	exists, err := dao.OrderInfo.Ctx(ctx).
+		Where("number", number).
+		Where("status", consts.OrderStatusPaid).
+		Exist()
+	if err != nil {
+		return gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+	if exists {
+		g.Log().Infof(ctx, "{%s}订单的状态已修改，不需要再修改", number)
+		return nil
+	}
+
 	updateData := g.Map{
 		"status":     status,
 		"updated_at": gtime.Now(),
 	}
 
-	_, err := dao.OrderInfo.Ctx(ctx).Where("number", number).Update(updateData)
+	// 更新订单状态
+	_, err = dao.OrderInfo.Ctx(ctx).Where("number", number).Update(updateData)
 	if err != nil {
-		return fmt.Errorf("更新订单状态失败: %v", err)
+		return gerror.WrapCode(gcode.CodeDbOperationError, err)
 	}
 
 	g.Log().Infof(ctx, "订单状态更新成功, 订单编号:{%s}, 新状态: %d", number, status)
@@ -548,14 +561,7 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 }
 
 func IdempotentCheck(ctx context.Context, number string) (bool, error) {
-	exists, err := dao.OrderInfo.Ctx(ctx).
-		Where("number", number).
-		Where("status", consts.OrderStatusPaid).
-		Exist()
-	if err != nil {
-		return false, err
-	}
-	return exists, nil
+	return false, nil
 }
 
 // GetCount 获取各类订单数量
