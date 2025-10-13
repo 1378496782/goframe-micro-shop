@@ -103,10 +103,10 @@ Page({
     try {
       const res = await api.getUserCoupons({ page: 1, size: 10 });
       
-      if (res.code === 0) {
+      if (res.code === 0 && res.data && Array.isArray(res.data.list)) {
         // 格式化优惠券数据
-        const formattedCoupons = res.data.list
-          .filter(coupon => coupon.status === 0) // 只显示未使用的优惠券
+        const formattedCoupons = (res.data.list || [])
+          .filter(coupon => coupon && coupon.status === 0) // 只显示未使用的优惠券
           .map(coupon => {
             let desc = '';
             let amountYuan = coupon.amount / 100; // 分转元
