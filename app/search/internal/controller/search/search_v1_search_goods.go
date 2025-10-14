@@ -3,12 +3,13 @@ package search
 import (
 	"context"
 	"encoding/json"
+	"shop-goframe-micro-service-refacotor/app/search/utility/elasticsearch"
+	"shop-goframe-micro-service-refacotor/utility/consts"
+
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/olivere/elastic/v7"
-	"shop-goframe-micro-service-refacotor/app/search/utility/elasticsearch"
-	"shop-goframe-micro-service-refacotor/utility/consts"
 
 	"shop-goframe-micro-service-refacotor/app/search/api/search/v1"
 )
