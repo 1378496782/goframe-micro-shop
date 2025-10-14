@@ -11,11 +11,11 @@ option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/pbentity
 import "google/protobuf/timestamp.proto";
 
 message UserCouponInfo {
-    uint32                     Id        = 1; //
-    uint32                     UserId    = 2; // 用户id
-    uint32                     CouponId  = 3; // 优惠券id
-    uint32                     Status    = 4; // 状态：0-待使用，1-已使用，2-已过期
-    uint64                     Amount    = 5; // 优惠金额（单位：分）
+    int32                     Id        = 1; //
+    int32                     UserId    = 2; // 用户id
+    int32                     CouponId  = 3; // 优惠券id
+    int32                     Status    = 4; // 状态：0-待使用，1-已使用，2-已过期
+    int32                     Amount    = 5; // 优惠金额（单位：分）
     google.protobuf.Timestamp CreatedAt = 6; // 创建时间
     google.protobuf.Timestamp UpdatedAt = 7; // 更新时间
     google.protobuf.Timestamp DeletedAt = 8; // 删除时间（软删除）

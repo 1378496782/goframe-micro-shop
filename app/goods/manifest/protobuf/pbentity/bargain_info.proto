@@ -1,0 +1,22 @@
+// ==========================================================================
+// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
+// ==========================================================================
+
+syntax = "proto3";
+
+package pbentity;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/pbentity";
+
+import "google/protobuf/timestamp.proto";
+
+message BargainInfo {
+    int32                     Id          = 1; //
+    int32                     UserId      = 2; //
+    int32                     GoodsId     = 3; //
+    int32                     Counts      = 4; //
+    google.protobuf.Timestamp CreatedTime = 5; //
+    google.protobuf.Timestamp UpdatedTime = 6; //
+    google.protobuf.Timestamp DeletedTime = 7; //
+    google.protobuf.Timestamp ExpiredTime = 8; //
+}

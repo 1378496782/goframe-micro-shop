@@ -30,6 +30,7 @@ CREATE TABLE `goods_info`  (
                                `sort` tinyint NOT NULL DEFAULT 0 COMMENT '排序 倒叙',
                                `detail_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '商品详情',
                                `enable_bargain` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否允许砍价 1是 0否 默认0',
+                               `bargain_price` int  DEFAULT 0 COMMENT '允许砍到的最低价格',
                                `created_at` datetime NULL DEFAULT NULL,
                                `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                `deleted_at` datetime NULL DEFAULT NULL,
@@ -168,6 +169,74 @@ CREATE TABLE `user_coupon_info` (
         UNIQUE KEY `uk_user_coupon` (`user_id`, `coupon_id`) COMMENT '同一用户不能重复领取同张优惠券'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户优惠券信息表';
 
+-- 删除已存在的 bargain_info 表（如果存在）
+DROP TABLE IF EXISTS `bargain_info`;
+
+-- 创建 bargain_info表
+create table `bargain_info`(
+    id           int auto_increment  primary key,
+    user_id      int      not null,
+    goods_id     int      not null,
+    counts       int      not null,
+    created_time datetime not null,
+    updated_time datetime null,
+    deleted_time datetime null,
+    expired_time datetime not null
+);
+
+-- ----------------------------
+-- Records of bargain_info
+-- ----------------------------
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (1, 8, 16, 9, '2025-10-11 11:10:16', '2025-10-11 11:10:16', NULL, '2025-10-11 22:10:16');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (2, 7, 10, 9, '2025-10-11 11:10:27', '2025-10-11 11:10:27', '2025-10-11 11:11:23', '2025-10-12 00:10:27');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (3, 7, 20, 9, '2025-10-11 11:10:32', '2025-10-11 11:47:46', NULL, '2025-10-12 05:10:32');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (4, 3, 20, 9, '2025-10-11 11:10:36', '2025-10-11 11:10:36', NULL, '2025-10-11 21:10:36');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (5, 3, 30, 9, '2025-10-11 11:10:41', '2025-10-11 11:10:41', NULL, '2025-10-12 00:10:41');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (6, 40, 30, 9, '2025-10-11 11:10:48', '2025-10-11 11:10:48', NULL, '2025-10-12 01:10:48');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (7, 18, 30, 9, '2025-10-11 11:10:55', '2025-10-11 11:10:55', NULL, '2025-10-12 01:10:55');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (8, 7, 10, 5, '2025-10-12 09:07:19', '2025-10-12 09:08:14', NULL, '2025-10-12 23:07:19');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (9, 7, 10, 5, '2025-10-12 09:24:27', '2025-10-12 09:26:31', NULL, '2025-10-12 20:24:27');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (10, 0, 3, 80, '2025-10-13 10:38:49', '2025-10-13 10:38:49', NULL, '2025-10-14 04:38:49');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (11, 0, 49, 50, '2025-10-13 10:40:40', '2025-10-13 10:50:52', NULL, '2025-10-14 03:40:40');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (12, 3, 20, 14, '2025-10-13 10:41:34', '2025-10-13 10:41:34', '2025-10-13 10:43:05', '2025-10-13 22:41:34');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (13, 0, 20, 11, '2025-10-13 10:47:48', '2025-10-13 10:47:48', NULL, '2025-10-13 20:47:48');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (14, 18, 18, 18, '2025-10-13 11:13:15', '2025-10-13 11:13:15', '2025-10-13 11:21:34', '2025-10-14 00:13:15');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (15, 20, 6, 10, '2025-10-13 11:18:26', '2025-10-13 11:18:26', '2025-10-13 11:24:26', '2025-10-14 04:18:26');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (16, 0, 19, 10, '2025-10-13 11:34:02', '2025-10-13 11:34:32', NULL, '2025-10-13 21:34:02');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (17, 7, 9, 6, '2025-10-13 11:42:20', '2025-10-13 11:42:38', '2025-10-13 11:45:21', '2025-10-13 22:42:20');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (18, 7, 10, 10, '2025-10-13 11:57:37', '2025-10-13 11:58:34', '2025-10-13 11:59:37', '2025-10-13 23:57:37');
+
+
+-- 删除已存在的bargain_history表（如果存在）
+DROP TABLE IF EXISTS `bargain_history`;
+
+-- 创建砍价记录表bargain_history
+create table `bargain_history`(
+            id           int auto_increment  primary key,
+            bargain_id   int      not null,
+            amount       int      not null,
+            user_id      int      not null,
+            created_time datetime not null,
+            deleted_time datetime null
+);
+
+
+-- ----------------------------
+-- Records of bargain_history
+-- ----------------------------
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (1, 3, 12, 10, '2025-10-11 11:47:46', '2025-10-11 11:59:18');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (2, 8, 29, 30, '2025-10-12 09:08:14', NULL);
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (3, 9, 20, 20, '2025-10-12 09:26:31', '2025-10-13 11:14:47');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (4, 11, 10, 12, '2025-10-13 10:44:14', '2025-10-13 10:45:47');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (5, 11, 10, 0, '2025-10-13 10:50:52', NULL);
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (6, 16, 21, 0, '2025-10-13 11:34:32', NULL);
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (7, 17, 13, 7, '2025-10-13 11:42:38', '2025-10-13 11:46:06');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (8, 18, 16, 7, '2025-10-13 11:58:34', '2025-10-13 11:59:15');
+
+
+
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
 USE user;
 
 -- ----------------------------
