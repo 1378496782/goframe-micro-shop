@@ -7,14 +7,15 @@ import (
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"syscall"
 
-	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gcmd"
-	"google.golang.org/grpc"
 	"shop-goframe-micro-service-refacotor/app/order/internal/controller/order_info"
 	"shop-goframe-micro-service-refacotor/app/order/internal/controller/refund_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/consumer"
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
+
+	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcmd"
+	"google.golang.org/grpc"
 )
 
 var (

@@ -20,12 +20,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OrderInfo_Create_FullMethodName    = "/order_info.v1.order_info/Create"
-	OrderInfo_GetDetail_FullMethodName = "/order_info.v1.order_info/GetDetail"
-	OrderInfo_GetList_FullMethodName   = "/order_info.v1.order_info/GetList"
-	OrderInfo_GetCount_FullMethodName  = "/order_info.v1.order_info/GetCount"
-	OrderInfo_Payment_FullMethodName   = "/order_info.v1.order_info/Payment"
-	OrderInfo_Notify_FullMethodName    = "/order_info.v1.order_info/Notify"
+	OrderInfo_Create_FullMethodName      = "/order_info.v1.order_info/Create"
+	OrderInfo_GetDetail_FullMethodName   = "/order_info.v1.order_info/GetDetail"
+	OrderInfo_GetList_FullMethodName     = "/order_info.v1.order_info/GetList"
+	OrderInfo_GetCount_FullMethodName    = "/order_info.v1.order_info/GetCount"
+	OrderInfo_Payment_FullMethodName     = "/order_info.v1.order_info/Payment"
+	OrderInfo_Notify_FullMethodName      = "/order_info.v1.order_info/Notify"
+	OrderInfo_CancelOrder_FullMethodName = "/order_info.v1.order_info/CancelOrder"
 )
 
 // OrderInfoClient is the client API for OrderInfo service.
@@ -38,6 +39,7 @@ type OrderInfoClient interface {
 	GetCount(ctx context.Context, in *OrderInfoGetCountReq, opts ...grpc.CallOption) (*OrderInfoGetCountRes, error)
 	Payment(ctx context.Context, in *PaymentReq, opts ...grpc.CallOption) (*PaymentRes, error)
 	Notify(ctx context.Context, in *NotifyReq, opts ...grpc.CallOption) (*NotifyRes, error)
+	CancelOrder(ctx context.Context, in *CancelOrderReq, opts ...grpc.CallOption) (*CancelOrderRes, error)
 }
 
 type orderInfoClient struct {
@@ -108,6 +110,16 @@ func (c *orderInfoClient) Notify(ctx context.Context, in *NotifyReq, opts ...grp
 	return out, nil
 }
 
+func (c *orderInfoClient) CancelOrder(ctx context.Context, in *CancelOrderReq, opts ...grpc.CallOption) (*CancelOrderRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CancelOrderRes)
+	err := c.cc.Invoke(ctx, OrderInfo_CancelOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderInfoServer is the server API for OrderInfo service.
 // All implementations must embed UnimplementedOrderInfoServer
 // for forward compatibility.
@@ -118,6 +130,7 @@ type OrderInfoServer interface {
 	GetCount(context.Context, *OrderInfoGetCountReq) (*OrderInfoGetCountRes, error)
 	Payment(context.Context, *PaymentReq) (*PaymentRes, error)
 	Notify(context.Context, *NotifyReq) (*NotifyRes, error)
+	CancelOrder(context.Context, *CancelOrderReq) (*CancelOrderRes, error)
 	mustEmbedUnimplementedOrderInfoServer()
 }
 
@@ -145,6 +158,9 @@ func (UnimplementedOrderInfoServer) Payment(context.Context, *PaymentReq) (*Paym
 }
 func (UnimplementedOrderInfoServer) Notify(context.Context, *NotifyReq) (*NotifyRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Notify not implemented")
+}
+func (UnimplementedOrderInfoServer) CancelOrder(context.Context, *CancelOrderReq) (*CancelOrderRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelOrder not implemented")
 }
 func (UnimplementedOrderInfoServer) mustEmbedUnimplementedOrderInfoServer() {}
 func (UnimplementedOrderInfoServer) testEmbeddedByValue()                   {}
@@ -275,6 +291,24 @@ func _OrderInfo_Notify_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderInfo_CancelOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelOrderReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderInfoServer).CancelOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderInfo_CancelOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderInfoServer).CancelOrder(ctx, req.(*CancelOrderReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderInfo_ServiceDesc is the grpc.ServiceDesc for OrderInfo service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -305,6 +339,10 @@ var OrderInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Notify",
 			Handler:    _OrderInfo_Notify_Handler,
+		},
+		{
+			MethodName: "CancelOrder",
+			Handler:    _OrderInfo_CancelOrder_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -71,6 +71,7 @@ var (
 						orderController.RefundInfoGetDetail,
 						orderController.RefundInfoGetList,
 						orderController.RefundInfoCreate,
+						orderController.CancelOrder,
 					)
 				})
 			})
