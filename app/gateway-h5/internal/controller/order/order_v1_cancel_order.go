@@ -2,7 +2,6 @@ package order
 
 import (
 	"context"
-	"fmt"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 
 	order_info "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
@@ -14,11 +13,16 @@ import (
 
 func (c *ControllerV1) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrderRes, err error) {
 	// 从上下文中获取userId
-	userId := ctx.Value(middleware.CtxUserId)
-	fmt.Println(userId)
+	value := ctx.Value(middleware.CtxUserId)
+	userId, ok := value.(uint32)
+	if !ok {
+		// 处理类型不匹配的情况
+		panic("用户ID类型错误或不存在")
+	}
 
 	grpcReq := &order_info.CancelOrderReq{
-		Id: req.Id,
+		Id:     req.Id,
+		UserId: userId,
 	}
 	grpcRes, err := c.OrderInfoClient.CancelOrder(ctx, grpcReq)
 	if err != nil {

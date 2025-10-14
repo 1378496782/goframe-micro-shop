@@ -3,6 +3,7 @@ package order_info
 import (
 	"bytes"
 	"context"
+	"log"
 	"net/http"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
@@ -183,6 +184,8 @@ func (*Controller) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res
 		}, nil
 	}
 
+	log.Println("orderinfo.UserId:", orderinfo.UserId)
+	log.Println("req.UserId:", req.UserId)
 	if uint32(orderinfo.UserId) != req.UserId {
 		return &v1.CancelOrderRes{
 			Code:    1003,
