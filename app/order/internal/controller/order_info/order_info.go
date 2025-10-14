@@ -2,9 +2,17 @@ package order_info
 
 import (
 	"context"
+<<<<<<< HEAD
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	orderStatus "shop-goframe-micro-service-refacotor/app/order/internal/consts"
+=======
+	"log"
+	"net/http"
+	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
+	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
+>>>>>>> ab55f63e02fd1e30115070c2fa03fcf68fec0921
 	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
+	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"shop-goframe-micro-service-refacotor/utility/consts"
 
@@ -122,4 +130,63 @@ func (*Controller) GetCount(ctx context.Context, req *v1.OrderInfoGetCountReq) (
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 	return res, nil
+}
+
+func (*Controller) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrderRes, err error) {
+	infoError := consts.InfoError(consts.OrderInfo, consts.GetOrderRecord)
+
+	record, err := dao.OrderInfo.Ctx(ctx).Where("id", req.Id).One()
+
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	if record.IsEmpty() {
+		return &v1.CancelOrderRes{
+			Code:    1001,
+			Message: "订单不存在",
+			Data:    "",
+		}, nil
+	}
+
+	var orderinfo *entity.OrderInfo
+	err = record.Struct(&orderinfo)
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	if orderinfo.Status != 1 {
+		return &v1.CancelOrderRes{
+			Code:    1002,
+			Message: "订单状态不允许取消",
+			Data:    "",
+		}, nil
+	}
+
+	log.Println("orderinfo.UserId:", orderinfo.UserId)
+	log.Println("req.UserId:", req.UserId)
+	if uint32(orderinfo.UserId) != req.UserId {
+		return &v1.CancelOrderRes{
+			Code:    1003,
+			Message: "用户无权限操作此订单",
+			Data:    "",
+		}, nil
+	}
+	orderinfo.Status = 7
+
+	_, err = dao.OrderInfo.Ctx(ctx).Where("id", req.Id).Update(&orderinfo)
+	if err != nil {
+		return &v1.CancelOrderRes{
+			Code:    1004,
+			Message: "系统错误，取消失败",
+			Data:    "",
+		}, nil
+	}
+
+	return &v1.CancelOrderRes{
+		Code:    0,
+		Message: "订单取消成功",
+		Data:    "",
+	}, nil
 }

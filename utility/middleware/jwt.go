@@ -1,11 +1,12 @@
 package middleware
 
 import (
+	"shop-goframe-micro-service-refacotor/utility"
+
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gctx"
-	"shop-goframe-micro-service-refacotor/utility"
 )
 
 const (
@@ -31,6 +32,7 @@ func JWTAuth(r *ghttp.Request) {
 	}
 
 	// 将用户ID存入上下文
-	r.SetCtxVar(CtxUserId, claims.UserId)
+	userId := claims.UserId
+	r.SetCtxVar(CtxUserId, userId)
 	r.Middleware.Next()
 }

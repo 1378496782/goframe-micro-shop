@@ -15,6 +15,7 @@ service order_info {
   rpc GetCount(OrderInfoGetCountReq) returns (OrderInfoGetCountRes) {}
   rpc Payment(PaymentReq)returns(PaymentRes){}
   rpc Notify(NotifyReq)returns(NotifyRes){}
+  rpc CancelOrder(CancelOrderReq)returns(CancelOrderRes){}
 }
 
 // 创建订单请求
@@ -148,4 +149,14 @@ message OrderInfoGetCountRes {
     uint32 delivered = 3;
     uint32 completed = 4;
     uint32 afterSale = 5;
+}
+
+message CancelOrderReq {
+  uint32 id = 1;
+  uint32 userId = 2;
+}
+message CancelOrderRes {
+  uint32 code = 1;
+  string message = 2;
+  string data = 3;
 }

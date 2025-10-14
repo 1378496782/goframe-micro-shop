@@ -71,12 +71,16 @@ var (
 						orderController.RefundInfoGetDetail,
 						orderController.RefundInfoGetList,
 						orderController.RefundInfoCreate,
+<<<<<<< HEAD
 						goodsController.Bargain_info_Create,
 						goodsController.Bargain_info_Get,
 						goodsController.Bargain_info_Delete,
 						goodsController.Bargain_history_Create,
 						goodsController.Bargain_history_Get,
 						goodsController.Bargain_history_Delete,
+=======
+						orderController.CancelOrder,
+>>>>>>> ab55f63e02fd1e30115070c2fa03fcf68fec0921
 					)
 				})
 			})

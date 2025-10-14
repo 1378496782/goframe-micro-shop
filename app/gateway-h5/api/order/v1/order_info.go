@@ -143,3 +143,12 @@ type OrderInfoGetCountRes struct {
 	Completed uint32 `json:"completed"`
 	AfterSale uint32 `json:"afterSale"`
 }
+type CancelOrderReq struct {
+	g.Meta `path:"/order/cancel" method:"post" tags:"订单管理" sm:"取消订单"`
+	Id     uint32 `json:"id"`
+}
+type CancelOrderRes struct {
+	Code    uint32 `json:"code"`
+	Message string `json:"message"`
+	Data    string `json:"data"`
+}
