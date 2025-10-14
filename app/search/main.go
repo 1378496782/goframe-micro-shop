@@ -5,6 +5,7 @@ import (
 	_ "shop-goframe-micro-service-refacotor/app/search/internal/packed"
 	"shop-goframe-micro-service-refacotor/app/search/utility/binlog"
 	"shop-goframe-micro-service-refacotor/app/search/utility/elasticsearch"
+	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 
 	"shop-goframe-micro-service-refacotor/app/search/internal/cmd"
 )

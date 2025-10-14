@@ -20,6 +20,7 @@ var (
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
 					search.NewV1().SearchGoods,
+					search.NewV1().SearchGoodsMysql,
 				)
 			})
 			s.Run()
