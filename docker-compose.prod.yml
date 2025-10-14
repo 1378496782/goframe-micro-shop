@@ -531,6 +531,7 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: 1450
+    name: shop-micro-network
 
 volumes:
   mysql_data:
