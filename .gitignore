@@ -21,3 +21,6 @@ backups/
 !manifest/config/
 /uploads/
 *.exe
+*.log
+*.pb.go
+*_grpc.pb.go
