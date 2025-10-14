@@ -33,6 +33,9 @@ const (
 	CartInfo           = "CartInfo"
 	CouponInfo         = "CouponInfo"
 	UserCouponInfo     = "UserCouponInfo"
+	BargainInfo        = "BargainInfo"
+	BargainHistoryInfo = "BargainHistoryInfo"
+	Empty              = "IsEmpty"
 )
 
 func InfoError(info string, fail string) string {

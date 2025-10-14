@@ -14,7 +14,7 @@ func (c *ControllerV1) OrderInfoGetList(ctx context.Context, req *v1.OrderInfoGe
 	// 使用 gconv 自动转换结构体
 	grpcReq := &order_info.OrderInfoGetListReq{}
 
-	grpcGoodsReq := &goods_info.GoodsInfoGetDetailReq{} //todo
+	grpcGoodsReq := &goods_info.GoodsInfoGetDetailReq{}
 	//调用getdetails 并返回goods id与goods name picurl
 	//想办法调用
 	g.Dump(grpcGoodsReq)
