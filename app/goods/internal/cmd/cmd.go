@@ -4,17 +4,9 @@ import (
 	"context"
 	"os"
 	"os/signal"
-<<<<<<< HEAD
-<<<<<<< HEAD
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_history"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_info"
-=======
-=======
-	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_history"
-	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_info"
->>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/recommend_goods_info"
->>>>>>> master
 	"syscall"
 
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/cart_info"
@@ -78,17 +70,9 @@ var (
 			cart_info.Register(s)
 			coupon_info.Register(s)
 			user_coupon_info.Register(s)
-<<<<<<< HEAD
-<<<<<<< HEAD
 			bargain_history.Register(s)
 			bargain_info.Register(s)
-=======
-=======
-			bargain_history.Register(s)
-			bargain_info.Register(s)
->>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 			recommend_goods_info.Register(s)
->>>>>>> master
 			s.Run()
 			return nil
 		},
@@ -105,13 +89,10 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	couponConsumer := consumer.NewCouponConfirmConsumer(ctx)
 	manager.AddConsumer(couponConsumer)
 
-<<<<<<< HEAD
-=======
 	// 添加订单创建事件消费者
 	orderCreatedConsumer := consumer.NewOrderCreatedConsumer(ctx)
 	manager.AddConsumer(orderCreatedConsumer)
 
->>>>>>> master
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)
 	// manager.AddConsumer(anotherConsumer)

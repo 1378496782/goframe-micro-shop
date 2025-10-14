@@ -14,11 +14,7 @@ type Bargain_info_CreateReq struct {
 	User_id  int32 `json:"user_Id"   v:"required" dc:"创建砍价用户id"`
 	Goods_id int32 `json:"goods_Id" d:"0" v:"required" dc:"砍价商品id"`
 	Counts   int32 `json:"counts" d:"0" v:"required" dc:"最大帮砍次数"`
-<<<<<<< HEAD
 }
-=======
-} //三个入参默认值 全是0
->>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 
 type Bargain_info_CreateRes struct {
 	Id          int32  `json:"Id"    dc:"砍价信息id"`

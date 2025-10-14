@@ -2,15 +2,10 @@ package order_info
 
 import (
 	"context"
-<<<<<<< HEAD
+	"log"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	orderStatus "shop-goframe-micro-service-refacotor/app/order/internal/consts"
-=======
-	"log"
-	"net/http"
-	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
->>>>>>> ab55f63e02fd1e30115070c2fa03fcf68fec0921
 	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"

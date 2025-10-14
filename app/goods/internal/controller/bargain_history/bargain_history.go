@@ -158,11 +158,7 @@ func (*Controller) Delete(ctx context.Context, req *v1.BargainHistoryDeleteReq) 
 		Where("deleted_time", nil).
 		One()
 	if err != nil {
-<<<<<<< HEAD
-		infoError := consts.InfoError(consts.BargainHistoryInfo, consts.GetDetailFile)
-=======
 		infoError := consts.InfoError(consts.BargainHistoryInfo, consts.GetDetailFail)
->>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
