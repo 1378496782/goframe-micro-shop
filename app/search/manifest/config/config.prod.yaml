@@ -13,6 +13,11 @@ server:
     ctxKeys: [ "traceId" ]
     timeFormat: "2006-01-02 15:04:05.000"
 
+database:
+  default:
+    link:  "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/goods"
+    debug:
+
 etcd:
   address: "etcd:2379"
 
@@ -30,3 +35,4 @@ binlog:
       port: 3306
       username: "root"
       password: "CHANGE_ME_MYSQL_ROOT_PASSWORD"
+
