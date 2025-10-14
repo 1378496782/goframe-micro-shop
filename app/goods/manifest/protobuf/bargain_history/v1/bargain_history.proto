@@ -13,13 +13,21 @@ service bargain_history {
   rpc Delete(BargainHistoryDeleteReq) returns (BargainHistoryDeleteRes) {}
 }
 
+<<<<<<< HEAD
 //帮砍信息-创建-请求体
+=======
+//砍价信息-创建-请求体
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 message BargainHistoryCreateReq{
   int32   BargainId   = 1; //帮砍的砍价信息id
   int32   UserId      = 2; //帮砍的用户id
 }
 
+<<<<<<< HEAD
 //帮砍信息-创建-响应体
+=======
+//砍价信息-创建-响应体
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 message BargainHistoryCreateRes{
   int32                     Id          = 1; // 砍价记录id
   int32                     BargainId   = 2; // 帮砍价的信息id
@@ -30,13 +38,21 @@ message BargainHistoryCreateRes{
 }
 
 
+<<<<<<< HEAD
 //帮砍信息-查询-请求体
+=======
+//砍价信息-查询-请求体
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 message BargainHistoryGetListReq{
   int32                     Id          = 1; // 砍价记录id
   int32                     UserId      = 2; // 帮砍的用户id
 }
 
+<<<<<<< HEAD
 //帮砍信息-查询-响应体 待定
+=======
+//砍价信息-查询-响应体 待定
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 message BargainHistoryGetListRes{
   int32                     Id          = 1; // 砍价记录id
   int32                     BargainId   = 2; // 帮砍的砍价信息id
@@ -47,7 +63,11 @@ message BargainHistoryGetListRes{
 
 
 
+<<<<<<< HEAD
 //帮砍信息-删除-请求体
+=======
+//砍价信息-删除-请求体
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 message BargainHistoryDeleteReq{
   int32   BargainId   = 1; //帮砍的砍价信息id
   int32   UserId      = 2; //帮砍的用户id
@@ -55,7 +75,11 @@ message BargainHistoryDeleteReq{
 
 }
 
+<<<<<<< HEAD
 //帮砍信息-删除-请求体
+=======
+//砍价信息-删除-请求体
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 message BargainHistoryDeleteRes{
   int32                     Id          = 1; // 砍价记录id
   int32                     BargainId   = 2; // 帮砍的砍价信息id

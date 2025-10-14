@@ -27,7 +27,11 @@ func Register(s *grpcx.GrpcServer) {
 }
 
 func (*Controller) GetList(ctx context.Context, req *v1.BargainInfoGetListReq) (res *v1.BargainInfoGetListRes, err error) {
+<<<<<<< HEAD
 	infoError := consts.InfoError(consts.BargainInfo, consts.GetDetailFile) //构建错误信息
+=======
+	infoError := consts.InfoError(consts.BargainInfo, consts.GetDetailFail) //构建错误信息
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 
 	//验证参数合法性
 	if req.Id <= 0 || req.UserId <= 0 || req.GoodsId <= 0 {
@@ -123,7 +127,11 @@ func (*Controller) Delete(ctx context.Context, req *v1.BargainInfoDeleteReq) (re
 		One()
 
 	if err != nil {
+<<<<<<< HEAD
 		infoError := consts.InfoError(consts.BargainInfo, consts.GetDetailFile)
+=======
+		infoError := consts.InfoError(consts.BargainInfo, consts.GetDetailFail)
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}

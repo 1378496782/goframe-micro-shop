@@ -5,9 +5,14 @@ import (
 	"os"
 	"os/signal"
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_history"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_info"
 =======
+=======
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_history"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_info"
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/recommend_goods_info"
 >>>>>>> master
 	"syscall"
@@ -74,9 +79,14 @@ var (
 			coupon_info.Register(s)
 			user_coupon_info.Register(s)
 <<<<<<< HEAD
+<<<<<<< HEAD
 			bargain_history.Register(s)
 			bargain_info.Register(s)
 =======
+=======
+			bargain_history.Register(s)
+			bargain_info.Register(s)
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 			recommend_goods_info.Register(s)
 >>>>>>> master
 			s.Run()

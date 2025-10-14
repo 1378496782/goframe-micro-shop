@@ -7,15 +7,21 @@ package goods
 import (
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/goods"
 <<<<<<< HEAD
+<<<<<<< HEAD
 	bargain_history "shop-goframe-micro-service-refacotor/app/goods/api/bargain_history/v1"
 	bargain_info "shop-goframe-micro-service-refacotor/app/goods/api/bargain_info/v1"
 =======
 	recommend_goods_info "shop-goframe-micro-service-refacotor/app/goods/api/recommend_goods_info/v1"
 >>>>>>> master
+=======
+	bargain_history "shop-goframe-micro-service-refacotor/app/goods/api/bargain_history/v1"
+	bargain_info "shop-goframe-micro-service-refacotor/app/goods/api/bargain_info/v1"
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 	cart_info "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
 	category_info "shop-goframe-micro-service-refacotor/app/goods/api/category_info/v1"
 	goods_images "shop-goframe-micro-service-refacotor/app/goods/api/goods_images/v1"
 	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
+	recommend_goods_info "shop-goframe-micro-service-refacotor/app/goods/api/recommend_goods_info/v1"
 	user_coupon_info "shop-goframe-micro-service-refacotor/app/goods/api/user_coupon_info/v1"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 
@@ -37,6 +43,8 @@ type ControllerV1 struct {
 	CategoryInfoClient       category_info.CategoryInfoClient
 	CartInfoClient           cart_info.CartInfoClient
 	UserCouponInfoClient     user_coupon_info.UserCouponInfoClient
+	BargainInfoClient        bargain_info.BargainInfoClient
+	BargainHistoryClient     bargain_history.BargainHistoryClient
 	RecommendGoodsInfoClient recommend_goods_info.RecommendGoodsInfoClient
 >>>>>>> master
 }
@@ -60,6 +68,8 @@ func NewV1() goods.IGoodsV1 {
 		CategoryInfoClient:       category_info.NewCategoryInfoClient(conn),
 		CartInfoClient:           cart_info.NewCartInfoClient(conn),
 		UserCouponInfoClient:     user_coupon_info.NewUserCouponInfoClient(conn),
+		BargainInfoClient:        bargain_info.NewBargainInfoClient(conn),
+		BargainHistoryClient:     bargain_history.NewBargainHistoryClient(conn),
 		RecommendGoodsInfoClient: recommend_goods_info.NewRecommendGoodsInfoClient(conn),
 >>>>>>> master
 	}

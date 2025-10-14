@@ -1,0 +1,12 @@
+[2025-10-11 11:35:53] ==========================================
+[2025-10-11 11:35:53] 开始重新构建单个服务: goods-service
+[2025-10-11 11:35:53] ==========================================
+[2025-10-11 11:35:53] 步骤1: 检查服务当前状态
+[2025-10-11 11:35:53] 停止 goods-service 服务...
+./rebuild-service.sh: line 234: /usr/local/bin/docker-compose: Permission denied
+[2025-10-11 11:35:53] ⚠️  goods-service 服务停止失败或不存在
+[2025-10-11 11:35:53] 查找 goods-service 相关的镜像...
+[2025-10-11 11:35:53] 没有找到 goods-service 相关的镜像需要清理
+[2025-10-11 11:35:53] 构建 goods-service 服务...
+./rebuild-service.sh: line 267: /usr/local/bin/docker-compose: Permission denied
+[2025-10-11 11:35:53] ❌ goods-service 服务构建失败

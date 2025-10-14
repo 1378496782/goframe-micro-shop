@@ -6,10 +6,14 @@
 // versions:
 // 	protoc-gen-go v1.36.9
 <<<<<<< HEAD
+<<<<<<< HEAD
 // 	protoc        v6.32.0
 =======
 // 	protoc        v6.31.1
 >>>>>>> master
+=======
+// 	protoc        v6.32.0
+>>>>>>> d924eccf78c04f3d02c9def3e16d8c975f2b0fca
 // source: pbentity/coupon_info.proto
 
 package pbentity
