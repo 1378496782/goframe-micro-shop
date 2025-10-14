@@ -14,6 +14,7 @@ type RefundInfo struct {
 	Number       string      `json:"number"       orm:"number"        description:"售后订单号"`                      // 售后订单号
 	OrderId      int         `json:"orderId"      orm:"order_id"      description:"订单id"`                       // 订单id
 	GoodsId      int         `json:"goodsId"      orm:"goods_id"      description:"要售后的商品id"`                   // 要售后的商品id
+	RefundId     string      `json:"refundId"     orm:"refund_id"     description:"第三方退款编号"`                    // 第三方退款编号
 	Reason       string      `json:"reason"       orm:"reason"        description:"退款原因"`                       // 退款原因
 	Status       int         `json:"status"       orm:"status"        description:"审核状态 1待处理 2同意退款 3拒绝退款"`      // 审核状态 1待处理 2同意退款 3拒绝退款
 	RefundStatus int         `json:"refundStatus" orm:"refund_status" description:"退款状态 0未退款 1退款中 2退款成功 3退款失败"` // 退款状态 0未退款 1退款中 2退款成功 3退款失败

@@ -1,7 +1,6 @@
 package order
 
 import (
-	"bytes"
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
@@ -32,9 +31,6 @@ func (c *ControllerV1) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.N
 		})
 		return
 	}
-	// 恢复 body，防止其他中间件重用失败
-	r.Body = io.NopCloser(bytes.NewBuffer(body))
-	req.RawBody = string(body)
 
 	// headers（只取验签相关的）
 	headers := map[string]string{
@@ -44,7 +40,6 @@ func (c *ControllerV1) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.N
 		"Wechatpay-Serial":    r.Header.Get("Wechatpay-Serial"),
 		"X-Bypass-Verify":     r.Header.Get("X-Bypass-Verify"), // 测试代码，本地测试用
 	}
-	req.Headers = headers
 
 	// 调用 gRPC 服务进行验签/解密/业务处理
 	_, err = c.OrderInfoClient.Notify(ctx, &order_info.NotifyReq{
