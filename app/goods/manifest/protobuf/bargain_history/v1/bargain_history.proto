@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package bargain_history.v1;
+
+option go_package = "./template";
+
+import "pbentity/bargain_history.proto";
+import "google/protobuf/timestamp.proto";
+
+service bargain_history {
+  rpc GetList(BargainHistoryGetListReq) returns (BargainHistoryGetListRes) {}
+  rpc Create(BargainHistoryCreateReq) returns (BargainHistoryCreateRes) {}
+  rpc Delete(BargainHistoryDeleteReq) returns (BargainHistoryDeleteRes) {}
+}
+
+//砍价信息-创建-请求体
+message BargainHistoryCreateReq{
+  int32   BargainId   = 1; //帮砍的砍价信息id
+  int32   UserId      = 2; //帮砍的用户id
+}
+
+//砍价信息-创建-响应体
+message BargainHistoryCreateRes{
+  int32                     Id          = 1; // 砍价记录id
+  int32                     BargainId   = 2; // 帮砍价的信息id
+  int32                     Amount      = 3; // 本次砍价砍的金额数量
+  int32                     UserId      = 4; // 帮砍的用户id
+  google.protobuf.Timestamp CreatedTime = 5; // 本次砍价时间
+
+}
+
+
+//砍价信息-查询-请求体
+message BargainHistoryGetListReq{
+  int32                     Id          = 1; // 砍价记录id
+  int32                     UserId      = 2; // 帮砍的用户id
+}
+
+//砍价信息-查询-响应体 待定
+message BargainHistoryGetListRes{
+  int32                     Id          = 1; // 砍价记录id
+  int32                     BargainId   = 2; // 帮砍的砍价信息id
+  int32                     Amount      = 3; // 帮砍的金额
+  int32                     UserId      = 4; // 帮砍的用户id
+  google.protobuf.Timestamp CreatedTime = 5; // 创建时间
+}
+
+
+
+//砍价信息-删除-请求体
+message BargainHistoryDeleteReq{
+  int32   BargainId   = 1; //帮砍的砍价信息id
+  int32   UserId      = 2; //帮砍的用户id
+  int32   Id =3; //实际的id
+
+}
+
+//砍价信息-删除-请求体
+message BargainHistoryDeleteRes{
+  int32                     Id          = 1; // 砍价记录id
+  int32                     BargainId   = 2; // 帮砍的砍价信息id
+  int32                     UserId      = 3; // 帮砍的用户id
+  google.protobuf.Timestamp CreatedTime = 4; // 创建时间
+  google.protobuf.Timestamp DeletedTime = 5; // 删除时间
+
+}

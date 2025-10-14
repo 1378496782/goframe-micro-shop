@@ -33,11 +33,13 @@ type GoodsInfoColumns struct {
 	Stock            string // 库存
 	Sale             string // 销量
 	Tags             string // 标签
+	Sort             string // 排序 倒叙
 	DetailInfo       string // 商品详情
+	EnableBargain    string // 是否允许砍价 1是 0否 默认0
 	CreatedAt        string //
 	UpdatedAt        string //
 	DeletedAt        string //
-	Sort             string // 排序 倒序
+	BargainPrice     string //
 }
 
 // goodsInfoColumns holds the columns for the table goods_info.
@@ -54,11 +56,13 @@ var goodsInfoColumns = GoodsInfoColumns{
 	Stock:            "stock",
 	Sale:             "sale",
 	Tags:             "tags",
+	Sort:             "sort",
 	DetailInfo:       "detail_info",
+	EnableBargain:    "enable_bargain",
 	CreatedAt:        "created_at",
 	UpdatedAt:        "updated_at",
 	DeletedAt:        "deleted_at",
-	Sort:             "sort",
+	BargainPrice:     "bargain_price",
 }
 
 // NewGoodsInfoDao creates and returns a new DAO object for table data access.

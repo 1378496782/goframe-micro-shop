@@ -12,10 +12,10 @@ import (
 // CartInfo is the golang structure of table cart_info for DAO operations like Where/Data.
 type CartInfo struct {
 	g.Meta    `orm:"table:cart_info, do:true"`
-	Id        interface{} // 购物车表
-	UserId    interface{} //
-	GoodsId   interface{} // 商品id
-	Count     interface{} // 商品数量
+	Id        any         // 购物车表
+	UserId    any         //
+	GoodsId   any         // 商品id
+	Count     any         // 商品数量
 	CreatedAt *gtime.Time //
 	UpdatedAt *gtime.Time //
 }

@@ -11,11 +11,11 @@ option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/pbentity
 import "google/protobuf/timestamp.proto";
 
 message CouponInfo {
-    uint32                     Id        = 1; //
-    uint32                     GoodsId   = 2; // 关联商品id（0表示全场通用）
+    int32                     Id        = 1; //
+    int32                     GoodsId   = 2; // 关联商品id（0表示全场通用）
     string                    Name      = 3; // 优惠券名称
-    uint32                     Type      = 4; // 优惠券类型：0-新人券，1-活动券，2-其他
-    uint64                     Amount    = 5; // 优惠金额（单位：分）
+    int32                     Type      = 4; // 优惠券类型：0-新人券，1-活动券，2-其他
+    int32                     Amount    = 5; // 优惠金额（单位：分）
     google.protobuf.Timestamp Deadline  = 6; // 过期时间
     google.protobuf.Timestamp CreatedAt = 7; // 创建时间
     google.protobuf.Timestamp UpdatedAt = 8; // 更新时间

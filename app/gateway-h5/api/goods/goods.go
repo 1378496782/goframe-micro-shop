@@ -11,6 +11,12 @@ import (
 )
 
 type IGoodsV1 interface {
+	Bargain_history_Create(ctx context.Context, req *v1.Bargain_history_CreateReq) (res *v1.Bargain_history_CreateRes, err error)
+	Bargain_history_Get(ctx context.Context, req *v1.Bargain_history_GetReq) (res *v1.Bargain_history_GetRes, err error)
+	Bargain_history_Delete(ctx context.Context, req *v1.Bargain_history_DeleteReq) (res *v1.Bargain_history_DeleteRes, err error)
+	Bargain_info_Create(ctx context.Context, req *v1.Bargain_info_CreateReq) (res *v1.Bargain_info_CreateRes, err error)
+	Bargain_info_Get(ctx context.Context, req *v1.Bargain_info_GetReq) (res *v1.Bargain_info_GetRes, err error)
+	Bargain_info_Delete(ctx context.Context, req *v1.Bargain_info_DeleteReq) (res *v1.Bargain_info_DeleteRes, err error)
 	CartInfoGetList(ctx context.Context, req *v1.CartInfoGetListReq) (res *v1.CartInfoGetListRes, err error)
 	CartInfoCreate(ctx context.Context, req *v1.CartInfoCreateReq) (res *v1.CartInfoCreateRes, err error)
 	CartInfoDelete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *v1.CartInfoDeleteRes, err error)
