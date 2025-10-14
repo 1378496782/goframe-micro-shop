@@ -27,7 +27,7 @@ func NewV1() order.IOrderV1 {
 		middleware.GrpcClientTimeout,
 	))
 
-	//goods调用的微服务链接 搭配超时组件
+	//goods调用的微服务链接 搭配超时组件和认证拦截器
 	var goods_conn = grpcx.Client.MustNewGrpcClientConn("goods", grpcx.Client.ChainUnary(
 		middleware.GrpcClientTimeout,
 	))
