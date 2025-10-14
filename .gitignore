@@ -20,3 +20,4 @@ bin
 backups/
 !manifest/config/
 /uploads/
+*.exe
