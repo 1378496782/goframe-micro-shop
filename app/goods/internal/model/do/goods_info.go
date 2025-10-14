@@ -12,21 +12,23 @@ import (
 // GoodsInfo is the golang structure of table goods_info for DAO operations like Where/Data.
 type GoodsInfo struct {
 	g.Meta           `orm:"table:goods_info, do:true"`
-	Id               interface{} //
-	Name             interface{} // 商品名字
-	PicUrl           interface{} // 主图
-	Images           interface{} // 支持单图,多图
-	Price            interface{} // 价格(分)
-	Level1CategoryId interface{} // 1级分类id
-	Level2CategoryId interface{} // 2级分类id
-	Level3CategoryId interface{} // 3级分类id
-	Brand            interface{} // 品牌
-	Stock            interface{} // 库存
-	Sale             interface{} // 销量
-	Tags             interface{} // 标签
-	DetailInfo       interface{} // 商品详情
+	Id               any         //
+	Name             any         // 商品名字
+	PicUrl           any         // 主图
+	Images           any         // 支持单图,多图
+	Price            any         // 价格(分)
+	Level1CategoryId any         // 1级分类id
+	Level2CategoryId any         // 2级分类id
+	Level3CategoryId any         // 3级分类id
+	Brand            any         // 品牌
+	Stock            any         // 库存
+	Sale             any         // 销量
+	Tags             any         // 标签
+	Sort             any         // 排序 倒叙
+	DetailInfo       any         // 商品详情
+	EnableBargain    any         // 是否允许砍价 1是 0否 默认0
 	CreatedAt        *gtime.Time //
 	UpdatedAt        *gtime.Time //
 	DeletedAt        *gtime.Time //
-	Sort             interface{} // 排序 倒序
+	BargainPrice     any         //
 }

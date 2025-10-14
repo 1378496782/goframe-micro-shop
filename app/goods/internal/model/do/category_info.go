@@ -12,12 +12,12 @@ import (
 // CategoryInfo is the golang structure of table category_info for DAO operations like Where/Data.
 type CategoryInfo struct {
 	g.Meta    `orm:"table:category_info, do:true"`
-	Id        interface{} //
-	ParentId  interface{} // 父级id
-	Name      interface{} //
-	PicUrl    interface{} // icon
-	Level     interface{} // 等级 默认1级分类
-	Sort      interface{} //
+	Id        any         //
+	ParentId  any         // 父级id
+	Name      any         //
+	PicUrl    any         // icon
+	Level     any         // 等级 默认1级分类
+	Sort      any         //
 	CreatedAt *gtime.Time //
 	UpdatedAt *gtime.Time //
 	DeletedAt *gtime.Time //

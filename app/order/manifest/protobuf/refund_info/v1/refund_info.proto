@@ -6,6 +6,7 @@ option go_package = "shop-goframe-micro-service-refacotor/app/order/api/refund_i
 
 import "pbentity/refund_info.proto";
 
+
 service refund_info {
   rpc GetList(RefundInfoGetListReq) returns (RefundInfoGetListRes) {}
   rpc GetDetail(RefundInfoGetDetailReq) returns (RefundInfoGetDetailRes) {}
