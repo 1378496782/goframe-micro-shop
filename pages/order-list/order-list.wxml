@@ -26,8 +26,6 @@
         wx:for="{{orderList}}" 
         wx:key="id" 
         class="order-item grid-item"
-        bindtap="viewOrderDetail"
-        data-id="{{item.id}}"
       >
         <!-- 订单头部 -->
         <view class="order-header">
@@ -77,16 +75,12 @@
                 catchtap="goPay" 
                 data-id="{{item.id}}"
                 data-number="{{item.order_number}}"
+                data-index="{{index}}"
               >去支付</button>
             </block>
             
             <!-- 待发货状态 -->
             <block wx:elif="{{item.status === 2}}">
-              <button 
-                class="action-btn default" 
-                catchtap="viewOrderDetail" 
-                data-id="{{item.id}}"
-              >查看详情</button>
             </block>
             
             <!-- 待收货状态 -->
@@ -105,11 +99,6 @@
             
             <!-- 已完成状态 -->
             <block wx:elif="{{item.status === 4}}">
-              <button 
-                class="action-btn default" 
-                catchtap="viewOrderDetail" 
-                data-id="{{item.id}}"
-              >查看详情</button>
               <button 
                 class="action-btn primary" 
                 catchtap="applyAfterSale" 

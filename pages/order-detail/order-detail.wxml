@@ -31,7 +31,7 @@
             <view class="goods-name">{{item.name}}</view>
             <view class="goods-spec">{{item.spec}}</view>
             <view class="goods-price-row">
-              <text class="goods-price">¥{{item.actual_price}}</text>
+              <text class="goods-price">¥{{item.price}}</text>
               <text class="goods-count">x{{item.quantity}}</text>
             </view>
           </view>
@@ -46,7 +46,7 @@
     <view class="info-grid">
       <view class="info-row">
         <text class="info-label">订单编号</text>
-        <text class="info-value">{{orderInfo.number}}</text>
+        <text class="info-value">{{orderInfo.order_number || orderInfo.number}}</text>
       </view>
       <view class="info-row">
         <text class="info-label">下单时间</text>
@@ -63,19 +63,19 @@
   <view class="price-section">
     <view class="price-row">
       <text>商品总价</text>
-      <text>¥{{orderInfo.price}}</text>
+      <text>¥{{orderInfo.price || 0}}</text>
     </view>
-    <view class="price-row">
+    <view class="price-row" wx:if="{{orderInfo.coupon_price}}">
       <text>优惠券抵扣</text>
       <text>-¥{{orderInfo.coupon_price}}</text>
     </view>
-    <view class="price-row">
+    <view class="price-row" wx:if="{{orderInfo.freight}}">
       <text>运费</text>
-      <text>¥{{orderInfo.freight || 0}}</text>
+      <text>¥{{orderInfo.freight}}</text>
     </view>
     <view class="price-row total">
       <text>实付款</text>
-      <text>¥{{orderInfo.actual_price}}</text>
+      <text>¥{{orderInfo.actual_price || orderInfo.price || 0}}</text>
     </view>
   </view>
 

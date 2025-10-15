@@ -68,32 +68,29 @@ Page({
 
     // 处理图片URL，添加基础URL - 兼容不同字段名
     const { CONSTANTS } = require('../../config/index')
-    const processedItems = selectedItems.map(item => ({
-      ...item,
-      // 兼容不同字段名
-      name: item.name || item.goods_name,
-      spec: item.spec || item.goods_brand || '默认规格',
-      price: item.price || item.goods_price || 0,
-      quantity: item.quantity || item.count || 1,
-      // 处理图片URL
-      goods_pic_url: item.image || `${constants.IMAGE_BASE_URL}${item.goods_pic_url || ''}`
-    }))
+    const processedItems = selectedItems.map(item => {
+      const price = parseFloat(item.price || item.goods_price || 0);
+      return {
+        ...item,
+        // 兼容不同字段名
+        name: item.name || item.goods_name,
+        spec: item.spec || item.goods_brand || '默认规格',
+        price: price,
+        quantity: item.quantity || item.count || 1,
+        // 格式化价格显示
+        formattedPrice: price.toFixed(2),
+        // 处理图片URL
+        goods_pic_url: item.image || `${CONSTANTS.IMAGE_BASE_URL}${item.goods_pic_url || ''}`
+      };
+    });
 
-    // 计算总价 - 兼容不同字段名
-    const totalPrice = processedItems.reduce((sum, item) => {
-      const price = item.price || item.goods_price || 0
-      const quantity = item.quantity || item.count || 1
-      return sum + (price * quantity)
-    }, 0)
-    
-    const actualPrice = totalPrice - this.data.couponPrice
-    
     // 设置页面数据
     this.setData({
-      orderItems: processedItems,
-      totalPrice: totalPrice,
-      actualPrice: actualPrice
+      orderItems: processedItems
     })
+    
+    // 使用统一的calculateTotalPrice函数计算价格
+    this.calculateTotalPrice();
     
     // 加载用户优惠券
     this.loadUserCoupons();
@@ -243,16 +240,24 @@ Page({
             mainImage = item.pic_url;
           }
           
+          const price = (item.price / 100).toFixed(2); // 转换为元
+          const originalPrice = ((item.price * 1.2) / 100).toFixed(2); // 模拟原价
+          
           return {
             id: item.id,
             name: item.name,
-            price: (item.price / 100).toFixed(2), // 转换为元
+            price: price,
+            formattedPrice: price, // 格式化价格显示
             image: mainImage.startsWith('http') ? mainImage : CONSTANTS.IMAGE_BASE_URL + mainImage,
-            originalPrice: ((item.price * 1.2) / 100).toFixed(2) // 模拟原价
+            originalPrice: originalPrice,
+            selected: false // 默认未选中
           };
         });
 
         this.setData({ recommendGoods: formattedGoods });
+        
+        // 推荐商品加载完成后重新计算价格
+        this.calculateTotalPrice();
       }
     } catch (error) {
       console.error('加载推荐商品失败:', error);
@@ -261,38 +266,87 @@ Page({
     }
   },
 
-  // 添加推荐商品到购物车
-  async addRecommendToCart(e) {
-    const { id } = e.currentTarget.dataset;
-    const goods = this.data.recommendGoods.find(item => item.id === id);
+  // 推荐商品勾选处理
+  onRecommendSelect(e) {
+    const { value } = e.detail;
+    const { recommendGoods } = this.data;
     
-    if (!goods) return;
+    console.log('勾选事件触发：', { value, recommendGoods });
     
-    try {
-      wx.showLoading({ title: '添加中...', mask: true });
-      
-      const res = await api.addToCart({
-        goods_id: id,
-        count: 1
-      });
+    // 更新推荐商品的选中状态
+    const updatedGoods = recommendGoods.map(item => ({
+      ...item,
+      selected: item.id === value ? !item.selected : item.selected
+    }));
+    
+    console.log('更新后的推荐商品：', updatedGoods);
+    
+    this.setData({ recommendGoods: updatedGoods });
+    
+    // 重新计算总价
+    this.calculateTotalPrice();
+  },
 
-      if (res.code === 0) {
-        wx.showToast({
-          title: '已添加到购物车',
-          icon: 'success'
+  // 计算总价（包括勾选的推荐商品）
+  calculateTotalPrice() {
+    const { orderItems, recommendGoods, couponPrice } = this.data;
+    
+    console.log('开始计算总价，当前数据：', {
+      orderItems: orderItems,
+      recommendGoods: recommendGoods,
+      couponPrice: couponPrice
+    });
+    
+    // 计算主商品总价
+    const mainTotalPrice = orderItems.reduce((sum, item) => {
+      const price = parseFloat(item.price) || parseFloat(item.goods_price) || 0;
+      const quantity = parseInt(item.quantity) || parseInt(item.count) || 1;
+      const itemTotal = price * quantity;
+      console.log('主商品计算：', { price, quantity, itemTotal });
+      return sum + itemTotal;
+    }, 0);
+    
+    // 计算勾选的推荐商品总价
+    const recommendTotalPrice = recommendGoods.reduce((sum, item) => {
+      if (item.selected) {
+        const price = parseFloat(item.price) || 0;
+        console.log('推荐商品勾选：', { 
+          name: item.name, 
+          price: price,
+          originalPrice: item.price, // 显示原始价格字符串
+          selected: item.selected 
         });
-      } else {
-        throw new Error(res.message || '添加失败');
+        return sum + price; // 每个推荐商品默认数量为1
       }
-    } catch (error) {
-      console.error('添加推荐商品失败:', error);
-      wx.showToast({
-        title: error.message || '添加失败',
-        icon: 'none'
-      });
-    } finally {
-      wx.hideLoading();
-    }
+      return sum;
+    }, 0);
+    
+    // 总价 = 主商品总价 + 推荐商品总价
+    const totalPrice = mainTotalPrice + recommendTotalPrice;
+    const actualPrice = Math.max(0, totalPrice - couponPrice);
+    
+    console.log('价格计算结果：', {
+      mainTotalPrice,
+      recommendTotalPrice,
+      totalPrice,
+      couponPrice,
+      actualPrice
+    });
+    
+    // 显示所有推荐商品的状态和价格
+    console.log('推荐商品详细状态：', recommendGoods.map(item => ({
+      name: item.name,
+      price: item.price,
+      parsedPrice: parseFloat(item.price),
+      selected: item.selected
+    })));
+    
+    this.setData({
+      totalPrice: totalPrice,
+      actualPrice: actualPrice
+    });
+    
+    console.log('价格更新完成，新数据：', this.data);
   },
 
   // 处理备注输入

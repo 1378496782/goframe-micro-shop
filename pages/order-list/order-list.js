@@ -291,15 +291,41 @@ Page({
   },
 
   /**
-   * 去支付
+   * 去支付 - 跳转到订单确认页面
    * @param {object} e 事件对象
    */
   goPay: function (e) {
     const orderId = e.currentTarget.dataset.id;
     const orderNumber = e.currentTarget.dataset.number;
+    const index = e.currentTarget.dataset.index;
+    
+    // 获取当前订单的商品信息
+    const order = this.data.orderList[index];
+    if (!order || !order.goods) {
+      wx.showToast({
+        title: '订单信息不完整',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 格式化商品信息用于传递
+    const goodsInfo = order.goods.map(item => ({
+      id: item.id,
+      goods_id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      count: item.quantity,
+      image: item.image,
+      goods_pic_url: item.image
+    }));
+    
+    // 编码商品信息为URL参数
+    const encodedGoods = encodeURIComponent(JSON.stringify(goodsInfo));
     
     wx.navigateTo({
-      url: `/pages/payment/payment?orderId=${orderId}&orderNumber=${orderNumber}`
+      url: `/pages/order-confirm/order-confirm?orderId=${orderId}&orderNumber=${orderNumber}&selectedItems=${encodedGoods}`
     });
   },
 

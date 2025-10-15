@@ -94,24 +94,16 @@ Page({
     // 格式化商品数据
     let goods = [];
     if (orderGoods && Array.isArray(orderGoods)) {
+      const { CONSTANTS } = require('../../config/index');
       goods = orderGoods.map(item => ({
         ...item,
         id: item.goods_id || item.id,
         name: item.goods_name || item.name,
-        image: item.pic_url ? `${getApp().globalData.imageBaseUrl}${item.pic_url}` : '/images/default-product.png',
+        image: item.pic_url ? `${CONSTANTS.IMAGE_BASE_URL}${item.pic_url.replace(/^\//, '')}` : '/images/default-product.png',
         price: item.goods_price || item.price || 0,
+        actual_price: item.actual_price || item.price || 0,
         quantity: item.count || item.quantity || 1
       }));
-    }
-
-    // 格式化地址数据 - 使用返回的收货人信息
-    let address = null;
-    if (orderInfo.consignee_name || orderInfo.consignee_address) {
-      address = {
-        name: orderInfo.consignee_name || '',
-        phone: orderInfo.consignee_phone || '',
-        detail: orderInfo.consignee_address || ''
-      };
     }
 
     // 格式化时间
@@ -129,7 +121,6 @@ Page({
     return {
       ...orderInfo,
       goods: goods,
-      address: address,
       createTime: formatTime(orderInfo.created_at || orderInfo.create_time),
       payTime: formatTime(orderInfo.pay_at || orderInfo.pay_time),
       shipTime: formatTime(orderInfo.ship_time),
