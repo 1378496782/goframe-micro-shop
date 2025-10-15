@@ -43,7 +43,7 @@ const API = {
   PRODUCT_DETAIL: `${config.BASE_URL}/goods/detail`,
   
   // 搜索相关   
-  SEARCH_GOODS: `${config.SEARCH_URL}/search/goods`,
+  SEARCH_GOODS: `${config.SEARCH_URL}/search/goods/mysql`,
   
   // 订单相关
   ORDER_LIST: `${config.BASE_URL}/frontend/order/list`,

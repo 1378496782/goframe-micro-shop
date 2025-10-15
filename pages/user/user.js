@@ -1346,6 +1346,35 @@ Page({
    */
   navigateTo(e) {
     const url = e.currentTarget.dataset.url
+    
+    // 特殊处理客服中心，直接打开微信客服对话框
+    if (url === '/pages/service/service') {
+      this.openCustomerService()
+      return
+    }
+    
     wx.navigateTo({ url })
+  },
+
+  /**
+   * 打开微信客服对话框
+   */
+  openCustomerService() {
+    wx.openCustomerServiceChat({
+      extInfo: {
+        url: 'https://work.weixin.qq.com/kfid/kfc123456789' // 需要替换为实际的客服链接
+      },
+      corpId: 'ww1234567890abcdef', // 需要替换为实际的企业ID
+      success(res) {
+        console.log('打开客服成功', res)
+      },
+      fail(err) {
+        console.error('打开客服失败', err)
+        wx.showToast({
+          title: '打开客服失败，请稍后重试',
+          icon: 'none'
+        })
+      }
+    })
   }
 })

@@ -9,6 +9,8 @@
         value="{{keyword}}"
         bindinput="onKeywordInput"
         bindconfirm="onSearch"
+        bindfocus="onSearchFocus"
+        bindblur="onSearchBlur"
       />
       <button class="search-btn" bindtap="onSearch">搜索</button>
     </view>
@@ -16,6 +18,57 @@
     <button class="filter-btn" bindtap="toggleFilter">
       <text class="icon">筛选</text>
     </button>
+  </view>
+
+  <!-- 搜索建议面板 -->
+  <view class="suggestion-panel" wx:if="{{showSuggestions && keyword}}">
+    <view 
+      class="suggestion-item" 
+      wx:for="{{suggestions}}" 
+      wx:key="*this"
+      bindtap="onSuggestionTap"
+      data-suggestion="{{item}}"
+    >
+      <text class="suggestion-text">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 搜索历史 -->
+  <view class="history-panel" wx:if="{{!keyword && searchHistory.length > 0}}">
+    <view class="panel-header">
+      <text class="panel-title">搜索历史</text>
+      <button class="clear-history" bindtap="clearSearchHistory">清空</button>
+    </view>
+    <view class="history-list">
+      <view 
+        class="history-item" 
+        wx:for="{{searchHistory}}" 
+        wx:key="*this"
+        bindtap="onHistoryTap"
+        data-keyword="{{item}}"
+      >
+        <text class="history-text">{{item}}</text>
+        <button class="delete-history" bindtap="deleteHistoryItem" data-index="{{index}}">×</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 热门搜索 -->
+  <view class="hot-search-panel" wx:if="{{!keyword}}">
+    <view class="panel-header">
+      <text class="panel-title">热门搜索</text>
+    </view>
+    <view class="hot-search-list">
+      <view 
+        class="hot-search-item" 
+        wx:for="{{hotKeywords}}" 
+        wx:key="*this"
+        bindtap="onHotSearchTap"
+        data-keyword="{{item.keyword}}"
+      >
+        <text class="hot-search-text {{item.isHot ? 'hot' : ''}}">{{item.keyword}}</text>
+      </view>
+    </view>
   </view>
 
   <!-- 筛选面板 -->

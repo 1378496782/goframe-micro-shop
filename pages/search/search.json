@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "goods-card": "/components/goods-card/goods-card"
+  },
   "navigationBarTitleText": "商品搜索",
   "enablePullDownRefresh": true,
   "backgroundColor": "#f8f8f8",
