@@ -146,5 +146,22 @@ Page({
     this.loadHomeData().then(() => {
       wx.stopPullDownRefresh()
     })
+  },
+
+  // 分享给朋友
+  onShareAppMessage() {
+    return {
+      title: '发现优质商品，快来选购吧！',
+      path: '/pages/index/index',
+      imageUrl: this.data.banners.length > 0 ? this.data.banners[0].image : ''
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '优质电商平台，海量商品任你选',
+      imageUrl: this.data.banners.length > 0 ? this.data.banners[0].image : ''
+    };
   }
 })

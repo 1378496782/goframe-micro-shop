@@ -32,10 +32,15 @@ Page({
         size: this.data.size 
       });
       
-      // 格式化商品数据
-      const formattedProducts = res.list.map(item => {
+      // 检查API返回的数据结构
+      console.log('API返回数据:', res);
+      
+      // 根据API实际返回的数据结构获取商品列表
+      // mock数据中返回的是 res.data.list，真实API可能返回 res.data 或 res.list
+      const productList = (res.data && res.data.list) || res.list || res.data || res.products || [];
+      const formattedProducts = productList.map(item => {
         // 处理图片URL，确保是完整URL
-        let mainImage = item.pic_url || 'https://via.placeholder.com/200x200?text=商品图片';
+        let mainImage = item.pic_url || item.image || item.mainImage || 'https://via.placeholder.com/200x200?text=商品图片';
         if (mainImage && !mainImage.startsWith('http')) {
           mainImage = CONSTANTS.IMAGE_BASE_URL + mainImage;
         }
@@ -48,7 +53,8 @@ Page({
       });
       
       const newProducts = isRefresh ? formattedProducts : [...this.data.products, ...formattedProducts];
-      const hasMore = newProducts.length < res.total;
+      // 检查是否有更多数据，如果当前返回的数据数量小于请求的size，说明没有更多数据了
+      const hasMore = formattedProducts.length >= this.data.size;
       
       this.setData({
         products: newProducts,
@@ -93,5 +99,22 @@ Page({
 
   onShow() {
     console.log('更多商品页面显示');
+  },
+
+  // 分享给朋友
+  onShareAppMessage() {
+    return {
+      title: '发现更多优质商品，快来选购吧！',
+      path: '/pages/more-goods/more-goods',
+      imageUrl: this.data.products.length > 0 ? this.data.products[0].mainImage : ''
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '海量商品任你选，快来发现更多好物',
+      imageUrl: this.data.products.length > 0 ? this.data.products[0].mainImage : ''
+    };
   }
 });

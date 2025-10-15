@@ -363,5 +363,24 @@ Page({
         }
       });
     });
+  },
+
+  // 分享给朋友
+  onShareAppMessage() {
+    const { product } = this.data;
+    return {
+      title: product ? `${product.name} - 仅售¥${product.price}` : '发现好商品',
+      path: `/pages/product-detail/product-detail?id=${product ? product.id : ''}`,
+      imageUrl: product && product.images && product.images.length > 0 ? product.images[0] : ''
+    };
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    const { product } = this.data;
+    return {
+      title: product ? `推荐：${product.name}` : '优质商品推荐',
+      imageUrl: product && product.images && product.images.length > 0 ? product.images[0] : ''
+    };
   }
 })
