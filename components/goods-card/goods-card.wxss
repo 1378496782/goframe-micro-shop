@@ -12,6 +12,37 @@
   height: 100px;
   border-radius: 6px;
   margin-right: 12px;
+  background: linear-gradient(135deg, #f5f5f5 25%, #e8e8e8 50%, #f5f5f5 75%);
+  background-size: 400% 400%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  transition: opacity 0.3s ease;
+}
+
+.goods-image.loaded {
+  animation: none;
+  background: transparent;
+}
+
+.goods-image.error {
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goods-image.error::before {
+  content: "图片加载失败";
+  color: #999;
+  font-size: 12px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 .goods-info {

@@ -64,7 +64,8 @@ Page({
           
           return {
             ...item,
-            priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
+            priceFormatted: (item.price / 100).toFixed(2), // 当前价格从分转换为元
+            originalPriceFormatted: ((item.price * 2) / 100).toFixed(2), // 原价 = 当前价格 × 2
             mainImage: mainImage || 'https://via.placeholder.com/200x200?text=商品图片'
           }
         })
@@ -146,6 +147,21 @@ Page({
     this.loadHomeData().then(() => {
       wx.stopPullDownRefresh()
     })
+  },
+
+  // 轮播图图片加载错误处理
+  onBannerImageError(e) {
+    console.log('轮播图加载失败:', e)
+    const index = e.currentTarget.dataset.index
+    wx.showToast({
+      title: '图片加载失败',
+      icon: 'none'
+    })
+  },
+
+  // 轮播图图片加载成功
+  onBannerImageLoad(e) {
+    console.log('轮播图加载成功')
   },
 
   // 分享给朋友

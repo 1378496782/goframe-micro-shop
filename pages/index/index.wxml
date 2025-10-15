@@ -11,9 +11,19 @@
   </view>
   
   <!-- 轮播图 -->
-  <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000">
+  <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000" duration="500">
     <swiper-item wx:for="{{banners}}" wx:key="id">
-      <image src="{{item.image}}" class="banner-image" mode="aspectFill" bindtap="onBannerClick" data-url="{{item.url}}"/>
+      <image 
+        src="{{item.image}}" 
+        class="banner-image" 
+        mode="aspectFill" 
+        lazy-load="true"
+        binderror="onBannerImageError"
+        bindload="onBannerImageLoad"
+        bindtap="onBannerClick" 
+        data-url="{{item.url}}"
+        show-menu-by-longpress="true"
+      />
     </swiper-item>
   </swiper>
 
@@ -77,6 +87,7 @@
           <text class="product-name">{{item.name}}</text>
           <view class="price-section">
             <text class="current-price">¥{{item.priceFormatted}}</text>
+            <text class="original-price">¥{{item.originalPriceFormatted}}</text>
           </view>
           <text class="sales">已售{{item.sale || 0}}件</text>
         </view>
