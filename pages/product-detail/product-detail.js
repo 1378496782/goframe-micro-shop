@@ -51,7 +51,7 @@ Page({
         
         // 添加主图
         if (product.pic_url) {
-          images.push(product.pic_url.startsWith('http') ? product.pic_url : constants.IMAGE_BASE_URL + product.pic_url)
+          images.push(product.pic_url.startsWith('http') ? product.pic_url : CONSTANTS.IMAGE_BASE_URL + product.pic_url)
         }
         
         // 添加详情图
@@ -60,7 +60,7 @@ Page({
             const detailImages = JSON.parse(product.images)
             detailImages.forEach(img => {
               if (img.url) {
-                images.push(img.url.startsWith('http') ? img.url : constants.IMAGE_BASE_URL + img.url)
+                images.push(img.url.startsWith('http') ? img.url : CONSTANTS.IMAGE_BASE_URL + img.url)
               }
             })
           } catch (e) {
@@ -70,7 +70,7 @@ Page({
         
         // 如果没有图片，添加默认占位图
         if (images.length === 0) {
-          images.push(constants.IMAGE_BASE_URL + 'default-product.png')
+          images.push(CONSTANTS.IMAGE_BASE_URL + 'default-product.png')
         }
         
         // 格式化商品数据
