@@ -32,33 +32,31 @@ Page({
         size: this.data.size 
       });
       
-      if (res.code === 0) {
-        // 格式化商品数据
-        const formattedProducts = res.data.list.map(item => {
-          // 处理图片URL，确保是完整URL
-          let mainImage = item.pic_url || 'https://via.placeholder.com/200x200?text=商品图片';
-          if (mainImage && !mainImage.startsWith('http')) {
-            mainImage = constants.IMAGE_BASE_URL + mainImage;
-          }
-          
-          return {
-            ...item,
-            priceFormatted: (item.price / 100).toFixed(2),
-            mainImage: mainImage
-          };
-        });
+      // 格式化商品数据
+      const formattedProducts = res.list.map(item => {
+        // 处理图片URL，确保是完整URL
+        let mainImage = item.pic_url || 'https://via.placeholder.com/200x200?text=商品图片';
+        if (mainImage && !mainImage.startsWith('http')) {
+          mainImage = CONSTANTS.IMAGE_BASE_URL + mainImage;
+        }
         
-        const newProducts = isRefresh ? formattedProducts : [...this.data.products, ...formattedProducts];
-        const hasMore = newProducts.length < res.data.total;
-        
-        this.setData({
-          products: newProducts,
-          page: currentPage + 1,
-          hasMore: hasMore,
-          loading: false,
-          refreshing: false
-        });
-      }
+        return {
+          ...item,
+          priceFormatted: (item.price / 100).toFixed(2),
+          mainImage: mainImage
+        };
+      });
+      
+      const newProducts = isRefresh ? formattedProducts : [...this.data.products, ...formattedProducts];
+      const hasMore = newProducts.length < res.total;
+      
+      this.setData({
+        products: newProducts,
+        page: currentPage + 1,
+        hasMore: hasMore,
+        loading: false,
+        refreshing: false
+      });
     } catch (error) {
       console.error('加载商品数据失败:', error);
       wx.showToast({
