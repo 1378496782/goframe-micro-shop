@@ -20,7 +20,7 @@
     enable-back-to-top 
     bindscrolltolower="onReachBottom"
   >
-    <view class="order-list grid-layout">
+    <view class="order-list">
       <!-- 订单项 -->
       <view 
         wx:for="{{orderList}}" 

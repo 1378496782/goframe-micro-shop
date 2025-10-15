@@ -702,7 +702,10 @@ const api = {
   helpBargain: (data) => request('/frontend/bargain/help', data, 'POST'),
   
   // 用户优惠券
-  getUserCoupons: (params) => request('/frontend/user_coupon', params, 'GET')
+  getUserCoupons: (params) => request('/frontend/user_coupon', params, 'GET'),
+  
+  // 推荐商品
+  getRecommendGoods: (params) => request('/frontend/recommend/goods', params, 'GET')
 };
 
 module.exports = {

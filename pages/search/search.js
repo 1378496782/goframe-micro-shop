@@ -1,4 +1,23 @@
-const { searchAPI } = require('../../utils/request')
+// 直接请求搜索API
+function requestSearchAPI(params) {
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: 'http://101.42.249.106:8199/frontend/goods',
+      data: params,
+      method: 'GET',
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          resolve(res.data)
+        } else {
+          reject(new Error('请求失败'))
+        }
+      },
+      fail: (err) => {
+        reject(err)
+      }
+    })
+  })
+}
 
 Page({
   data: {
@@ -101,26 +120,36 @@ Page({
         params.max_price = Math.floor(this.data.maxPrice * 100) // 转换为分
       }
 
-      const res = await searchAPI.searchGoods(params)
+      const res = await requestSearchAPI(params)
       console.log('搜索响应:', res)
       
-      // 格式化商品数据：价格转换和图片提取
-      console.log('原始商品列表:', res.data.list)
+      // 检查返回数据
+      if (!res || res.code !== 0 || !res.data || !res.data.list) {
+        throw new Error(res?.message || 'API返回数据格式不正确')
+      }
+      
+      // 格式化商品数据
       const formattedList = res.data.list.map(item => {
-        // 解析images字段（JSON字符串）
-        let mainImage = ''
-        try {
-          const imagesData = JSON.parse(item.images)
-          mainImage = imagesData.image || ''
-        } catch (e) {
-          console.warn('解析图片数据失败:', e)
-          mainImage = ''
+        // 解析图片数据
+        let imageUrl = item.pic_url
+        if (!imageUrl && item.images) {
+          try {
+            const imagesObj = JSON.parse(item.images)
+            imageUrl = imagesObj.image || ''
+          } catch (e) {
+            console.warn('解析图片数据失败:', e)
+          }
         }
-         
+        
         return {
-          ...item,
-          priceFormatted: (item.price / 100).toFixed(2), // 价格从分转换为元
-          mainImage: mainImage
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          priceFormatted: (item.price / 100).toFixed(2),
+          mainImage: imageUrl || 'https://via.placeholder.com/200x200?text=商品图片',
+          highlightName: item.highlight || item.name,
+          sale: item.sale || 0,
+          stock: item.stock || 0
         }
       })
       
@@ -138,14 +167,16 @@ Page({
     } catch (error) {
       console.error('搜索失败:', error)
       console.error('错误详情:', error.message)
-      this.setData({ loading: false })
+      this.setData({ 
+        loading: false,
+        goodsList: [],
+        hasMore: false
+      })
       
-      if (isRefresh) {
-        wx.showToast({
-          title: '搜索失败，请重试',
-          icon: 'none'
-        })
-      }
+      wx.showToast({
+        title: error.message || '搜索失败，请重试',
+        icon: 'none'
+      })
     }
   },
 

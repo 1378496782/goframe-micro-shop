@@ -374,3 +374,86 @@
 .stopPropagation {
   /* 空样式，用于阻止事件冒泡 */
 }
+
+/* 推荐商品区域 */
+.recommend-section {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.recommend-list {
+  white-space: nowrap;
+  padding: 10rpx 0;
+}
+
+.recommend-item {
+  display: inline-block;
+  width: 220rpx;
+  margin-right: 20rpx;
+  vertical-align: top;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.recommend-item:last-child {
+  margin-right: 0;
+}
+
+.recommend-image {
+  width: 220rpx;
+  height: 220rpx;
+  display: block;
+  background: #f0f0f0;
+}
+
+.recommend-info {
+  padding: 15rpx;
+}
+
+.recommend-name {
+  font-size: 26rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recommend-price {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.current-price {
+  font-size: 28rpx;
+  color: #e64340;
+  font-weight: bold;
+}
+
+.original-price {
+  font-size: 22rpx;
+  color: #999;
+  text-decoration: line-through;
+  margin-left: 10rpx;
+}
+
+.add-btn {
+  width: 100%;
+  height: 50rpx;
+  line-height: 50rpx;
+  font-size: 24rpx;
+  background: #19aecc;
+  color: white;
+  border-radius: 25rpx;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.add-btn:active {
+  opacity: 0.8;
+}
