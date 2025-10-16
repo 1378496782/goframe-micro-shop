@@ -2,15 +2,17 @@ package refund_info
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/util/gconv"
 	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/refund_info/v1"
 	"shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
+	"shop-goframe-micro-service-refacotor/app/order/internal/logic/refund_info"
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"shop-goframe-micro-service-refacotor/utility"
+
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -149,14 +151,14 @@ func (*Controller) Create(ctx context.Context, req *v1.RefundInfoCreateReq) (res
 			TransactionId: order.TransactionId,
 			OutRefundNo:   order.Number,
 			Reason:        req.Reason,
-			TotalAmount:   int64(order.ActualPrice) * 100,
-			RefundAmount:  int64(order.ActualPrice) * 100,
+			TotalAmount:   int64(order.ActualPrice),
+			RefundAmount:  int64(order.ActualPrice),
 		}
 		refundId, err := payment.Refund(ctx, refundReq)
 		if err != nil {
 			return nil, err
 		}
-		g.Log().Infof(ctx, "已向微信平台发送退款申请，订单号=%s，退款单号=%s", order.Id, refund.Number)
+		g.Log().Infof(ctx, "已向微信平台发送退款申请，订单号=%d，退款单号=%s,退款号=%s", order.Id, refund.Number, refundId)
 		_, err = dao.RefundInfo.Ctx(ctx).Where("id", id).Data(g.Map{
 			"refund_status": int(consts.RefundOrderStatusProcessing),
 			"refund_id":     refundId,
@@ -166,4 +168,19 @@ func (*Controller) Create(ctx context.Context, req *v1.RefundInfoCreateReq) (res
 		}
 	}
 	return &v1.RefundInfoCreateRes{Id: uint32(id)}, nil
+}
+
+func (*Controller) RefundNotify(ctx context.Context, req *v1.RefundNotifyReq) (res *v1.RefundNotifyRes, err error) {
+	// 1) 微信支付回调验证
+	refundId, err := payment.RefundNotify(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2) 修改订单状态
+	if err = refund_info.UpdateRefundStatusByNumber(ctx, refundId, int(consts.RefundOrderStatusSuccess)); err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }

@@ -29,9 +29,9 @@ const (
 type RefundOrderStatus int
 
 const (
-	_                           RefundOrderStatus = iota // 0 未退款（初始状态）
-	RefundOrderStatusNone                                // 0 未退款（初始状态）
-	RefundOrderStatusProcessing                          // 1 退款中（已提交至支付平台）
-	RefundOrderStatusSuccess                             // 2 退款成功
-	RefundOrderStatusFailed                              // 3 退款失败
+	_                           RefundOrderStatus = iota
+	RefundOrderStatusNone                         // 1 未退款（初始状态）
+	RefundOrderStatusProcessing                   // 2 退款中（已提交至支付平台）
+	RefundOrderStatusSuccess                      // 3 退款成功
+	RefundOrderStatusFailed                       // 4 退款失败
 )

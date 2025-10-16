@@ -327,9 +327,9 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 	}
 
 	updateData := g.Map{
-		"status":        status,
-		"updated_at":    gtime.Now(),
-		"transactionId": transactionId,
+		"status":         status,
+		"updated_at":     gtime.Now(),
+		"transaction_id": transactionId,
 	}
 
 	// 更新订单状态
@@ -367,10 +367,6 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 	}
 
 	return nil
-}
-
-func IdempotentCheck(ctx context.Context, number string) (bool, error) {
-	return false, nil
 }
 
 // GetCount 获取各类订单数量

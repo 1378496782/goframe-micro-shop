@@ -53,3 +53,13 @@ type RefundInfoCreateReq struct {
 type RefundInfoCreateRes struct {
 	Id uint32 `json:"id" dc:"退款ID"`
 }
+
+// 退款回调
+type RefundNotifyReq struct {
+	g.Meta `path:"/refundNotify" method:"post" tags:"订单管理" sm:"支付回调"`
+	// 注意：这些字段不由框架自动绑定（因为微信是 POST 原始 JSON），需要手动读取 body 并赋值
+	RawBody string            `json:"-" dc:"回调原始body（由框架手动读取）"`
+	Headers map[string]string `json:"-" dc:"回调请求头（由框架手动读取）"`
+}
+
+type RefundNotifyRes struct{}

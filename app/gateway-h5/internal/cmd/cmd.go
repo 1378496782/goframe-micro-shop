@@ -38,6 +38,7 @@ var (
 						userController.UserInfoLogin,
 						userController.WxMiniLogin,
 						orderController.Notify,
+						orderController.RefundNotify,
 						goodsController.CategoryInfoGetAll,
 						goodsController.CategoryInfoGetList,
 						goodsController.GoodsInfoGetDetail,
