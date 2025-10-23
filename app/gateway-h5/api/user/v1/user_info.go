@@ -72,10 +72,8 @@ type UserInfoUpdateRes struct {
 // ================ 微信登录相关 ===============
 // 用户微信登录
 type WxMiniLoginReq struct {
-	g.Meta        `path:"/user/wxMiniLogin" tags:"用户管理" method:"post" summary:"微信登录"`
-	Code          string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
-	IV            string `json:"iv" v:"required#初始向量不能为空" dc:"初始向量"`
-	EncryptedData string `json:"encryptedData" v:"required#密文不能为空" dc:"密文"`
+	g.Meta `path:"/user/wxMiniLogin" tags:"用户管理" method:"post" summary:"微信登录"`
+	Code   string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
 }
 
 // 用户微信响应
@@ -92,8 +90,8 @@ type WxMiniLoginRes struct {
 type WxMiniRegisterReq struct {
 	g.Meta        `path:"/user/wxMiniRegister" tags:"用户管理" method:"post" summary:"微信登录"`
 	Code          string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
-	IV            string `json:"iv" v:"required#初始向量不能为空" dc:"初始向量"`
-	EncryptedData string `json:"encryptedData" v:"required#密文不能为空" dc:"密文"`
+	IV            string `json:"iv"  dc:"初始向量"`
+	EncryptedData string `json:"encryptedData" dc:"密文"`
 	Nickname      string `json:"nickname" dc:"用户昵称"`
 	Avatar        string `json:"avatar" dc:"用户头像"`
 }
