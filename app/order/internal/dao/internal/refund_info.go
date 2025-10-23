@@ -25,6 +25,7 @@ type RefundInfoColumns struct {
 	Number       string // 售后订单号
 	OrderId      string // 订单id
 	GoodsId      string // 要售后的商品id
+	RefundId     string // 第三方退款编号
 	Reason       string // 退款原因
 	Status       string // 审核状态 1待处理 2同意退款 3拒绝退款
 	RefundStatus string // 退款状态 0未退款 1退款中 2退款成功 3退款失败
@@ -41,6 +42,7 @@ var refundInfoColumns = RefundInfoColumns{
 	Number:       "number",
 	OrderId:      "order_id",
 	GoodsId:      "goods_id",
+	RefundId:     "refund_id",
 	Reason:       "reason",
 	Status:       "status",
 	RefundStatus: "refund_status",

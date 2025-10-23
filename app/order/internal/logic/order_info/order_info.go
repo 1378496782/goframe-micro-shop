@@ -313,7 +313,7 @@ func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
 }
 
 // UpdateOrderStatus 更新订单状态
-func UpdateOrderStatusByNumber(ctx context.Context, number string, status int) error {
+func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string, status int) error {
 	exists, err := dao.OrderInfo.Ctx(ctx).
 		Where("number", number).
 		Where("status", consts.OrderStatusPaid).
@@ -327,8 +327,9 @@ func UpdateOrderStatusByNumber(ctx context.Context, number string, status int) e
 	}
 
 	updateData := g.Map{
-		"status":     status,
-		"updated_at": gtime.Now(),
+		"status":         status,
+		"updated_at":     gtime.Now(),
+		"transaction_id": transactionId,
 	}
 
 	// 更新订单状态
@@ -366,10 +367,6 @@ func HandleCouponResult(ctx context.Context, orderId int, success bool, message 
 	}
 
 	return nil
-}
-
-func IdempotentCheck(ctx context.Context, number string) (bool, error) {
-	return false, nil
 }
 
 // GetCount 获取各类订单数量

@@ -60,7 +60,7 @@ payment:
     apiV3Key: "CHANGE_ME_WECHAT_API_V3_KEY"            # APIv3 密钥
     appId: "CHANGE_ME_WECHAT_APP_ID"                             # 小程序 AppId
     notifyUrl: "https://business.dayu.club/frontend/notify"         # 支付回调地址
-    refundNotifyUrl: "https://business.dayu.club/frontend/notify" # 退款回调地址
+    refundNotifyUrl: "https://business.dayu.club/frontend/refundNotify" # 退款回调地址
     privateKey: |
       CHANGE_ME_WECHAT_PRIVATE_KEY
       -----END PRIVATE KEY-----

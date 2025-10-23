@@ -11,7 +11,7 @@ service refund_info {
   rpc GetList(RefundInfoGetListReq) returns (RefundInfoGetListRes) {}
   rpc GetDetail(RefundInfoGetDetailReq) returns (RefundInfoGetDetailRes) {}
   rpc Create(RefundInfoCreateReq) returns (RefundInfoCreateRes) {}
-  rpc Refund(RefundNotifyReq)returns(RefundNotifyRes){}
+  rpc RefundNotify(RefundNotifyReq)returns(RefundNotifyRes){}
 }
 
 // 新增消息定义
@@ -61,6 +61,4 @@ message RefundNotifyReq {
 
 // 回调响应体
 message RefundNotifyRes{
-  string code = 1;    // SUCCESS / FAIL
-  string message = 2; // 返回信息
 }

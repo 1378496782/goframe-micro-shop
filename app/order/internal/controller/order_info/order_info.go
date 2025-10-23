@@ -104,13 +104,13 @@ func (*Controller) Payment(ctx context.Context, req *v1.PaymentReq) (res *v1.Pay
 
 func (*Controller) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.NotifyRes, err error) {
 	// 1) 微信支付回调验证
-	orderNumber, err := payment.Notify(ctx, req)
+	orderNumber, transactionId, err := payment.Notify(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
 	// 2) 修改订单状态
-	if err = order_info.UpdateOrderStatusByNumber(ctx, orderNumber, int(orderStatus.OrderStatusPaid)); err != nil {
+	if err = order_info.UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(orderStatus.OrderStatusPaid)); err != nil {
 		return nil, err
 	}
 

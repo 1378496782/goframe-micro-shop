@@ -16,6 +16,7 @@ type RefundInfo struct {
 	Number       any         // 售后订单号
 	OrderId      any         // 订单id
 	GoodsId      any         // 要售后的商品id
+	RefundId     any         // 第三方退款编号
 	Reason       any         // 退款原因
 	Status       any         // 审核状态 1待处理 2同意退款 3拒绝退款
 	RefundStatus any         // 退款状态 0未退款 1退款中 2退款成功 3退款失败
