@@ -82,6 +82,7 @@ func (c *ControllerV1) OrderInfoGetList(ctx context.Context, req *v1.OrderInfoGe
 			goodsID := uint32(goodsItem.GoodsId)
 			if goodsDetail, ok := goodsMap[goodsID]; ok && goodsDetail.Data != nil {
 				res.List[i].GoodsInfo[j].GoodsName = goodsDetail.Data.Name
+				res.List[i].GoodsInfo[j].GoodsPrice = goodsDetail.Data.Price
 				res.List[i].GoodsInfo[j].PicUrl = goodsDetail.Data.PicUrl
 			}
 		}

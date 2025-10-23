@@ -36,10 +36,11 @@ type OrderInfoItem struct {
 
 // orderInfo 商品信息专用
 type OrderListGoodsInfo struct {
-	GoodsId   uint32 `json:"goods_id" dc:"商品ID"`
-	Count     uint32 `json:"count" dc:"商品数量"`
-	GoodsName string `json:"goods_name" dc:"商品名称"`
-	PicUrl    string `json:"pic_url" dc:"商品图片URL"`
+	GoodsId    uint32 `json:"goods_id" dc:"商品ID"`
+	Count      uint32 `json:"count" dc:"商品数量"`
+	GoodsName  string `json:"goods_name" dc:"商品名称"`
+	GoodsPrice int32  `json:"goods_price" dc:"商品价格"`
+	PicUrl     string `json:"pic_url" dc:"商品图片URL"`
 }
 
 // 创建订单
