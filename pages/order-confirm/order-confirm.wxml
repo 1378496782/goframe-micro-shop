@@ -13,7 +13,7 @@
   </view>
 
   <!-- 推荐商品 -->
-  <view class="recommend-section" wx:if="{{recommendGoods.length > 0}}">
+<!--  <view class="recommend-section" wx:if="{{recommendGoods.length > 0}}">
     <view class="section-title">顺手买</view>
     <view class="recommend-list">
       <view wx:for="{{recommendGoods}}" wx:key="id" class="recommend-item">
@@ -28,7 +28,7 @@
         </view>
       </view>
     </view>
-  </view>
+  </view> -->
 
   <!-- 优惠券选择 -->
   <view class="coupon-section">
