@@ -1,14 +1,16 @@
 <view class="container">
   <!-- 用户信息头部 -->
-  <view class="user-header">
-    <view class="user-profile" bindtap="onProfileClick">
-      <image class="avatar" src="{{userInfo.avatar || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
-      <view class="user-info">
-        <text class="username">{{userInfo.name || userInfo.nickname || '点击登录'}}</text>
-        <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
-      </view>
+ <view class="user-header">
+  <view class="user-profile" bindtap="onWxFirstLogin">
+    <image class="avatar" src="{{uploadedAvatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
+    <view class="user-info">
+      <text class="username">{{userInfo.name || userInfo.nickname || '点击登录'}}</text>
+      <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
     </view>
   </view>
+</view>
+
+
 
   <!-- 订单状态 -->
   <view class="order-status">
@@ -154,7 +156,7 @@
         
         <button 
           class="auth-cancel-button" 
-          bindtap="closePhoneAuthPopup"
+          bindtap="onGetPhoneNumber"
         >
           拒绝授权
         </button>

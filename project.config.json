@@ -48,7 +48,7 @@
     "condition": false
   },
   "compileType": "miniprogram",
-  "libVersion": "3.9.2",
+  "libVersion": "3.10.2",
   "appid": "CHANGE_ME_WECHAT_APP_ID",
   "projectname": "shop-goframe-micro-uniapp",
   "simulatorType": "wechat",
