@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
-	v1 "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
+	user_info "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
 	"shop-goframe-micro-service-refacotor/app/user/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/user/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility"
@@ -151,7 +151,7 @@ func GetUserInfo(ctx context.Context, userId int) (*entity.UserInfo, error) {
 	return &user, nil
 }
 
-func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (token string, expireIn int, userInfo *entity.UserInfo, isNewUser bool, err error) {
+func WxMiniLogin(ctx context.Context, openId string) (token string, expireIn int, userInfo *entity.UserInfo, isNewUser bool, err error) {
 	// 1. 参数校验
 	if openId == "" {
 		return "", 0, nil, false, errors.New("用户登录凭证不能为空")
@@ -164,45 +164,71 @@ func WxMiniLogin(ctx context.Context, openId string, req *v1.WxMiniLoginReq) (to
 		return "", 0, nil, false, errors.New("系统错误")
 	}
 
-	// 3. 注册 or 登录
-	now := gtime.Now()
-	var userId int
-	var user entity.UserInfo
+	// 3.1 如果查找不到记录
 	if userRecord.IsEmpty() {
-		isNewUser = true
-		// 3-1. 用户不存在，注册
-		user = entity.UserInfo{
-			Name:      req.Nickname,
-			Avatar:    req.Avatar,
-			OpenId:    openId,
-			Phone:     req.Phone,
-			CreatedAt: now,
-			UpdatedAt: now,
-			Status:    1,
-		}
-		// 3-2. 保存到数据库
-		Id, err := dao.UserInfo.Ctx(ctx).InsertAndGetId(&user)
-		if err != nil {
-			g.Log().Errorf(ctx, "创建用户失败: %v", err)
-			return "", 0, nil, false, errors.New("创建用户失败")
-		}
-		userId = int(Id)
-		user.Id = userId
-	} else {
-		isNewUser = false
-		// 3-1. 用户存在，获取 userId
-		if err = userRecord.Struct(&user); err != nil {
-			g.Log().Errorf(ctx, "用户数据解析失败: %v", err)
-			return "", 0, nil, false, errors.New("系统错误")
-		}
-		userId = user.Id
+		return "", 0, nil, true, nil
 	}
 
-	// 5. 生成JWT Token
+	// 3.2 找到记录
+	var userId int
+	var user entity.UserInfo
+	isNewUser = false
+	// 4. 获取 userId
+	if err = userRecord.Struct(&user); err != nil {
+		g.Log().Errorf(ctx, "用户数据解析失败: %v", err)
+		return "", 0, nil, false, errors.New("系统错误")
+	}
+	userId = user.Id
+
+	// 4. 生成JWT Token
 	token, expireTime, err := utility.GenerateToken(uint32(userId))
 	if err != nil {
 		return "", 0, nil, false, errors.New("生成token错误")
 	}
 	expireIn = int(expireTime.Sub(time.Now()).Seconds())
 	return token, expireIn, &user, isNewUser, nil
+}
+
+func WxMiniRegister(ctx context.Context, openId string, req *user_info.WxMiniRegisterReq) (token string, expireIn int, userInfo *entity.UserInfo, err error) {
+	// 1. 参数校验
+	if openId == "" {
+		return "", 0, nil, errors.New("用户登录凭证不能为空")
+	}
+
+	// 2. 查询用户
+	userRecord, err := dao.UserInfo.Ctx(ctx).Where("open_id", openId).One()
+	if err != nil {
+		g.Log().Errorf(ctx, "查询用户失败: %v", err)
+		return "", 0, nil, errors.New("系统错误")
+	}
+
+	if !userRecord.IsEmpty() {
+		return "", 0, nil, errors.New("用户已注册,请重新登录")
+	}
+
+	now := gtime.Now()
+	user := entity.UserInfo{
+		Name:      req.Nickname,
+		Avatar:    req.Avatar,
+		OpenId:    openId,
+		Phone:     req.Phone,
+		CreatedAt: now,
+		UpdatedAt: now,
+		Status:    1,
+	}
+
+	Id, err := dao.UserInfo.Ctx(ctx).InsertAndGetId(&user)
+	if err != nil {
+		g.Log().Errorf(ctx, "创建用户失败: %v", err)
+		return "", 0, nil, errors.New("创建用户失败")
+	}
+	userId := int(Id)
+	user.Id = userId
+
+	token, expireTime, err := utility.GenerateToken(uint32(userId))
+	if err != nil {
+		return "", 0, nil, errors.New("生成token错误")
+	}
+	expireIn = int(expireTime.Sub(time.Now()).Seconds())
+	return token, expireIn, &user, nil
 }

@@ -2,8 +2,6 @@ package user_info
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	v1 "shop-goframe-micro-service-refacotor/app/user/api/user_info/v1"
 	"shop-goframe-micro-service-refacotor/app/user/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/user/internal/logic/user_info"
@@ -148,36 +146,28 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 	}
 
 	// 解析微信返回数据
-	userData, err := miniprogram.GetEncryptor().Decrypt(authResult.SessionKey, req.EncryptedData, req.IV)
+	_, err = miniprogram.GetEncryptor().Decrypt(authResult.SessionKey, req.EncryptedData, req.IV)
 	if err != nil {
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "解析数据失败")
 	}
 
-	if len(req.Nickname) == 0 {
-		nicknameArr := []string{userData.NickName, utility.Krand(6, utility.KC_RAND_KIND_NUM)}
-		req.Nickname = strings.Join(nicknameArr, "")
-	}
-	if len(req.Avatar) == 0 {
-		req.Avatar = userData.AvatarURL
-	}
-	if len(req.Phone) == 0 {
-		req.Phone = userData.PhoneNumber
-	}
-
 	// 绑定用户或登录
-	token, expireIn, userInfo, isNewUser, err := user_info.WxMiniLogin(ctx, authResult.OpenID, req)
+	token, expireIn, userInfo, isNewUser, err := user_info.WxMiniLogin(ctx, authResult.OpenID)
 	// 错误类型
 	infoError := consts.InfoError(consts.UserInfo, consts.WxMiniLoginFail)
 	if err != nil {
-		// 记录错误日志
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
+
+	// 新用户，直接返回
 	if isNewUser {
-		go rabbitmq.PublishUserRegisteredEvent(userInfo.Id)
+		return &v1.WxMiniLoginRes{
+			IsFirstLogin: isNewUser,
+		}, nil
 	}
 
-	// 计算过期时间
+	// 计算 token 过期时间
 	expireTime := time.Now().Add(time.Duration(expireIn) * time.Second)
 	expireProto := timestamppb.New(expireTime)
 	if err := expireProto.CheckValid(); err != nil {
@@ -186,11 +176,11 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 
 	// 返回响应
 	return &v1.WxMiniLoginRes{
-		Type:          "Bearer",
-		Token:         token,
-		ExpireIn:      uint32(expireIn),
-		OpenId:        authResult.OpenID,
-		NeedPhoneAuth: isNewUser,
+		Type:         "Bearer",
+		Token:        token,
+		ExpireIn:     uint32(expireIn),
+		OpenId:       authResult.OpenID,
+		IsFirstLogin: isNewUser,
 		UserInfo: &v1.UserInfoBase{
 			Id:     uint32(userInfo.Id),
 			Name:   userInfo.Name,
@@ -215,7 +205,8 @@ func (*Controller) UpdateInfo(ctx context.Context, req *v1.UserInfoUpdateReq) (r
 	return &v1.UserInfoUpdateRes{Id: req.Id}, nil
 }
 
-func (*Controller) FillPhone(ctx context.Context, req *v1.FillPhoneReq) (res *v1.FillPhoneRes, err error) {
+func (*Controller) WxMiniRegister(ctx context.Context, req *v1.WxMiniRegisterReq) (res *v1.WxMiniRegisterRes, err error) {
+	// 发起授权
 	miniprogram := wechat.NewWechat().GetMiniProgram(&miniConfig.Config{
 		AppID:     g.Cfg().MustGet(nil, "wxMiniConf.appId").String(),
 		AppSecret: g.Cfg().MustGet(nil, "wxMiniConf.secret").String(),
@@ -232,22 +223,49 @@ func (*Controller) FillPhone(ctx context.Context, req *v1.FillPhoneReq) (res *v1
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "解析数据失败")
 	}
 
-	phone := userData.PhoneNumber
-	if phone == "" {
-		return nil, gerror.WrapCode(gcode.CodeInternalError, errors.New("手机号不能为空"))
+	if len(req.Nickname) == 0 {
+		nicknameArr := []string{userData.NickName, utility.Krand(6, utility.KC_RAND_KIND_NUM)}
+		req.Nickname = strings.Join(nicknameArr, "")
 	}
-	fmt.Println("phone", phone)
+	if len(req.Avatar) == 0 {
+		req.Avatar = userData.AvatarURL
+	}
+	if len(req.Phone) == 0 {
+		req.Phone = userData.PhoneNumber
+	}
 
-	infoError := consts.InfoError(consts.UserInfo, consts.FillPhoneFail)
-	// 填充数据库中的手机号
-	_, err = dao.UserInfo.Ctx(ctx).Where("id", req.Id).Data(g.Map{
-		"phone": phone,
-	}).Update()
+	// 绑定用户或登录
+	token, expireIn, userInfo, err := user_info.WxMiniRegister(ctx, authResult.OpenID, req)
+	// 错误类型
+	infoError := consts.InfoError(consts.UserInfo, consts.WxMiniLoginFail)
 	if err != nil {
+		// 记录错误日志
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 
-	// 返回更新成功响应，包含被更新ID
-	return &v1.FillPhoneRes{Id: req.Id}, nil
+	go rabbitmq.PublishUserRegisteredEvent(userInfo.Id)
+
+	// 计算过期时间
+	expireTime := time.Now().Add(time.Duration(expireIn) * time.Second)
+	expireProto := timestamppb.New(expireTime)
+	if err := expireProto.CheckValid(); err != nil {
+		return nil, err
+	}
+
+	// 返回响应
+	return &v1.WxMiniRegisterRes{
+		Type:     "Bearer",
+		Token:    token,
+		ExpireIn: uint32(expireIn),
+		OpenId:   authResult.OpenID,
+		UserInfo: &v1.UserInfoBase{
+			Id:     uint32(userInfo.Id),
+			Name:   userInfo.Name,
+			Avatar: userInfo.Avatar,
+			Sex:    uint32(userInfo.Sex),
+			Sign:   userInfo.Sign,
+			Status: uint32(userInfo.Status),
+		},
+	}, nil
 }
