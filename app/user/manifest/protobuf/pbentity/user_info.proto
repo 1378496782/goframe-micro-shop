@@ -6,7 +6,7 @@ syntax = "proto3";
 
 package UserInfo;
 
-option go_package = "shop-goframe-micro-service-refacotor/app/user/api/pbentity";
+option go_package = "shop-goframe-micro-service-refacotor/app/user/api/c";
 
 import "google/protobuf/timestamp.proto";
 
