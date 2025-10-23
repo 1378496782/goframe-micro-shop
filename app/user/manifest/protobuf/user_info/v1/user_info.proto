@@ -52,8 +52,6 @@ message UserInfoLoginRes {
 // ========== 微信登录 ==========
 message WxMiniLoginReq{
   string code=1; // 登录凭证
-  string iV=2;// 初始向量
-  string encryptedData=3; // 密文
 }
 
 message WxMiniLoginRes {

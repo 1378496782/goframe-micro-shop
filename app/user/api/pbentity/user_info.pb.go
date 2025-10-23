@@ -8,7 +8,7 @@
 // 	protoc        v4.23.0
 // source: pbentity/user_info.proto
 
-package pbentity
+package c
 
 import (
 	reflect "reflect"

@@ -145,12 +145,6 @@ func (*Controller) WxMiniLogin(ctx context.Context, req *v1.WxMiniLoginReq) (res
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "发起授权请求失败")
 	}
 
-	// 解析微信返回数据
-	_, err = miniprogram.GetEncryptor().Decrypt(authResult.SessionKey, req.EncryptedData, req.IV)
-	if err != nil {
-		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "解析数据失败")
-	}
-
 	// 绑定用户或登录
 	token, expireIn, userInfo, isNewUser, err := user_info.WxMiniLogin(ctx, authResult.OpenID)
 	// 错误类型
@@ -217,21 +211,23 @@ func (*Controller) WxMiniRegister(ctx context.Context, req *v1.WxMiniRegisterReq
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "发起授权请求失败")
 	}
 
-	// 解析微信返回数据
-	userData, err := miniprogram.GetEncryptor().Decrypt(authResult.SessionKey, req.EncryptedData, req.IV)
-	if err != nil {
-		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "解析数据失败")
-	}
+	if req.EncryptedData != "" && req.IV != "" {
+		// 解析微信返回数据
+		userData, err := miniprogram.GetEncryptor().Decrypt(authResult.SessionKey, req.EncryptedData, req.IV)
+		if err != nil {
+			return nil, gerror.WrapCode(gcode.CodeInternalError, err, "解析数据失败")
+		}
 
-	if len(req.Nickname) == 0 {
-		nicknameArr := []string{userData.NickName, utility.Krand(6, utility.KC_RAND_KIND_NUM)}
-		req.Nickname = strings.Join(nicknameArr, "")
-	}
-	if len(req.Avatar) == 0 {
-		req.Avatar = userData.AvatarURL
-	}
-	if len(req.Phone) == 0 {
-		req.Phone = userData.PhoneNumber
+		if len(req.Nickname) == 0 {
+			nicknameArr := []string{userData.NickName, utility.Krand(6, utility.KC_RAND_KIND_NUM)}
+			req.Nickname = strings.Join(nicknameArr, "")
+		}
+		if len(req.Avatar) == 0 {
+			req.Avatar = userData.AvatarURL
+		}
+		if len(req.Phone) == 0 {
+			req.Phone = userData.PhoneNumber
+		}
 	}
 
 	// 绑定用户或登录
