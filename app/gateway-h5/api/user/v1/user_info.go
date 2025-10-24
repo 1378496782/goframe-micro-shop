@@ -93,7 +93,7 @@ type WxMiniRegisterReq struct {
 	IV            string `json:"iv"  dc:"初始向量"`
 	EncryptedData string `json:"encryptedData" dc:"密文"`
 	Nickname      string `json:"nickname" dc:"用户昵称"`
-	Avatar        string `json:"avatar" dc:"用户头像"`
+	Avatar        string `json:"avatar" dc:"用户key"`
 }
 
 type WxMiniRegisterRes struct {

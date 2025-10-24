@@ -73,7 +73,7 @@ func UploadToQiniu(ctx context.Context, fileContent []byte, filename string) (st
 
 	// 私有空间生成签名URL
 	deadline := time.Now().Add(time.Second * time.Duration(expireTime)).Unix()
-	privateURL := storage.MakePrivateURL(mac, domain, key, deadline)
+	privateURL := storage.MakePrivateURLv2(mac, domain, key, deadline)
 
 	return privateURL, key, deadline, nil
 }
@@ -95,7 +95,7 @@ func GetFileUrl(ctx context.Context, key string) (string, int64, error) {
 
 	// 私有空间生成签名URL
 	deadline := time.Now().Add(time.Second * time.Duration(expireTime)).Unix() // 1小时有效
-	privateURL := storage.MakePrivateURL(mac, domain, key, deadline)
+	privateURL := storage.MakePrivateURLv2(mac, domain, key, deadline)
 
 	return privateURL, deadline, nil
 }
