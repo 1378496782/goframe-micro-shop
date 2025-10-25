@@ -19,10 +19,10 @@ type CollectionInfoCreateRes struct {
 
 // CollectionInfoDeleteReq 删除收藏请求
 type CollectionInfoDeleteReq struct {
-	g.Meta   `path:"/collection" method:"delete" tags:"收藏管理" summary:"删除收藏"`
-	Id       uint32 `json:"id"       v:"required" dc:"收藏ID"`
-	Type     uint32 `json:"type"     v:"required|in:1,2" dc:"收藏类型：1商品 2文章"`
-	ObjectId uint32 `json:"objectId" v:"required" dc:"对象ID"`
+	g.Meta `path:"/collection" method:"delete" tags:"收藏管理" summary:"删除收藏"`
+	Id     uint32 `json:"id"       v:"required" dc:"收藏ID"`
+	//Type     uint32 `json:"type"     v:"required|in:1,2" dc:"收藏类型：1商品 2文章"`
+	//ObjectId uint32 `json:"objectId" v:"required" dc:"对象ID"`
 }
 
 // CollectionInfoDeleteRes 删除收藏响应
@@ -40,10 +40,17 @@ type CollectionInfoGetListReq struct {
 
 // CollectionInfoGetListRes 获取收藏列表响应
 type CollectionInfoGetListRes struct {
-	List  []*CollectionInfoItem `json:"list" dc:"收藏列表"`
-	Page  uint32                `json:"page" dc:"当前页码"`
-	Size  uint32                `json:"size" dc:"每页数量"`
-	Total uint32                `json:"total" dc:"总数"`
+	List  []*UserCollectionInfoItem `json:"list" dc:"收藏列表"`
+	Page  uint32                    `json:"page" dc:"当前页码"`
+	Size  uint32                    `json:"size" dc:"每页数量"`
+	Total uint32                    `json:"total" dc:"总数"`
+}
+
+type UserCollectionInfoItem struct {
+	CollectionInfoItem
+	PicUrl string `json:"pic_url" dc:"主图"`
+	Name   string `json:"name" dc:"商品名称"`
+	Price  uint64 `json:"price" dc:"价格"`
 }
 
 // CollectionInfoItem 收藏项
