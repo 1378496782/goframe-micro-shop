@@ -2,7 +2,7 @@
   <!-- 用户信息头部 -->
  <view class="user-header">
   <view class="user-profile" bindtap="onWxFirstLogin">
-    <image class="avatar" src="{{uploadedAvatarUrl || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
+    <image class="avatar" src="{{avatarUrl  || 'https://via.placeholder.com/100x100/19aecc/ffffff?text=用户'}}" />
     <view class="user-info">
       <text class="username">{{userInfo.name || userInfo.nickname || '点击登录'}}</text>
       <text class="user-level" wx:if="{{userInfo.level}}">{{userInfo.level}}</text>
@@ -136,11 +136,11 @@
 
   <!-- 手机号授权弹窗 -->
   <view class="phone-auth-popup {{showPhoneAuthPopup ? 'show' : ''}}">
-    <view class="popup-overlay" catchtap="closePhoneAuthPopup"></view>
+    <view class="popup-overlay" catchtap="onGetPhoneNumber"></view>
     <view class="popup-content">
       <view class="popup-header">
         <text class="popup-title">手机号授权</text>
-        <view class="popup-close" bindtap="closePhoneAuthPopup">×</view>
+        <view class="popup-close" bindtap="onGetPhoneNumber">×</view>
       </view>
       
       <view class="popup-body">
@@ -160,8 +160,6 @@
         >
           拒绝授权
         </button>
-        
-        <text class="popup-tip">拒绝授权将退出登录状态</text>
       </view>
     </view>
   </view>

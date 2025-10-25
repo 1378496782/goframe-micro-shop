@@ -29,6 +29,7 @@ Page({
     hasShownLoginTip: false,
     tempAvatar: '',
     uploadedAvatarUrl: '',
+    avatarUrl:'',
     avatarKey: '',
     tempNickname: '',
     wxLoginCode: '',
@@ -39,7 +40,7 @@ Page({
       code: '',
       iv: '',
       encryptedData: ''
-    }
+    },
   },
 
   onWxFirstLogin() {
@@ -66,6 +67,11 @@ Page({
 
   /** 登录接口 */
   wxMiniLogin(data) {
+  const token = wx.getStorageSync("token")
+  if (token) {
+    console.log("已存在 token，跳过登录")
+    return  
+  }
     wx.showLoading({ title: '登录中...' })
     wx.request({
       url: API.USER_WX_LOGIN,
@@ -85,7 +91,7 @@ Page({
             console.log("dataTT",res.data.data)
             this.handleLoginSuccess(res.data.data)
             wx.showToast({ title: '登录成功', icon: 'success' })
-            this.getImageUrl(res.data.data.data.user_info.avatar)
+            this.getImageUrl(res.data.data.user_info.avatar)
           }
         } else {
           wx.showToast({ title: res.data.message || '登录失败', icon: 'none' })
@@ -117,31 +123,45 @@ Page({
     this.setData({ showUserInfoForm: false })
   },
 
-  getImageUrl(key) {
-      wx.request({
-      url: API.Key_URL,
-      method: 'GET',
-      key,
-      success: (res) => {
-        wx.hideLoading()
-        if (res.data.code === 0) {
-          const result = res.data.data
-          console.log("getFileURL",res.data.data)
-          this.setData({ uploadedAvatarUrl: res.data.data.data.url })
-          wx.setStorageSync('avatarUrl', res.data.data.data.url)
-          wx.setStorageSync('avatarExpireTime',res.data.data.data.expireTime)
-        } else {
-          wx.showToast({ title: res.data.message || '获取头像 url', icon: 'none' })
-        }
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        wx.showToast({ title: '网络错误', icon: 'none' })
-        console.error(err)
-      }
-      })
-  },
+getImageUrl(key) {
+  if (!key) {
+    wx.showToast({ title: 'key 不能为空', icon: 'none' });
+    return;
+  }
 
+  wx.request({
+    url: API.Key_URL,
+    method: 'GET',
+    data: { key },  // 注意这里传的参数
+    success: (res) => {
+      wx.hideLoading();
+      const { avatarUrl } = this.data
+
+      if (res.data.code === 0) {
+        const result = res.data.data;
+
+        // 假设后端返回格式对应 GetAvatarImageRes
+        const url = result.url;
+        const expireTime = result.expireTime;
+
+
+        // 存储到本地缓存
+        wx.setStorageSync('avatarUrl', url);
+        wx.setStorageSync('avatarExpireTime', expireTime);
+
+        console.log('获取头像 URL 成功:', url, '过期时间:', expireTime);
+        this.setData({ avatarUrl:url })
+      } else {
+        wx.showToast({ title: res.data.message || '获取头像 URL 失败', icon: 'none' });
+      }
+    },
+    fail: (err) => {
+      wx.hideLoading();
+      wx.showToast({ title: '网络错误', icon: 'none' });
+      console.error('获取头像 URL 出错:', err);
+    }
+  });
+},
  
   /**
    * 监听orderCounts数据变化
@@ -156,6 +176,21 @@ Page({
    */
   onLoad() {
     this.checkLoginStatus()
+  },
+  getAvatarUrl(){
+    const avatarUrl = wx.getStorageSync('avatarUrl') // 从 storage 取出
+    const avatarExpireAt=wx.getStorageSync('avatarExpireTime')
+    console.log("avatarExpireAt",avatarExpireAt)
+    console.log("Date Now",Date.now())
+    const avatarKey=wx.getStorageSync('avatarKey')
+    if (!avatarKey){
+      return 
+    }
+    if (avatarUrl&&avatarExpireAt>Date.now()){
+      this.setData({ avatarUrl:avatarUrl })
+    }else {
+      this.getImageUrl(avatarKey)
+    }
   },
 
   /**
@@ -305,7 +340,7 @@ Page({
       this.handleWxLoginPhoneAuth(e)
     } else {
       // 用户信息填写场景的手机号授权
-      this.handleUserInfoPhoneAuth(e)
+      this.handleWxLoginPhoneAuth(e)
     }
   },
   
@@ -340,7 +375,6 @@ handleWxLoginPhoneAuth(e) {
     }
   })
 },
-
   
   /**
    * 处理用户信息填写场景的手机号授权
@@ -399,9 +433,9 @@ handleWxLoginPhoneAuth(e) {
         wx.hideLoading()
         console.log("registerRes",res)
         if (res && res.data.code === 0) {
-          // 注册成功，完成登录
-          this.handleLoginSuccess(res.data.data || res)
-          wx.showToast({ title: '注册成功', icon: 'success' })
+          this.handleLoginSuccess(res.data.data);
+          this.getImageUrl(res.data.data.user_info.avatar)
+          wx.showToast({ title: '注册成功', icon: 'success' });
         } else {
           wx.showToast({ 
             title: res.message || '注册失败', 
@@ -416,61 +450,6 @@ handleWxLoginPhoneAuth(e) {
       },
     })
   },
-
-  //   // 保存token到本地存储
-  //   if (loginData.token) {
-  //     wx.setStorageSync('token', loginData.token)
-  //     console.log('已保存token:', loginData.token)
-  //   }
-    
-  //   // 保存用户信息到本地存储
-  //   if (loginData.user_info) {
-  //     wx.setStorageSync('userInfo', loginData.user_info)
-  //     wx.setStorageSync('avatarKey',loginData.user_info.avatar)
-  //     console.log('已保存userInfo:', loginData.user_info)
-  //   }
-    
-  //   // 保存openId，用于微信支付
-  //   if (loginData.openId) {
-  //     wx.setStorageSync('openId', loginData.openId)
-  //     console.log('已保存openId:', loginData.openId)
-  //   }
-    
-  //   // 保存token过期时间
-  //   if (loginData.expire_in) {
-  //     wx.setStorageSync('token_expire', Date.now() + loginData.expire_in * 1000)
-  //     console.log('token过期时间:', new Date(Date.now() + loginData.expire_in * 1000))
-  //   }
-    
-  //   // 更新全局状态
-  //   app.globalData.isLoggedIn = true
-  //   app.globalData.userInfo = loginData.user_info || {}
-  //   app.globalData.token = loginData.token
-  //   app.globalData.openId = loginData.openId
-    
-  //   // 更新页面数据
-  //   this.setData({ 
-  //     isLoggedIn: true, 
-  //     userInfo: loginData.user_info || {},
-  //     showUserInfoForm: false,
-  //     tempAvatar: '',
-  //     uploadedAvatarUrl: '',
-  //     tempNickname: '',
-  //     wxLoginCode: '',
-  //     wxIv: '',
-  //     wxEncryptedData: '',
-  //     showPhoneAuthPopup: false,
-  //     wxLoginTempData: null
-  //   })
-    
-  //   wx.showToast({ title: '登录成功', icon: 'success' })
-    
-  //   // 登录成功后获取最新的用户信息和订单统计
-  //   setTimeout(() => {
-  //     this.getUserInfo()
-  //     this.getOrderCounts()
-  //   }, 500)
-  // },
   
   /**
    * 处理登录成功逻辑
@@ -785,19 +764,18 @@ handleWxLoginPhoneAuth(e) {
           wx.hideLoading()
           const data = JSON.parse(res.data)
           if (data.code === 0 && data.data?.url) {
-            // 上传成功，保存头像URL
-            this.setData({ uploadedAvatarUrl: data.data.url })
-            this.setData({avatarKey:data.data.key})
-            wx.setStorageSync('avatarUrl', data.data.url)
-            wx.setStorageSync('avatarExpireTime',data.data.expireTime)
+            const url = data.data.url;
+            const key = data.data.key;
             
-            // 显示手机号授权弹窗（根据流程图：是否授权手机号？）
+            // 页面 data 和缓存同步
             this.setData({
-              showPhoneAuthPopup: true,
-              wxLoginTempData: {
-                ...wxLoginTempData,
-              }
-            })
+              uploadedAvatarUrl: url,
+              avatarKey: key,
+              avatarURLExpireTime: data.data.expireTime
+            });
+
+            // 显示手机号授权弹窗
+            this.setData({ showPhoneAuthPopup: true });
             
             wx.showToast({ title: '头像上传成功，请授权手机号', icon: 'success' })
           } else {
@@ -831,12 +809,22 @@ handleWxLoginPhoneAuth(e) {
    */
   checkLoginStatus() {
     console.log('开始检查登录状态')
+    const tokenExpire=wx.getStorageSync('token_expire')
+    if (tokenExpire&&tokenExpire<Date.now()){
+      wx.showToast({
+            title: '认证已过期，请重新登录',
+            icon: 'none'
+          })
+      this.clearUserSession()
+      return 
+    }
     const { isLoggedIn, userInfo } = checkLoginStatus()
     console.log('登录检查结果:', { isLoggedIn, userInfo })
     app.globalData.isLoggedIn = isLoggedIn
     app.globalData.userInfo = userInfo || {}
     this.setData({ isLoggedIn, userInfo: userInfo || {} })
     console.log('页面数据已更新，登录状态:', this.data.isLoggedIn)
+    this.getAvatarUrl()
   },
 
   closeWxLoginPopup() {
@@ -976,76 +964,79 @@ handleWxLoginPhoneAuth(e) {
    * 退出登录方法
    * 清空本地缓存和全局状态，返回登录页面
    */
-  logout() {
-    wx.showModal({
-      title: '提示',
-      content: '确定要退出登录吗？',
-      success: (res) => {
-        if (res.confirm) {
-          // 清空本地存储
-          wx.removeStorageSync('token')
-          wx.removeStorageSync('userInfo')
-          wx.removeStorageSync('openId') // 同时清除openId
-          wx.removeStorageSync('token_expire')
-          wx.removeStorageSync('avatarKey')
-          wx.removeStorageSync('avatarUrl')
-          wx.removeStorageSync('avatarExpireTime')
-          
-          // 重置全局状态
-          app.globalData.isLoggedIn = false
-          app.globalData.userInfo = {}
-          
-          // 更新页面数据，包括重置订单统计数据
-          this.setData({
-            isLoggedIn: false,
-            userInfo: {},
-            orderCounts: {
-              pending: 0,
-              shipping: 0,
-              delivered: 0,
-              completed: 0,
-              afterSale: 0
-            }
-          })
-          
-          wx.showToast({
-            title: '已退出登录',
-            icon: 'success'
-          })
-          
-          // 留在当前用户页面，显示微信一键登录按钮
-        }
-      }
-    })
-  },
+// 清理用户登录状态（storage + data）
+clearUserSession() {
+  // 1. 清理本地存储
+  const keysToRemove = [
+    'token',
+    'userInfo',
+    'openId',
+    'token_expire',
+    'avatarKey',
+    'avatarUrl',
+    'avatarExpireTime'
+  ];
+  keysToRemove.forEach(k => wx.removeStorageSync(k));
 
-  /**
-   * 清除登录状态
-   * 当用户不存在或token失效时调用
-   */
-  clearLoginStatus() {
-    // 清空本地存储
-    wx.removeStorageSync('token')
-    wx.removeStorageSync('userInfo')
-    wx.removeStorageSync('openId')
-    
-    // 重置全局状态
-    app.globalData.isLoggedIn = false
-    app.globalData.userInfo = {}
-    
-    // 更新页面数据，包括重置订单统计数据
-    this.setData({
-      isLoggedIn: false,
-      userInfo: {},
-      orderCounts: {
-        pending: 0,
-        shipping: 0,
-        delivered: 0,
-        completed: 0,
-        afterSale: 0
+  // 2. 重置全局状态
+  const app = getApp();
+  app.globalData.isLoggedIn = false;
+  app.globalData.userInfo = {};
+
+  // 3. 重置页面 data
+  this.setData({
+    isLoggedIn: false,
+    userInfo: {},
+    showUserInfoForm: false,
+    orderCounts: {
+      pending: 0,
+      shipping: 0,
+      delivered: 0,
+      completed: 0,
+      afterSale: 0
+    },
+    tempAvatar: '',
+    uploadedAvatarUrl: '',
+    avatarUrl: '',
+    avatarURL: '',
+    avatarKey: '',
+    tempNickname: '',
+    wxLoginCode: '',
+    wxIv: '',
+    wxEncryptedData: '',
+    showPhoneAuthPopup: false,
+    phoneAuthData: {
+      code: '',
+      iv: '',
+      encryptedData: ''
+    },
+    hasShownLoginTip: false
+  });
+},
+
+// 退出登录逻辑
+logout() {
+  wx.showModal({
+    title: '提示',
+    content: '确定要退出登录吗？',
+    success: (res) => {
+      if (res.confirm) {
+        this.clearUserSession();
+
+        wx.showToast({
+          title: '已退出登录',
+          icon: 'success'
+        });
+
+        // 可选：跳转登录页
+        // wx.reLaunch({ url: '/pages/login/login' });
       }
-    })
-  },
+    }
+  });
+},
+
+
+
 
   /**
    * 获取用户信息
