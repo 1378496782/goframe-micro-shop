@@ -26,14 +26,14 @@
 
 <!-- 规格选择 -->
 <view class="spec-section" wx:if="{{!loading && product}}">
-  <text class="section-title">商品信息</text>
+<!--  <text class="section-title">商品信息</text> -->
   <view class="spec-options">
-    <view class="spec-item">
+  <!--  <view class="spec-item">
       <text class="spec-name">商品名称</text>
       <view class="spec-values">
         <text class="spec-value active">{{product.name}}</text>
       </view>
-    </view>
+    </view> -->
     <view class="spec-item" wx:if="{{product.brand}}">
       <text class="spec-name">品牌</text>
       <view class="spec-values">

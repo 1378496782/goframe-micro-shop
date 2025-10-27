@@ -18,8 +18,8 @@
       <image src="{{item.mainImage}}" class="item-image" mode="aspectFill" />
       
       <!-- 商品信息 -->
-      <view class="item-info">
-        <text class="item-name">{{item.name}}</text>
+    <view class="item-info">
+      <text class="item-name">{{item.name}}</text>
         
         <!-- 价格信息 -->
         <view class="price-info">
