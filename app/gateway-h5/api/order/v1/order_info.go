@@ -12,7 +12,7 @@ type OrderInfoGetListReq struct {
 	g.Meta `path:"/order/list" method:"get" tags:"订单管理" sm:"订单分页列表"`
 	Page   uint32 `json:"page" d:"1" v:"min:1" dc:"页码"`
 	Size   uint32 `json:"size" d:"10" v:"max:50" dc:"每页数量"`
-	UserId uint32 `json:"user_id"  v:"required"  dc:"用户ID"`
+	//UserId uint32 `json:"user_id"  v:"required"  dc:"用户ID"`
 	Status uint32 `json:"status"  v:"required" dc:"订单状态：1待支付 2已支付待发货 3已发货 4已收货待评价"`
 }
 

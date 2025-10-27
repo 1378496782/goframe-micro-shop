@@ -14,8 +14,9 @@ service collection_info {
 
 // 新增消息定义
 message CollectionInfoCreateReq {
-  uint32                     ObjectId  = 1; // 对象id
-  uint32                     Type      = 2; // 收藏类型：1商品 2文章
+  uint32                     UserId    = 1; // 用户id
+  uint32                     ObjectId  = 2; // 对象id
+  uint32                     Type      = 3; // 收藏类型：1商品 2文章
 }
 
 message CollectionInfoCreateRes {
@@ -23,9 +24,10 @@ message CollectionInfoCreateRes {
 }
 
 message CollectionInfoDeleteReq {
-  uint32                     Id        = 1; //
-  uint32                     Type      = 2; // 收藏类型：1商品 2文章
-  uint32                     ObjectId  = 3; // 对象id
+  uint32                     Id        = 1; // 收藏id
+  uint32                     UserId    = 2; // 用户id
+  // uint32                     Type      = 2; // 收藏类型：1商品 2文章
+  //uint32                     ObjectId  = 3; // 对象id
 }
 
 message CollectionInfoDeleteRes {
@@ -33,9 +35,10 @@ message CollectionInfoDeleteRes {
 }
 
 message CollectionInfoGetListReq {
-  uint32 type = 1; // 收藏类型：1商品 2文章
-  uint32 page = 2;
-  uint32 size = 3;  // 修改：字段编号必须从1开始递增
+  uint32 UserId = 1; // 用户id
+  uint32 type   = 2; // 收藏类型：1商品 2文章
+  uint32 page   = 3; // 第几页。
+  uint32 size   = 4;  // 每页显示几个。修改：字段编号必须从1开始递增
 }
 
 
