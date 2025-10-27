@@ -2,7 +2,7 @@ package interaction
 
 import (
 	"context"
-	"fmt"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
 	collection "shop-goframe-micro-service-refacotor/app/interaction/api/collection_info/v1"
@@ -52,9 +52,14 @@ func (c *ControllerV1) CollectionInfoGetList(ctx context.Context, req *v1.Collec
 			goodsDetailReq.Id = v.ObjectId
 			goodsDetailRes, err := c.GoodsClient.GetDetail(ctx, goodsDetailReq)
 			if err != nil {
-				fmt.Println(err)
+				g.Log().Errorf(ctx, "获取商品详情失败, 商品ID: %d, 错误: %v", v.ObjectId, err)
 				continue
 			}
+			if goodsDetailRes == nil || goodsDetailRes.Data == nil {
+				g.Log().Warningf(ctx, "商品详情返回为空, 商品ID: %d", v.ObjectId)
+				continue
+			}
+
 			v.PicUrl = goodsDetailRes.Data.PicUrl
 			v.Name = goodsDetailRes.Data.Name
 			v.Price = uint64(goodsDetailRes.Data.Price)
