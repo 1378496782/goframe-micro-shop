@@ -36,7 +36,6 @@ const API = {
   USER_INFO: `${config.BASE_URL}/frontend/user/info`,
   USER_WX_LOGIN: `${config.BASE_URL}/frontend/user/wxMiniLogin`,
   USER_WX_REGISTER: `${config.BASE_URL}/frontend/user/wxMiniRegister`,
-  USER_BIND_PHONE: `${config.BASE_URL}/frontend/user/bindPhone`,
   USER_FILL_PHONE: `${config.BASE_URL}/frontend/user/fillPhone`,
   
   // 商品相关
