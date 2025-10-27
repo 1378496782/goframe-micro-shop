@@ -27,7 +27,8 @@ type OrderInfoColumns struct {
 	PayType          string // 支付方式 1微信 2支付宝 3云闪付
 	Remark           string // 备注
 	PayAt            string // 支付时间
-	Status           string // 订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消
+	Status           string // 订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消 8退款
+	TransactionId    string // 第三方支付交易号
 	ConsigneeName    string // 收货人姓名
 	ConsigneePhone   string // 收货人手机号
 	ConsigneeAddress string // 收货人详细地址
@@ -47,6 +48,7 @@ var orderInfoColumns = OrderInfoColumns{
 	Remark:           "remark",
 	PayAt:            "pay_at",
 	Status:           "status",
+	TransactionId:    "transaction_id",
 	ConsigneeName:    "consignee_name",
 	ConsigneePhone:   "consignee_phone",
 	ConsigneeAddress: "consignee_address",

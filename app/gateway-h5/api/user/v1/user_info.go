@@ -19,39 +19,6 @@ type UserInfoLoginRes struct {
 	UserInfo *UserInfoBase `json:"user_info" dc:"用户基础信息"`
 }
 
-// 用户微信登录
-type WxMiniLoginReq struct {
-	g.Meta        `path:"/user/wxMiniAuth" tags:"用户管理" method:"post" summary:"微信登录"`
-	Code          string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
-	IV            string `json:"iv" v:"required#初始向量不能为空" dc:"初始向量"`
-	EncryptedData string `json:"encryptedData" v:"required#密文不能为空" dc:"密文"`
-	Nickname      string `json:"nickname" dc:"用户昵称"`
-	Avatar        string `json:"avatar" dc:"用户头像"`
-}
-
-// 用户微信响应
-type WxMiniLoginRes struct {
-	Type          string        `json:"type" dc:"token类型"`
-	Token         string        `json:"token" dc:"token字符串"`
-	ExpireIn      uint32        `json:"expire_in" dc:"过期时间（秒）"`
-	OpenId        string        `json:"openId" dc:"用户唯一凭证"`
-	NeedPhoneAuth bool          `json:"need_phone_auth" dc:"是否需要授权手机号"`
-	UserInfo      *UserInfoBase `json:"user_info" dc:"用户基础信息"`
-}
-
-// 填写手机号请求
-type FillPhoneReq struct {
-	g.Meta        `path:"/user/fillPhone" tags:"用户管理" method:"post" summary:"填写手机号"`
-	Code          string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
-	IV            string `json:"iv" v:"required#初始向量不能为空" dc:"初始向量"`
-	EncryptedData string `json:"encryptedData" v:"required#密文不能为空" dc:"密文"`
-}
-
-// 填写手机号响应
-type FillPhoneRes struct {
-	Id uint32 `json:"id" dc:"用户ID"`
-}
-
 // 用户注册请求
 type UserInfoRegisterReq struct {
 	g.Meta       `path:"/user/register" tags:"用户管理" method:"post" summary:"注册"`
@@ -102,11 +69,48 @@ type UserInfoUpdateRes struct {
 	Id uint32 `json:"id" dc:"用户ID"`
 }
 
+// ================ 微信登录相关 ===============
+// 用户微信登录
+type WxMiniLoginReq struct {
+	g.Meta `path:"/user/wxMiniLogin" tags:"用户管理" method:"post" summary:"微信登录"`
+	Code   string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
+}
+
+// 用户微信响应
+type WxMiniLoginRes struct {
+	Type         string        `json:"type" dc:"token类型"`
+	Token        string        `json:"token" dc:"token字符串"`
+	ExpireIn     uint32        `json:"expire_in" dc:"过期时间（秒）"`
+	OpenId       string        `json:"openId" dc:"用户唯一凭证"`
+	IsFirstLogin bool          `json:"is_first_login" dc:"是否是首次登录"`
+	UserInfo     *UserInfoBase `json:"user_info" dc:"用户基础信息"`
+}
+
+// 用户微信注册
+type WxMiniRegisterReq struct {
+	g.Meta        `path:"/user/wxMiniRegister" tags:"用户管理" method:"post" summary:"微信登录"`
+	Code          string `json:"code" v:"required#临时登录凭证不能为空" dc:"临时登录凭证"`
+	IV            string `json:"iv"  dc:"初始向量"`
+	EncryptedData string `json:"encryptedData" dc:"密文"`
+	Nickname      string `json:"nickname" dc:"用户昵称"`
+	Avatar        string `json:"avatar" dc:"用户key"`
+}
+
+type WxMiniRegisterRes struct {
+	Type     string        `json:"type" dc:"token类型"`
+	Token    string        `json:"token" dc:"token字符串"`
+	ExpireIn uint32        `json:"expire_in" dc:"过期时间（秒）"`
+	OpenId   string        `json:"openId" dc:"用户唯一凭证"`
+	UserInfo *UserInfoBase `json:"user_info" dc:"用户基础信息"`
+}
+
+// ===============================================
+
 // 公共结构体：用户基础信息
 type UserInfoBase struct {
 	Id     uint32 `json:"id" dc:"用户ID"`
 	Name   string `json:"name" dc:"用户名"`
-	Avatar string `json:"avatar" dc:"头像"`
+	Avatar string `json:"avatar" dc:"头像 key (需要调用 gateway-resource 接口获取访问 url)"`
 	Sex    uint32 `json:"sex" dc:"性别"`
 	Sign   string `json:"sign" dc:"个性签名"`
 	Status uint32 `json:"status" dc:"状态"`

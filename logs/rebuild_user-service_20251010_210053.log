@@ -1,0 +1,17 @@
+[2025-10-10 21:00:53] ==========================================
+[2025-10-10 21:00:53] 开始重新构建单个服务: user-service
+[2025-10-10 21:00:53] ==========================================
+[2025-10-10 21:00:53] 步骤1: 检查服务当前状态
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+[2025-10-10 21:00:53] 停止 user-service 服务...
+ Container user-service  Stopping
+ Container user-service  Stopped
+[2025-10-10 21:00:53] ✅ user-service 服务停止成功
+[2025-10-10 21:00:53] 查找 user-service 相关的镜像...
+[2025-10-10 21:00:53] 找到以下相关镜像，将被删除：
+shop-goframe-micro-service-refacotor-user-service:latest
+[2025-10-10 21:00:53] 删除镜像: shop-goframe-micro-service-refacotor-user-service:latest
+[2025-10-10 21:00:53] 无法删除镜像 shop-goframe-micro-service-refacotor-user-service:latest（可能正在被使用）
+[2025-10-10 21:00:53] 构建 user-service 服务...
+failed to solve: process "/bin/sh -c go build -o bin/user ./app/user" did not complete successfully: exit code: 1
+[2025-10-10 21:02:28] ❌ user-service 服务构建失败

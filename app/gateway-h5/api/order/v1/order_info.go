@@ -12,7 +12,7 @@ type OrderInfoGetListReq struct {
 	g.Meta `path:"/order/list" method:"get" tags:"订单管理" sm:"订单分页列表"`
 	Page   uint32 `json:"page" d:"1" v:"min:1" dc:"页码"`
 	Size   uint32 `json:"size" d:"10" v:"max:50" dc:"每页数量"`
-	UserId uint32 `json:"user_id"  v:"required"  dc:"用户ID"`
+	//UserId uint32 `json:"user_id"  v:"required"  dc:"用户ID"`
 	Status uint32 `json:"status"  v:"required" dc:"订单状态：1待支付 2已支付待发货 3已发货 4已收货待评价"`
 }
 
@@ -36,10 +36,11 @@ type OrderInfoItem struct {
 
 // orderInfo 商品信息专用
 type OrderListGoodsInfo struct {
-	GoodsId   uint32 `json:"goods_id" dc:"商品ID"`
-	Count     uint32 `json:"count" dc:"商品数量"`
-	GoodsName string `json:"goods_name" dc:"商品名称"`
-	PicUrl    string `json:"pic_url" dc:"商品图片URL"`
+	GoodsId    uint32 `json:"goods_id" dc:"商品ID"`
+	Count      uint32 `json:"count" dc:"商品数量"`
+	GoodsName  string `json:"goods_name" dc:"商品名称"`
+	GoodsPrice int32  `json:"goods_price" dc:"商品价格"`
+	PicUrl     string `json:"pic_url" dc:"商品图片URL"`
 }
 
 // 创建订单
@@ -97,10 +98,7 @@ type NotifyReq struct {
 	Headers map[string]string `json:"-" dc:"回调请求头（由框架手动读取）"`
 }
 
-// NotifyRes 回调响应体
 type NotifyRes struct {
-	Code    string `json:"code,omitempty"`
-	Message string `json:"message,omitempty"`
 }
 
 // 获取订单详情
@@ -145,4 +143,13 @@ type OrderInfoGetCountRes struct {
 	Delivered uint32 `json:"delivered"`
 	Completed uint32 `json:"completed"`
 	AfterSale uint32 `json:"afterSale"`
+}
+type CancelOrderReq struct {
+	g.Meta `path:"/order/cancel" method:"post" tags:"订单管理" sm:"取消订单"`
+	Id     uint32 `json:"id"`
+}
+type CancelOrderRes struct {
+	Code    uint32 `json:"code"`
+	Message string `json:"message"`
+	Data    string `json:"data"`
 }

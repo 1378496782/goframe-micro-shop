@@ -6,10 +6,12 @@ option go_package = "shop-goframe-micro-service-refacotor/app/order/api/refund_i
 
 import "pbentity/refund_info.proto";
 
+
 service refund_info {
   rpc GetList(RefundInfoGetListReq) returns (RefundInfoGetListRes) {}
   rpc GetDetail(RefundInfoGetDetailReq) returns (RefundInfoGetDetailRes) {}
   rpc Create(RefundInfoCreateReq) returns (RefundInfoCreateRes) {}
+  rpc RefundNotify(RefundNotifyReq)returns(RefundNotifyRes){}
 }
 
 // 新增消息定义
@@ -49,4 +51,14 @@ message RefundInfoListResponse {
 
 message RefundInfoGetListRes {
   RefundInfoListResponse data = 1;
+}
+
+// 回调请求体
+message RefundNotifyReq {
+  string raw_body = 1; // 微信原始回调 body（JSON）
+  map<string, string> headers = 2; // 回调的 HTTP headers (Wechatpay-Signature, Wechatpay-Timestamp, Wechatpay-Nonce, Wechatpay-Serial)
+}
+
+// 回调响应体
+message RefundNotifyRes{
 }

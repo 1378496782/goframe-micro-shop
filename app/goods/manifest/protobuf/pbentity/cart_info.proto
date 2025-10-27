@@ -11,10 +11,10 @@ option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/pbentity
 import "google/protobuf/timestamp.proto";
 
 message CartInfo {
-    uint32                     Id        = 1; // 购物车表
-    uint32                     UserId    = 2; //
-    uint32                     GoodsId   = 3; // 商品id
-    uint32                     Count     = 4; // 商品数量
+    int32                     Id        = 1; // 购物车表
+    int32                     UserId    = 2; //
+    int32                     GoodsId   = 3; // 商品id
+    int32                     Count     = 4; // 商品数量
     google.protobuf.Timestamp CreatedAt = 5; //
     google.protobuf.Timestamp UpdatedAt = 6; //
 }

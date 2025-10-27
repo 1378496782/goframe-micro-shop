@@ -15,6 +15,7 @@ service order_info {
   rpc GetCount(OrderInfoGetCountReq) returns (OrderInfoGetCountRes) {}
   rpc Payment(PaymentReq)returns(PaymentRes){}
   rpc Notify(NotifyReq)returns(NotifyRes){}
+  rpc CancelOrder(CancelOrderReq)returns(CancelOrderRes){}
 }
 
 // 创建订单请求
@@ -60,25 +61,9 @@ message OrderInfoGetDetailRes {
   repeated pbentity.OrderGoodsInfo order_goods_infos = 2;
 }
 
-// // 分页查询请求 ======= V1版本  ========
-//message OrderInfoGetListReq {
-//  uint32 page = 1;                        // 分页号码，默认1
-//  uint32 size = 2;                        // 分页数量，最大50
-//  string number = 3;                     // 订单编号
-//  uint32 user_id = 4;                     // 用户id
-//  uint32 pay_type = 5;                    // 支付方式 1微信 2支付宝 3云闪付
-//  google.protobuf.Timestamp pay_at_gte = 6; // 支付时间>=
-//  google.protobuf.Timestamp pay_at_lte = 7; // 支付时间<=
-//  uint32 status = 8;                      // 订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消
-//  string consignee_phone = 9;            // 收货人手机号
-//  uint32 price_gte = 10;                  // 订单金额>= 单位分
-//  uint32 price_lte = 11;                  // 订单金额<= 单位分
-//  google.protobuf.Timestamp date_gte = 12; // 创建时间>=
-//  google.protobuf.Timestamp date_lte = 13; // 创建时间<=
-//}
 
 
-//    =======分页查询请求 V2版本 模仿淘宝 order服务内改动 ========
+//    =======分页查询请求 模仿淘宝 order服务内改动 ========
 message OrderInfoGetListReq{
     uint32 user_id = 1;                      // user_id 用户id 不确定该不该有 先写
     uint32 page = 2;                        // 分页号码，默认1
@@ -88,13 +73,6 @@ message OrderInfoGetListReq{
 }
 
 
-//  分页数据响应 v1 版本
-// message OrderInfoListResponse {
-//   repeated pbentity.OrderInfo list = 1;
-//   uint32 total = 2;
-//   uint32 page = 3;
-//   uint32 size = 4;
-// }
 
 // 响应专用结构体
 message OrderListInfo{
@@ -159,8 +137,6 @@ message NotifyReq {
 
 // 回调响应体
 message NotifyRes{
-  string code = 1;    // SUCCESS / FAIL
-  string message = 2; // 返回信息
 }
 
 message OrderInfoGetCountReq {
@@ -173,4 +149,14 @@ message OrderInfoGetCountRes {
     uint32 delivered = 3;
     uint32 completed = 4;
     uint32 afterSale = 5;
+}
+
+message CancelOrderReq {
+  uint32 id = 1;
+  uint32 userId = 2;
+}
+message CancelOrderRes {
+  uint32 code = 1;
+  string message = 2;
+  string data = 3;
 }

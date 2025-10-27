@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package bargain_info.v1;
+
+option go_package = "./template";
+
+import "pbentity/bargain_info.proto";
+import "google/protobuf/timestamp.proto";
+
+service bargain_info {
+  rpc GetList(BargainInfoGetListReq) returns (BargainInfoGetListRes) {}
+  rpc Create(BargainInfoCreateReq) returns (BargainInfoCreateRes) {}
+  rpc Delete(BargainInfoDeleteReq) returns (BargainInfoDeleteRes) {}
+}
+
+
+//砍价信息-创建-请求体
+message BargainInfoCreateReq{
+  int32 UserID=1; //创建砍价信息的用户id
+  int32 GoodsID=2; //要砍价的商品id
+  int32 counts=3;//最大帮砍次数
+}
+
+//砍价信息-创建-响应体
+message BargainInfoCreateRes{
+  int32                     Id          = 1; //砍价信息id
+  int32                     UserId      = 2; //创建砍价的用户id
+  int32                     GoodsId     = 3; //砍价商品id
+  int32                     Counts      = 4; //最大帮砍次数
+  google.protobuf.Timestamp CreatedTime = 5; //创建时间
+  google.protobuf.Timestamp ExpiredTime = 6; //失效时间
+}
+
+
+//砍价信息-查询-请求体
+message BargainInfoGetListReq{
+  int32 Id =1; //砍价信息id
+  int32 UserId=2; //用户id
+  int32 GoodsId=3;// 商品id
+
+}
+
+//砍价信息-查询-响应体
+message BargainInfoGetListRes{
+  int32                     Id          = 1; //砍价信息id
+  int32                     UserId      = 2; //创建砍价的用户id
+  int32                     GoodsId     = 3; //砍价商品id
+  int32                     Counts      = 4; //最大帮砍次数
+  google.protobuf.Timestamp CreatedTime = 5; //创建时间
+  google.protobuf.Timestamp UpdatedTime = 6; //最新一次帮砍时间
+  google.protobuf.Timestamp ExpiredTime = 7; //失效时间
+}
+
+
+
+
+//砍价信息-删除-请求体
+message BargainInfoDeleteReq{
+  int32   UserId    = 1; //创建砍价信息的id
+  int32   GoodsId      = 2; //砍价商品id
+  int32   Id =3; //实际的id
+
+}
+
+//砍价信息-删除-响应体
+message BargainInfoDeleteRes{
+  int32                     Id          = 1; //砍价信息id
+  int32                     UserId      = 2; //发起砍价用户
+  int32                     GoodsId     =3;//对应商品id
+  google.protobuf.Timestamp CreatedTime = 4; //创建时间
+  google.protobuf.Timestamp UpdatedTime = 5; //最新更改时间
+  google.protobuf.Timestamp DeletedTime = 6; //删除时间
+
+}

@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_history"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/bargain_info"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/controller/recommend_goods_info"
 	"syscall"
 
@@ -68,6 +70,8 @@ var (
 			cart_info.Register(s)
 			coupon_info.Register(s)
 			user_coupon_info.Register(s)
+			bargain_history.Register(s)
+			bargain_info.Register(s)
 			recommend_goods_info.Register(s)
 			s.Run()
 			return nil

@@ -37,7 +37,9 @@ var (
 						userController.UserInfoRegister,
 						userController.UserInfoLogin,
 						userController.WxMiniLogin,
+						userController.WxMiniRegister,
 						orderController.Notify,
+						orderController.RefundNotify,
 						goodsController.CategoryInfoGetAll,
 						goodsController.CategoryInfoGetList,
 						goodsController.GoodsInfoGetDetail,
@@ -57,7 +59,6 @@ var (
 						userController.UserInfo,
 						userController.UserInfoUpdatePassword,
 						userController.UserInfoUpdate,
-						userController.FillPhone,
 						goodsController.CartInfoGetList,
 						goodsController.CartInfoCreate,
 						goodsController.CartInfoDelete,
@@ -71,6 +72,13 @@ var (
 						orderController.RefundInfoGetDetail,
 						orderController.RefundInfoGetList,
 						orderController.RefundInfoCreate,
+						goodsController.Bargain_info_Create,
+						goodsController.Bargain_info_Get,
+						goodsController.Bargain_info_Delete,
+						goodsController.Bargain_history_Create,
+						goodsController.Bargain_history_Get,
+						goodsController.Bargain_history_Delete,
+						orderController.CancelOrder,
 					)
 				})
 			})

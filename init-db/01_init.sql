@@ -30,6 +30,7 @@ CREATE TABLE `goods_info`  (
                                `sort` tinyint NOT NULL DEFAULT 0 COMMENT '排序 倒叙',
                                `detail_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '商品详情',
                                `enable_bargain` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否允许砍价 1是 0否 默认0',
+                               `bargain_price` int  DEFAULT 0 COMMENT '允许砍到的最低价格',
                                `created_at` datetime NULL DEFAULT NULL,
                                `updated_at` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                `deleted_at` datetime NULL DEFAULT NULL,
@@ -168,6 +169,74 @@ CREATE TABLE `user_coupon_info` (
         UNIQUE KEY `uk_user_coupon` (`user_id`, `coupon_id`) COMMENT '同一用户不能重复领取同张优惠券'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户优惠券信息表';
 
+-- 删除已存在的 bargain_info 表（如果存在）
+DROP TABLE IF EXISTS `bargain_info`;
+
+-- 创建 bargain_info表
+create table `bargain_info`(
+    id           int auto_increment  primary key,
+    user_id      int      not null,
+    goods_id     int      not null,
+    counts       int      not null,
+    created_time datetime not null,
+    updated_time datetime null,
+    deleted_time datetime null,
+    expired_time datetime not null
+);
+
+-- ----------------------------
+-- Records of bargain_info
+-- ----------------------------
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (1, 8, 16, 9, '2025-10-11 11:10:16', '2025-10-11 11:10:16', NULL, '2025-10-11 22:10:16');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (2, 7, 10, 9, '2025-10-11 11:10:27', '2025-10-11 11:10:27', '2025-10-11 11:11:23', '2025-10-12 00:10:27');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (3, 7, 20, 9, '2025-10-11 11:10:32', '2025-10-11 11:47:46', NULL, '2025-10-12 05:10:32');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (4, 3, 20, 9, '2025-10-11 11:10:36', '2025-10-11 11:10:36', NULL, '2025-10-11 21:10:36');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (5, 3, 30, 9, '2025-10-11 11:10:41', '2025-10-11 11:10:41', NULL, '2025-10-12 00:10:41');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (6, 40, 30, 9, '2025-10-11 11:10:48', '2025-10-11 11:10:48', NULL, '2025-10-12 01:10:48');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (7, 18, 30, 9, '2025-10-11 11:10:55', '2025-10-11 11:10:55', NULL, '2025-10-12 01:10:55');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (8, 7, 10, 5, '2025-10-12 09:07:19', '2025-10-12 09:08:14', NULL, '2025-10-12 23:07:19');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (9, 7, 10, 5, '2025-10-12 09:24:27', '2025-10-12 09:26:31', NULL, '2025-10-12 20:24:27');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (10, 0, 3, 80, '2025-10-13 10:38:49', '2025-10-13 10:38:49', NULL, '2025-10-14 04:38:49');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (11, 0, 49, 50, '2025-10-13 10:40:40', '2025-10-13 10:50:52', NULL, '2025-10-14 03:40:40');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (12, 3, 20, 14, '2025-10-13 10:41:34', '2025-10-13 10:41:34', '2025-10-13 10:43:05', '2025-10-13 22:41:34');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (13, 0, 20, 11, '2025-10-13 10:47:48', '2025-10-13 10:47:48', NULL, '2025-10-13 20:47:48');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (14, 18, 18, 18, '2025-10-13 11:13:15', '2025-10-13 11:13:15', '2025-10-13 11:21:34', '2025-10-14 00:13:15');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (15, 20, 6, 10, '2025-10-13 11:18:26', '2025-10-13 11:18:26', '2025-10-13 11:24:26', '2025-10-14 04:18:26');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (16, 0, 19, 10, '2025-10-13 11:34:02', '2025-10-13 11:34:32', NULL, '2025-10-13 21:34:02');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (17, 7, 9, 6, '2025-10-13 11:42:20', '2025-10-13 11:42:38', '2025-10-13 11:45:21', '2025-10-13 22:42:20');
+INSERT INTO `bargain_info` (`id`, `user_id`, `goods_id`, `counts`, `created_time`, `updated_time`, `deleted_time`, `expired_time`) VALUES (18, 7, 10, 10, '2025-10-13 11:57:37', '2025-10-13 11:58:34', '2025-10-13 11:59:37', '2025-10-13 23:57:37');
+
+
+-- 删除已存在的bargain_history表（如果存在）
+DROP TABLE IF EXISTS `bargain_history`;
+
+-- 创建砍价记录表bargain_history
+create table `bargain_history`(
+            id           int auto_increment  primary key,
+            bargain_id   int      not null,
+            amount       int      not null,
+            user_id      int      not null,
+            created_time datetime not null,
+            deleted_time datetime null
+);
+
+
+-- ----------------------------
+-- Records of bargain_history
+-- ----------------------------
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (1, 3, 12, 10, '2025-10-11 11:47:46', '2025-10-11 11:59:18');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (2, 8, 29, 30, '2025-10-12 09:08:14', NULL);
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (3, 9, 20, 20, '2025-10-12 09:26:31', '2025-10-13 11:14:47');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (4, 11, 10, 12, '2025-10-13 10:44:14', '2025-10-13 10:45:47');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (5, 11, 10, 0, '2025-10-13 10:50:52', NULL);
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (6, 16, 21, 0, '2025-10-13 11:34:32', NULL);
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (7, 17, 13, 7, '2025-10-13 11:42:38', '2025-10-13 11:46:06');
+INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (8, 18, 16, 7, '2025-10-13 11:58:34', '2025-10-13 11:59:15');
+
+
+
+----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
 USE user;
 
 -- ----------------------------
@@ -347,6 +416,7 @@ CREATE TABLE `order_info`  (
            `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '备注',
            `pay_at` datetime DEFAULT NULL COMMENT '支付时间',
            `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '订单状态： 1待支付 2已支付待发货 3已发货 4已收货待评价 5已评价 6待确认 7已取消 8发起退款',
+           `transaction_id` varchar(32) DEFAULT NULL COMMENT '第三方支付交易号',
            `consignee_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '收货人姓名',
            `consignee_phone` varchar(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '收货人手机号',
            `consignee_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '收货人详细地址',
@@ -361,22 +431,24 @@ CREATE TABLE `order_info`  (
 -- ----------------------------
 -- Records of order_info
 -- ----------------------------
-INSERT INTO `order_info` VALUES (1, '1659231316407832000111', 1, 1, '0', NULL, 1, '王先生', '13269477432', '北京丰台汽车博物馆', 10000, 100, 9900, '2022-08-27 09:35:16', '2022-07-31 09:35:16');
-INSERT INTO `order_info` VALUES (2, '1659231554317361000757', 1, 1, '0', NULL, 1, '王先生', '13269477432', '北京丰台汽车博物馆', 10000, 200, 9800, '2022-07-31 09:39:14', '2022-07-31 09:39:14');
-INSERT INTO `order_info` VALUES (3, '1661603467832912000516', 1, 0, '', '2022-12-13 21:52:26', 0, '', '', '', 0, 0, 0, '2022-12-08 20:31:07', '2022-08-27 20:31:07');
-INSERT INTO `order_info` VALUES (4, '1661603562656619000513', 1, 1, '放到快递柜就可以，不用打电话。', '2022-12-13 21:52:19', 0, '王先生', '13269477432', '北京丰台汽车博物馆', 0, 0, 0, '2022-12-09 20:32:42', '2022-08-27 20:32:42');
-INSERT INTO `order_info` VALUES (5, '1661604424031843000546', 1, 0, '', '2022-12-13 21:52:12', 0, '', '', '', 0, 0, 0, '2022-12-10 20:47:04', '2022-08-27 20:47:04');
-INSERT INTO `order_info` VALUES (6, '1661604530142913000770', 1, 1, '这是备注', '2022-12-13 21:52:05', 1, '', '', '', 100, 0, 0, '2022-12-11 20:48:50', '2022-08-27 20:48:50');
-INSERT INTO `order_info` VALUES (7, '166160461284091500027', 1, 1, '这是备注', '2022-12-13 21:51:58', 1, '', '', '', 100, 0, 9800, '2022-12-12 20:50:50', '2022-08-27 20:50:12');
-INSERT INTO `order_info` VALUES (8, '166160465089079000090', 1, 1, '这是备注', '2022-12-19 13:14:07', 1, '', '', '', 100, 0, 9800, '2022-12-19 20:50:50', '2022-08-27 20:50:50');
-INSERT INTO `order_info` VALUES (9, '1675756215452071000340', 15, 0, 'ad sint', NULL, 1, '应便更空政于八', '18130435879', '香港特别行政区三沙市望城区', 25, 31, 97, '2023-02-07 15:50:15', '2023-02-07 15:50:15');
-INSERT INTO `order_info` VALUES (10, '1675756478857950000699', 15, 0, 'ad sint', NULL, 1, '应便更空政于八', '18130435879', '香港特别行政区三沙市望城区', 25, 31, 97, '2023-02-07 15:54:38', '2023-02-07 15:54:38');
-INSERT INTO `order_info` VALUES (11, '1675756573337742000600', 15, 0, 'ad sint', NULL, 1, '应便更空政于八', '18130435879', '香港特别行政区三沙市望城区', 25, 31, 97, '2023-02-07 15:56:13', '2023-02-07 15:56:13');
-INSERT INTO `order_info` VALUES (13, '1675756783046217000276', 15, 0, 'consequat cupidatat in', NULL, 1, '在区三少', '18127326325', '广东省天津市安溪县', 87, 66, 92, '2023-02-07 15:59:43', '2023-02-07 15:59:43');
-INSERT INTO `order_info` VALUES (14, '1675923255725252000737', 15, 0, '备注', NULL, 1, '王中阳go', '18130435879', '北京市朝阳区望京SOHO', 10, 1, 9, '2023-02-09 14:14:15', '2023-02-09 14:14:15');
-INSERT INTO `order_info` VALUES (15, '1675923359070046000221', 15, 0, '备注', NULL, 1, '王中阳go', '18130435879', '北京市朝阳区望京SOHO', 10, 1, 9, '2023-02-09 14:15:59', '2023-02-09 14:15:59');
-INSERT INTO `order_info` VALUES (16, '1675925468868358000350', 15, 0, '备注', NULL, 1, '王中阳go', '18130435879', '北京市朝阳区望京SOHO', 10, 1, 9, '2023-02-09 14:51:09', '2023-02-09 14:51:09');
-
+INSERT INTO `order_info`
+(id, number, user_id, pay_type, remark, pay_at, status, transaction_id, consignee_name, consignee_phone, consignee_address, price, coupon_price, actual_price, created_at, updated_at)
+VALUES
+    (1, '1659231316407832000111', 1, 1, '0', NULL, 1, NULL, '王先生', '13269477432', '北京丰台汽车博物馆', 10000, 100, 9900, '2022-08-27 09:35:16', '2022-07-31 09:35:16'),
+    (2, '1659231554317361000757', 1, 1, '0', NULL, 1, NULL, '王先生', '13269477432', '北京丰台汽车博物馆', 10000, 200, 9800, '2022-07-31 09:39:14', '2022-07-31 09:39:14'),
+    (3, '1661603467832912000516', 1, 0, '', '2022-12-13 21:52:26', 0, NULL, '', '', '', 0, 0, 0, '2022-12-08 20:31:07', '2022-08-27 20:31:07'),
+    (4, '1661603562656619000513', 1, 1, '放到快递柜就可以，不用打电话。', '2022-12-13 21:52:19', 0, NULL, '王先生', '13269477432', '北京丰台汽车博物馆', 0, 0, 0, '2022-12-09 20:32:42', '2022-08-27 20:32:42'),
+    (5, '1661604424031843000546', 1, 0, '', '2022-12-13 21:52:12', 0, NULL, '', '', '', 0, 0, 0, '2022-12-10 20:47:04', '2022-08-27 20:47:04'),
+    (6, '1661604530142913000770', 1, 1, '这是备注', '2022-12-13 21:52:05', 1, NULL, '', '', '', 100, 0, 0, '2022-12-11 20:48:50', '2022-08-27 20:48:50'),
+    (7, '166160461284091500027', 1, 1, '这是备注', '2022-12-13 21:51:58', 1, NULL, '', '', '', 100, 0, 9800, '2022-12-12 20:50:50', '2022-08-27 20:50:12'),
+    (8, '166160465089079000090', 1, 1, '这是备注', '2022-12-19 13:14:07', 1, NULL, '', '', '', 100, 0, 9800, '2022-12-19 20:50:50', '2022-08-27 20:50:50'),
+    (9, '1675756215452071000340', 15, 0, 'ad sint', NULL, 1, NULL, '应便更空政于八', '18130435879', '香港特别行政区三沙市望城区', 25, 31, 97, '2023-02-07 15:50:15', '2023-02-07 15:50:15'),
+    (10, '1675756478857950000699', 15, 0, 'ad sint', NULL, 1, NULL, '应便更空政于八', '18130435879', '香港特别行政区三沙市望城区', 25, 31, 97, '2023-02-07 15:54:38', '2023-02-07 15:54:38'),
+    (11, '1675756573337742000600', 15, 0, 'ad sint', NULL, 1, NULL, '应便更空政于八', '18130435879', '香港特别行政区三沙市望城区', 25, 31, 97, '2023-02-07 15:56:13', '2023-02-07 15:56:13'),
+    (13, '1675756783046217000276', 15, 0, 'consequat cupidatat in', NULL, 1, NULL, '在区三少', '18127326325', '广东省天津市安溪县', 87, 66, 92, '2023-02-07 15:59:43', '2023-02-07 15:59:43'),
+    (14, '1675923255725252000737', 15, 0, '备注', NULL, 1, NULL, '王中阳go', '18130435879', '北京市朝阳区望京SOHO', 10, 1, 9, '2023-02-09 14:14:15', '2023-02-09 14:14:15'),
+    (15, '1675923359070046000221', 15, 0, '备注', NULL, 1, NULL, '王中阳go', '18130435879', '北京市朝阳区望京SOHO', 10, 1, 9, '2023-02-09 14:15:59', '2023-02-09 14:15:59'),
+    (16, '1675925468868358000350', 15, 0, '备注', NULL, 1, NULL, '王中阳go', '18130435879', '北京市朝阳区望京SOHO', 10, 1, 9, '2023-02-09 14:51:09', '2023-02-09 14:51:09');
 
 -- ----------------------------
 -- Table structure for refund_info
@@ -387,9 +459,10 @@ CREATE TABLE `refund_info`  (
                                 `number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '售后订单号',
                                 `order_id` int NOT NULL COMMENT '订单id',
                                 `goods_id` int NOT NULL DEFAULT 0 COMMENT '要售后的商品id',
+                                `refund_id` varchar(32) DEFAULT NULL COMMENT '第三方退款编号',
                                 `reason` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '退款原因',
                                 `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '审核状态 1待处理 2同意退款 3拒绝退款',
-                                `refund_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '退款状态 0未退款 1退款中 2退款成功 3退款失败',
+                                `refund_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '退款状态 1未退款 2退款中 3退款成功 4退款失败',
                                 `refund_amount` int NOT NULL DEFAULT 0 COMMENT '退款金额 单位分',
                                 `user_id` int NOT NULL COMMENT '用户id',
                                 `created_at` datetime DEFAULT NULL,
@@ -401,7 +474,11 @@ CREATE TABLE `refund_info`  (
 -- ----------------------------
 -- Records of refund_info
 -- ----------------------------
-INSERT INTO `refund_info` VALUES (1, 'refund1659247832739250000428', 1, 1, '不想要了', 1,1, 1,1, '2022-07-31 14:10:32', '2022-07-31 14:10:32', NULL);
+INSERT INTO `refund_info`
+(id, number, order_id, goods_id, refund_id, reason, status, refund_status, refund_amount, user_id, created_at, updated_at, deleted_at)
+VALUES
+    (1, 'refund1659247832739250000428', 1, 1, '', '不想要了', 1, 1, 1, 1, '2022-07-31 14:10:32', '2022-07-31 14:10:32', NULL);
+
 
 USE resource;
 
