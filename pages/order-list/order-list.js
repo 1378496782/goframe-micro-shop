@@ -229,8 +229,8 @@ Page({
             name: item.goods_name,
             image: imageUrl,
             goods_pic_url: imageUrl,
-            price: item.price || 0,
-            goods_price: item.price || 0,
+            price: (item.goods_price / 100).toFixed(2) || 0,
+            goods_price: (item.goods_price / 100).toFixed(2) || 0,
             quantity: item.count || 1,
             count: item.count || 1
           }

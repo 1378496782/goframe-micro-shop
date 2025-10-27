@@ -69,14 +69,17 @@ Page({
     // 处理图片URL，添加基础URL - 兼容不同字段名
     const { CONSTANTS } = require('../../config/index')
     const processedItems = selectedItems.map(item => {
+      // 确保价格是数字类型
       const price = parseFloat(item.price || item.goods_price || 0);
+      const quantity = parseInt(item.quantity || item.count || 1);
+      
       return {
         ...item,
         // 兼容不同字段名
         name: item.name || item.goods_name,
         spec: item.spec || item.goods_brand || '默认规格',
         price: price,
-        quantity: item.quantity || item.count || 1,
+        quantity: quantity,
         // 格式化价格显示
         formattedPrice: price.toFixed(2),
         // 处理图片URL
@@ -84,13 +87,17 @@ Page({
       };
     });
 
-    // 设置页面数据
+    // 设置页面数据，并在回调中计算价格
     this.setData({
-      orderItems: processedItems
-    })
-    
-    // 使用统一的calculateTotalPrice函数计算价格
-    this.calculateTotalPrice();
+      orderItems: processedItems,
+      // 初始化价格数据，避免显示为空
+      totalPrice: 0,
+      actualPrice: 0
+    }, () => {
+      console.log('商品数据设置完成，开始计算价格');
+      // 使用统一的calculateTotalPrice函数计算价格
+      this.calculateTotalPrice();
+    });
     
     // 加载用户优惠券
     this.loadUserCoupons();
@@ -268,23 +275,34 @@ Page({
 
   // 推荐商品勾选处理
   onRecommendSelect(e) {
+    console.log('推荐商品勾选事件触发：', e);
+    
     const { value } = e.detail;
     const { recommendGoods } = this.data;
     
-    console.log('勾选事件触发：', { value, recommendGoods });
+    console.log('勾选事件详情：', { value, recommendGoods });
     
     // 更新推荐商品的选中状态
-    const updatedGoods = recommendGoods.map(item => ({
-      ...item,
-      selected: item.id === value ? !item.selected : item.selected
-    }));
+    const updatedGoods = recommendGoods.map(item => {
+      // 确保value是字符串比较，因为checkbox的value可能是字符串
+      const itemId = item.id.toString();
+      const valueStr = value.toString();
+      
+      return {
+        ...item,
+        selected: itemId === valueStr ? !item.selected : item.selected
+      };
+    });
     
     console.log('更新后的推荐商品：', updatedGoods);
     
-    this.setData({ recommendGoods: updatedGoods });
-    
-    // 重新计算总价
-    this.calculateTotalPrice();
+    this.setData({ 
+      recommendGoods: updatedGoods 
+    }, () => {
+      // 在setData回调中重新计算总价，确保数据已更新
+      console.log('推荐商品状态更新完成，开始重新计算总价');
+      this.calculateTotalPrice();
+    });
   },
 
   // 计算总价（包括勾选的推荐商品）
@@ -297,23 +315,43 @@ Page({
       couponPrice: couponPrice
     });
     
-    // 计算主商品总价
+    // 计算主商品总价 - 修复价格解析逻辑
     const mainTotalPrice = orderItems.reduce((sum, item) => {
-      const price = parseFloat(item.price) || parseFloat(item.goods_price) || 0;
-      const quantity = parseInt(item.quantity) || parseInt(item.count) || 1;
+      // 尝试多种可能的字段名
+      let price = 0;
+      if (typeof item.price === 'number') {
+        price = item.price;
+      } else if (typeof item.price === 'string') {
+        price = parseFloat(item.price) || 0;
+      } else if (typeof item.goods_price === 'number') {
+        price = item.goods_price;
+      } else if (typeof item.goods_price === 'string') {
+        price = parseFloat(item.goods_price) || 0;
+      }
+      
+      const quantity = parseInt(item.quantity || item.count || 1);
       const itemTotal = price * quantity;
-      console.log('主商品计算：', { price, quantity, itemTotal });
+      console.log('主商品计算：', { 
+        name: item.name || item.goods_name, 
+        price: price,
+        quantity: quantity, 
+        itemTotal: itemTotal 
+      });
       return sum + itemTotal;
     }, 0);
     
-    // 计算勾选的推荐商品总价
+    // 计算勾选的推荐商品总价 - 修复价格解析逻辑
     const recommendTotalPrice = recommendGoods.reduce((sum, item) => {
       if (item.selected) {
-        const price = parseFloat(item.price) || 0;
+        let price = 0;
+        if (typeof item.price === 'number') {
+          price = item.price;
+        } else if (typeof item.price === 'string') {
+          price = parseFloat(item.price) || 0;
+        }
         console.log('推荐商品勾选：', { 
           name: item.name, 
           price: price,
-          originalPrice: item.price, // 显示原始价格字符串
           selected: item.selected 
         });
         return sum + price; // 每个推荐商品默认数量为1
@@ -337,16 +375,24 @@ Page({
     console.log('推荐商品详细状态：', recommendGoods.map(item => ({
       name: item.name,
       price: item.price,
-      parsedPrice: parseFloat(item.price),
       selected: item.selected
     })));
     
-    this.setData({
-      totalPrice: totalPrice,
-      actualPrice: actualPrice
+    // 确保价格是数字类型，避免显示问题
+    const finalTotalPrice = Number(totalPrice.toFixed(2));
+    const finalActualPrice = Number(actualPrice.toFixed(2));
+    
+    console.log('最终设置的价格：', {
+      totalPrice: finalTotalPrice,
+      actualPrice: finalActualPrice
     });
     
-    console.log('价格更新完成，新数据：', this.data);
+    this.setData({
+      totalPrice: finalTotalPrice,
+      actualPrice: finalActualPrice
+    }, () => {
+      console.log('价格更新完成，页面数据：', this.data);
+    });
   },
 
   // 处理备注输入
