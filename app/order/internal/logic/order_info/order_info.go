@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
 	"shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
+	goods "shop-goframe-micro-service-refacotor/app/order/utility/goods_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
 	"shop-goframe-micro-service-refacotor/utility"
 	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
@@ -30,9 +32,11 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	//订单金额必须等于商品金额之和
 	var totalGoodsPrice uint32
 	var totalCouponPrice uint32
+	var goodsIds []uint32
 	for _, item := range req.OrderGoodsInfo {
 		totalGoodsPrice += item.Price
 		totalCouponPrice += item.CouponPrice
+		goodsIds = append(goodsIds, item.GoodsId)
 	}
 	if req.Price != totalGoodsPrice {
 		return 0, "", fmt.Errorf("订单总价[%d]与商品总价[%d]不符", req.Price, totalGoodsPrice)
@@ -43,6 +47,17 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	}
 	if req.CouponPrice < totalCouponPrice {
 		return 0, "", fmt.Errorf("订单优惠券价格[%d]小于商品优惠券价格[%d]", req.CouponPrice, totalCouponPrice)
+	}
+	// 库存校验
+	goodsStockMap, err := goods.Client.GetGoodsStock(ctx, &goods_info.GetGoodsStockReq{GoodsIds: goodsIds})
+	if err != nil {
+		return 0, "", fmt.Errorf("调用 goods 模块失败,err:%v", err)
+	}
+	fmt.Println("goodsStockMap", goodsStockMap)
+	for _, item := range req.OrderGoodsInfo {
+		if item.Count > uint32(goodsStockMap.GoodsStock[item.GoodsId]) {
+			return 0, "", fmt.Errorf("商品{%d}库存不足", item.GoodsId)
+		}
 	}
 
 	// 计算OrderGoodsItem中分摊的coupon_price
@@ -149,11 +164,21 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	success = true
 
 	// 订单创建成功后，发布订单创建事件，用于后续操作（如删除购物车商品）
-	var goodsIds []uint32
+	var goodsInfos []*grabbitmq.OrderGoodsInfo
 	for _, item := range req.OrderGoodsInfo {
-		goodsIds = append(goodsIds, item.GoodsId)
+		goodsInfos = append(goodsInfos, &grabbitmq.OrderGoodsInfo{
+			GoodsId: int(item.GoodsId),
+			Count:   int(item.Count),
+		})
 	}
-	go grabbitmq.PublishOrderCreatedEvent(req.UserId, goodsIds)
+	event := grabbitmq.OrderCreatedEvent{
+		UserId:    req.UserId,
+		OrderId:   uint32(orderId),
+		GoodsIds:  goodsIds,
+		GoodsInfo: goodsInfos,
+	}
+
+	go grabbitmq.PublishOrderCreatedEvent(event)
 
 	// 订单创建成功后，如果有优惠券使用，发送订单确认消息给goods服务进行优惠券扣减
 	if req.CouponId > 0 {
@@ -168,16 +193,16 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 }
 
 // sendOrderTimeoutMessage 发送订单超时消息
-func sendOrderTimeoutMessage(ctx context.Context, orderId int32) {
-	// 获取配置的延迟时间
-	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
-
-	// 使用静态方法发送订单超时消息
-	err := rabbitmq.SendOrderTimeoutMessageStatic(ctx, orderId, delay)
-	if err != nil {
-		g.Log().Errorf(ctx, "发送订单超时消息失败, 订单ID: %d, 错误: %v", orderId, err)
-	}
-}
+//func sendOrderTimeoutMessage(ctx context.Context, orderId int32) {
+//	// 获取配置的延迟时间
+//	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
+//
+//	// 使用静态方法发送订单超时消息
+//	err := rabbitmq.SendOrderTimeoutMessageStatic(ctx, orderId, delay)
+//	if err != nil {
+//		g.Log().Errorf(ctx, "发送订单超时消息失败, 订单ID: %d, 错误: %v", orderId, err)
+//	}
+//}
 
 // GetDetail 获取订单详情
 func GetDetail(ctx context.Context, orderId uint32, userId uint32) (*pbentity.OrderInfo, []*pbentity.OrderGoodsInfo, error) {
@@ -402,4 +427,56 @@ func GetCount(ctx context.Context, userId uint32) (*v1.OrderInfoGetCountRes, err
 	}
 
 	return res, nil
+}
+
+func HandleOrderTimeoutResult(ctx context.Context, orderId int) error {
+	// 更新字段
+	updateData := g.Map{
+		"status":     consts.OrderStatusCancelled,
+		"updated_at": gtime.Now(), // 可选：更新时间戳
+	}
+	// 更新订单状态
+	result, err := dao.OrderInfo.Ctx(ctx).Where("id=? AND status=?", orderId, consts.OrderStatusPendingPayment).Update(updateData)
+	if err != nil {
+		return gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	row, _ := result.RowsAffected()
+	if row == 0 {
+		g.Log().Infof(ctx, "订单已取消，无需再取消, orderId=%d", orderId)
+		return nil
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单编号:{%s}, 新状态: %d", orderId, consts.OrderStatusPendingPayment)
+	return nil
+}
+
+func GetOrderDetail(ctx context.Context, orderId int) ([]*grabbitmq.OrderGoodsInfo, error) {
+	// 查询主订单
+	var order entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).WherePri(orderId).Scan(&order)
+	if err != nil {
+		return nil, fmt.Errorf("查询订单失败: %v", err)
+	}
+	// 检查订单是否存在
+	if order.Id == 0 {
+		return nil, gerror.NewCode(gcode.CodeNotFound, "订单不存在")
+	}
+	// 查询订单商品
+	var goodsList []*entity.OrderGoodsInfo
+	err = dao.OrderGoodsInfo.Ctx(ctx).Where("order_id", orderId).Scan(&goodsList)
+	if err != nil {
+		return nil, fmt.Errorf("查询订单商品失败: %v", err)
+	}
+
+	// 转换订单商品数据
+	var orderGoodsInfo []*grabbitmq.OrderGoodsInfo
+	for _, goods := range goodsList {
+		orderGoodsInfo = append(orderGoodsInfo, &grabbitmq.OrderGoodsInfo{
+			GoodsId: goods.GoodsId,
+			Count:   goods.Count,
+		})
+	}
+
+	return orderGoodsInfo, nil
 }

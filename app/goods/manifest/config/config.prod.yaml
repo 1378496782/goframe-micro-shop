@@ -42,14 +42,18 @@ rabbitmq:
     couponConfirmExchange: "coupon.confirm.exchange"
     couponConfirmResultExchange: "coupon.confirm.result.exchange"
     orderExchange: "order.events.exchange"
+    goodsStockExchange: "goods.stock.exchange"
   queue:
     user:
       registered: "user_registered_queue"
     couponConfirmRequestQueue: "coupon.confirm.request.queue"
     orderCreatedQueue: "goods_service_order_created_queue"
+    goodsStockQueue: "goods_stock_queue"
   routingKey:
     user:
       registered: "user.registered"
     couponConfirmRequest: "coupon.confirm.request"
     couponConfirmResult: "coupon.confirm.result"
     orderCreated: "order.created"
+    goodsStock: "goods.stock"
+

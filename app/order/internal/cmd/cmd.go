@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	goods "shop-goframe-micro-service-refacotor/app/order/utility/goods_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"syscall"
 
@@ -65,6 +66,7 @@ var (
 			s := grpcx.Server.New(c)
 			order_info.Register(s)
 			refund_info.Register(s)
+			goods.Register()
 			s.Run()
 			return nil
 		},
@@ -76,6 +78,10 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	// 添加优惠券确认结果消费者
 	couponResultConsumer := consumer.NewCouponResultConsumer(ctx)
 	manager.AddConsumer(couponResultConsumer)
+
+	// 添加订单超时未支付消费者
+	orderTimeoutConsumer := consumer.NewOrderTimeoutConsumer(ctx)
+	manager.AddConsumer(orderTimeoutConsumer)
 
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)

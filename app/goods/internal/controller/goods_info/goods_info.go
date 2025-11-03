@@ -205,3 +205,52 @@ func (*Controller) Delete(ctx context.Context, req *v1.GoodsInfoDeleteReq) (res 
 	// 返回删除成功的空响应
 	return &v1.GoodsInfoDeleteRes{}, nil // 返回空结构体
 }
+
+func (*Controller) GetGoodsStock(ctx context.Context, req *v1.GetGoodsStockReq) (res *v1.GetGoodsStockRes, err error) {
+	goodsToStack := make(map[uint32]int32)
+	var goodsId []uint32
+	for _, productId := range req.GoodsIds {
+		detail, err := goodsRedis.GetGoodsDetail(ctx, productId)
+		if err != nil {
+			g.Log().Infof(ctx, "Redis查询失败: %v", err)
+			goodsId = append(goodsId, productId)
+			continue
+		}
+		if detail.IsNil() {
+			g.Log().Infof(ctx, "缓存未命中: %v", err)
+			goodsId = append(goodsId, productId)
+			continue
+		}
+		// 检查是否为空缓存标记
+		if detail.String() == "__EMPTY__" {
+			g.Log().Info(ctx, "空缓存命中，防止缓存穿透")
+			return nil, gerror.New("商品不存在")
+		}
+		// 缓存命中，反序列化数据
+		var cachedRes v1.GoodsInfoGetDetailRes
+		if err := detail.Struct(&cachedRes); err != nil {
+			g.Log().Errorf(ctx, "缓存数据反序列化失败: %v", err)
+			goodsId = append(goodsId, productId)
+		}
+		if cachedRes.Data.Stock <= 0 {
+			g.Log().Infof(ctx, "商品 %d 库存不足或为0，准备查数据库确认", productId)
+			goodsId = append(goodsId, productId)
+			continue
+		}
+		g.Log().Info(ctx, "goods detail缓存命中")
+		goodsToStack[productId] = cachedRes.Data.Stock
+	}
+	if len(goodsId) > 0 {
+		var goodsInfo []*entity.GoodsInfo
+		err = dao.GoodsInfo.Ctx(ctx).Fields("id", "stock").WhereIn("id", goodsId).Scan(&goodsInfo)
+		infoError := consts.InfoError(consts.GoodsInfo, consts.GetStockFail)
+		if err != nil {
+			g.Log().Errorf(ctx, "%v %v", infoError, err)
+			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+		}
+		for _, re := range goodsInfo {
+			goodsToStack[uint32(re.Id)] = int32(re.Stock)
+		}
+	}
+	return &v1.GetGoodsStockRes{GoodsStock: goodsToStack}, nil
+}
