@@ -93,6 +93,10 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	orderCreatedConsumer := consumer.NewOrderCreatedConsumer(ctx)
 	manager.AddConsumer(orderCreatedConsumer)
 
+	// 添加订单库存返还消费者
+	returnStockConsumer := consumer.NewReturnStockConsumer(ctx)
+	manager.AddConsumer(returnStockConsumer)
+
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)
 	// manager.AddConsumer(anotherConsumer)

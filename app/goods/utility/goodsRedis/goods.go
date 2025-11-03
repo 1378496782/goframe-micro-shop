@@ -89,3 +89,32 @@ func DeleteCategoryAll(ctx context.Context) error {
 	_, err := goodsCache.Remove(ctx, categoryAllKey)
 	return err
 }
+
+// DeleteKeys 批量删除多个缓存
+func DeleteKeys(ctx context.Context, keys []uint32) error {
+	cache := GetGoodsCache()
+	if cache == nil {
+		return fmt.Errorf("goodsCache 未初始化")
+	}
+
+	// 构建缓存 key 切片
+	cacheKeys := make([]any, len(keys))
+	for i, key := range keys {
+		cacheKeys[i] = fmt.Sprintf("%s%d", GoodsDetailKey, key)
+	}
+
+	// 批量删除
+	if _, err := cache.Remove(ctx, cacheKeys...); err != nil {
+		g.Log().Warningf(ctx, "批量删除缓存失败: %v, keys=%v", err, cacheKeys)
+		// 不 return，尝试延迟双删
+	}
+
+	// 延迟双删
+	time.AfterFunc(300*time.Millisecond, func() {
+		if _, err := cache.Remove(ctx, cacheKeys...); err != nil {
+			g.Log().Warningf(ctx, "延迟双删缓存失败: %v, keys=%v", err, cacheKeys)
+		}
+	})
+
+	return nil
+}

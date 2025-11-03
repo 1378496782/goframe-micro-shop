@@ -2,13 +2,10 @@ package rabbitmq
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"sync"
-	"time"
-
 	"github.com/gogf/gf/v2/frame/g"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"sync"
 )
 
 //没有使用，因为使用了通用的消费者管理器，所以不需要单独的消费者客户端
@@ -191,52 +188,53 @@ func (r *OrderRabbitMQClient) initExchangeAndQueue(ctx context.Context) error {
 }
 
 // SendOrderTimeoutMessage 发送订单超时消息
-func (r *OrderRabbitMQClient) SendOrderTimeoutMessage(ctx context.Context, orderId int32, delayMs int) error {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	// 获取交换机名称
-	exchangeName := g.Cfg().MustGet(ctx, "rabbitmq.default.exchange.orderDelayExchange").String()
-	if exchangeName == "" {
-		return fmt.Errorf("交换机名称不能为空，请检查配置文件")
-	}
-
-	message := map[string]interface{}{
-		"order_id":  orderId,
-		"type":      "order_timeout",
-		"timestamp": time.Now().Format(time.RFC3339),
-	}
-
-	body, err := json.Marshal(message)
-	if err != nil {
-		return fmt.Errorf("序列化消息失败: %v", err)
-	}
-
-	err = r.channel.Publish(
-		exchangeName,    // exchange
-		"order.timeout", // routing key
-		false,           // mandatory
-		false,           // immediate
-		amqp.Publishing{
-			ContentType: "application/json",
-			Body:        body,
-			Headers: amqp.Table{
-				"x-delay": delayMs, // 延迟时间，单位毫秒
-			},
-			DeliveryMode: amqp.Persistent, // 持久化消息
-		})
-	if err != nil {
-		return fmt.Errorf("发送消息失败: %v", err)
-	}
-
-	g.Log().Infof(ctx, "订单超时消息发送成功, 订单ID: %d, 延迟: %d毫秒", orderId, delayMs)
-	return nil
-}
+//func (r *OrderRabbitMQClient) SendOrderTimeoutMessage(ctx context.Context, orderId int32, delayMs int) error {
+//	r.mutex.Lock()
+//	defer r.mutex.Unlock()
+//
+//	// 获取交换机名称
+//	exchangeName := g.Cfg().MustGet(ctx, "rabbitmq.default.exchange.orderDelayExchange").String()
+//	if exchangeName == "" {
+//		return fmt.Errorf("交换机名称不能为空，请检查配置文件")
+//	}
+//
+//	message := map[string]interface{}{
+//		"order_id":  orderId,
+//		"type":      "order_timeout",
+//		"timestamp": time.Now().Format(time.RFC3339),
+//	}
+//
+//	body, err := json.Marshal(message)
+//	if err != nil {
+//		return fmt.Errorf("序列化消息失败: %v", err)
+//	}
+//
+//	err = r.channel.Publish(
+//		exchangeName,    // exchange
+//		"order.timeout", // routing key
+//		false,           // mandatory
+//		false,           // immediate
+//		amqp.Publishing{
+//			ContentType: "application/json",
+//			Body:        body,
+//			Headers: amqp.Table{
+//				"x-delay": delayMs, // 延迟时间，单位毫秒
+//			},
+//			DeliveryMode: amqp.Persistent, // 持久化消息
+//		})
+//	if err != nil {
+//		return fmt.Errorf("发送消息失败: %v", err)
+//	}
+//
+//	g.Log().Infof(ctx, "订单超时消息发送成功, 订单ID: %d, 延迟: %d毫秒", orderId, delayMs)
+//	return nil
+//}
 
 // GetOrderTimeoutDelay 从配置获取订单超时延迟时间
 func GetOrderTimeoutDelay(ctx context.Context) int {
 	// 从配置获取订单超时时间，默认30分钟
 	timeout := g.Cfg().MustGet(ctx, "business.orderTimeout").Int()
+	g.Log().Infof(ctx, "延迟时间:%d", timeout)
 	if timeout <= 0 {
 		timeout = 30 * 60 * 1000 // 30分钟
 	}
@@ -244,11 +242,11 @@ func GetOrderTimeoutDelay(ctx context.Context) int {
 }
 
 // SendOrderTimeoutMessageStatic 静态方法发送订单超时消息
-func SendOrderTimeoutMessageStatic(ctx context.Context, orderId int32, delayMs int) error {
-	client, err := GetOrderRabbitMQClient(ctx)
-	if err != nil {
-		return err
-	}
-
-	return client.SendOrderTimeoutMessage(ctx, orderId, delayMs)
-}
+//func SendOrderTimeoutMessageStatic(ctx context.Context, orderId int32, delayMs int) error {
+//	client, err := GetOrderRabbitMQClient(ctx)
+//	if err != nil {
+//		return err
+//	}
+//
+//	return client.SendOrderTimeoutMessage(ctx, orderId, delayMs)
+//}

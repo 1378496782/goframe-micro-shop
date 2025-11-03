@@ -48,11 +48,13 @@ rabbitmq:
     couponConfirmExchange: "coupon.confirm.exchange"
     # 用于向order服务发送确认结果（Direct Exchange）
     couponConfirmResultExchange: "coupon.confirm.result.exchange"
+    goodsStockExchange: "goods.stock.exchange"
   queue:
     user:
       registered: "user_registered_queue"
     # 服务监听“优惠券确认请求”的队列
     couponConfirmRequestQueue: "coupon.confirm.request.queue"
+    goodsStockQueue: "goods_stock_queue"
   routingKey:
     user:
       registered: "user.registered"
@@ -60,3 +62,4 @@ rabbitmq:
     couponConfirmRequest: "coupon.confirm.request"
     # 服务发送“确认结果”给服务order时用的 RoutingKey
     couponConfirmResult: "coupon.confirm.result"
+    goodsStock: "goods.stock"

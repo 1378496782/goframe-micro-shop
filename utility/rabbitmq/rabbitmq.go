@@ -149,12 +149,12 @@ func (r *RabbitMQ) Close() {
 // DeclareExchange 声明交换机
 func (r *RabbitMQ) DeclareExchange(name, kind string) error {
 	args := amqp.Table{}
-	
+
 	// 如果是延迟交换机，需要设置特殊参数
 	if kind == "x-delayed-message" {
 		args["x-delayed-type"] = "direct" // 指定延迟交换机的底层类型
 	}
-	
+
 	return r.channel.ExchangeDeclare(
 		name,
 		kind,

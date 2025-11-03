@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/goods_info"
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
 )
 
@@ -35,7 +36,7 @@ func (c *OrderCreatedConsumer) HandleMessage(ctx context.Context, msg amqp.Deliv
 		return err // Nack the message
 	}
 
-	g.Log().Infof(ctx, "Received OrderCreatedEvent: %+v", event)
+	g.Log().Infof(ctx, "收到创建订单事件OrderCreatedEvent: %+v", event)
 
 	if len(event.GoodsIds) == 0 {
 		g.Log().Infof(ctx, "No goods to delete from cart for user %d", event.UserId)
@@ -49,6 +50,15 @@ func (c *OrderCreatedConsumer) HandleMessage(ctx context.Context, msg amqp.Deliv
 		return err // Nack the message
 	}
 
-	g.Log().Infof(ctx, "Successfully deleted %d goods from cart for user %d", len(event.GoodsIds), event.UserId)
+	// 扣减库存
+	// todo: 添加最大重试次数
+	err = goods_info.ReduceStock(ctx, &event)
+	if err != nil {
+		//go rabbitmq.PublishOrderCreatedEvent(event)
+		//g.Log().Warningf(ctx, "库存扣减失败，已重新发布重试事件，失败原因: %v", err)
+		return err // Nack the message
+	}
+
+	g.Log().Infof(ctx, "成功从订单{%d}中扣减库存", event.OrderId)
 	return nil // Ack the message
 }

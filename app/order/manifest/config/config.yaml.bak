@@ -36,6 +36,7 @@ rabbitmq:
     couponConfirmExchange: "coupon.confirm.exchange"  # Direct 类型推荐
     #用于接收goods服务的优惠券确认结果
     couponConfirmResultExchange: "coupon.confirm.result.exchange"
+    goodsStockExchange: "goods.stock.exchange"
   queue:
     orderTimeoutQueue: "order.timeout.queue"
     #监听“确认结果”的队列（来自goods服务的回复）
@@ -46,6 +47,7 @@ rabbitmq:
     couponConfirm: "coupon.confirm.request"
     # 监听回复时绑定用的 RoutingKey（order服务回复时用这个key发回来）
     couponConfirmResult: "coupon.confirm.result"
+    goodsStock: "goods.stock" # 配置添加到 bak
 
 
 # 业务配置

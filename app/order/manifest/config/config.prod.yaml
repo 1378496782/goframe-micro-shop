@@ -32,6 +32,7 @@ rabbitmq:
     couponConfirmExchange: "coupon.confirm.exchange"
     couponConfirmResultExchange: "coupon.confirm.result.exchange"
     orderExchange: "order.events.exchange"
+    goodsStockExchange: "goods.stock.exchange"
   queue:
     orderTimeoutQueue: "order.timeout.queue"
     couponConfirmResultQueue: "coupon.confirm.result.queue"
@@ -40,9 +41,10 @@ rabbitmq:
     couponConfirm: "coupon.confirm.request"
     couponConfirmResult: "coupon.confirm.result"
     orderCreated: "order.created"
+    goodsStock: "goods.stock"
 
 business:
-  orderTimeout: 1800000
+  orderTimeout: 1800000  # 订单超时时间（毫秒），默认30分钟
 
 # 微信支付
 payment:
