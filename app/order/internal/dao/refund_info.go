@@ -5,10 +5,7 @@
 package dao
 
 import (
-	"shop-goframe-micro-service-refacotor/app/order/internal/dao/internal"
 )
-
-// refundInfoDao is the data access object for the table refund_info.
 // You can define custom methods on it to extend its functionality as needed.
 type refundInfoDao struct {
 	*internal.RefundInfoDao

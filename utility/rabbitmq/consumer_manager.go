@@ -3,12 +3,17 @@ package rabbitmq
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	"shop-goframe-micro-service-refacotor/utility/idempotent"
 )
 
 // Consumer 消费者接口
@@ -21,6 +26,10 @@ type Consumer interface {
 
 	// HandleMessage 处理消息
 	HandleMessage(ctx context.Context, msg amqp.Delivery) error
+	
+	// GetBusinessID 从消息中提取业务ID，用于幂等性检查（可选实现）
+	// 如果不实现，将使用消息头中的business_id或空字符串
+	GetBusinessID(data []byte, event map[string]interface{}) string
 }
 
 // ConsumerConfig 消费者配置
@@ -33,6 +42,7 @@ type ConsumerConfig struct {
 	AutoAck       bool   // 是否自动确认，默认false
 	PrefetchCount int    // 预取数量，默认1
 	Durable       bool   // 是否持久化，默认true
+	MaxRetries    int    // 最大重试次数，默认3次；设置为0表示不限制
 }
 
 // ConsumerManager 通用消费者管理器
@@ -117,6 +127,9 @@ func (cm *ConsumerManager) startConsumer(consumer Consumer) {
 	if config.PrefetchCount == 0 {
 		config.PrefetchCount = 1
 	}
+	if config.MaxRetries == 0 {
+		config.MaxRetries = 3 // 默认最大重试次数为3次
+	}
 	config.Durable = true // 强制持久化
 
 	// 设置队列
@@ -189,6 +202,21 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 		}
 	}()
 
+	// 记录消息接收日志
+	g.Log().Debugf(cm.ctx, "接收到消息: consumer=%s, exchange=%s, routingKey=%s, messageID=%s",
+		consumer.GetName(), msg.Exchange, msg.RoutingKey, msg.MessageId)
+
+	// 幂等性检查
+	if err := cm.checkIdempotency(consumer, msg); err != nil {
+		g.Log().Warningf(cm.ctx, "消息幂等性检查失败或已处理: consumer=%s, messageID=%s, error=%v",
+			consumer.GetName(), msg.MessageId, err)
+		// 已处理过的消息直接确认
+		if !consumer.GetConfig().AutoAck {
+			msg.Ack(false)
+		}
+		return
+	}
+
 	start := time.Now()
 	err := consumer.HandleMessage(cm.ctx, msg)
 	duration := time.Since(start)
@@ -197,10 +225,30 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 		g.Log().Errorf(cm.ctx, "消费者 %s 处理消息失败 (耗时 %v): %v",
 			consumer.GetName(), duration, err)
 
-		// 根据错误类型决定是否重新入队
-		if shouldRequeue(err) {
+		// 检查重试次数
+		retryCount := cm.getMessageRetryCount(msg)
+		config := consumer.GetConfig()
+		
+		// 根据错误类型和重试次数决定是否重新入队
+		if shouldRequeue(err) && (config.MaxRetries <= 0 || retryCount < config.MaxRetries) {
+			// 增加重试计数
+			newRetryCount := retryCount + 1
+			g.Log().Infof(cm.ctx, "消息将重新入队，当前重试次数: %d, 最大重试次数: %d", 
+				newRetryCount, config.MaxRetries)
+			
+			// 更新消息头中的重试次数
+			if msg.Headers == nil {
+				msg.Headers = make(amqp.Table)
+			}
+			msg.Headers["x-retry-count"] = newRetryCount
+			
+			// 在重新入队前发布一条带有更新后重试次数的消息
+			// 注意：这里我们仍然使用Nack让消息重新入队，但会记录重试次数
+			// 在实际场景中，如果需要更精确的控制，可以先Nack(false,false)然后重新发布带有新header的消息
 			msg.Nack(false, true) // 重新入队
 		} else {
+			g.Log().Warningf(cm.ctx, "消息达到最大重试次数或为永久性错误，不再重试，重试次数: %d, 最大重试次数: %d", 
+			retryCount, config.MaxRetries)
 			msg.Nack(false, false) // 不重新入队
 		}
 		return
@@ -214,12 +262,147 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 	}
 }
 
+// checkIdempotency 检查消息的幂等性
+func (cm *ConsumerManager) checkIdempotency(consumer Consumer, msg amqp.Delivery) error {
+	// 获取消息相关信息
+	messageID := msg.MessageId
+	if messageID == "" {
+		// 如果没有messageID，生成一个基于消息体的简单标识
+		messageID = fmt.Sprintf("%x", msg.Body[:32]) // 使用消息体前32字节作为标识
+	}
+
+	// 尝试从消息中提取业务ID
+	// 1. 首先尝试使用消费者的GetBusinessID方法
+	businessID := ""
+	// 解析消息体以获取event数据
+	event := make(map[string]interface{})
+	if err := UnmarshalEvent(msg.Body, &event); err == nil {
+		businessID = consumer.GetBusinessID(msg.Body, event)
+	}
+	
+	// 2. 如果消费者没有提供业务ID，尝试从消息头获取
+	if businessID == "" {
+		if businessIDHeader, exists := msg.Headers["business_id"]; exists {
+			businessID = gconv.String(businessIDHeader)
+		}
+	}
+
+	// 生成幂等键
+	// 格式: rabbitmq:consumer_name:message_id:business_id
+	key := idempotent.GenerateMessageKey(
+		fmt.Sprintf("rabbitmq:%s", consumer.GetName()),
+		messageID,
+		businessID,
+	)
+
+	// 设置幂等键的过期时间，默认24小时
+	expiration := 24 * time.Hour
+	if ttlHeader, exists := msg.Headers["idempotent_ttl"]; exists {
+		if ttl, ok := ttlHeader.(int64); ok {
+			expiration = time.Duration(ttl) * time.Second
+		}
+	}
+
+	// 尝试获取幂等锁
+	locked, err := idempotent.TryLock(cm.ctx, key, expiration)
+	if err != nil {
+		// 幂等性服务错误，为了不阻塞业务流程，暂时允许继续处理
+		g.Log().Errorf(cm.ctx, "幂等性检查服务错误: key=%s, error=%v", key, err)
+		return nil // 允许处理，不视为错误
+	}
+
+	if !locked {
+		// 已存在幂等锁，说明消息已处理过
+		return fmt.Errorf("消息已处理过")
+	}
+
+	return nil
+}
+
+// 定义错误类型，用于控制重试行为
+type (
+	// TemporaryError 临时性错误，表示可以重试
+	TemporaryError struct {
+		Err error
+	}
+	
+	// PermanentError 永久性错误，表示不应该重试
+	PermanentError struct {
+		Err error
+	}
+)
+
+// Error 实现error接口
+func (e TemporaryError) Error() string {
+	return fmt.Sprintf("临时性错误: %v", e.Err)
+}
+
+// Error 实现error接口
+func (e PermanentError) Error() string {
+	return fmt.Sprintf("永久性错误: %v", e.Err)
+}
+
+// Unwrap 实现errors.Unwrap接口
+func (e TemporaryError) Unwrap() error {
+	return e.Err
+}
+
+// Unwrap 实现errors.Unwrap接口
+func (e PermanentError) Unwrap() error {
+	return e.Err
+}
+
+// IsTemporary 判断是否为临时性错误
+func IsTemporary(err error) bool {
+	var tempErr TemporaryError
+	return errors.Is(err, &tempErr)
+}
+
+// IsPermanent 判断是否为永久性错误
+func IsPermanent(err error) bool {
+	var permErr PermanentError
+	return errors.Is(err, &permErr)
+}
+
+// getMessageRetryCount 获取消息的当前重试次数
+func (cm *ConsumerManager) getMessageRetryCount(msg amqp.Delivery) int {
+	// 从消息头获取重试次数
+	if retryCount, exists := msg.Headers["x-retry-count"]; exists {
+		// 尝试将各种类型转换为整数
+		return gconv.Int(retryCount)
+	}
+	return 0
+}
+
 // shouldRequeue 判断是否应该重新入队
 func shouldRequeue(err error) bool {
-	// 可以根据错误类型来判断是否重新入队
-	// 例如：网络错误、临时性错误等可以重新入队
-	// 数据格式错误、业务逻辑错误等不重新入队
-	return false // 默认不重新入队
+	// 检查是否为临时性错误
+	var tempErr TemporaryError
+	if errors.As(err, &tempErr) {
+		return true
+	}
+	
+	// 对于其他类型的错误，可以根据错误信息判断
+	// 例如网络错误、连接错误等临时性问题可以重试
+	errMsg := err.Error()
+	temporaryErrorPatterns := []string{
+		"connection",
+		"timeout",
+		"network",
+		"refused",
+		"unavailable",
+		"reset by peer",
+		"deadline exceeded",
+	}
+	
+	for _, pattern := range temporaryErrorPatterns {
+		if strings.Contains(strings.ToLower(errMsg), strings.ToLower(pattern)) {
+			return true
+		}
+	}
+	
+	// 默认不重新入队
+	return false
 }
 
 // BaseConsumer 基础消费者实现，可以被具体消费者嵌入
@@ -244,6 +427,12 @@ func (bc *BaseConsumer) GetName() string {
 // GetConfig 获取消费者配置
 func (bc *BaseConsumer) GetConfig() ConsumerConfig {
 	return bc.config
+}
+
+// GetBusinessID 默认实现，返回空字符串
+// 具体消费者可以覆盖此方法以提供自定义的业务ID提取逻辑
+func (bc *BaseConsumer) GetBusinessID(data []byte, event map[string]interface{}) string {
+	return ""
 }
 
 // UnmarshalEvent 通用事件解析helper

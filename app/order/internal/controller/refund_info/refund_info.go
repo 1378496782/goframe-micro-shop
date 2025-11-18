@@ -10,7 +10,6 @@ import (
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"shop-goframe-micro-service-refacotor/utility"
-
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 
@@ -146,6 +145,7 @@ func (*Controller) Create(ctx context.Context, req *v1.RefundInfoCreateReq) (res
 	}
 
 	// todo 优化：微信支付接口失败，需要有一个重试机制
+	// todo 优化：微信支付接口失败，需要有一个重试机制
 	if refund.Status == int(consts.RefundStatusApproved) {
 		refundReq := &payment.RefundReq{
 			TransactionId: order.TransactionId,
@@ -159,6 +159,13 @@ func (*Controller) Create(ctx context.Context, req *v1.RefundInfoCreateReq) (res
 			return nil, err
 		}
 		g.Log().Infof(ctx, "已向微信平台发送退款申请，订单号=%d，退款单号=%s,退款号=%s", order.Id, refund.Number, refundId)
+		_, err = dao.RefundInfo.Ctx(ctx).Where("id", id).Data(g.Map{
+			"refund_status": int(consts.RefundOrderStatusProcessing),
+			"refund_id":     refundId,
+		}).Update()
+		if err != nil {
+			g.Log().Errorf(ctx, "%v,%v", err, "更新退款状态失败")
+		}
 		_, err = dao.RefundInfo.Ctx(ctx).Where("id", id).Data(g.Map{
 			"refund_status": int(consts.RefundOrderStatusProcessing),
 			"refund_id":     refundId,

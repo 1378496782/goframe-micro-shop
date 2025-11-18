@@ -14,6 +14,7 @@ require (
 	github.com/qiniu/go-sdk/v7 v7.25.4
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/silenceper/wechat/v2 v2.1.9
+	github.com/stretchr/testify v1.11.1
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.21
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.7
@@ -22,6 +23,7 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
@@ -31,6 +33,7 @@ require (
 	github.com/pingcap/errors v0.11.5-0.20250318082626-8f80e5cb09ec // indirect
 	github.com/pingcap/log v1.1.1-0.20241212030209-7e3ff8601a2a // indirect
 	github.com/pingcap/tidb/pkg/parser v0.0.0-20250421232622-526b2c79173d // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
