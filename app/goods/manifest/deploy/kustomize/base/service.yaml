@@ -1,12 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: template-mono-app
+  name: goods-service
+  labels:
+    app: goods-service
 spec:
+  type: ClusterIP  # 内部服务，只在集群内访问
   ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8000
+    - name: grpc
+      port: 31004  # 与容器端口保持一致
+      targetPort: 31004
+      protocol: TCP
   selector:
-    app: template-mono-app
+    app: goods-service  # 与Deployment的标签匹配
 

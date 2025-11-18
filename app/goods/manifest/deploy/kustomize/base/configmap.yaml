@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: goods-service-config
+data:
+  config.yaml: |
+    grpc:
+      name: "goods"
+      address: ":31004"
+      logger:
+        path: "./log"
+        file: "{Y-m-d}.log"
+        prefix: "goods-service"
+        level: "all"
+        stdout: true
+        rotateSize: 104857600
+        rotateBackupLimit: 7
+        ctxKeys: [ "traceId" ]
+        timeFormat: "2006-01-02 15:04:05.000"
+
+    database:
+      default:
+        link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/goods"
+        debug: false
+
+    etcd:
+      address: "etcd:2379"
+
+    redis:
+      goods:
+        address: "redis:6379"
+        db: 1
+        pass: ""
+        idleTimeout: "600s"
+        maxActive: 50
+        idle: 10
+        connectTimeout: "5s"
+
+    rabbitmq:
+      default:
+        host: "rabbitmq"
+        port: "5672"
+        user: "root"
+        password: "root"
+        vhost: "/"
+      exchange:
+        user: "user_events"
+        couponConfirmExchange: "coupon.confirm.exchange"
+        couponConfirmResultExchange: "coupon.confirm.result.exchange"
+        orderExchange: "order.events.exchange"
+        goodsStockExchange: "goods.stock.exchange"
+      queue:
+        user:
+          registered: "user_registered_queue"
+        couponConfirmRequestQueue: "coupon.confirm.request.queue"
+        orderCreatedQueue: "goods_service_order_created_queue"
+        goodsStockQueue: "goods_stock_queue"
+      routingKey:
+        user:
+          registered: "user.registered"
+        couponConfirmRequest: "coupon.confirm.request"
+        couponConfirmResult: "coupon.confirm.result"
+        orderCreated: "order.created"
+        goodsStock: "goods.stock"

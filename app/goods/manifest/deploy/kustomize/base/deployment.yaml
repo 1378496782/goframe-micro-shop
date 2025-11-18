@@ -1,21 +1,59 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: template-mono-app
+  name: goods-service
   labels:
-    app: template-mono-app
+    app: goods-service
 spec:
-  replicas: 1
+  replicas: 2  # 初始副本数，将由HPA控制
   selector:
     matchLabels:
-      app: template-mono-app
+      app: goods-service
   template:
     metadata:
       labels:
-        app: template-mono-app
+        app: goods-service
     spec:
       containers:
-        - name : main
-          image: template-mono-app
+        - name: goods-service
+          image: shop-goframe-micro/goods-service:latest
           imagePullPolicy: Always
+          ports:
+            - containerPort: 31004  # GRPC服务端口
+          resources:
+            limits:
+              cpu: "500m"  # 0.5 CPU核心
+              memory: "512Mi"  # 512MB内存
+            requests:
+              cpu: "100m"  # 0.1 CPU核心
+              memory: "128Mi"  # 128MB内存
+          env:
+            - name: ENV
+              value: "production"
+            - name: TZ
+              value: "Asia/Shanghai"
+          livenessProbe:
+            tcpSocket:
+              port: 31004
+            initialDelaySeconds: 60  # 容器启动60秒后开始探测
+            periodSeconds: 30  # 每30秒探测一次
+          readinessProbe:
+            tcpSocket:
+              port: 31004
+            initialDelaySeconds: 30  # 容器启动30秒后开始探测
+            periodSeconds: 15  # 每15秒探测一次
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: log-volume
+              mountPath: /app/log
+      volumes:
+        - name: config-volume
+          configMap:
+            name: goods-service-config
+        - name: log-volume
+          emptyDir: {}
+      imagePullSecrets:
+        - name: registry-credentials  # 用于拉取私有镜像的密钥
 
