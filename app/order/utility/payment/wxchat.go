@@ -22,7 +22,6 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
 	"net/http"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
-	v2 "shop-goframe-micro-service-refacotor/app/order/api/refund_info/v1"
 	"strconv"
 	"time"
 )
@@ -173,49 +172,153 @@ func Notify(ctx context.Context, req *v1.NotifyReq) (string, string, error) {
 
 // ================ 微信退款相关 ==================
 
+// RefundReq 退款请求结构
+type RefundReq struct {
+	TransactionId string // 原支付交易对应的微信订单号
+	OutRefundNo   string // 退款单号
+	Reason        string // 退款原因
+	TotalAmount   int64  // 原订单金额（分）
+	RefundAmount  int64  // 退款金额（分）
+}
+
+// Refund 微信退款
+func Refund(ctx context.Context, req *RefundReq) (string, error) {
+	if wechatClient == nil {
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, errors.New("客户端未初始化"))
+	}
+
+	// 加载配置
+	wxConf := loadConfigParam()
+
+	// 构建退款请求
 	prepayReq := refunddomestic.CreateRequest{
 		TransactionId: core.String(req.TransactionId),      // 原支付交易对应的微信订单号
-		OutRefundNo:   core.String(req.OutRefundNo),        // 原支付交易对应的商户订单号
+		OutRefundNo:   core.String(req.OutRefundNo),        // 退款单号
 		Reason:        core.String(req.Reason),             // 退货理由
 		NotifyUrl:     core.String(wxConf.refundNotifyUrl), // 退款回调 url
 		Amount: &refunddomestic.AmountReq{
 			Total:    core.Int64(req.TotalAmount),  // 原订单支付金额，单位分
 			Refund:   core.Int64(req.RefundAmount), // 退款金额，单位分
-func Refund(ctx context.Context, req *RefundReq) (string, error) {
+			Currency: core.String("CNY"),           // 货币类型
+		},
 	}
 
-		return "", gerror.WrapCode(gcode.CodeOperationFailed, errors.New("客户端未初始化"))
+	// 调用微信退款API
 	svc := refunddomestic.RefundsApiService{Client: wechatClient}
-	resp, apiResult, err := svc.Create(ctx, prepayReq)
+	resp, _, err := svc.Create(ctx, prepayReq)
 	if err != nil {
-		return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "向微信发送请求失败")
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "向微信发送退款请求失败")
 	}
-	// 5) 判断返回状态
-		TransactionId: core.String(req.TransactionId),      // 原支付交易对应的微信订单号
-		OutRefundNo:   core.String(req.OutRefundNo),        // 原支付交易对应的商户订单号
-		Reason:        core.String(req.Reason),             // 退货理由
-		NotifyUrl:     core.String(wxConf.refundNotifyUrl), // 退款回调 url
 
-	// 6) 解析退款结果（同步结果）
-	// todo 根据 status 去进行不同的处理
+	// 检查响应
+	if resp == nil || resp.RefundId == nil {
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, errors.New("退款响应为空或退款ID为空"))
+	}
+
+	refundId := *resp.RefundId
+	
+	// 根据状态处理
 	if resp.Status != nil {
 		status := *resp.Status
 		switch status {
 		case "SUCCESS":
-			fmt.Printf("✅ 退款成功，退款单号：%s\n", *resp.RefundId)
-			return "", nil
+			g.Log().Info(ctx, "退款成功", g.Map{"refundId": refundId})
+			return refundId, nil
 		case "PROCESSING":
-			fmt.Printf("⏳ 退款处理中，请等待异步通知。退款单号：%s\n", *resp.RefundId)
-		return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "向微信发送请求失败")
-			return "", gerror.Newf("⚠️ 退款异常，请人工介入，退款单号：%s", *resp.RefundId)
-			return "", gerror.Newf("❌ 退款已关闭，退款单号：%s", *resp.RefundId)
+			g.Log().Info(ctx, "退款处理中，等待异步通知", g.Map{"refundId": refundId})
+			return refundId, nil
+		case "REFUNDCLOSE":
+			g.Log().Warning(ctx, "退款已关闭", g.Map{"refundId": refundId})
+			return "", gerror.Newf("退款已关闭，退款单号：%s", refundId)
+		case "REFUNDERR":
+			g.Log().Warning(ctx, "退款异常", g.Map{"refundId": refundId})
+			return "", gerror.Newf("退款异常，请人工介入，退款单号：%s", refundId)
 		default:
-		return "", gerror.Newf("退款接口返回异常状态码：%d", apiResult.Response.StatusCode)
+			g.Log().Warning(ctx, "退款状态未知", g.Map{"status": status, "refundId": refundId})
+			// 即使状态未知，也返回退款ID，以便后续处理
+			return refundId, nil
 		}
-	fmt.Println("resp", *resp)
+	}
 
-	// 6) 解析退款结果（同步结果）
-	// todo 根据 status 去进行不同的处理
+	// 如果没有状态字段，也返回退款ID
+	g.Log().Info(ctx, "退款请求已发送，无明确状态", g.Map{"refundId": refundId})
+	return refundId, nil
+}
+
+// RefundNotifyReq 退款回调请求
+type RefundNotifyReq struct {
+	Headers  map[string]string
+	RawBody  string
+}
+
+// RefundNotification 退款通知结构
+type RefundNotification struct {
+	Refund *struct {
+		RefundId *string `json:"refund_id"`
+		Status   *string `json:"status"`
+	} `json:"refund"`
+}
+
+// RefundNotify 处理微信退款回调
+func RefundNotify(ctx context.Context, req interface{}) (string, error) {
+	// 类型断言
+	notifyReq, ok := req.(*RefundNotifyReq)
+	if !ok {
+		return "", gerror.WrapCode(gcode.CodeInvalidParameter, errors.New("无效的回调请求类型"))
+	}
+
+	// 测试代码(本地测试用)
+	if notifyReq.Headers["X-Bypass-Verify"] == "1" {
+		res := new(RefundNotification)
+		if err := json.Unmarshal([]byte(notifyReq.RawBody), res); err != nil {
+			return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "测试模式：解析退款通知失败")
+		}
+		if res.Refund != nil && res.Refund.RefundId != nil {
+			return *res.Refund.RefundId, nil
+		}
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, errors.New("测试模式：退款ID为空"))
+	}
+
+	// 1) 获取配置文件
+	wxConf := loadConfigParam()
+	// 2) 使用下载管理器获取平台证书访问器
+	certVisitor := downloader.MgrInstance().GetCertificateVisitor(wxConf.mchID)
+	// 3) 初始化 notify.Handler （使用平台证书验签 + apiv3 Key 解密）
+	handler := notify.NewNotifyHandler(wxConf.apiV3Key, verifiers.NewSHA256WithRSAVerifier(certVisitor))
+
+	// 4) 将原始回调内容构造成 *http.Request 给 wechatpay SDK 使用
+	httpReq, err := http.NewRequest("POST", "", bytes.NewBuffer([]byte(notifyReq.RawBody)))
+	if err != nil {
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "构造 http 请求失败")
+	}
+	for k, v := range notifyReq.Headers {
+		httpReq.Header.Set(k, v)
+	}
+
+	// 5) 解析并验证通知签名与加密数据
+	res := new(RefundNotification)
+	_, err = handler.ParseNotifyRequest(ctx, httpReq, res)
+	if err != nil {
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, err, "ParseNotifyRequest 验签/解密失败")
+	}
+
+	// 6) 检查退款ID
+	if res.Refund == nil || res.Refund.RefundId == nil {
+		return "", gerror.WrapCode(gcode.CodeOperationFailed, errors.New("退款通知中未包含退款ID"))
+	}
+
+	refundId := *res.Refund.RefundId
+	g.Log().Info(ctx, "收到微信退款回调", g.Map{"refundId": refundId})
+	return refundId, nil
+}
+
+// genNonceStr 生成随机字符串
+func genNonceStr(n int) (string, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
 	s := hex.EncodeToString(b)
 	if len(s) > n {
 		s = s[:n]
