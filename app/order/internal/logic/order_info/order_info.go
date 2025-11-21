@@ -13,6 +13,7 @@ import (
 	goods "shop-goframe-micro-service-refacotor/app/order/utility/goods_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
 	"shop-goframe-micro-service-refacotor/utility"
+	"shop-goframe-micro-service-refacotor/utility/metrics"
 	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
 
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -104,6 +105,8 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	db := g.DB()
 	tx, err := db.Begin(ctx)
 	if err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
 		return 0, "", fmt.Errorf("开启事务失败: %v", err)
 	}
 
@@ -120,6 +123,8 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	// 使用 gconv.Struct 转换主订单
 	var order entity.OrderInfo
 	if err := gconv.Struct(req, &order); err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
 		return 0, "", fmt.Errorf("订单数据转换失败: %v", err)
 	}
 
@@ -137,6 +142,8 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	// 使用事务插入主订单
 	result, err := dao.OrderInfo.Ctx(ctx).TX(tx).InsertAndGetId(order)
 	if err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
 		return 0, "", fmt.Errorf("插入订单失败: %v", err)
 	}
 	orderId := int32(result)
@@ -152,12 +159,16 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	if len(orderGoodsList) > 0 {
 		_, err = dao.OrderGoodsInfo.Ctx(ctx).TX(tx).Insert(orderGoodsList)
 		if err != nil {
+			// 记录订单创建失败的业务指标
+			metrics.RecordOrderCreate(ctx, false)
 			return 0, "", fmt.Errorf("插入订单商品失败: %v", err)
 		}
 	}
 
 	// 提交事务
 	if err = tx.Commit(); err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
 		return 0, "", fmt.Errorf("提交事务失败: %v", err)
 	}
 
@@ -188,6 +199,14 @@ func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, err
 	// 订单创建成功后，异步发送延迟消息
 	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
 	go grabbitmq.PublishOrderTimeoutEvent(int(orderId), delay)
+
+	// 记录订单创建成功的业务指标
+	metrics.RecordOrderCreate(ctx, true)
+
+	// 对于每个商品，更新库存指标
+	for _, goodsInfo := range goodsInfos {
+		metrics.UpdateInventory(ctx, fmt.Sprintf("%d", goodsInfo.GoodsId), int64(goodsStockMap.GoodsStock[uint32(goodsInfo.GoodsId)]-int32(goodsInfo.Count)))
+	}
 
 	return orderId, order.Number, nil
 }
