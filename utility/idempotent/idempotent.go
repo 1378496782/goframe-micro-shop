@@ -33,26 +33,36 @@ func NewRedisIdempotentService(redisClient interface{}) IdempotentService {
 }
 
 // TryLock 尝试获取幂等锁
+// 设计思路：
+// 1. 使用Redis的SETNX命令（Set if Not eXists）实现分布式环境下的幂等控制
+// 2. 采用类型断言而非强类型依赖，提高代码的兼容性和可测试性
+// 3. 使用链式调用模式（.SetNX().Result()）适配GoFrame Redis客户端的API风格
+// 4. 将当前时间戳（纳秒级）作为锁值，便于后续可能的锁持有时间分析
 func (s *redisIdempotentService) TryLock(ctx context.Context, key string, expiration time.Duration) (bool, error) {
-	// 使用Redis的SETNX命令实现幂等性
+	// 使用类型断言将redisClient转换为具有SetNX方法的接口类型
+	// 这种设计允许我们注入任何实现了相同方法签名的Redis客户端或Mock对象
 	result, err := s.redisClient.(interface {
-		SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) (bool, error)
-	}).SetNX(ctx, key, time.Now().UnixNano(), expiration)
+		// 定义SetNX方法的签名，返回一个带有Result()方法的接口
+		// 这是适配GoFrame Redis客户端链式调用风格的关键
+		SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) interface{ Result() (bool, error) }
+	}).SetNX(ctx, key, time.Now().UnixNano(), expiration).Result()
 
+	// 错误处理与日志记录
 	if err != nil {
 		g.Log().Errorf(ctx, "获取幂等锁失败: key=%s, error=%v", key, err)
 		return false, fmt.Errorf("获取幂等锁失败: %v", err)
 	}
 
+	// 返回结果：true表示成功获取锁，false表示锁已存在
 	return result, nil
 }
 
 // ReleaseLock 释放幂等锁
 func (s *redisIdempotentService) ReleaseLock(ctx context.Context, key string) error {
-	// 直接删除键来释放锁
+	// 直接删除键来释放锁，适配GoFrame Redis客户端
 	_, err := s.redisClient.(interface {
-		Del(ctx context.Context, keys ...string) (int64, error)
-	}).Del(ctx, key)
+		Del(ctx context.Context, keys ...string) interface{ Result() (int64, error) }
+	}).Del(ctx, key).Result()
 
 	if err != nil {
 		g.Log().Errorf(ctx, "释放幂等锁失败: key=%s, error=%v", key, err)
