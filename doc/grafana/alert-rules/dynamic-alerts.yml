@@ -1,0 +1,112 @@
+# Grafana动态阈值告警规则配置
+# 适用于Grafana 8.0+版本
+apiVersion: 1
+
+groups:
+  - name: 服务性能指标告警
+    rules:
+      # 1. 动态错误率告警（基于历史数据的动态阈值）
+      - alert: 服务动态错误率异常
+        expr: |
+          sum(rate(service_errors_total[5m])) by (error_type, service) / 
+          sum(rate(http_requests_total[5m])) by (service) > 
+          avg_over_time((sum(rate(service_errors_total[1h])) by (error_type, service) / 
+          sum(rate(http_requests_total[1h])) by (service))[24h:5m]) * 1.5
+        for: 5m
+        labels:
+          severity: warning
+          type: dynamic_threshold
+        annotations:
+          summary: "{{ $labels.service }}服务{{ $labels.error_type }}错误率异常"
+          description: "错误率超过历史同期平均值的1.5倍，当前值: {{ $value | humanizePercentage }}"
+
+      # 2. 动态响应时间告警（基于历史数据的动态阈值）
+      - alert: 服务动态响应时间异常
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, path)) > 
+          avg_over_time((histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1h])) by (le, path)))[24h:5m]) * 1.8
+        for: 5m
+        labels:
+          severity: warning
+          type: dynamic_threshold
+        annotations:
+          summary: "路径{{ $labels.path }}响应时间异常"
+          description: "P95响应时间超过历史同期平均值的1.8倍，当前值: {{ $value | humanizeDuration }}"
+
+      # 3. 动态CPU使用率告警（基于历史数据的动态阈值）
+      - alert: 服务动态CPU使用率异常
+        expr: |
+          sum(rate(process_cpu_seconds_total[5m])) by (instance) > 
+          avg_over_time((sum(rate(process_cpu_seconds_total[1h])) by (instance))[24h:5m]) * 1.3
+        for: 10m
+        labels:
+          severity: warning
+          type: dynamic_threshold
+        annotations:
+          summary: "实例{{ $labels.instance }}CPU使用率异常"
+          description: "CPU使用率超过历史同期平均值的1.3倍，当前值: {{ $value | humanizePercentage }}"
+
+      # 4. 动态流量波动告警（基于历史数据的动态阈值）
+      - alert: 服务动态流量波动异常
+        expr: |
+          sum(rate(http_requests_total[5m])) by (method) < 
+          avg_over_time((sum(rate(http_requests_total[1h])) by (method))[24h:5m]) * 0.5
+        for: 10m
+        labels:
+          severity: warning
+          type: dynamic_threshold
+        annotations:
+          summary: "{{ $labels.method }}请求流量异常降低"
+          description: "请求量低于历史同期平均值的50%，当前值: {{ $value | humanize }}/秒"
+
+  - name: 业务指标告警
+    rules:
+      # 5. 动态库存告警（基于历史数据的动态阈值）
+      - alert: 动态库存变化异常
+        expr: |
+          abs(business_inventory_count - avg_over_time(business_inventory_count[1h])) > 
+          avg_over_time((abs(business_inventory_count - avg_over_time(business_inventory_count[1h])))[24h:5m]) * 2
+        for: 5m
+        labels:
+          severity: warning
+          type: dynamic_threshold
+        annotations:
+          summary: "产品{{ $labels.product_id }}库存变化异常"
+          description: "库存变化幅度超过历史同期平均值的2倍，当前值: {{ $value }}"
+
+      # 6. 动态订单量告警（基于历史数据的动态阈值）
+      - alert: 动态订单量波动异常
+        expr: |
+          sum(rate(business_order_create_total[5m])) by (status) < 
+          avg_over_time((sum(rate(business_order_create_total[1h])) by (status))[24h:5m]) * 0.6
+        for: 15m
+        labels:
+          severity: warning
+          type: dynamic_threshold
+        annotations:
+          summary: "订单量异常降低"
+          description: "{{ $labels.status }}订单量低于历史同期平均值的60%，当前值: {{ $value | humanize }}/秒"
+
+      # 7. 订单成功率异常告警
+      - alert: 订单成功率异常降低
+        expr: |
+          business_order_success_ratio < 
+          avg_over_time(business_order_success_ratio[24h:5m]) * 0.8
+        for: 5m
+        labels:
+          severity: warning
+          type: dynamic_threshold
+        annotations:
+          summary: "订单成功率异常降低"
+          description: "订单成功率低于历史同期平均值的80%，当前值: {{ $value | humanizePercentage }}"
+
+# 动态阈值告警配置说明：
+# 1. 以上规则在Grafana UI中配置时，需选择"动态阈值"类型的条件
+# 2. 关键参数设置建议：
+#    - 学习周期：建议设置为7-14天，以捕获工作日/周末的不同模式
+#    - 敏感度：一般场景建议使用"中等"敏感度，重要服务可使用"高"敏感度
+#    - 检测模式：根据具体指标特点选择"上升"、"下降"或"上升或下降"
+#    - 边界：选择"动态上限"、"动态下限"或"动态上限和下限"
+# 3. 对于时间敏感的业务指标，建议配置时间分组以处理工作日/周末的差异
+# 4. 首次部署后，需要等待学习周期完成才能准确触发告警
+# 5. 定期审查告警触发情况，调整参数以减少误报和漏报
