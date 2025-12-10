@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/banner"
+	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/flash_sale"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/goods"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/interaction"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/order"
@@ -28,6 +29,7 @@ var (
 			bannerController := banner.NewV1()
 			interactionController := interaction.NewV1()
 			orderController := order.NewV1()
+			flashSaleController := flash_sale.NewV1()
 
 			s.Group("/frontend", func(group *ghttp.RouterGroup) {
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
@@ -46,6 +48,9 @@ var (
 						goodsController.GoodsInfoGetList,
 						bannerController,
 						goodsController.RecommendGoodsInfoGetList,
+						// 秒杀相关接口 - 无需认证
+						flashSaleController.FlashSaleGoodsList,
+						flashSaleController.FlashSaleGoodsDetail,
 					)
 				})
 				// 需要JWT验证的路由
@@ -79,6 +84,9 @@ var (
 						goodsController.Bargain_history_Get,
 						goodsController.Bargain_history_Delete,
 						orderController.CancelOrder,
+						// 秒杀相关接口 - 需要认证
+						flashSaleController.CreateFlashSaleOrder,
+						flashSaleController.GetFlashSaleResult,
 					)
 				})
 			})

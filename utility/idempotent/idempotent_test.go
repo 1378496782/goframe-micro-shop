@@ -17,7 +17,7 @@ type mockRedisClient struct {
 }
 
 // 实现SetNX方法，直接返回匿名接口类型
-func (m *mockRedisClient) SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) interface { Result() (bool, error) } {
+func (m *mockRedisClient) SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) interface{ Result() (bool, error) } {
 	m.callCount["SetNX"]++
 	return &mockSetNXResult{
 		do: func() (bool, error) {
@@ -32,7 +32,7 @@ func (m *mockRedisClient) SetNX(ctx context.Context, key string, value interface
 }
 
 // 实现Del方法，直接返回匿名接口类型
-func (m *mockRedisClient) Del(ctx context.Context, keys ...string) interface { Result() (int64, error) } {
+func (m *mockRedisClient) Del(ctx context.Context, keys ...string) interface{ Result() (int64, error) } {
 	m.callCount["Del"]++
 	return &mockDelResult{
 		do: func() (int64, error) {
