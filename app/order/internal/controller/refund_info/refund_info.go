@@ -8,6 +8,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"shop-goframe-micro-service-refacotor/utility"
+
 	"github.com/gogf/gf/v2/util/gconv"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
@@ -33,14 +34,14 @@ func (*Controller) GetList(ctx context.Context, req *v1.RefundInfoGetListReq) (r
 	}
 
 	// 查询总数
-	total, err := dao.RefundInfo.GetModel().Ctx(ctx).Count()
+	total, err := dao.RefundInfo.Ctx(ctx).Count()
 	if err != nil {
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "查询退款记录总数失败")
 	}
 	response.Total = uint32(total)
 
 	// 查询当前页数据
-	refundRecords, err := dao.RefundInfo.GetModel().Ctx(ctx).
+	refundRecords, err := dao.RefundInfo.Ctx(ctx).
 		Page(int(req.Page), int(req.Size)).
 		All()
 	if err != nil {
@@ -70,7 +71,7 @@ func (*Controller) GetList(ctx context.Context, req *v1.RefundInfoGetListReq) (r
 
 func (*Controller) GetDetail(ctx context.Context, req *v1.RefundInfoGetDetailReq) (res *v1.RefundInfoGetDetailRes, err error) {
 	// 查询退款记录
-	record, err := dao.RefundInfo.GetModel().Ctx(ctx).Where("id", req.Id).One()
+	record, err := dao.RefundInfo.Ctx(ctx).Where("id", req.Id).One()
 	if err != nil {
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "查询退款记录失败")
 	}
@@ -108,7 +109,7 @@ func (*Controller) Create(ctx context.Context, req *v1.RefundInfoCreateReq) (res
 
 	// 使用延迟初始化的DAO方法
 	// 查询订单是否已存在退款记录
-	exist, _ := dao.RefundInfo.GetModel().Ctx(ctx).
+	exist, _ := dao.RefundInfo.Ctx(ctx).
 		Where("order_id", req.OrderId).
 		One()
 	if !exist.IsEmpty() {
@@ -120,7 +121,7 @@ func (*Controller) Create(ctx context.Context, req *v1.RefundInfoCreateReq) (res
 	refund.RefundStatus = 0 // 初始状态
 	refund.Status = 1       // 待处理状态
 
-	id, err := dao.RefundInfo.GetModel().Ctx(ctx).InsertAndGetId(refund)
+	id, err := dao.RefundInfo.Ctx(ctx).InsertAndGetId(refund)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +142,7 @@ func (*Controller) RefundNotify(ctx context.Context, req *v1.RefundNotifyReq) (r
 	}
 
 	// 2) 直接更新退款状态
-	_, err = dao.RefundInfo.GetModel().Ctx(ctx).
+	_, err = dao.RefundInfo.Ctx(ctx).
 		Where("number", refundId).
 		Data(map[string]interface{}{
 			"refund_status": 2, // 退款成功状态

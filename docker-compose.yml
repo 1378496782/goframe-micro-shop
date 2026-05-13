@@ -142,7 +142,7 @@ services:
     ports:
       - "31003:31003"
     volumes:
-      - ./app/admin/manifest/config/:/app/config/
+      - ./app/admin/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -161,7 +161,7 @@ services:
     ports:
       - "31004:31004"
     volumes:
-      - ./app/goods/manifest/config:/app/config
+      - ./app/goods/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -181,7 +181,7 @@ services:
     ports:
       - "31005:31005"
     volumes:
-      - ./app/order/manifest/config:/app/config
+      - ./app/order/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -201,7 +201,7 @@ services:
     ports:
       - "31001:31001"
     volumes:
-      - ./app/user/manifest/config:/app/config
+      - ./app/user/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -220,7 +220,7 @@ services:
     ports:
       - "31002:31002"
     volumes:
-      - ./app/interaction/manifest/config:/app/config
+      - ./app/interaction/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -239,7 +239,7 @@ services:
     ports:
       - "8599:8599"
     volumes:
-      - ./app/worker/manifest/config:/app/config
+      - ./app/worker/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - rabbitmq
@@ -257,7 +257,7 @@ services:
     ports:
       - "8499:8499"
     volumes:
-      - ./app/search/manifest/config:/app/config
+      - ./app/search/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - mysql
@@ -277,7 +277,7 @@ services:
     ports:
       - "8299:8299"
     volumes:
-      - ./app/gateway-admin/manifest/config:/app/config
+      - ./app/gateway-admin/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -295,7 +295,7 @@ services:
     ports:
       - "8199:8199"
     volumes:
-      - ./app/gateway-h5/manifest/config:/app/config
+      - ./app/gateway-h5/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -315,7 +315,7 @@ services:
     ports:
       - "8399:8399"
     volumes:
-      - ./app/gateway-resource/manifest/config:/app/config
+      - ./app/gateway-resource/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd
@@ -334,7 +334,7 @@ services:
     ports:
       - "31006:31006"
     volumes:
-      - ./app/banner/manifest/config:/app/config
+      - ./app/banner/manifest/config:/app/manifest/config
       - ./log:/app/log
     depends_on:
       - etcd

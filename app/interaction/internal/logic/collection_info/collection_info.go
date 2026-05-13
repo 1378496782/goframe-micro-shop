@@ -53,27 +53,24 @@ func GetList(ctx context.Context, req *v1.CollectionInfoGetListReq) ([]*pbentity
 	return list, total, nil
 }
 
-// Create 创建
 func Create(ctx context.Context, req *v1.CollectionInfoCreateReq) (int, error) {
-
-	// 先查询。
-	collectionInfo := entity.CollectionInfo{}
-	err := dao.CollectionInfo.Ctx(ctx).Where(dao.CollectionInfo.Columns().UserId, req.UserId).Scan(&collectionInfo)
-	if err != nil && err != sql.ErrNoRows {
+	exists, err := dao.CollectionInfo.Ctx(ctx).
+		Where(dao.CollectionInfo.Columns().UserId, req.UserId).
+		Where(dao.CollectionInfo.Columns().ObjectId, req.ObjectId).
+		Where(dao.CollectionInfo.Columns().Type, req.Type).
+		Exist()
+	if err != nil {
 		return 0, fmt.Errorf("查询收藏失败: %v", err)
 	}
-	// 有数据，直接返回了。
-	if collectionInfo.UserId > 0 {
+	if exists {
 		return 0, nil
 	}
-	// 没数据进行插入
-	// 向数据库中插入数据并获取自动生成的ID
+
 	lastInsertId, err := dao.CollectionInfo.Ctx(ctx).InsertAndGetId(req)
 	if err != nil {
 		return 0, fmt.Errorf("插入收藏失败: %v", err)
 	}
 
-	// 返回创建成功响应，包含新创建的ID
 	return int(lastInsertId), nil
 }
 

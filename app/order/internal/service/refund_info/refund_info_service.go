@@ -63,7 +63,7 @@ func (s *refundInfoService) CreateRefund(ctx context.Context, req *CreateRefundR
 	}
 
 	// 查询订单是否已存在退款记录
-	exist, _ := dao.RefundInfo.GetModel().Ctx(ctx).
+	exist, _ := dao.RefundInfo.Ctx(ctx).
 		Where("order_id", req.OrderId).
 		One()
 	if !exist.IsEmpty() {
@@ -85,7 +85,7 @@ func (s *refundInfoService) CreateRefund(ctx context.Context, req *CreateRefundR
 	refund.Status = int(consts.RefundStatusPending)
 
 	// 保存退款记录
-	id, err := dao.RefundInfo.GetModel().Ctx(ctx).InsertAndGetId(refund)
+	id, err := dao.RefundInfo.Ctx(ctx).InsertAndGetId(refund)
 	if err != nil {
 		return nil, errors.New("创建退款记录失败")
 	}
@@ -122,7 +122,7 @@ func (s *refundInfoService) ProcessRefund(ctx context.Context, refundId int, ord
 	}
 
 	// 更新退款状态为处理中
-	_, err = dao.RefundInfo.GetModel().Ctx(ctx).Where("id", refundId).Data(g.Map{
+	_, err = dao.RefundInfo.Ctx(ctx).Where("id", refundId).Data(g.Map{
 		"refund_status": int(consts.RefundOrderStatusProcessing),
 		"refund_id":     thirdPartyRefundId,
 		"updated_at":    gtime.Now(),
@@ -174,7 +174,7 @@ func (s *refundInfoService) RetryProcessRefund(ctx context.Context, refundId int
 // UpdateRefundStatus 更新退款状态
 func (s *refundInfoService) UpdateRefundStatus(ctx context.Context, refundId string, status int) error {
 	// 检查是否已经是成功状态
-	exists, err := dao.RefundInfo.GetModel().Ctx(ctx).
+	exists, err := dao.RefundInfo.Ctx(ctx).
 		Where("refund_id", refundId).
 		Where("refund_status", consts.RefundOrderStatusSuccess).
 		Exist()
@@ -187,7 +187,7 @@ func (s *refundInfoService) UpdateRefundStatus(ctx context.Context, refundId str
 	}
 
 	// 更新退款状态
-	_, err = dao.RefundInfo.GetModel().Ctx(ctx).Where("refund_id", refundId).Data(g.Map{
+	_, err = dao.RefundInfo.Ctx(ctx).Where("refund_id", refundId).Data(g.Map{
 		"refund_status": status,
 		"updated_at":    gtime.Now(),
 	}).Update()
@@ -202,7 +202,7 @@ func (s *refundInfoService) UpdateRefundStatus(ctx context.Context, refundId str
 // GetRefundByRefundId 根据第三方退款编号获取退款记录
 func (s *refundInfoService) GetRefundByRefundId(ctx context.Context, refundId string) (*entity.RefundInfo, error) {
 	var refund entity.RefundInfo
-	err := dao.RefundInfo.GetModel().Ctx(ctx).Where("refund_id", refundId).Scan(&refund)
+	err := dao.RefundInfo.Ctx(ctx).Where("refund_id", refundId).Scan(&refund)
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func (s *refundInfoService) GetRefundByRefundId(ctx context.Context, refundId st
 // GetRefundById 根据ID获取退款记录
 func (s *refundInfoService) GetRefundById(ctx context.Context, id int) (*entity.RefundInfo, error) {
 	var refund entity.RefundInfo
-	err := dao.RefundInfo.GetModel().Ctx(ctx).WherePri(id).Scan(&refund)
+	err := dao.RefundInfo.Ctx(ctx).WherePri(id).Scan(&refund)
 	if err != nil {
 		return nil, err
 	}
