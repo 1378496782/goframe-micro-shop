@@ -234,9 +234,6 @@ INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created
 INSERT INTO `bargain_history` (`id`, `bargain_id`, `amount`, `user_id`, `created_time`, `deleted_time`) VALUES (8, 18, 16, 7, '2025-10-13 11:58:34', '2025-10-13 11:59:15');
 
 
-
-----------------------------------------------------------------------------------
-----------------------------------------------------------------------------------
 USE user;
 
 -- ----------------------------

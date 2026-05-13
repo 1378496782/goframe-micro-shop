@@ -5,25 +5,18 @@
 package dao
 
 import (
-	"github.com/gogf/gf/v2/database/gdb"
-	"github.com/gogf/gf/v2/frame/g"
+	"shop-goframe-micro-service-refacotor/app/order/internal/dao/internal"
 )
 
-// refundInfoDao is the DAO object for table refund_info.
+// refundInfoDao is the data access object for table refund_info.
+// You can define custom methods on it to extend its functionality as needed.
 type refundInfoDao struct {
-	model *gdb.Model
+	*internal.RefundInfoDao
 }
 
-// RefundInfo is a globally accessible object for table refund_info operations.
-var RefundInfo = refundInfoDao{}
-
-// GetModel 获取退款模型实例
-func (dao *refundInfoDao) GetModel() *gdb.Model {
-	if dao.model == nil {
-		// 延迟初始化，避免在测试环境中直接连接数据库
-		dao.model = g.DB().Model("refund_info")
-	}
-	return dao.model
-}
+var (
+	// RefundInfo is a globally accessible object for table refund_info operations.
+	RefundInfo = refundInfoDao{internal.NewRefundInfoDao()}
+)
 
 // Add your custom methods and functionality below.
