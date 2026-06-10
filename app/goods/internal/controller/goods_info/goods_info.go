@@ -10,6 +10,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/goods/utility/goodsRedis"
 	"shop-goframe-micro-service-refacotor/utility"
 	"shop-goframe-micro-service-refacotor/utility/consts"
+	"strings"
 	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -47,6 +48,11 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 		query = query.Where("sort > ?", 0)
 	}
 
+	keyword := strings.TrimSpace(req.Keyword)
+	if keyword != "" {
+		query = query.Where("name like ?", "%"+keyword+"%")
+	}
+
 	// 查询总数
 	total, err := query.Count()
 	fmt.Println("total,", total)
@@ -63,6 +69,7 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 		// 如果是热门商品，按sort降序排列（越大越靠前）
 		OrderDesc("sort").
 		All()
+
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)

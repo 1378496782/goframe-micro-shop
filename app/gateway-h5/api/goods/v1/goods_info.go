@@ -17,10 +17,11 @@ type GoodsInfoGetDetailRes struct {
 
 // 商品分页查询
 type GoodsInfoGetListReq struct {
-	g.Meta `path:"/goods" method:"get" tags:"商品管理" sm:"商品分页列表"`
-	Page   uint32 `json:"page" d:"1"  v:"min:1" dc:"页码"`
-	Size   uint32 `json:"size" d:"10" v:"max:100" dc:"每页数量"`
-	IsHot  uint32 `json:"is_hot" d:"0"  dc:"热门推荐(1 开启)"`
+	g.Meta  `path:"/goods" method:"get" tags:"商品管理" sm:"商品分页列表"`
+	Page    uint32 `json:"page" d:"1"  v:"min:1" dc:"页码"`
+	Size    uint32 `json:"size" d:"10" v:"max:100" dc:"每页数量"`
+	IsHot   uint32 `json:"is_hot" d:"0"  dc:"热门推荐(1 开启)"`
+	Keyword string `json:"keyword" dc:"搜索关键词"`
 }
 
 type GoodsInfoGetListRes struct {

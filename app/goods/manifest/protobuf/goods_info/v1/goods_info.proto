@@ -85,6 +85,7 @@ message GoodsInfoGetListReq {
   uint32 page = 1;
   uint32 size = 2;  // 修改：字段编号必须从1开始递增
   uint32 is_hot = 3;
+  string keyword = 4;
 }
 
 

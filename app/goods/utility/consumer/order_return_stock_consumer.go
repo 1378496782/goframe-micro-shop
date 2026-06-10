@@ -3,10 +3,11 @@ package consumer
 import (
 	"context"
 	"encoding/json"
-	"github.com/gogf/gf/v2/frame/g"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/goods_info"
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
+
+	"github.com/gogf/gf/v2/frame/g"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 // ReturnStockConsumer 订单库存返还事件消费者
@@ -44,7 +45,7 @@ func (c *ReturnStockConsumer) HandleMessage(ctx context.Context, msg amqp.Delive
 
 	goodsInfoArr, err := goods_info.ReturnStock(ctx, &event)
 	if err != nil {
-		g.Log().Infof(ctx, "返回库存失败", event.OrderId)
+		g.Log().Errorf(ctx, "订单{%d} 返还库存失败,err: %v", event.OrderId, err)
 		return err
 	}
 	// todo 自动重试（带最大次数限制+延迟）、细分错误处理
