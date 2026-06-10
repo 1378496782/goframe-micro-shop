@@ -81,6 +81,13 @@ func createConnection(ctx context.Context) (*RabbitMQ, error) {
 	}, nil
 }
 
+// NewChannel 从现有连接创建一个新的独立 channel。
+// amqp.Channel 不是线程安全的，多消费者场景下每个消费者应使用独立 channel，
+// 避免一个消费者触发协议错误把其他消费者的 channel 一起被关闭。
+func (r *RabbitMQ) NewChannel() (*amqp.Channel, error) {
+	return r.conn.Channel()
+}
+
 // Publish 发布消息
 func (r *RabbitMQ) Publish(exchange, routingKey string, message interface{}) error {
 	body, err := json.Marshal(message)

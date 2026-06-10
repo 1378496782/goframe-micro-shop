@@ -111,6 +111,7 @@ func (cm *ConsumerManager) Stop() {
 }
 
 // startConsumer 启动单个消费者
+// 每个消费者使用独立的 amqp.Channel，避免共享 channel 引发的协议级错误连带关闭所有消费者。
 func (cm *ConsumerManager) startConsumer(consumer Consumer) {
 	defer cm.wg.Done()
 
@@ -132,22 +133,52 @@ func (cm *ConsumerManager) startConsumer(consumer Consumer) {
 	}
 	config.Durable = true // 强制持久化
 
+	// 基础空值校验，避免声明到默认交换机（空字符串对应默认交换机，RabbitMQ 不允许客户端声明）
+	if config.Exchange == "" {
+		g.Log().Errorf(cm.ctx, "消费者 %s 配置错误: exchange 为空，请检查配置", name)
+		return
+	}
+	if config.Queue == "" {
+		g.Log().Errorf(cm.ctx, "消费者 %s 配置错误: queue 为空，请检查配置", name)
+		return
+	}
+
+	// 为当前消费者创建独立 channel，避免与其他消费者共享
+	ch, err := cm.rb.NewChannel()
+	if err != nil {
+		g.Log().Errorf(cm.ctx, "消费者 %s 创建 channel 失败: %v", name, err)
+		return
+	}
+	defer func() {
+		if closeErr := ch.Close(); closeErr != nil {
+			g.Log().Warningf(cm.ctx, "消费者 %s 关闭 channel 时出错: %v", name, closeErr)
+		}
+	}()
+
 	// 设置队列
-	err := cm.setupQueue(config)
+	err = cm.setupQueue(ch, config)
 	if err != nil {
 		g.Log().Errorf(cm.ctx, "设置消费者 %s 队列失败: %v", name, err)
 		return
 	}
 
 	// 设置QoS
-	err = cm.rb.SetQoS(config.PrefetchCount, 0, false)
+	err = ch.Qos(config.PrefetchCount, 0, false)
 	if err != nil {
 		g.Log().Errorf(cm.ctx, "设置消费者 %s QoS失败: %v", name, err)
 		return
 	}
 
 	// 开始消费消息
-	msgs, err := cm.rb.Consume(config.Queue, config.ConsumerTag, config.AutoAck)
+	msgs, err := ch.Consume(
+		config.Queue,
+		config.ConsumerTag,
+		config.AutoAck,
+		false, // exclusive
+		false, // noLocal
+		false, // noWait
+		nil,   // args
+	)
 	if err != nil {
 		g.Log().Errorf(cm.ctx, "消费者 %s 启动失败: %v", name, err)
 		return
@@ -170,22 +201,48 @@ func (cm *ConsumerManager) startConsumer(consumer Consumer) {
 	}
 }
 
-// setupQueue 设置队列
-func (cm *ConsumerManager) setupQueue(config ConsumerConfig) error {
-	// 声明交换机
-	err := cm.rb.DeclareExchange(config.Exchange, config.ExchangeType)
+// setupQueue 使用指定 channel 设置队列
+func (cm *ConsumerManager) setupQueue(ch *amqp.Channel, config ConsumerConfig) error {
+	// 声明交换机（延迟交换机需要特殊参数）
+	args := amqp.Table{}
+	if config.ExchangeType == "x-delayed-message" {
+		args["x-delayed-type"] = "direct"
+	}
+
+	err := ch.ExchangeDeclare(
+		config.Exchange,
+		config.ExchangeType,
+		true,  // durable
+		false, // autoDelete
+		false, // internal
+		false, // noWait
+		args,
+	)
 	if err != nil {
 		return fmt.Errorf("声明交换机失败: %v", err)
 	}
 
 	// 声明队列
-	q, err := cm.rb.DeclareQueue(config.Queue)
+	q, err := ch.QueueDeclare(
+		config.Queue,
+		true,  // durable
+		false, // autoDelete
+		false, // exclusive
+		false, // noWait
+		nil,   // args
+	)
 	if err != nil {
 		return fmt.Errorf("声明队列失败: %v", err)
 	}
 
 	// 绑定队列
-	err = cm.rb.QueueBind(q.Name, config.RoutingKey, config.Exchange)
+	err = ch.QueueBind(
+		q.Name,
+		config.RoutingKey,
+		config.Exchange,
+		false, // noWait
+		nil,   // args
+	)
 	if err != nil {
 		return fmt.Errorf("绑定队列失败: %v", err)
 	}
