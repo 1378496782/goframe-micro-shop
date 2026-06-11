@@ -574,6 +574,7 @@ type GoodsInfoGetListReq struct {
 	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"` // 修改：字段编号必须从1开始递增
 	IsHot         uint32                 `protobuf:"varint,3,opt,name=is_hot,json=isHot,proto3" json:"is_hot,omitempty"`
 	Keyword       string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"`
+	CategoryId    uint32                 `protobuf:"varint,5,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -634,6 +635,13 @@ func (x *GoodsInfoGetListReq) GetKeyword() string {
 		return x.Keyword
 	}
 	return ""
+}
+
+func (x *GoodsInfoGetListReq) GetCategoryId() uint32 {
+	if x != nil {
+		return x.CategoryId
+	}
+	return 0
 }
 
 type GoodsInfoListResponse struct {
@@ -884,12 +892,14 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"$\n" +
 	"\x12GoodsInfoDeleteReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"\x14\n" +
-	"\x12GoodsInfoDeleteRes\"n\n" +
+	"\x12GoodsInfoDeleteRes\"\x8f\x01\n" +
 	"\x13GoodsInfoGetListReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\rR\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\rR\x04size\x12\x15\n" +
 	"\x06is_hot\x18\x03 \x01(\rR\x05isHot\x12\x18\n" +
-	"\akeyword\x18\x04 \x01(\tR\akeyword\"~\n" +
+	"\akeyword\x18\x04 \x01(\tR\akeyword\x12\x1f\n" +
+	"\vcategory_id\x18\x05 \x01(\rR\n" +
+	"categoryId\"~\n" +
 	"\x15GoodsInfoListResponse\x12'\n" +
 	"\x04list\x18\x01 \x03(\v2\x13.pbentity.GoodsInfoR\x04list\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +
