@@ -138,7 +138,7 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 		// 检查是否为空缓存标记
 		if detail.String() == "__EMPTY__" {
 			g.Log().Info(ctx, "空缓存命中，防止缓存穿透")
-			return nil, gerror.New("商品不存在")
+			return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 		}
 		// 缓存命中，反序列化数据
 		var cachedRes v1.GoodsInfoGetDetailRes

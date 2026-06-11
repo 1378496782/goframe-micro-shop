@@ -2,6 +2,9 @@ package goods
 
 import (
 	"context"
+
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/util/gconv"
 
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/goods/v1"
@@ -20,6 +23,9 @@ func (c *ControllerV1) GoodsInfoGetDetail(ctx context.Context, req *v1.GoodsInfo
 
 	if err != nil {
 		return nil, err
+	}
+	if grpcRes.Data == nil {
+		return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 	}
 
 	// 批量转换列表项
