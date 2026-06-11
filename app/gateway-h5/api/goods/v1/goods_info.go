@@ -17,15 +17,16 @@ type GoodsInfoGetDetailRes struct {
 
 // 商品分页查询
 type GoodsInfoGetListReq struct {
-	g.Meta     `path:"/goods" method:"get" tags:"商品管理" sm:"商品分页列表"`
-	Page       uint32 `json:"page" d:"1"  v:"min:1" dc:"页码"`
-	Size       uint32 `json:"size" d:"10" v:"max:100" dc:"每页数量"`
-	IsHot      uint32 `json:"is_hot" d:"0"  dc:"热门推荐(1 开启)"`
-	Keyword    string `json:"keyword" dc:"搜索关键词"`
-	CategoryId uint32 `json:"category_id" dc:"分类ID"`
-	PriceMin   uint64 `json:"price_min" dc:"最低价格(分)"`
-	PriceMax   uint64 `json:"price_max" dc:"最高价格(分)"`
-	SortType   uint32 `json:"sort_type" d:"0" dc:"排序类型：0默认排序 1价格升序 2价格降序 3销量降序"`
+	g.Meta      `path:"/goods" method:"get" tags:"商品管理" sm:"商品分页列表"`
+	Page        uint32 `json:"page" d:"1"  v:"min:1" dc:"页码"`
+	Size        uint32 `json:"size" d:"10" v:"max:100" dc:"每页数量"`
+	IsHot       uint32 `json:"is_hot" d:"0"  dc:"热门推荐(1 开启)"`
+	Keyword     string `json:"keyword" dc:"搜索关键词"`
+	CategoryId  uint32 `json:"category_id" dc:"分类ID"`
+	PriceMin    uint64 `json:"price_min" dc:"最低价格(分)"`
+	PriceMax    uint64 `json:"price_max" dc:"最高价格(分)"`
+	SortType    uint32 `json:"sort_type" d:"0" v:"in:0,1,2,3" dc:"排序类型：0默认排序 1价格升序 2价格降序 3销量降序"`
+	OnlyInStock uint32 `json:"only_in_stock" d:"0" v:"in:0,1" dc:"是否只看有库存：0否 1是"`
 }
 
 type GoodsInfoGetListRes struct {

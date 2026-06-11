@@ -75,6 +75,52 @@ func (SortType) EnumDescriptor() ([]byte, []int) {
 	return file_goods_info_v1_goods_info_proto_rawDescGZIP(), []int{0}
 }
 
+type OnlyInStock int32
+
+const (
+	OnlyInStock_NO  OnlyInStock = 0
+	OnlyInStock_YES OnlyInStock = 1
+)
+
+// Enum value maps for OnlyInStock.
+var (
+	OnlyInStock_name = map[int32]string{
+		0: "NO",
+		1: "YES",
+	}
+	OnlyInStock_value = map[string]int32{
+		"NO":  0,
+		"YES": 1,
+	}
+)
+
+func (x OnlyInStock) Enum() *OnlyInStock {
+	p := new(OnlyInStock)
+	*p = x
+	return p
+}
+
+func (x OnlyInStock) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OnlyInStock) Descriptor() protoreflect.EnumDescriptor {
+	return file_goods_info_v1_goods_info_proto_enumTypes[1].Descriptor()
+}
+
+func (OnlyInStock) Type() protoreflect.EnumType {
+	return &file_goods_info_v1_goods_info_proto_enumTypes[1]
+}
+
+func (x OnlyInStock) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OnlyInStock.Descriptor instead.
+func (OnlyInStock) EnumDescriptor() ([]byte, []int) {
+	return file_goods_info_v1_goods_info_proto_rawDescGZIP(), []int{1}
+}
+
 type GoodsInfoGetDetailReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -630,6 +676,7 @@ type GoodsInfoGetListReq struct {
 	PriceMin      uint64                 `protobuf:"varint,6,opt,name=price_min,json=priceMin,proto3" json:"price_min,omitempty"`
 	PriceMax      uint64                 `protobuf:"varint,7,opt,name=price_max,json=priceMax,proto3" json:"price_max,omitempty"`
 	SortType      SortType               `protobuf:"varint,8,opt,name=sort_type,json=sortType,proto3,enum=goods_info.v1.SortType" json:"sort_type,omitempty"`
+	OnlyInStock   OnlyInStock            `protobuf:"varint,9,opt,name=only_in_stock,json=onlyInStock,proto3,enum=goods_info.v1.OnlyInStock" json:"only_in_stock,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -718,6 +765,13 @@ func (x *GoodsInfoGetListReq) GetSortType() SortType {
 		return x.SortType
 	}
 	return SortType_DEFAULT
+}
+
+func (x *GoodsInfoGetListReq) GetOnlyInStock() OnlyInStock {
+	if x != nil {
+		return x.OnlyInStock
+	}
+	return OnlyInStock_NO
 }
 
 type GoodsInfoListResponse struct {
@@ -968,7 +1022,7 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"$\n" +
 	"\x12GoodsInfoDeleteReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"\x14\n" +
-	"\x12GoodsInfoDeleteRes\"\xff\x01\n" +
+	"\x12GoodsInfoDeleteRes\"\xbf\x02\n" +
 	"\x13GoodsInfoGetListReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\rR\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\rR\x04size\x12\x15\n" +
@@ -978,7 +1032,8 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"categoryId\x12\x1b\n" +
 	"\tprice_min\x18\x06 \x01(\x04R\bpriceMin\x12\x1b\n" +
 	"\tprice_max\x18\a \x01(\x04R\bpriceMax\x124\n" +
-	"\tsort_type\x18\b \x01(\x0e2\x17.goods_info.v1.SortTypeR\bsortType\"~\n" +
+	"\tsort_type\x18\b \x01(\x0e2\x17.goods_info.v1.SortTypeR\bsortType\x12>\n" +
+	"\ronly_in_stock\x18\t \x01(\x0e2\x1a.goods_info.v1.OnlyInStockR\vonlyInStock\"~\n" +
 	"\x15GoodsInfoListResponse\x12'\n" +
 	"\x04list\x18\x01 \x03(\v2\x13.pbentity.GoodsInfoR\x04list\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +
@@ -999,7 +1054,10 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\tPRICE_ASC\x10\x01\x12\x0e\n" +
 	"\n" +
 	"PRICE_DESC\x10\x02\x12\r\n" +
-	"\tSALE_DESC\x10\x032\x87\x04\n" +
+	"\tSALE_DESC\x10\x03*\x1e\n" +
+	"\vOnlyInStock\x12\x06\n" +
+	"\x02NO\x10\x00\x12\a\n" +
+	"\x03YES\x10\x012\x87\x04\n" +
 	"\n" +
 	"goods_info\x12S\n" +
 	"\aGetList\x12\".goods_info.v1.GoodsInfoGetListReq\x1a\".goods_info.v1.GoodsInfoGetListRes\"\x00\x12Y\n" +
@@ -1021,49 +1079,51 @@ func file_goods_info_v1_goods_info_proto_rawDescGZIP() []byte {
 	return file_goods_info_v1_goods_info_proto_rawDescData
 }
 
-var file_goods_info_v1_goods_info_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_goods_info_v1_goods_info_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_goods_info_v1_goods_info_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_goods_info_v1_goods_info_proto_goTypes = []any{
 	(SortType)(0),                 // 0: goods_info.v1.SortType
-	(*GoodsInfoGetDetailReq)(nil), // 1: goods_info.v1.GoodsInfoGetDetailReq
-	(*GoodsInfoGetDetailRes)(nil), // 2: goods_info.v1.GoodsInfoGetDetailRes
-	(*GoodsInfoCreateReq)(nil),    // 3: goods_info.v1.GoodsInfoCreateReq
-	(*GoodsInfoCreateRes)(nil),    // 4: goods_info.v1.GoodsInfoCreateRes
-	(*GoodsInfoUpdateReq)(nil),    // 5: goods_info.v1.GoodsInfoUpdateReq
-	(*GoodsInfoUpdateRes)(nil),    // 6: goods_info.v1.GoodsInfoUpdateRes
-	(*GoodsInfoDeleteReq)(nil),    // 7: goods_info.v1.GoodsInfoDeleteReq
-	(*GoodsInfoDeleteRes)(nil),    // 8: goods_info.v1.GoodsInfoDeleteRes
-	(*GoodsInfoGetListReq)(nil),   // 9: goods_info.v1.GoodsInfoGetListReq
-	(*GoodsInfoListResponse)(nil), // 10: goods_info.v1.GoodsInfoListResponse
-	(*GoodsInfoGetListRes)(nil),   // 11: goods_info.v1.GoodsInfoGetListRes
-	(*GetGoodsStockReq)(nil),      // 12: goods_info.v1.GetGoodsStockReq
-	(*GetGoodsStockRes)(nil),      // 13: goods_info.v1.GetGoodsStockRes
-	nil,                           // 14: goods_info.v1.GetGoodsStockRes.GoodsStockEntry
-	(*pbentity.GoodsInfo)(nil),    // 15: pbentity.GoodsInfo
+	(OnlyInStock)(0),              // 1: goods_info.v1.OnlyInStock
+	(*GoodsInfoGetDetailReq)(nil), // 2: goods_info.v1.GoodsInfoGetDetailReq
+	(*GoodsInfoGetDetailRes)(nil), // 3: goods_info.v1.GoodsInfoGetDetailRes
+	(*GoodsInfoCreateReq)(nil),    // 4: goods_info.v1.GoodsInfoCreateReq
+	(*GoodsInfoCreateRes)(nil),    // 5: goods_info.v1.GoodsInfoCreateRes
+	(*GoodsInfoUpdateReq)(nil),    // 6: goods_info.v1.GoodsInfoUpdateReq
+	(*GoodsInfoUpdateRes)(nil),    // 7: goods_info.v1.GoodsInfoUpdateRes
+	(*GoodsInfoDeleteReq)(nil),    // 8: goods_info.v1.GoodsInfoDeleteReq
+	(*GoodsInfoDeleteRes)(nil),    // 9: goods_info.v1.GoodsInfoDeleteRes
+	(*GoodsInfoGetListReq)(nil),   // 10: goods_info.v1.GoodsInfoGetListReq
+	(*GoodsInfoListResponse)(nil), // 11: goods_info.v1.GoodsInfoListResponse
+	(*GoodsInfoGetListRes)(nil),   // 12: goods_info.v1.GoodsInfoGetListRes
+	(*GetGoodsStockReq)(nil),      // 13: goods_info.v1.GetGoodsStockReq
+	(*GetGoodsStockRes)(nil),      // 14: goods_info.v1.GetGoodsStockRes
+	nil,                           // 15: goods_info.v1.GetGoodsStockRes.GoodsStockEntry
+	(*pbentity.GoodsInfo)(nil),    // 16: pbentity.GoodsInfo
 }
 var file_goods_info_v1_goods_info_proto_depIdxs = []int32{
-	15, // 0: goods_info.v1.GoodsInfoGetDetailRes.data:type_name -> pbentity.GoodsInfo
+	16, // 0: goods_info.v1.GoodsInfoGetDetailRes.data:type_name -> pbentity.GoodsInfo
 	0,  // 1: goods_info.v1.GoodsInfoGetListReq.sort_type:type_name -> goods_info.v1.SortType
-	15, // 2: goods_info.v1.GoodsInfoListResponse.list:type_name -> pbentity.GoodsInfo
-	10, // 3: goods_info.v1.GoodsInfoGetListRes.data:type_name -> goods_info.v1.GoodsInfoListResponse
-	14, // 4: goods_info.v1.GetGoodsStockRes.goods_stock:type_name -> goods_info.v1.GetGoodsStockRes.GoodsStockEntry
-	9,  // 5: goods_info.v1.goods_info.GetList:input_type -> goods_info.v1.GoodsInfoGetListReq
-	1,  // 6: goods_info.v1.goods_info.GetDetail:input_type -> goods_info.v1.GoodsInfoGetDetailReq
-	3,  // 7: goods_info.v1.goods_info.Create:input_type -> goods_info.v1.GoodsInfoCreateReq
-	5,  // 8: goods_info.v1.goods_info.Update:input_type -> goods_info.v1.GoodsInfoUpdateReq
-	7,  // 9: goods_info.v1.goods_info.Delete:input_type -> goods_info.v1.GoodsInfoDeleteReq
-	12, // 10: goods_info.v1.goods_info.GetGoodsStock:input_type -> goods_info.v1.GetGoodsStockReq
-	11, // 11: goods_info.v1.goods_info.GetList:output_type -> goods_info.v1.GoodsInfoGetListRes
-	2,  // 12: goods_info.v1.goods_info.GetDetail:output_type -> goods_info.v1.GoodsInfoGetDetailRes
-	4,  // 13: goods_info.v1.goods_info.Create:output_type -> goods_info.v1.GoodsInfoCreateRes
-	6,  // 14: goods_info.v1.goods_info.Update:output_type -> goods_info.v1.GoodsInfoUpdateRes
-	8,  // 15: goods_info.v1.goods_info.Delete:output_type -> goods_info.v1.GoodsInfoDeleteRes
-	13, // 16: goods_info.v1.goods_info.GetGoodsStock:output_type -> goods_info.v1.GetGoodsStockRes
-	11, // [11:17] is the sub-list for method output_type
-	5,  // [5:11] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	1,  // 2: goods_info.v1.GoodsInfoGetListReq.only_in_stock:type_name -> goods_info.v1.OnlyInStock
+	16, // 3: goods_info.v1.GoodsInfoListResponse.list:type_name -> pbentity.GoodsInfo
+	11, // 4: goods_info.v1.GoodsInfoGetListRes.data:type_name -> goods_info.v1.GoodsInfoListResponse
+	15, // 5: goods_info.v1.GetGoodsStockRes.goods_stock:type_name -> goods_info.v1.GetGoodsStockRes.GoodsStockEntry
+	10, // 6: goods_info.v1.goods_info.GetList:input_type -> goods_info.v1.GoodsInfoGetListReq
+	2,  // 7: goods_info.v1.goods_info.GetDetail:input_type -> goods_info.v1.GoodsInfoGetDetailReq
+	4,  // 8: goods_info.v1.goods_info.Create:input_type -> goods_info.v1.GoodsInfoCreateReq
+	6,  // 9: goods_info.v1.goods_info.Update:input_type -> goods_info.v1.GoodsInfoUpdateReq
+	8,  // 10: goods_info.v1.goods_info.Delete:input_type -> goods_info.v1.GoodsInfoDeleteReq
+	13, // 11: goods_info.v1.goods_info.GetGoodsStock:input_type -> goods_info.v1.GetGoodsStockReq
+	12, // 12: goods_info.v1.goods_info.GetList:output_type -> goods_info.v1.GoodsInfoGetListRes
+	3,  // 13: goods_info.v1.goods_info.GetDetail:output_type -> goods_info.v1.GoodsInfoGetDetailRes
+	5,  // 14: goods_info.v1.goods_info.Create:output_type -> goods_info.v1.GoodsInfoCreateRes
+	7,  // 15: goods_info.v1.goods_info.Update:output_type -> goods_info.v1.GoodsInfoUpdateRes
+	9,  // 16: goods_info.v1.goods_info.Delete:output_type -> goods_info.v1.GoodsInfoDeleteRes
+	14, // 17: goods_info.v1.goods_info.GetGoodsStock:output_type -> goods_info.v1.GetGoodsStockRes
+	12, // [12:18] is the sub-list for method output_type
+	6,  // [6:12] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_goods_info_v1_goods_info_proto_init() }
@@ -1076,7 +1136,7 @@ func file_goods_info_v1_goods_info_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_goods_info_v1_goods_info_proto_rawDesc), len(file_goods_info_v1_goods_info_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,

@@ -80,6 +80,11 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 		query = query.OrderDesc(dao.GoodsInfo.Columns().Sort)
 	}
 
+	// 根据是否只看有库存添加筛选条件
+	if req.OnlyInStock == v1.OnlyInStock_YES {
+		query = query.Where("stock > ?", 0)
+	}
+
 	// 查询总数
 	total, err := query.Count()
 	fmt.Println("total,", total)

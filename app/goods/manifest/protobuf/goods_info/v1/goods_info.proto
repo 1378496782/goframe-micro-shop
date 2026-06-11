@@ -90,6 +90,7 @@ message GoodsInfoGetListReq {
   uint64 price_min = 6;
   uint64 price_max = 7;
   SortType sort_type = 8;
+  OnlyInStock only_in_stock = 9;
 }
 
 enum SortType {
@@ -99,6 +100,10 @@ enum SortType {
   SALE_DESC = 3;
 }
 
+enum OnlyInStock {
+  NO = 0;
+  YES = 1;
+}
 
 message GoodsInfoListResponse {
   repeated pbentity.GoodsInfo list = 1;
