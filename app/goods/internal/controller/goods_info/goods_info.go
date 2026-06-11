@@ -81,7 +81,7 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 	}
 
 	// 根据是否只看有库存添加筛选条件
-	if req.OnlyInStock == v1.OnlyInStock_YES {
+	if req.OnlyInStock == 1 {
 		query = query.Where("stock > ?", 0)
 	}
 
