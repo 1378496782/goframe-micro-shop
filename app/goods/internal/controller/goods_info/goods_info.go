@@ -48,9 +48,15 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 		query = query.Where("sort > ?", 0)
 	}
 
+	// 根据关键字添加筛选条件
 	keyword := strings.TrimSpace(req.Keyword)
 	if keyword != "" {
 		query = query.Where("name like ?", "%"+keyword+"%")
+	}
+
+	// 根据分类ID添加筛选条件
+	if req.CategoryId > 0 {
+		query = query.Where("level1_category_id = ? or level2_category_id = ? or level3_category_id = ?", req.CategoryId, req.CategoryId, req.CategoryId)
 	}
 
 	// 查询总数
