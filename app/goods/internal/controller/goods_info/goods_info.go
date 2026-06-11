@@ -59,6 +59,15 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 		query = query.Where("level1_category_id = ? or level2_category_id = ? or level3_category_id = ?", req.CategoryId, req.CategoryId, req.CategoryId)
 	}
 
+	// 根据价格范围添加筛选条件
+	if req.PriceMin > 0 && req.PriceMax > 0 {
+		query = query.Where("price between ? and ?", req.PriceMin, req.PriceMax)
+	} else if req.PriceMin > 0 {
+		query = query.Where("price >= ?", req.PriceMin)
+	} else if req.PriceMax > 0 {
+		query = query.Where("price <= ?", req.PriceMax)
+	}
+
 	// 查询总数
 	total, err := query.Count()
 	fmt.Println("total,", total)
