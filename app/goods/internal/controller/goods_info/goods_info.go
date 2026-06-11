@@ -161,7 +161,7 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 		g.Log().Errorf(ctx, "%v %v", infoError+"查询商品不存在", err)
 		// 设置空缓存防止缓存穿透
 		_ = goodsRedis.SetEmptyGoodsDetail(ctx, req.Id)
-		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError+"查询商品不存在")
+		return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 	}
 
 	// 转换为实体结构
