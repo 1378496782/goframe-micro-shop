@@ -132,25 +132,26 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 	// 先尝试从Redis获取
 	detail, err := goodsRedis.GetGoodsDetail(ctx, req.Id)
 	if err != nil {
-		g.Log().Infof(ctx, "Redis查询失败: %v", err)
+		g.Log().Infof(ctx, "商品详情缓存读取失败，降级查询MySQL: goods_id=%d, err=%v", req.Id, err)
 		// 继续查询数据库，不直接返回错误
 	} else if !detail.IsNil() {
 		// 检查是否为空缓存标记
-		if detail.String() == "__EMPTY__" {
-			g.Log().Info(ctx, "空缓存命中，防止缓存穿透")
+		if detail.String() == goodsRedis.EmptyValue {
+			g.Log().Infof(ctx, "商品详情命中空缓存: goods_id=%d", req.Id)
 			return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 		}
 		// 缓存命中，反序列化数据
 		var cachedRes v1.GoodsInfoGetDetailRes
 		if err := detail.Struct(&cachedRes); err != nil {
-			g.Log().Errorf(ctx, "缓存数据反序列化失败: %v", err)
+			g.Log().Errorf(ctx, "商品详情缓存反序列化失败，降级查询MySQL: goods_id=%d, err=%v", req.Id, err)
 			// 继续查询数据库
 		} else {
-			g.Log().Info(ctx, "goods detail缓存命中")
+			g.Log().Infof(ctx, "商品详情命中缓存: goods_id=%d", req.Id)
 			return &cachedRes, nil
 		}
 	}
 	// 缓存未命中，查询数据库
+	g.Log().Infof(ctx, "商品详情缓存未命中，查询MySQL: goods_id=%d", req.Id)
 	infoError := consts.InfoError(consts.GoodsInfo, consts.GetDetailFail)
 	record, err := dao.GoodsInfo.Ctx(ctx).Where("id", req.Id).One()
 	if err != nil {
@@ -158,11 +159,12 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 	if record.IsEmpty() {
-		g.Log().Errorf(ctx, "%v %v", infoError+"查询商品不存在", err)
+		g.Log().Infof(ctx, "MySQL未查询到商品，写入空缓存: goods_id=%d", req.Id)
 		// 设置空缓存防止缓存穿透
 		_ = goodsRedis.SetEmptyGoodsDetail(ctx, req.Id)
 		return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 	}
+	g.Log().Infof(ctx, "MySQL查询到商品详情: goods_id=%d", req.Id)
 
 	// 转换为实体结构
 	var goods entity.GoodsInfo
@@ -189,8 +191,10 @@ func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq)
 	defer cancel()
 
 	if err := goodsRedis.SetGoodsDetail(ctxWithTimeout, pbGoods.Id, res); err != nil {
-		g.Log().Warningf(ctx, "设置商品详情缓存失败: %v", err)
+		g.Log().Warningf(ctx, "设置商品详情缓存失败: goods_id=%d, err=%v", pbGoods.Id, err)
 		// 不返回错误，因为主业务已成功
+	} else {
+		g.Log().Infof(ctx, "商品详情已写入缓存: goods_id=%d", pbGoods.Id)
 	}
 	return res, nil
 }
