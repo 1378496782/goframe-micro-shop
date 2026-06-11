@@ -575,6 +575,8 @@ type GoodsInfoGetListReq struct {
 	IsHot         uint32                 `protobuf:"varint,3,opt,name=is_hot,json=isHot,proto3" json:"is_hot,omitempty"`
 	Keyword       string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"`
 	CategoryId    uint32                 `protobuf:"varint,5,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
+	PriceMin      uint64                 `protobuf:"varint,6,opt,name=price_min,json=priceMin,proto3" json:"price_min,omitempty"`
+	PriceMax      uint64                 `protobuf:"varint,7,opt,name=price_max,json=priceMax,proto3" json:"price_max,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -640,6 +642,20 @@ func (x *GoodsInfoGetListReq) GetKeyword() string {
 func (x *GoodsInfoGetListReq) GetCategoryId() uint32 {
 	if x != nil {
 		return x.CategoryId
+	}
+	return 0
+}
+
+func (x *GoodsInfoGetListReq) GetPriceMin() uint64 {
+	if x != nil {
+		return x.PriceMin
+	}
+	return 0
+}
+
+func (x *GoodsInfoGetListReq) GetPriceMax() uint64 {
+	if x != nil {
+		return x.PriceMax
 	}
 	return 0
 }
@@ -892,14 +908,16 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"$\n" +
 	"\x12GoodsInfoDeleteReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"\x14\n" +
-	"\x12GoodsInfoDeleteRes\"\x8f\x01\n" +
+	"\x12GoodsInfoDeleteRes\"\xc9\x01\n" +
 	"\x13GoodsInfoGetListReq\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\rR\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\rR\x04size\x12\x15\n" +
 	"\x06is_hot\x18\x03 \x01(\rR\x05isHot\x12\x18\n" +
 	"\akeyword\x18\x04 \x01(\tR\akeyword\x12\x1f\n" +
 	"\vcategory_id\x18\x05 \x01(\rR\n" +
-	"categoryId\"~\n" +
+	"categoryId\x12\x1b\n" +
+	"\tprice_min\x18\x06 \x01(\x04R\bpriceMin\x12\x1b\n" +
+	"\tprice_max\x18\a \x01(\x04R\bpriceMax\"~\n" +
 	"\x15GoodsInfoListResponse\x12'\n" +
 	"\x04list\x18\x01 \x03(\v2\x13.pbentity.GoodsInfoR\x04list\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +

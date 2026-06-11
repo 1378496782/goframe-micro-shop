@@ -23,6 +23,8 @@ type GoodsInfoGetListReq struct {
 	IsHot      uint32 `json:"is_hot" d:"0"  dc:"热门推荐(1 开启)"`
 	Keyword    string `json:"keyword" dc:"搜索关键词"`
 	CategoryId uint32 `json:"category_id" dc:"分类ID"`
+	PriceMin   uint64 `json:"price_min" dc:"最低价格(分)"`
+	PriceMax   uint64 `json:"price_max" dc:"最高价格(分)"`
 }
 
 type GoodsInfoGetListRes struct {
