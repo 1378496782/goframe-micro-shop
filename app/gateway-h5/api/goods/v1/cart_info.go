@@ -42,8 +42,8 @@ type CartInfoItem struct {
 // CartInfoCreateReq 创建购物车选项
 type CartInfoCreateReq struct {
 	g.Meta  `path:"/cart" method:"post" tags:"购物车管理" sm:"创建购物车选项"`
-	GoodsId uint32 `json:"goods_id" dc:"商品id"`
-	Count   uint32 `json:"count" dc:"商品数量"`
+	GoodsId uint32 `json:"goods_id" v:"required|min:1" dc:"商品id"`
+	Count   uint32 `json:"count" d:"1" v:"min:1" dc:"商品数量"`
 }
 
 type CartInfoCreateRes struct {
