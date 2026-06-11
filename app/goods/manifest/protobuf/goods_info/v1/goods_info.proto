@@ -89,6 +89,14 @@ message GoodsInfoGetListReq {
   uint32 category_id = 5;
   uint64 price_min = 6;
   uint64 price_max = 7;
+  SortType sort_type = 8;
+}
+
+enum SortType {
+  DEFAULT = 0;
+  PRICE_ASC = 1;
+  PRICE_DESC = 2;
+  SALE_DESC = 3;
 }
 
 

@@ -68,6 +68,18 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 		query = query.Where("price <= ?", req.PriceMax)
 	}
 
+	// 根据排序类型添加排序条件
+	switch req.SortType {
+	case v1.SortType_PRICE_ASC:
+		query = query.OrderAsc(dao.GoodsInfo.Columns().Price)
+	case v1.SortType_PRICE_DESC:
+		query = query.OrderDesc(dao.GoodsInfo.Columns().Price)
+	case v1.SortType_SALE_DESC:
+		query = query.OrderDesc(dao.GoodsInfo.Columns().Sale)
+	default:
+		query = query.OrderDesc(dao.GoodsInfo.Columns().Sort)
+	}
+
 	// 查询总数
 	total, err := query.Count()
 	fmt.Println("total,", total)
@@ -81,8 +93,6 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 	// 查询当前页数据
 	goodsRecords, err := query.
 		Page(int(req.Page), int(req.Size)).
-		// 如果是热门商品，按sort降序排列（越大越靠前）
-		OrderDesc("sort").
 		All()
 
 	if err != nil {

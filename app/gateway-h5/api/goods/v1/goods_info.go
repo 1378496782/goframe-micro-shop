@@ -25,6 +25,7 @@ type GoodsInfoGetListReq struct {
 	CategoryId uint32 `json:"category_id" dc:"分类ID"`
 	PriceMin   uint64 `json:"price_min" dc:"最低价格(分)"`
 	PriceMax   uint64 `json:"price_max" dc:"最高价格(分)"`
+	SortType   uint32 `json:"sort_type" d:"0" dc:"排序类型：0默认排序 1价格升序 2价格降序 3销量降序"`
 }
 
 type GoodsInfoGetListRes struct {
