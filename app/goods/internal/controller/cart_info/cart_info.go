@@ -2,14 +2,16 @@ package cart_info
 
 import (
 	"context"
+	v1 "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/cart_info"
+	"shop-goframe-micro-service-refacotor/app/goods/internal/model/entity"
+	"shop-goframe-micro-service-refacotor/utility/consts"
+
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
-	v1 "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
-	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
-	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/cart_info"
-	"shop-goframe-micro-service-refacotor/utility/consts"
 )
 
 type Controller struct {
@@ -34,17 +36,51 @@ func (c *Controller) GetList(ctx context.Context, req *v1.CartInfoGetListReq) (r
 }
 
 func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *v1.CartInfoCreateRes, err error) {
+	if req.Count == 0 || req.UserId == 0 || req.GoodsId == 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+
 	// 错误类型
 	infoError := consts.InfoError(consts.CartInfo, consts.CreateFail)
-	// 向数据库中插入数据并获取自动生成的ID
-	result, err := dao.CartInfo.Ctx(ctx).InsertAndGetId(req)
+
+	// 	先根据 user_id + goods_id 查 cart_info
+	record, err := dao.CartInfo.Ctx(ctx).Where(g.Map{
+		dao.CartInfo.Columns().UserId:  req.UserId,
+		dao.CartInfo.Columns().GoodsId: req.GoodsId,
+	}).One()
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 
-	// 返回创建成功响应，包含新创建的ID
-	return &v1.CartInfoCreateRes{Id: uint32(result)}, nil
+	// 如果不存在：正常插入一条新购物车记录
+	if record.IsEmpty() {
+		id, err := dao.CartInfo.Ctx(ctx).InsertAndGetId(req)
+		if err != nil {
+			g.Log().Errorf(ctx, "%v %v", infoError, err)
+			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+		}
+		return &v1.CartInfoCreateRes{Id: uint32(id)}, nil
+	}
+
+	// 如果已存在：更新 count = old_count + req.Count
+	var existingCartInfo entity.CartInfo
+	err = record.Struct(&existingCartInfo)
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+	existingCartInfo.Count += int(req.Count)
+	_, err = dao.CartInfo.Ctx(ctx).Where(dao.CartInfo.Columns().Id, existingCartInfo.Id).
+		Update(g.Map{
+			dao.CartInfo.Columns().Count: existingCartInfo.Count,
+		})
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+
+	return &v1.CartInfoCreateRes{Id: uint32(existingCartInfo.Id)}, nil
 }
 
 func (*Controller) Delete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *v1.CartInfoDeleteRes, err error) {
