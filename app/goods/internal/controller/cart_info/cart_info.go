@@ -9,7 +9,6 @@ import (
 	v1 "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/cart_info"
-	"shop-goframe-micro-service-refacotor/app/goods/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility/consts"
 )
 
@@ -35,41 +34,8 @@ func (c *Controller) GetList(ctx context.Context, req *v1.CartInfoGetListReq) (r
 }
 
 func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *v1.CartInfoCreateRes, err error) {
-	if req.GoodsId == 0 || req.Count == 0 {
-		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品ID和商品数量不能为空")
-	}
-
 	// 错误类型
 	infoError := consts.InfoError(consts.CartInfo, consts.CreateFail)
-
-	record, err := dao.CartInfo.Ctx(ctx).
-		Where("user_id", req.UserId).
-		Where("goods_id", req.GoodsId).
-		One()
-	if err != nil {
-		g.Log().Errorf(ctx, "%v %v", infoError, err)
-		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
-	}
-
-	if !record.IsEmpty() {
-		var existingCart entity.CartInfo
-		if err := record.Struct(&existingCart); err != nil {
-			g.Log().Errorf(ctx, "%v %v", infoError, err)
-			return nil, gerror.WrapCode(gcode.CodeInternalError, err, "购物车数据转换失败")
-		}
-
-		newCount := existingCart.Count + int(req.Count)
-		if _, err := dao.CartInfo.Ctx(ctx).
-			Where("id", existingCart.Id).
-			Data(g.Map{"count": newCount}).
-			Update(); err != nil {
-			g.Log().Errorf(ctx, "%v %v", infoError, err)
-			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
-		}
-
-		return &v1.CartInfoCreateRes{Id: uint32(existingCart.Id)}, nil
-	}
-
 	// 向数据库中插入数据并获取自动生成的ID
 	result, err := dao.CartInfo.Ctx(ctx).InsertAndGetId(req)
 	if err != nil {
