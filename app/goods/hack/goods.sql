@@ -75,7 +75,8 @@ CREATE TABLE `cart_info`  (
       `count` int NOT NULL COMMENT '商品数量',
       `created_at` datetime DEFAULT NULL,
       `updated_at` datetime DEFAULT NULL,
-      PRIMARY KEY (`id`)
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `uk_user_goods` (`user_id`, `goods_id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 
