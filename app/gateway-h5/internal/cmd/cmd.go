@@ -66,6 +66,7 @@ var (
 						goodsController.CartInfoGetList,
 						goodsController.CartInfoCreate,
 						goodsController.CartInfoDelete,
+						goodsController.CartInfoPut,
 						goodsController.UserCouponInfoGetList,
 						interactionController,
 						orderController.Payment,

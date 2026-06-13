@@ -23,6 +23,7 @@ const (
 	CartInfo_GetList_FullMethodName = "/cart_info.v1.cart_info/GetList"
 	CartInfo_Create_FullMethodName  = "/cart_info.v1.cart_info/Create"
 	CartInfo_Delete_FullMethodName  = "/cart_info.v1.cart_info/Delete"
+	CartInfo_Put_FullMethodName     = "/cart_info.v1.cart_info/Put"
 )
 
 // CartInfoClient is the client API for CartInfo service.
@@ -32,6 +33,7 @@ type CartInfoClient interface {
 	GetList(ctx context.Context, in *CartInfoGetListReq, opts ...grpc.CallOption) (*CartInfoGetListRes, error)
 	Create(ctx context.Context, in *CartInfoCreateReq, opts ...grpc.CallOption) (*CartInfoCreateRes, error)
 	Delete(ctx context.Context, in *CartInfoDeleteReq, opts ...grpc.CallOption) (*CartInfoDeleteRes, error)
+	Put(ctx context.Context, in *CartInfoPutReq, opts ...grpc.CallOption) (*CartInfoPutRes, error)
 }
 
 type cartInfoClient struct {
@@ -72,6 +74,16 @@ func (c *cartInfoClient) Delete(ctx context.Context, in *CartInfoDeleteReq, opts
 	return out, nil
 }
 
+func (c *cartInfoClient) Put(ctx context.Context, in *CartInfoPutReq, opts ...grpc.CallOption) (*CartInfoPutRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CartInfoPutRes)
+	err := c.cc.Invoke(ctx, CartInfo_Put_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CartInfoServer is the server API for CartInfo service.
 // All implementations must embed UnimplementedCartInfoServer
 // for forward compatibility.
@@ -79,6 +91,7 @@ type CartInfoServer interface {
 	GetList(context.Context, *CartInfoGetListReq) (*CartInfoGetListRes, error)
 	Create(context.Context, *CartInfoCreateReq) (*CartInfoCreateRes, error)
 	Delete(context.Context, *CartInfoDeleteReq) (*CartInfoDeleteRes, error)
+	Put(context.Context, *CartInfoPutReq) (*CartInfoPutRes, error)
 	mustEmbedUnimplementedCartInfoServer()
 }
 
@@ -97,6 +110,9 @@ func (UnimplementedCartInfoServer) Create(context.Context, *CartInfoCreateReq) (
 }
 func (UnimplementedCartInfoServer) Delete(context.Context, *CartInfoDeleteReq) (*CartInfoDeleteRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedCartInfoServer) Put(context.Context, *CartInfoPutReq) (*CartInfoPutRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method Put not implemented")
 }
 func (UnimplementedCartInfoServer) mustEmbedUnimplementedCartInfoServer() {}
 func (UnimplementedCartInfoServer) testEmbeddedByValue()                  {}
@@ -173,6 +189,24 @@ func _CartInfo_Delete_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CartInfo_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CartInfoPutReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CartInfoServer).Put(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CartInfo_Put_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CartInfoServer).Put(ctx, req.(*CartInfoPutReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CartInfo_ServiceDesc is the grpc.ServiceDesc for CartInfo service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +225,10 @@ var CartInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _CartInfo_Delete_Handler,
+		},
+		{
+			MethodName: "Put",
+			Handler:    _CartInfo_Put_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

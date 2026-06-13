@@ -58,3 +58,13 @@ type CartInfoDeleteReq struct {
 
 type CartInfoDeleteRes struct {
 }
+
+// CartInfoPutReq 更新购物车选项数量
+type CartInfoPutReq struct {
+	g.Meta `path:"/cart" method:"put" tags:"购物车管理" sm:"更新购物车选项数量"`
+	Id     uint32 `json:"id" v:"required" dc:"购物车ID"`
+	Count  uint32 `json:"count" v:"required|min:1" d:"1" dc:"商品数量"`
+}
+
+type CartInfoPutRes struct {
+}

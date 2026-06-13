@@ -11,19 +11,28 @@ service cart_info {
   rpc GetList(CartInfoGetListReq) returns (CartInfoGetListRes) {}
   rpc Create(CartInfoCreateReq) returns (CartInfoCreateRes) {}
   rpc Delete(CartInfoDeleteReq) returns (CartInfoDeleteRes) {}
+  rpc Put(CartInfoPutReq) returns (CartInfoPutRes) {}
 }
 
 // 新增消息定义
 message CartInfoCreateReq {
-  uint32                     GoodsId = 1; // 商品id
-  uint32                     Count          = 2; // 商品数量
-  uint32 UserId = 3;
+  uint32 goods_id = 1; // 商品id
+  uint32 count = 2; // 商品数量
+  uint32 user_id = 3;
 }
 
 message CartInfoCreateRes {
   uint32 id = 1;
 }
 
+message CartInfoPutReq {
+  uint32 id = 1; // 购物车ID
+  uint32 count = 2; // 商品数量
+  uint32 user_id = 3;
+}
+
+message CartInfoPutRes {
+}
 
 message CartInfoDeleteReq {
   uint32 id = 1;
@@ -36,7 +45,7 @@ message CartInfoDeleteRes {
 message CartInfoGetListReq {
   uint32 page = 1;
   uint32 size = 2;
-  uint32 UserId = 3;
+  uint32 user_id = 3;
 }
 
 message CartItem {

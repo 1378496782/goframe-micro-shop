@@ -141,6 +141,68 @@ func isDuplicateKeyError(err error) bool {
 	return strings.Contains(errMsg, "Duplicate entry") || strings.Contains(errMsg, "Error 1062")
 }
 
+func (*Controller) Put(ctx context.Context, req *v1.CartInfoPutReq) (res *v1.CartInfoPutRes, err error) {
+	if req.Count == 0 || req.UserId == 0 || req.Id == 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+
+	// 错误类型
+	infoError := consts.InfoError(consts.CartInfo, consts.UpdateFail)
+
+	// 加购前校验购物车记录是否存在
+	cartRecord, err := dao.CartInfo.Ctx(ctx).Where(g.Map{
+		dao.CartInfo.Columns().Id:     req.Id,
+		dao.CartInfo.Columns().UserId: req.UserId,
+	}).One()
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+	if cartRecord.IsEmpty() {
+		return nil, gerror.NewCode(gcode.CodeNotFound, "购物车中没有该商品或无权更新")
+	}
+	// 转化为购物车记录
+	var existingCartInfo entity.CartInfo
+	if err := cartRecord.Struct(&existingCartInfo); err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+
+	// 查询商品的库存
+	goodsRecord, err := dao.GoodsInfo.Ctx(ctx).Where(dao.GoodsInfo.Columns().Id, existingCartInfo.GoodsId).One()
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+	if goodsRecord.IsEmpty() {
+		return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
+	}
+	var goodsInfo entity.GoodsInfo
+	if err := goodsRecord.Struct(&goodsInfo); err != nil {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "数据转换失败")
+	}
+
+	// 校验库存是否足够
+	if int(req.Count) > int(goodsInfo.Stock) {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
+	}
+
+	// 更新购物车数量
+	_, err = dao.CartInfo.Ctx(ctx).Where(g.Map{
+		dao.CartInfo.Columns().Id:     req.Id,
+		dao.CartInfo.Columns().UserId: req.UserId,
+	}).
+		Update(g.Map{
+			dao.CartInfo.Columns().Count: req.Count,
+		})
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to update cart info: %v", err)
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "更新失败")
+	}
+
+	return &v1.CartInfoPutRes{}, nil
+}
+
 func (*Controller) Delete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *v1.CartInfoDeleteRes, err error) {
 	// 根据ID和用户ID从数据库中删除对应信息
 	result, err := dao.CartInfo.Ctx(ctx).Where("id", req.Id).Where("user_id", req.UserId).Delete()
