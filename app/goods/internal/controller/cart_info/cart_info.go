@@ -7,6 +7,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/cart_info"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/model/entity"
 	"shop-goframe-micro-service-refacotor/utility/consts"
+	"strings"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -44,21 +45,21 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 	infoError := consts.InfoError(consts.CartInfo, consts.CreateFail)
 
 	// 加购前校验商品是否存在
-	record, err := dao.GoodsInfo.Ctx(ctx).Where(dao.GoodsInfo.Columns().Id, req.GoodsId).One()
+	goodsRecord, err := dao.GoodsInfo.Ctx(ctx).Where(dao.GoodsInfo.Columns().Id, req.GoodsId).One()
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
-	if record.IsEmpty() {
+	if goodsRecord.IsEmpty() {
 		return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 	}
 	var goodsInfo entity.GoodsInfo
-	if err := record.Struct(&goodsInfo); err != nil {
+	if err := goodsRecord.Struct(&goodsInfo); err != nil {
 		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "数据转换失败")
 	}
 
 	// 	先根据 user_id + goods_id 查 cart_info
-	record, err = dao.CartInfo.Ctx(ctx).Where(g.Map{
+	cartRecord, err := dao.CartInfo.Ctx(ctx).Where(g.Map{
 		dao.CartInfo.Columns().UserId:  req.UserId,
 		dao.CartInfo.Columns().GoodsId: req.GoodsId,
 	}).One()
@@ -68,23 +69,41 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 	}
 
 	// 如果不存在：正常插入一条新购物车记录
-	if record.IsEmpty() {
+	// Insert 成功 -> 返回新 id
+	// Insert 失败，并且是 Duplicate entry -> 说明并发请求已经插入了，重新查购物车，继续走更新逻辑
+	// Insert 失败，但不是 Duplicate entry -> 真正的数据库错误
+	if cartRecord.IsEmpty() {
 		// 先判断库存是否足够
 		if int(req.Count) > int(goodsInfo.Stock) {
 			return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
 		}
 		id, err := dao.CartInfo.Ctx(ctx).InsertAndGetId(req)
+		if err == nil {
+			return &v1.CartInfoCreateRes{Id: uint32(id)}, nil
+		}
+		if !isDuplicateKeyError(err) {
+			g.Log().Errorf(ctx, "%v %v", infoError, err)
+			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+		}
+
+		// 走到这里，说明另一个并发请求已经插入了同一条购物车记录。
+		// 重新查询，然后继续走下面“已存在购物车记录”的更新逻辑。
+		cartRecord, err = dao.CartInfo.Ctx(ctx).Where(g.Map{
+			dao.CartInfo.Columns().UserId:  req.UserId,
+			dao.CartInfo.Columns().GoodsId: req.GoodsId,
+		}).One()
 		if err != nil {
 			g.Log().Errorf(ctx, "%v %v", infoError, err)
 			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 		}
-		return &v1.CartInfoCreateRes{Id: uint32(id)}, nil
+		if cartRecord.IsEmpty() {
+			return nil, gerror.NewCode(gcode.CodeInternalError, "购物车记录创建冲突，请重试")
+		}
 	}
 
 	// 如果已存在：更新 count = old_count + req.Count
-
 	var existingCartInfo entity.CartInfo
-	err = record.Struct(&existingCartInfo)
+	err = cartRecord.Struct(&existingCartInfo)
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
@@ -105,6 +124,14 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 	}
 
 	return &v1.CartInfoCreateRes{Id: uint32(existingCartInfo.Id)}, nil
+}
+
+func isDuplicateKeyError(err error) bool {
+	if err == nil {
+		return false
+	}
+	errMsg := err.Error()
+	return strings.Contains(errMsg, "Duplicate entry") || strings.Contains(errMsg, "Error 1062")
 }
 
 func (*Controller) Delete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *v1.CartInfoDeleteRes, err error) {
