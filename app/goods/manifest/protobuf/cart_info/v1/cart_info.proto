@@ -73,6 +73,8 @@ message CartInfoListResponse {
   uint32 page = 2;
   uint32 size = 3;
   uint32 total = 4;
+  uint64 total_price = 5; // 总金额(分)
+  uint32 total_count = 6; // 总数量
 }
 
 message CartInfoGetListRes {

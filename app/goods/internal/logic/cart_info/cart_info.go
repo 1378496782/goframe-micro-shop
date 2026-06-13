@@ -34,10 +34,12 @@ type CartGoodsInfo struct {
 // GetList 获取购物车列表
 func GetList(ctx context.Context, req *v1.CartInfoGetListReq) (*v1.CartInfoListResponse, error) {
 	response := &v1.CartInfoListResponse{
-		List:  make([]*v1.CartItem, 0),
-		Page:  req.Page,
-		Size:  req.Size,
-		Total: 0,
+		List:       make([]*v1.CartItem, 0),
+		Page:       req.Page,
+		Size:       req.Size,
+		Total:      0,
+		TotalPrice: 0,
+		TotalCount: 0,
 	}
 
 	// 查询总数
@@ -101,6 +103,8 @@ func GetList(ctx context.Context, req *v1.CartInfoGetListReq) (*v1.CartInfoListR
 		cartItem.GoodsUpdatedAt = utility.SafeConvertTime(item.GoodsUpdatedAt)
 
 		response.List = append(response.List, cartItem)
+		response.TotalPrice += item.GoodsPrice * uint64(item.Count)
+		response.TotalCount += item.Count
 	}
 
 	return response, nil

@@ -529,6 +529,8 @@ type CartInfoListResponse struct {
 	Page          uint32                 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
 	Size          uint32                 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
 	Total         uint32                 `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	TotalPrice    uint64                 `protobuf:"varint,5,opt,name=total_price,json=totalPrice,proto3" json:"total_price,omitempty" dc:"总金额(分)"` // 总金额(分)
+	TotalCount    uint32                 `protobuf:"varint,6,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty" dc:"总数量"`    // 总数量
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -587,6 +589,20 @@ func (x *CartInfoListResponse) GetSize() uint32 {
 func (x *CartInfoListResponse) GetTotal() uint32 {
 	if x != nil {
 		return x.Total
+	}
+	return 0
+}
+
+func (x *CartInfoListResponse) GetTotalPrice() uint64 {
+	if x != nil {
+		return x.TotalPrice
+	}
+	return 0
+}
+
+func (x *CartInfoListResponse) GetTotalCount() uint32 {
+	if x != nil {
+		return x.TotalCount
 	}
 	return 0
 }
@@ -681,12 +697,16 @@ const file_cart_info_v1_cart_info_proto_rawDesc = "" +
 	"\n" +
 	"goods_sort\x18\f \x01(\rR\tgoodsSort\x12D\n" +
 	"\x10goods_created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x0egoodsCreatedAt\x12D\n" +
-	"\x10goods_updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\x0egoodsUpdatedAt\"\x80\x01\n" +
+	"\x10goods_updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\x0egoodsUpdatedAt\"\xc2\x01\n" +
 	"\x14CartInfoListResponse\x12*\n" +
 	"\x04list\x18\x01 \x03(\v2\x16.cart_info.v1.CartItemR\x04list\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +
 	"\x04size\x18\x03 \x01(\rR\x04size\x12\x14\n" +
-	"\x05total\x18\x04 \x01(\rR\x05total\"L\n" +
+	"\x05total\x18\x04 \x01(\rR\x05total\x12\x1f\n" +
+	"\vtotal_price\x18\x05 \x01(\x04R\n" +
+	"totalPrice\x12\x1f\n" +
+	"\vtotal_count\x18\x06 \x01(\rR\n" +
+	"totalCount\"L\n" +
 	"\x12CartInfoGetListRes\x126\n" +
 	"\x04data\x18\x01 \x01(\v2\".cart_info.v1.CartInfoListResponseR\x04data2\xbd\x02\n" +
 	"\tcart_info\x12O\n" +

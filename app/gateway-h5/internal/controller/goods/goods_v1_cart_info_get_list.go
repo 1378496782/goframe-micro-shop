@@ -2,12 +2,13 @@ package goods
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/errors/gerror"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	cart "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 
-	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/goods/v1"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	v1 "shop-goframe-micro-service-refacotor/app/gateway-h5/api/goods/v1"
 )
 
 func (c *ControllerV1) CartInfoGetList(ctx context.Context, req *v1.CartInfoGetListReq) (res *v1.CartInfoGetListRes, err error) {
@@ -34,10 +35,12 @@ func (c *ControllerV1) CartInfoGetList(ctx context.Context, req *v1.CartInfoGetL
 
 	// 转换响应
 	res = &v1.CartInfoGetListRes{
-		Page:  grpcRes.Data.Page,
-		Size:  grpcRes.Data.Size,
-		Total: grpcRes.Data.Total,
-		List:  make([]*v1.CartInfoItem, 0, len(grpcRes.Data.List)),
+		Page:       grpcRes.Data.Page,
+		Size:       grpcRes.Data.Size,
+		Total:      grpcRes.Data.Total,
+		TotalPrice: grpcRes.Data.TotalPrice,
+		TotalCount: grpcRes.Data.TotalCount,
+		List:       make([]*v1.CartInfoItem, 0, len(grpcRes.Data.List)),
 	}
 
 	// 手动转换列表项，因为字段名不完全匹配
