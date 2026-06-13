@@ -31,6 +31,11 @@ type CartGoodsInfo struct {
 	GoodsSort      uint32      `orm:"goods_sort"`
 }
 
+type CartSummary struct {
+	TotalPrice uint64 `orm:"total_price"`
+	TotalCount uint32 `orm:"total_count"`
+}
+
 // GetList 获取购物车列表
 func GetList(ctx context.Context, req *v1.CartInfoGetListReq) (*v1.CartInfoListResponse, error) {
 	response := &v1.CartInfoListResponse{
@@ -103,9 +108,23 @@ func GetList(ctx context.Context, req *v1.CartInfoGetListReq) (*v1.CartInfoListR
 		cartItem.GoodsUpdatedAt = utility.SafeConvertTime(item.GoodsUpdatedAt)
 
 		response.List = append(response.List, cartItem)
-		response.TotalPrice += item.GoodsPrice * uint64(item.Count)
-		response.TotalCount += item.Count
 	}
+
+	// 全表查询计算总金额和总数量
+	var cartSummary CartSummary
+	err = dao.CartInfo.Ctx(ctx).
+		Where("user_id", req.UserId).
+		LeftJoin("goods_info", "goods_info.id = cart_info.goods_id").
+		Fields(`
+            COALESCE(sum(goods_info.price * cart_info.count), 0) as total_price,
+            COALESCE(sum(cart_info.count), 0) as total_count
+        `).
+		Scan(&cartSummary)
+	if err != nil {
+		return nil, err
+	}
+	response.TotalPrice = cartSummary.TotalPrice
+	response.TotalCount = cartSummary.TotalCount
 
 	return response, nil
 }

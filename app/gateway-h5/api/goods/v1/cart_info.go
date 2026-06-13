@@ -17,8 +17,8 @@ type CartInfoGetListRes struct {
 	Page       uint32          `json:"page" dc:"当前页码"`
 	Size       uint32          `json:"size" dc:"每页数量"`
 	Total      uint32          `json:"total" dc:"总数"`
-	TotalPrice uint64          `json:"total_price" dc:"当前页的总金额(分)"`
-	TotalCount uint32          `json:"total_count" dc:"当前页的总数量"`
+	TotalPrice uint64          `json:"total_price" dc:"总金额(分)"`
+	TotalCount uint32          `json:"total_count" dc:"总数量"`
 }
 
 type CartInfoItem struct {
