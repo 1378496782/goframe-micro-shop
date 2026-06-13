@@ -50,7 +50,7 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 	if record.IsEmpty() {
-		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品不存在")
+		return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
 	}
 	var goodsInfo entity.GoodsInfo
 	if err := record.Struct(&goodsInfo); err != nil {
