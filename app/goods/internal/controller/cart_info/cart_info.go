@@ -2,6 +2,7 @@ package cart_info
 
 import (
 	"context"
+	"fmt"
 	v1 "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/goods/internal/logic/cart_info"
@@ -10,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
+	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -108,19 +110,24 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
-	newCount := existingCartInfo.Count + int(req.Count)
-	// 先校验库存是否足够
-	// TODO: 这里可能存在并发问题, 需要添加锁
-	if newCount > int(goodsInfo.Stock) {
-		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
-	}
-	_, err = dao.CartInfo.Ctx(ctx).Where(dao.CartInfo.Columns().Id, existingCartInfo.Id).
+	// 需要先校验库存是否足够
+	addCount := int(req.Count)
+	result, err := dao.CartInfo.Ctx(ctx).Where(dao.CartInfo.Columns().Id, existingCartInfo.Id).
+		Where("count <= ?", goodsInfo.Stock-addCount).
 		Update(g.Map{
-			dao.CartInfo.Columns().Count: newCount,
+			dao.CartInfo.Columns().Count: gdb.Raw(fmt.Sprintf("count + %d", addCount)),
 		})
 	if err != nil {
-		g.Log().Errorf(ctx, "%v %v", infoError, err)
-		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+		g.Log().Errorf(ctx, "Failed to update cart info: %v", err)
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "更新失败")
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to get rows affected: %v", err)
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "更新失败")
+	}
+	if rowsAffected == 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
 	}
 
 	return &v1.CartInfoCreateRes{Id: uint32(existingCartInfo.Id)}, nil
