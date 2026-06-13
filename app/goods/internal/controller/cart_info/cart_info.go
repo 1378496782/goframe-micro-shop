@@ -43,8 +43,22 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 	// 错误类型
 	infoError := consts.InfoError(consts.CartInfo, consts.CreateFail)
 
+	// 加购前校验商品是否存在
+	record, err := dao.GoodsInfo.Ctx(ctx).Where(dao.GoodsInfo.Columns().Id, req.GoodsId).One()
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+	if record.IsEmpty() {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品不存在")
+	}
+	var goodsInfo entity.GoodsInfo
+	if err := record.Struct(&goodsInfo); err != nil {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "数据转换失败")
+	}
+
 	// 	先根据 user_id + goods_id 查 cart_info
-	record, err := dao.CartInfo.Ctx(ctx).Where(g.Map{
+	record, err = dao.CartInfo.Ctx(ctx).Where(g.Map{
 		dao.CartInfo.Columns().UserId:  req.UserId,
 		dao.CartInfo.Columns().GoodsId: req.GoodsId,
 	}).One()
@@ -55,6 +69,10 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 
 	// 如果不存在：正常插入一条新购物车记录
 	if record.IsEmpty() {
+		// 先判断库存是否足够
+		if int(req.Count) > int(goodsInfo.Stock) {
+			return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
+		}
 		id, err := dao.CartInfo.Ctx(ctx).InsertAndGetId(req)
 		if err != nil {
 			g.Log().Errorf(ctx, "%v %v", infoError, err)
@@ -64,16 +82,22 @@ func (*Controller) Create(ctx context.Context, req *v1.CartInfoCreateReq) (res *
 	}
 
 	// 如果已存在：更新 count = old_count + req.Count
+
 	var existingCartInfo entity.CartInfo
 	err = record.Struct(&existingCartInfo)
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
-	existingCartInfo.Count += int(req.Count)
+	newCount := existingCartInfo.Count + int(req.Count)
+	// 先校验库存是否足够
+	// TODO: 这里可能存在并发问题, 需要添加锁
+	if newCount > int(goodsInfo.Stock) {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
+	}
 	_, err = dao.CartInfo.Ctx(ctx).Where(dao.CartInfo.Columns().Id, existingCartInfo.Id).
 		Update(g.Map{
-			dao.CartInfo.Columns().Count: existingCartInfo.Count,
+			dao.CartInfo.Columns().Count: newCount,
 		})
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
