@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	cartApi "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
 	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
 	"shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
+	cart "shop-goframe-micro-service-refacotor/app/order/utility/cart_info"
 	goods "shop-goframe-micro-service-refacotor/app/order/utility/goods_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
 	"shop-goframe-micro-service-refacotor/utility"
@@ -466,7 +468,7 @@ func HandleOrderTimeoutResult(ctx context.Context, orderId int) error {
 		return nil
 	}
 
-	g.Log().Infof(ctx, "订单状态更新成功, 订单编号:{%s}, 新状态: %d", orderId, consts.OrderStatusPendingPayment)
+	g.Log().Infof(ctx, "订单状态更新成功, 订单编号:{%d}, 新状态: %d", orderId, consts.OrderStatusPendingPayment)
 	return nil
 }
 
@@ -498,4 +500,43 @@ func GetOrderDetail(ctx context.Context, orderId int) ([]*grabbitmq.OrderGoodsIn
 	}
 
 	return orderGoodsInfo, nil
+}
+
+func Preview(ctx context.Context, req *v1.OrderInfoPreviewReq) (*v1.OrderInfoPreviewRes, error) {
+	if len(req.CartIds) == 0 || req.UserId == 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+
+	cartRes, err := cart.Client.GetSelectedItems(ctx, &cartApi.CartInfoGetSelectedItemsReq{
+		UserId:  req.UserId,
+		CartIds: req.CartIds,
+	})
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	items := []*v1.OrderInfoPreviewItem{}
+	totalPrice := uint64(0)
+	totalCount := uint32(0)
+	for _, item := range cartRes.Items {
+		subTotal := item.GoodsPrice * uint64(item.Count)
+
+		items = append(items, &v1.OrderInfoPreviewItem{
+			CartId:     item.Id,
+			GoodsId:    item.GoodsId,
+			GoodsName:  item.GoodsName,
+			GoodsPrice: item.GoodsPrice,
+			Count:      item.Count,
+			SubTotal:   subTotal,
+		})
+
+		totalPrice += subTotal
+		totalCount += item.Count
+	}
+
+	return &v1.OrderInfoPreviewRes{
+		Items:      items,
+		TotalPrice: totalPrice,
+		TotalCount: totalCount,
+	}, nil
 }

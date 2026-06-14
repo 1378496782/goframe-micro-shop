@@ -224,3 +224,7 @@ func (*Controller) Delete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *
 	// 返回删除成功的空响应
 	return &v1.CartInfoDeleteRes{}, nil
 }
+
+func (*Controller) GetSelectedItems(ctx context.Context, req *v1.CartInfoGetSelectedItemsReq) (res *v1.CartInfoGetSelectedItemsRes, err error) {
+	return cart_info.GetSelectedItems(ctx, req)
+}

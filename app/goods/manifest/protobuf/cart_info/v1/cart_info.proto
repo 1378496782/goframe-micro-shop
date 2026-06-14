@@ -12,6 +12,7 @@ service cart_info {
   rpc Create(CartInfoCreateReq) returns (CartInfoCreateRes) {}
   rpc Delete(CartInfoDeleteReq) returns (CartInfoDeleteRes) {}
   rpc Put(CartInfoPutReq) returns (CartInfoPutRes) {}
+  rpc GetSelectedItems(CartInfoGetSelectedItemsReq) returns (CartInfoGetSelectedItemsRes) {}
 }
 
 // 新增消息定义
@@ -79,4 +80,13 @@ message CartInfoListResponse {
 
 message CartInfoGetListRes {
   CartInfoListResponse data = 1;
+}
+
+message CartInfoGetSelectedItemsReq {
+  uint32 user_id = 1;
+  repeated uint32 cart_ids = 2;
+}
+
+message CartInfoGetSelectedItemsRes {
+  repeated CartItem items = 1;
 }

@@ -6,6 +6,8 @@ import (
 	"shop-goframe-micro-service-refacotor/app/goods/internal/dao"
 	"shop-goframe-micro-service-refacotor/utility"
 
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/os/gtime"
 )
 
@@ -127,4 +129,42 @@ func GetList(ctx context.Context, req *v1.CartInfoGetListReq) (*v1.CartInfoListR
 	response.TotalCount = cartSummary.TotalCount
 
 	return response, nil
+}
+
+func GetSelectedItems(ctx context.Context, req *v1.CartInfoGetSelectedItemsReq) (*v1.CartInfoGetSelectedItemsRes, error) {
+	if req.UserId == 0 || len(req.CartIds) == 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+
+	// 使用 user_id + cart_ids 查询当前用户的购物车项
+	var cartItems []*v1.CartItem
+	err := dao.CartInfo.Ctx(ctx).
+		Where(dao.CartInfo.Columns().UserId, req.UserId).
+		WhereIn(dao.CartInfo.Columns().Id, req.CartIds).
+		LeftJoin("goods_info", "goods_info.id = cart_info.goods_id").
+		Fields(`
+            cart_info.id,
+            cart_info.user_id,
+            cart_info.count,
+            cart_info.created_at,
+            cart_info.updated_at,
+            goods_info.id as goods_id,
+            goods_info.name as goods_name,
+            goods_info.pic_url as goods_pic_url,
+            goods_info.price as goods_price,
+            goods_info.brand as goods_brand,
+            goods_info.stock as goods_stock,
+            goods_info.sale as goods_sale,
+            goods_info.tags as goods_tags,
+            goods_info.created_at as goods_created_at,
+            goods_info.updated_at as goods_updated_at,
+            goods_info.sort as goods_sort
+        `).
+		Scan(&cartItems)
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+	return &v1.CartInfoGetSelectedItemsRes{
+		Items: cartItems,
+	}, nil
 }

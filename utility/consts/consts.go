@@ -1,9 +1,10 @@
 package consts
 
 const (
-	GetListFail    = "GetList 查询失败"
-	GetDetailFail  = "GetDetail 查询失败"
-	GetOrderRecord = "GetOrderRecord 查询失败"
+	GetListFail      = "GetList 查询失败"
+	GetDetailFail    = "GetDetail 查询失败"
+	GetOrderRecord   = "GetOrderRecord 查询失败"
+	OrderPreviewFail = "OrderPreview 订单预览失败"
 
 	GetCountFail       = "GetCount 查询失败"
 	CreateFail         = "Create 插入失败"

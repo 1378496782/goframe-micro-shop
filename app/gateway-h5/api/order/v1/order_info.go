@@ -153,3 +153,23 @@ type CancelOrderRes struct {
 	Message string `json:"message"`
 	Data    string `json:"data"`
 }
+
+type OrderInfoPreviewReq struct {
+	g.Meta  `path:"/order/preview" method:"post" tags:"订单管理" sm:"订单预览"`
+	CartIds []uint32 `json:"cart_ids" v:"required" dc:"购物车ID列表"`
+}
+
+type OrderInfoPreviewRes struct {
+	Items      []*OrderInfoPreviewItem `json:"items" dc:"订单预览商品列表"`
+	TotalPrice uint64                  `json:"total_price" dc:"订单总金额"`
+	TotalCount uint32                  `json:"total_count" dc:"订单总数量"`
+}
+
+type OrderInfoPreviewItem struct {
+	CartId     uint32 `json:"cart_id" dc:"购物车ID"`
+	GoodsId    uint32 `json:"goods_id" dc:"商品ID"`
+	GoodsName  string `json:"goods_name" dc:"商品名称"`
+	GoodsPrice uint64 `json:"goods_price" dc:"商品价格(分)"`
+	Count      uint32 `json:"count" dc:"商品数量"`
+	SubTotal   uint64 `json:"sub_total" dc:"商品子金额(分)"`
+}

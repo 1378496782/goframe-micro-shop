@@ -185,3 +185,11 @@ func (*Controller) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res
 		Data:    "",
 	}, nil
 }
+
+func (*Controller) Preview(ctx context.Context, req *v1.OrderInfoPreviewReq) (res *v1.OrderInfoPreviewRes, err error) {
+	res, err = order_info.Preview(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}

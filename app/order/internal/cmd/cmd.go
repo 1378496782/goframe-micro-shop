@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	cart_info "shop-goframe-micro-service-refacotor/app/order/utility/cart_info"
 	goods "shop-goframe-micro-service-refacotor/app/order/utility/goods_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"syscall"
@@ -67,6 +68,7 @@ var (
 			order_info.Register(s)
 			refund_info.Register(s)
 			goods.Register()
+			cart_info.Register()
 			s.Run()
 			return nil
 		},
