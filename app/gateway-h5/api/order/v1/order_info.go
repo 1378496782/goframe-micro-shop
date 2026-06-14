@@ -173,3 +173,18 @@ type OrderInfoPreviewItem struct {
 	Count      uint32 `json:"count" dc:"商品数量"`
 	SubTotal   uint64 `json:"sub_total" dc:"商品子金额(分)"`
 }
+
+type OrderInfoCreateFromCartReq struct {
+	g.Meta           `path:"/order/cart"  method:"post" tags:"订单管理" sm:"创建订单"`
+	CartIds          []uint32 `json:"cart_ids" v:"required" dc:"购物车ID列表"`
+	ConsigneeName    string   `json:"consignee_name"  dc:"收货人姓名"`
+	ConsigneePhone   string   `json:"consignee_phone"  dc:"收货人手机号"`
+	ConsigneeAddress string   `json:"consignee_address"  dc:"收货人详细地址"`
+	Remark           string   `json:"remark" dc:"备注"`
+	CouponId         uint32   `json:"coupon_id" dc:"优惠券ID"`
+}
+
+type OrderInfoCreateFromCartRes struct {
+	Id     uint32 `json:"id" dc:"订单ID"`
+	Number string `json:"number" dc:"订单编号"`
+}

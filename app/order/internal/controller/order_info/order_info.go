@@ -193,3 +193,7 @@ func (*Controller) Preview(ctx context.Context, req *v1.OrderInfoPreviewReq) (re
 	}
 	return res, nil
 }
+
+func (*Controller) CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (res *v1.OrderInfoCreateRes, err error) {
+	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+}

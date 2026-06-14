@@ -10,6 +10,7 @@ import "google/protobuf/timestamp.proto";
 
 service order_info {
   rpc Create(OrderInfoCreateReq) returns (OrderInfoCreateRes) {}
+  rpc CreateFromCart(OrderInfoCreateFromCartReq) returns (OrderInfoCreateRes) {}
   rpc GetDetail(OrderInfoGetDetailReq) returns (OrderInfoGetDetailRes) {}
   rpc GetList(OrderInfoGetListReq) returns (OrderInfoGetListRes) {}
   rpc GetCount(OrderInfoGetCountReq) returns (OrderInfoGetCountRes) {}
@@ -180,4 +181,14 @@ message OrderInfoPreviewItem {
   uint64 goods_price = 4;
   uint32 count = 5;
   uint64 sub_total = 6;
+}
+
+message OrderInfoCreateFromCartReq {
+  repeated uint32 cart_ids = 1;       // 购物车id列表
+  string consignee_name = 2;          // 收货人姓名
+  string consignee_phone = 3;         // 收货人手机号
+  string consignee_address = 4;       // 收货人详细地址
+  string remark = 5;                  // 备注
+  uint32 user_id = 6;                 // 用户id
+  uint32 coupon_id = 7;               // 优惠券id
 }

@@ -20,14 +20,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OrderInfo_Create_FullMethodName      = "/order_info.v1.order_info/Create"
-	OrderInfo_GetDetail_FullMethodName   = "/order_info.v1.order_info/GetDetail"
-	OrderInfo_GetList_FullMethodName     = "/order_info.v1.order_info/GetList"
-	OrderInfo_GetCount_FullMethodName    = "/order_info.v1.order_info/GetCount"
-	OrderInfo_Payment_FullMethodName     = "/order_info.v1.order_info/Payment"
-	OrderInfo_Notify_FullMethodName      = "/order_info.v1.order_info/Notify"
-	OrderInfo_CancelOrder_FullMethodName = "/order_info.v1.order_info/CancelOrder"
-	OrderInfo_Preview_FullMethodName     = "/order_info.v1.order_info/Preview"
+	OrderInfo_Create_FullMethodName         = "/order_info.v1.order_info/Create"
+	OrderInfo_CreateFromCart_FullMethodName = "/order_info.v1.order_info/CreateFromCart"
+	OrderInfo_GetDetail_FullMethodName      = "/order_info.v1.order_info/GetDetail"
+	OrderInfo_GetList_FullMethodName        = "/order_info.v1.order_info/GetList"
+	OrderInfo_GetCount_FullMethodName       = "/order_info.v1.order_info/GetCount"
+	OrderInfo_Payment_FullMethodName        = "/order_info.v1.order_info/Payment"
+	OrderInfo_Notify_FullMethodName         = "/order_info.v1.order_info/Notify"
+	OrderInfo_CancelOrder_FullMethodName    = "/order_info.v1.order_info/CancelOrder"
+	OrderInfo_Preview_FullMethodName        = "/order_info.v1.order_info/Preview"
 )
 
 // OrderInfoClient is the client API for OrderInfo service.
@@ -35,6 +36,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderInfoClient interface {
 	Create(ctx context.Context, in *OrderInfoCreateReq, opts ...grpc.CallOption) (*OrderInfoCreateRes, error)
+	CreateFromCart(ctx context.Context, in *OrderInfoCreateFromCartReq, opts ...grpc.CallOption) (*OrderInfoCreateRes, error)
 	GetDetail(ctx context.Context, in *OrderInfoGetDetailReq, opts ...grpc.CallOption) (*OrderInfoGetDetailRes, error)
 	GetList(ctx context.Context, in *OrderInfoGetListReq, opts ...grpc.CallOption) (*OrderInfoGetListRes, error)
 	GetCount(ctx context.Context, in *OrderInfoGetCountReq, opts ...grpc.CallOption) (*OrderInfoGetCountRes, error)
@@ -56,6 +58,16 @@ func (c *orderInfoClient) Create(ctx context.Context, in *OrderInfoCreateReq, op
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(OrderInfoCreateRes)
 	err := c.cc.Invoke(ctx, OrderInfo_Create_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderInfoClient) CreateFromCart(ctx context.Context, in *OrderInfoCreateFromCartReq, opts ...grpc.CallOption) (*OrderInfoCreateRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OrderInfoCreateRes)
+	err := c.cc.Invoke(ctx, OrderInfo_CreateFromCart_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +149,7 @@ func (c *orderInfoClient) Preview(ctx context.Context, in *OrderInfoPreviewReq, 
 // for forward compatibility.
 type OrderInfoServer interface {
 	Create(context.Context, *OrderInfoCreateReq) (*OrderInfoCreateRes, error)
+	CreateFromCart(context.Context, *OrderInfoCreateFromCartReq) (*OrderInfoCreateRes, error)
 	GetDetail(context.Context, *OrderInfoGetDetailReq) (*OrderInfoGetDetailRes, error)
 	GetList(context.Context, *OrderInfoGetListReq) (*OrderInfoGetListRes, error)
 	GetCount(context.Context, *OrderInfoGetCountReq) (*OrderInfoGetCountRes, error)
@@ -156,6 +169,9 @@ type UnimplementedOrderInfoServer struct{}
 
 func (UnimplementedOrderInfoServer) Create(context.Context, *OrderInfoCreateReq) (*OrderInfoCreateRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedOrderInfoServer) CreateFromCart(context.Context, *OrderInfoCreateFromCartReq) (*OrderInfoCreateRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateFromCart not implemented")
 }
 func (UnimplementedOrderInfoServer) GetDetail(context.Context, *OrderInfoGetDetailReq) (*OrderInfoGetDetailRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDetail not implemented")
@@ -213,6 +229,24 @@ func _OrderInfo_Create_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderInfoServer).Create(ctx, req.(*OrderInfoCreateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OrderInfo_CreateFromCart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OrderInfoCreateFromCartReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderInfoServer).CreateFromCart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderInfo_CreateFromCart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderInfoServer).CreateFromCart(ctx, req.(*OrderInfoCreateFromCartReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -353,6 +387,10 @@ var OrderInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Create",
 			Handler:    _OrderInfo_Create_Handler,
+		},
+		{
+			MethodName: "CreateFromCart",
+			Handler:    _OrderInfo_CreateFromCart_Handler,
 		},
 		{
 			MethodName: "GetDetail",

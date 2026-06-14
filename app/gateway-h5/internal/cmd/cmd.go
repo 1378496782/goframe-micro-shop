@@ -71,6 +71,7 @@ var (
 						interactionController,
 						orderController.Payment,
 						orderController.OrderInfoCreate,
+						orderController.OrderInfoCreateFromCart,
 						orderController.OrderInfoGetList,
 						orderController.OrderInfoGetCount,
 						orderController.OrderInfoGetDetail,

@@ -1365,6 +1365,98 @@ func (x *OrderInfoPreviewItem) GetSubTotal() uint64 {
 	return 0
 }
 
+type OrderInfoCreateFromCartReq struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	CartIds          []uint32               `protobuf:"varint,1,rep,packed,name=cart_ids,json=cartIds,proto3" json:"cart_ids,omitempty" dc:"购物车id列表"`                    // 购物车id列表
+	ConsigneeName    string                 `protobuf:"bytes,2,opt,name=consignee_name,json=consigneeName,proto3" json:"consignee_name,omitempty" dc:"收货人姓名"`            // 收货人姓名
+	ConsigneePhone   string                 `protobuf:"bytes,3,opt,name=consignee_phone,json=consigneePhone,proto3" json:"consignee_phone,omitempty" dc:"收货人手机号"`        // 收货人手机号
+	ConsigneeAddress string                 `protobuf:"bytes,4,opt,name=consignee_address,json=consigneeAddress,proto3" json:"consignee_address,omitempty" dc:"收货人详细地址"` // 收货人详细地址
+	Remark           string                 `protobuf:"bytes,5,opt,name=remark,proto3" json:"remark,omitempty" dc:"备注"`                                                  // 备注
+	UserId           uint32                 `protobuf:"varint,6,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户id"`                                 // 用户id
+	CouponId         uint32                 `protobuf:"varint,7,opt,name=coupon_id,json=couponId,proto3" json:"coupon_id,omitempty" dc:"优惠券id"`                          // 优惠券id
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *OrderInfoCreateFromCartReq) Reset() {
+	*x = OrderInfoCreateFromCartReq{}
+	mi := &file_order_info_v1_order_info_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderInfoCreateFromCartReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderInfoCreateFromCartReq) ProtoMessage() {}
+
+func (x *OrderInfoCreateFromCartReq) ProtoReflect() protoreflect.Message {
+	mi := &file_order_info_v1_order_info_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderInfoCreateFromCartReq.ProtoReflect.Descriptor instead.
+func (*OrderInfoCreateFromCartReq) Descriptor() ([]byte, []int) {
+	return file_order_info_v1_order_info_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *OrderInfoCreateFromCartReq) GetCartIds() []uint32 {
+	if x != nil {
+		return x.CartIds
+	}
+	return nil
+}
+
+func (x *OrderInfoCreateFromCartReq) GetConsigneeName() string {
+	if x != nil {
+		return x.ConsigneeName
+	}
+	return ""
+}
+
+func (x *OrderInfoCreateFromCartReq) GetConsigneePhone() string {
+	if x != nil {
+		return x.ConsigneePhone
+	}
+	return ""
+}
+
+func (x *OrderInfoCreateFromCartReq) GetConsigneeAddress() string {
+	if x != nil {
+		return x.ConsigneeAddress
+	}
+	return ""
+}
+
+func (x *OrderInfoCreateFromCartReq) GetRemark() string {
+	if x != nil {
+		return x.Remark
+	}
+	return ""
+}
+
+func (x *OrderInfoCreateFromCartReq) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *OrderInfoCreateFromCartReq) GetCouponId() uint32 {
+	if x != nil {
+		return x.CouponId
+	}
+	return 0
+}
+
 var File_order_info_v1_order_info_proto protoreflect.FileDescriptor
 
 const file_order_info_v1_order_info_proto_rawDesc = "" +
@@ -1474,10 +1566,19 @@ const file_order_info_v1_order_info_proto_rawDesc = "" +
 	"\vgoods_price\x18\x04 \x01(\x04R\n" +
 	"goodsPrice\x12\x14\n" +
 	"\x05count\x18\x05 \x01(\rR\x05count\x12\x1b\n" +
-	"\tsub_total\x18\x06 \x01(\x04R\bsubTotal2\x8d\x05\n" +
+	"\tsub_total\x18\x06 \x01(\x04R\bsubTotal\"\x82\x02\n" +
+	"\x1aOrderInfoCreateFromCartReq\x12\x19\n" +
+	"\bcart_ids\x18\x01 \x03(\rR\acartIds\x12%\n" +
+	"\x0econsignee_name\x18\x02 \x01(\tR\rconsigneeName\x12'\n" +
+	"\x0fconsignee_phone\x18\x03 \x01(\tR\x0econsigneePhone\x12+\n" +
+	"\x11consignee_address\x18\x04 \x01(\tR\x10consigneeAddress\x12\x16\n" +
+	"\x06remark\x18\x05 \x01(\tR\x06remark\x12\x17\n" +
+	"\auser_id\x18\x06 \x01(\rR\x06userId\x12\x1b\n" +
+	"\tcoupon_id\x18\a \x01(\rR\bcouponId2\xef\x05\n" +
 	"\n" +
 	"order_info\x12P\n" +
-	"\x06Create\x12!.order_info.v1.OrderInfoCreateReq\x1a!.order_info.v1.OrderInfoCreateRes\"\x00\x12Y\n" +
+	"\x06Create\x12!.order_info.v1.OrderInfoCreateReq\x1a!.order_info.v1.OrderInfoCreateRes\"\x00\x12`\n" +
+	"\x0eCreateFromCart\x12).order_info.v1.OrderInfoCreateFromCartReq\x1a!.order_info.v1.OrderInfoCreateRes\"\x00\x12Y\n" +
 	"\tGetDetail\x12$.order_info.v1.OrderInfoGetDetailReq\x1a$.order_info.v1.OrderInfoGetDetailRes\"\x00\x12S\n" +
 	"\aGetList\x12\".order_info.v1.OrderInfoGetListReq\x1a\".order_info.v1.OrderInfoGetListRes\"\x00\x12V\n" +
 	"\bGetCount\x12#.order_info.v1.OrderInfoGetCountReq\x1a#.order_info.v1.OrderInfoGetCountRes\"\x00\x12A\n" +
@@ -1498,60 +1599,63 @@ func file_order_info_v1_order_info_proto_rawDescGZIP() []byte {
 	return file_order_info_v1_order_info_proto_rawDescData
 }
 
-var file_order_info_v1_order_info_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_order_info_v1_order_info_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_order_info_v1_order_info_proto_goTypes = []any{
-	(*OrderInfoCreateReq)(nil),      // 0: order_info.v1.OrderInfoCreateReq
-	(*OrderGoodsItem)(nil),          // 1: order_info.v1.OrderGoodsItem
-	(*OrderInfoCreateRes)(nil),      // 2: order_info.v1.OrderInfoCreateRes
-	(*OrderInfoGetDetailReq)(nil),   // 3: order_info.v1.OrderInfoGetDetailReq
-	(*OrderInfoGetDetailRes)(nil),   // 4: order_info.v1.OrderInfoGetDetailRes
-	(*OrderInfoGetListReq)(nil),     // 5: order_info.v1.OrderInfoGetListReq
-	(*OrderListInfo)(nil),           // 6: order_info.v1.OrderListInfo
-	(*OrderListGoodsInfo)(nil),      // 7: order_info.v1.OrderListGoodsInfo
-	(*OrderInfoListResponse)(nil),   // 8: order_info.v1.OrderInfoListResponse
-	(*OrderInfoGetListRes)(nil),     // 9: order_info.v1.OrderInfoGetListRes
-	(*PaymentReq)(nil),              // 10: order_info.v1.PaymentReq
-	(*PaymentRes)(nil),              // 11: order_info.v1.PaymentRes
-	(*NotifyReq)(nil),               // 12: order_info.v1.NotifyReq
-	(*NotifyRes)(nil),               // 13: order_info.v1.NotifyRes
-	(*OrderInfoGetCountReq)(nil),    // 14: order_info.v1.OrderInfoGetCountReq
-	(*OrderInfoGetCountRes)(nil),    // 15: order_info.v1.OrderInfoGetCountRes
-	(*CancelOrderReq)(nil),          // 16: order_info.v1.CancelOrderReq
-	(*CancelOrderRes)(nil),          // 17: order_info.v1.CancelOrderRes
-	(*OrderInfoPreviewReq)(nil),     // 18: order_info.v1.OrderInfoPreviewReq
-	(*OrderInfoPreviewRes)(nil),     // 19: order_info.v1.OrderInfoPreviewRes
-	(*OrderInfoPreviewItem)(nil),    // 20: order_info.v1.OrderInfoPreviewItem
-	nil,                             // 21: order_info.v1.NotifyReq.HeadersEntry
-	(*pbentity.OrderInfo)(nil),      // 22: pbentity.OrderInfo
-	(*pbentity.OrderGoodsInfo)(nil), // 23: pbentity.OrderGoodsInfo
+	(*OrderInfoCreateReq)(nil),         // 0: order_info.v1.OrderInfoCreateReq
+	(*OrderGoodsItem)(nil),             // 1: order_info.v1.OrderGoodsItem
+	(*OrderInfoCreateRes)(nil),         // 2: order_info.v1.OrderInfoCreateRes
+	(*OrderInfoGetDetailReq)(nil),      // 3: order_info.v1.OrderInfoGetDetailReq
+	(*OrderInfoGetDetailRes)(nil),      // 4: order_info.v1.OrderInfoGetDetailRes
+	(*OrderInfoGetListReq)(nil),        // 5: order_info.v1.OrderInfoGetListReq
+	(*OrderListInfo)(nil),              // 6: order_info.v1.OrderListInfo
+	(*OrderListGoodsInfo)(nil),         // 7: order_info.v1.OrderListGoodsInfo
+	(*OrderInfoListResponse)(nil),      // 8: order_info.v1.OrderInfoListResponse
+	(*OrderInfoGetListRes)(nil),        // 9: order_info.v1.OrderInfoGetListRes
+	(*PaymentReq)(nil),                 // 10: order_info.v1.PaymentReq
+	(*PaymentRes)(nil),                 // 11: order_info.v1.PaymentRes
+	(*NotifyReq)(nil),                  // 12: order_info.v1.NotifyReq
+	(*NotifyRes)(nil),                  // 13: order_info.v1.NotifyRes
+	(*OrderInfoGetCountReq)(nil),       // 14: order_info.v1.OrderInfoGetCountReq
+	(*OrderInfoGetCountRes)(nil),       // 15: order_info.v1.OrderInfoGetCountRes
+	(*CancelOrderReq)(nil),             // 16: order_info.v1.CancelOrderReq
+	(*CancelOrderRes)(nil),             // 17: order_info.v1.CancelOrderRes
+	(*OrderInfoPreviewReq)(nil),        // 18: order_info.v1.OrderInfoPreviewReq
+	(*OrderInfoPreviewRes)(nil),        // 19: order_info.v1.OrderInfoPreviewRes
+	(*OrderInfoPreviewItem)(nil),       // 20: order_info.v1.OrderInfoPreviewItem
+	(*OrderInfoCreateFromCartReq)(nil), // 21: order_info.v1.OrderInfoCreateFromCartReq
+	nil,                                // 22: order_info.v1.NotifyReq.HeadersEntry
+	(*pbentity.OrderInfo)(nil),         // 23: pbentity.OrderInfo
+	(*pbentity.OrderGoodsInfo)(nil),    // 24: pbentity.OrderGoodsInfo
 }
 var file_order_info_v1_order_info_proto_depIdxs = []int32{
 	1,  // 0: order_info.v1.OrderInfoCreateReq.order_goods_info:type_name -> order_info.v1.OrderGoodsItem
-	22, // 1: order_info.v1.OrderInfoGetDetailRes.order_info:type_name -> pbentity.OrderInfo
-	23, // 2: order_info.v1.OrderInfoGetDetailRes.order_goods_infos:type_name -> pbentity.OrderGoodsInfo
+	23, // 1: order_info.v1.OrderInfoGetDetailRes.order_info:type_name -> pbentity.OrderInfo
+	24, // 2: order_info.v1.OrderInfoGetDetailRes.order_goods_infos:type_name -> pbentity.OrderGoodsInfo
 	7,  // 3: order_info.v1.OrderListInfo.goods_info:type_name -> order_info.v1.OrderListGoodsInfo
 	6,  // 4: order_info.v1.OrderInfoListResponse.list:type_name -> order_info.v1.OrderListInfo
 	8,  // 5: order_info.v1.OrderInfoGetListRes.data:type_name -> order_info.v1.OrderInfoListResponse
-	21, // 6: order_info.v1.NotifyReq.headers:type_name -> order_info.v1.NotifyReq.HeadersEntry
+	22, // 6: order_info.v1.NotifyReq.headers:type_name -> order_info.v1.NotifyReq.HeadersEntry
 	20, // 7: order_info.v1.OrderInfoPreviewRes.items:type_name -> order_info.v1.OrderInfoPreviewItem
 	0,  // 8: order_info.v1.order_info.Create:input_type -> order_info.v1.OrderInfoCreateReq
-	3,  // 9: order_info.v1.order_info.GetDetail:input_type -> order_info.v1.OrderInfoGetDetailReq
-	5,  // 10: order_info.v1.order_info.GetList:input_type -> order_info.v1.OrderInfoGetListReq
-	14, // 11: order_info.v1.order_info.GetCount:input_type -> order_info.v1.OrderInfoGetCountReq
-	10, // 12: order_info.v1.order_info.Payment:input_type -> order_info.v1.PaymentReq
-	12, // 13: order_info.v1.order_info.Notify:input_type -> order_info.v1.NotifyReq
-	16, // 14: order_info.v1.order_info.CancelOrder:input_type -> order_info.v1.CancelOrderReq
-	18, // 15: order_info.v1.order_info.Preview:input_type -> order_info.v1.OrderInfoPreviewReq
-	2,  // 16: order_info.v1.order_info.Create:output_type -> order_info.v1.OrderInfoCreateRes
-	4,  // 17: order_info.v1.order_info.GetDetail:output_type -> order_info.v1.OrderInfoGetDetailRes
-	9,  // 18: order_info.v1.order_info.GetList:output_type -> order_info.v1.OrderInfoGetListRes
-	15, // 19: order_info.v1.order_info.GetCount:output_type -> order_info.v1.OrderInfoGetCountRes
-	11, // 20: order_info.v1.order_info.Payment:output_type -> order_info.v1.PaymentRes
-	13, // 21: order_info.v1.order_info.Notify:output_type -> order_info.v1.NotifyRes
-	17, // 22: order_info.v1.order_info.CancelOrder:output_type -> order_info.v1.CancelOrderRes
-	19, // 23: order_info.v1.order_info.Preview:output_type -> order_info.v1.OrderInfoPreviewRes
-	16, // [16:24] is the sub-list for method output_type
-	8,  // [8:16] is the sub-list for method input_type
+	21, // 9: order_info.v1.order_info.CreateFromCart:input_type -> order_info.v1.OrderInfoCreateFromCartReq
+	3,  // 10: order_info.v1.order_info.GetDetail:input_type -> order_info.v1.OrderInfoGetDetailReq
+	5,  // 11: order_info.v1.order_info.GetList:input_type -> order_info.v1.OrderInfoGetListReq
+	14, // 12: order_info.v1.order_info.GetCount:input_type -> order_info.v1.OrderInfoGetCountReq
+	10, // 13: order_info.v1.order_info.Payment:input_type -> order_info.v1.PaymentReq
+	12, // 14: order_info.v1.order_info.Notify:input_type -> order_info.v1.NotifyReq
+	16, // 15: order_info.v1.order_info.CancelOrder:input_type -> order_info.v1.CancelOrderReq
+	18, // 16: order_info.v1.order_info.Preview:input_type -> order_info.v1.OrderInfoPreviewReq
+	2,  // 17: order_info.v1.order_info.Create:output_type -> order_info.v1.OrderInfoCreateRes
+	2,  // 18: order_info.v1.order_info.CreateFromCart:output_type -> order_info.v1.OrderInfoCreateRes
+	4,  // 19: order_info.v1.order_info.GetDetail:output_type -> order_info.v1.OrderInfoGetDetailRes
+	9,  // 20: order_info.v1.order_info.GetList:output_type -> order_info.v1.OrderInfoGetListRes
+	15, // 21: order_info.v1.order_info.GetCount:output_type -> order_info.v1.OrderInfoGetCountRes
+	11, // 22: order_info.v1.order_info.Payment:output_type -> order_info.v1.PaymentRes
+	13, // 23: order_info.v1.order_info.Notify:output_type -> order_info.v1.NotifyRes
+	17, // 24: order_info.v1.order_info.CancelOrder:output_type -> order_info.v1.CancelOrderRes
+	19, // 25: order_info.v1.order_info.Preview:output_type -> order_info.v1.OrderInfoPreviewRes
+	17, // [17:26] is the sub-list for method output_type
+	8,  // [8:17] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
 	8,  // [8:8] is the sub-list for extension extendee
 	0,  // [0:8] is the sub-list for field type_name
@@ -1568,7 +1672,7 @@ func file_order_info_v1_order_info_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_info_v1_order_info_proto_rawDesc), len(file_order_info_v1_order_info_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
