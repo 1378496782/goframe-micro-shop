@@ -18,18 +18,17 @@ func (c *ControllerV1) OrderInfoCreateFromCart(ctx context.Context, req *v1.Orde
 		return nil, gerror.New("订单必须包含购物车ID列表")
 	}
 
+	grpcReq := &order_info.OrderInfoCreateFromCartReq{}
+	if err := gconv.Struct(req, grpcReq); err != nil {
+		return nil, err
+	}
+
 	value := ctx.Value(middleware.CtxUserId)
 	userId, ok := value.(uint32)
 	if !ok {
 		return nil, gerror.NewCode(gcode.CodeNotAuthorized, "无法获取用户信息，请重新登录")
 	}
-
-	grpcReq := &order_info.OrderInfoCreateFromCartReq{
-		UserId: userId,
-	}
-	if err := gconv.Struct(req, grpcReq); err != nil {
-		return nil, err
-	}
+	grpcReq.UserId = userId
 
 	grpcRes, err := c.OrderInfoClient.CreateFromCart(ctx, grpcReq)
 	if err != nil {
