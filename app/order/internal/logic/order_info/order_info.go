@@ -655,7 +655,7 @@ func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (or
 		UserId:  req.UserId,
 		CartIds: req.CartIds,
 	}); err != nil {
-		return 0, "", fmt.Errorf("删除购物车商品失败: %v", err)
+		g.Log().Errorf(ctx, "删除购物车商品失败: %v", err)
 	}
 
 	return orderId, order.Number, nil
