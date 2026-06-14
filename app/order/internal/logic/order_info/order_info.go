@@ -540,3 +540,7 @@ func Preview(ctx context.Context, req *v1.OrderInfoPreviewReq) (*v1.OrderInfoPre
 		TotalCount: totalCount,
 	}, nil
 }
+
+func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (orderId int32, orderNumber string, err error) {
+	return
+}

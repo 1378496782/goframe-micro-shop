@@ -195,5 +195,13 @@ func (*Controller) Preview(ctx context.Context, req *v1.OrderInfoPreviewReq) (re
 }
 
 func (*Controller) CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (res *v1.OrderInfoCreateRes, err error) {
-	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+	// 调用login层创建订单
+	orderId, orderNumber, err := order_info.CreateFromCart(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.OrderInfoCreateRes{
+		Id:     uint32(orderId),
+		Number: orderNumber,
+	}, nil
 }
