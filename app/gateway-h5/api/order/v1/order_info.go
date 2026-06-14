@@ -175,7 +175,7 @@ type OrderInfoPreviewItem struct {
 }
 
 type OrderInfoCreateFromCartReq struct {
-	g.Meta           `path:"/order/cart"  method:"post" tags:"订单管理" sm:"创建订单"`
+	g.Meta           `path:"/order/cart"  method:"post" tags:"订单管理" sm:"从购物车创建订单"`
 	CartIds          []uint32 `json:"cart_ids" v:"required" dc:"购物车ID列表"`
 	ConsigneeName    string   `json:"consignee_name"  dc:"收货人姓名"`
 	ConsigneePhone   string   `json:"consignee_phone"  dc:"收货人手机号"`

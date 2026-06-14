@@ -541,6 +541,113 @@ func Preview(ctx context.Context, req *v1.OrderInfoPreviewReq) (*v1.OrderInfoPre
 	}, nil
 }
 
+/*
+1. 参数校验
+2. 查选中的购物车商品
+3. 校验必须全部命中
+4. 校验商品有效性和库存，同时计算金额
+5. 组装订单主表
+6. 事务插入订单主表和订单商品表
+*/
 func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (orderId int32, orderNumber string, err error) {
-	return
+	// 1. 参数校验
+	if len(req.CartIds) == 0 || req.UserId == 0 {
+		return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+
+	// 2. 查选中的购物车商品
+	cartRes, err := cart.Client.GetSelectedItems(ctx, &cartApi.CartInfoGetSelectedItemsReq{
+		UserId:  req.UserId,
+		CartIds: req.CartIds,
+	})
+	if err != nil {
+		return 0, "", gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	// 3. 校验必须全部命中
+	if len(cartRes.Items) != len(req.CartIds) {
+		return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "购物车商品数量与请求参数不一致")
+	}
+
+	// 4. 校验商品有效性和库存，同时计算金额
+	totalPrice := uint64(0)
+	orderGoodsList := []entity.OrderGoodsInfo{}
+
+	for _, item := range cartRes.Items {
+		if item.GoodsId == 0 || item.GoodsName == "" || item.GoodsPrice <= 0 || item.Count <= 0 {
+			return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "商品名称、价格或数量无效")
+		}
+		if item.GoodsStock < item.Count {
+			return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
+		}
+
+		subTotal := item.GoodsPrice * uint64(item.Count)
+		totalPrice += subTotal
+
+		orderGoodsList = append(orderGoodsList, entity.OrderGoodsInfo{
+			GoodsId:     int(item.GoodsId),
+			Count:       int(item.Count),
+			Price:       int(subTotal),
+			CouponPrice: 0,
+			ActualPrice: int(subTotal),
+			CreatedAt:   gtime.Now(),
+			UpdatedAt:   gtime.Now(),
+		})
+	}
+
+	// 5. 组装订单主表
+	order := entity.OrderInfo{
+		Number:           utility.GenerateOrderNumber(),
+		UserId:           int(req.UserId),
+		Remark:           req.Remark,
+		Status:           int(consts.OrderStatusPendingPayment),
+		ConsigneeName:    req.ConsigneeName,
+		ConsigneePhone:   req.ConsigneePhone,
+		ConsigneeAddress: req.ConsigneeAddress,
+		Price:            int(totalPrice),
+		CouponPrice:      0,
+		ActualPrice:      int(totalPrice),
+		CreatedAt:        gtime.Now(),
+		UpdatedAt:        gtime.Now(),
+	}
+
+	// 6. 事务插入
+	db := g.DB()
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return 0, "", fmt.Errorf("开启事务失败: %v", err)
+	}
+
+	success := false
+	defer func() {
+		if !success {
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				g.Log().Errorf(ctx, "事务回滚失败: %v", rollbackErr)
+			}
+		}
+	}()
+
+	id, err := dao.OrderInfo.Ctx(ctx).TX(tx).InsertAndGetId(order)
+	if err != nil {
+		return 0, "", fmt.Errorf("插入订单失败: %v", err)
+	}
+
+	orderId = int32(id)
+
+	for i := range orderGoodsList {
+		orderGoodsList[i].OrderId = int(orderId)
+	}
+
+	if len(orderGoodsList) > 0 {
+		if _, err = dao.OrderGoodsInfo.Ctx(ctx).TX(tx).Insert(orderGoodsList); err != nil {
+			return 0, "", fmt.Errorf("插入订单商品失败: %v", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return 0, "", fmt.Errorf("提交事务失败: %v", err)
+	}
+
+	success = true
+	return orderId, order.Number, nil
 }
