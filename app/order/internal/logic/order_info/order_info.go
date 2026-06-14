@@ -649,5 +649,14 @@ func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (or
 	}
 
 	success = true
+
+	// 7. 删除购物车商品
+	if _, err = cart.Client.DeleteSelectedItems(ctx, &cartApi.CartInfoDeleteSelectedItemsReq{
+		UserId:  req.UserId,
+		CartIds: req.CartIds,
+	}); err != nil {
+		return 0, "", fmt.Errorf("删除购物车商品失败: %v", err)
+	}
+
 	return orderId, order.Number, nil
 }

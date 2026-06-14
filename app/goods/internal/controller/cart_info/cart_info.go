@@ -228,3 +228,12 @@ func (*Controller) Delete(ctx context.Context, req *v1.CartInfoDeleteReq) (res *
 func (*Controller) GetSelectedItems(ctx context.Context, req *v1.CartInfoGetSelectedItemsReq) (res *v1.CartInfoGetSelectedItemsRes, err error) {
 	return cart_info.GetSelectedItems(ctx, req)
 }
+
+func (*Controller) DeleteSelectedItems(ctx context.Context, req *v1.CartInfoDeleteSelectedItemsReq) (res *v1.CartInfoDeleteSelectedItemsRes, err error) {
+	res = &v1.CartInfoDeleteSelectedItemsRes{}
+	if req.UserId == 0 || req.CartIds == nil || len(req.CartIds) == 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+	_, err = dao.CartInfo.Ctx(ctx).Where("user_id", req.UserId).WhereIn("id", req.CartIds).Delete()
+	return
+}

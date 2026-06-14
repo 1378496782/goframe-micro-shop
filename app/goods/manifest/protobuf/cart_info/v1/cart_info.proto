@@ -13,6 +13,7 @@ service cart_info {
   rpc Delete(CartInfoDeleteReq) returns (CartInfoDeleteRes) {}
   rpc Put(CartInfoPutReq) returns (CartInfoPutRes) {}
   rpc GetSelectedItems(CartInfoGetSelectedItemsReq) returns (CartInfoGetSelectedItemsRes) {}
+  rpc DeleteSelectedItems(CartInfoDeleteSelectedItemsReq) returns (CartInfoDeleteSelectedItemsRes) {}
 }
 
 // 新增消息定义
@@ -90,3 +91,10 @@ message CartInfoGetSelectedItemsReq {
 message CartInfoGetSelectedItemsRes {
   repeated CartItem items = 1;
 }
+
+message CartInfoDeleteSelectedItemsReq {
+  uint32 user_id = 1;
+  repeated uint32 cart_ids = 2;
+}
+
+message CartInfoDeleteSelectedItemsRes {}

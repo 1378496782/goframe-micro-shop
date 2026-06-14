@@ -20,11 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CartInfo_GetList_FullMethodName          = "/cart_info.v1.cart_info/GetList"
-	CartInfo_Create_FullMethodName           = "/cart_info.v1.cart_info/Create"
-	CartInfo_Delete_FullMethodName           = "/cart_info.v1.cart_info/Delete"
-	CartInfo_Put_FullMethodName              = "/cart_info.v1.cart_info/Put"
-	CartInfo_GetSelectedItems_FullMethodName = "/cart_info.v1.cart_info/GetSelectedItems"
+	CartInfo_GetList_FullMethodName             = "/cart_info.v1.cart_info/GetList"
+	CartInfo_Create_FullMethodName              = "/cart_info.v1.cart_info/Create"
+	CartInfo_Delete_FullMethodName              = "/cart_info.v1.cart_info/Delete"
+	CartInfo_Put_FullMethodName                 = "/cart_info.v1.cart_info/Put"
+	CartInfo_GetSelectedItems_FullMethodName    = "/cart_info.v1.cart_info/GetSelectedItems"
+	CartInfo_DeleteSelectedItems_FullMethodName = "/cart_info.v1.cart_info/DeleteSelectedItems"
 )
 
 // CartInfoClient is the client API for CartInfo service.
@@ -36,6 +37,7 @@ type CartInfoClient interface {
 	Delete(ctx context.Context, in *CartInfoDeleteReq, opts ...grpc.CallOption) (*CartInfoDeleteRes, error)
 	Put(ctx context.Context, in *CartInfoPutReq, opts ...grpc.CallOption) (*CartInfoPutRes, error)
 	GetSelectedItems(ctx context.Context, in *CartInfoGetSelectedItemsReq, opts ...grpc.CallOption) (*CartInfoGetSelectedItemsRes, error)
+	DeleteSelectedItems(ctx context.Context, in *CartInfoDeleteSelectedItemsReq, opts ...grpc.CallOption) (*CartInfoDeleteSelectedItemsRes, error)
 }
 
 type cartInfoClient struct {
@@ -96,6 +98,16 @@ func (c *cartInfoClient) GetSelectedItems(ctx context.Context, in *CartInfoGetSe
 	return out, nil
 }
 
+func (c *cartInfoClient) DeleteSelectedItems(ctx context.Context, in *CartInfoDeleteSelectedItemsReq, opts ...grpc.CallOption) (*CartInfoDeleteSelectedItemsRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CartInfoDeleteSelectedItemsRes)
+	err := c.cc.Invoke(ctx, CartInfo_DeleteSelectedItems_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CartInfoServer is the server API for CartInfo service.
 // All implementations must embed UnimplementedCartInfoServer
 // for forward compatibility.
@@ -105,6 +117,7 @@ type CartInfoServer interface {
 	Delete(context.Context, *CartInfoDeleteReq) (*CartInfoDeleteRes, error)
 	Put(context.Context, *CartInfoPutReq) (*CartInfoPutRes, error)
 	GetSelectedItems(context.Context, *CartInfoGetSelectedItemsReq) (*CartInfoGetSelectedItemsRes, error)
+	DeleteSelectedItems(context.Context, *CartInfoDeleteSelectedItemsReq) (*CartInfoDeleteSelectedItemsRes, error)
 	mustEmbedUnimplementedCartInfoServer()
 }
 
@@ -129,6 +142,9 @@ func (UnimplementedCartInfoServer) Put(context.Context, *CartInfoPutReq) (*CartI
 }
 func (UnimplementedCartInfoServer) GetSelectedItems(context.Context, *CartInfoGetSelectedItemsReq) (*CartInfoGetSelectedItemsRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSelectedItems not implemented")
+}
+func (UnimplementedCartInfoServer) DeleteSelectedItems(context.Context, *CartInfoDeleteSelectedItemsReq) (*CartInfoDeleteSelectedItemsRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteSelectedItems not implemented")
 }
 func (UnimplementedCartInfoServer) mustEmbedUnimplementedCartInfoServer() {}
 func (UnimplementedCartInfoServer) testEmbeddedByValue()                  {}
@@ -241,6 +257,24 @@ func _CartInfo_GetSelectedItems_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CartInfo_DeleteSelectedItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CartInfoDeleteSelectedItemsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CartInfoServer).DeleteSelectedItems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CartInfo_DeleteSelectedItems_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CartInfoServer).DeleteSelectedItems(ctx, req.(*CartInfoDeleteSelectedItemsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CartInfo_ServiceDesc is the grpc.ServiceDesc for CartInfo service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -267,6 +301,10 @@ var CartInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSelectedItems",
 			Handler:    _CartInfo_GetSelectedItems_Handler,
+		},
+		{
+			MethodName: "DeleteSelectedItems",
+			Handler:    _CartInfo_DeleteSelectedItems_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
