@@ -573,7 +573,11 @@ func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (or
 	totalPrice := uint64(0)
 	orderGoodsList := []entity.OrderGoodsInfo{}
 
+	goodsIds := []uint32{}
+	counts := []uint32{}
 	for _, item := range cartRes.Items {
+		goodsIds = append(goodsIds, item.GoodsId)
+		counts = append(counts, item.Count)
 		if item.GoodsId == 0 || item.GoodsName == "" || item.GoodsPrice <= 0 || item.Count <= 0 {
 			return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "商品名称、价格或数量无效")
 		}
@@ -593,6 +597,15 @@ func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (or
 			CreatedAt:   gtime.Now(),
 			UpdatedAt:   gtime.Now(),
 		})
+	}
+
+	// 调 goods-service DeductStock
+	if _, err = goods.Client.DeductStock(ctx, &goods_info.DeductStockReq{
+		GoodsIds: goodsIds,
+		Counts:   counts,
+	}); err != nil {
+		g.Log().Errorf(ctx, "扣减商品库存失败: %v", err)
+		return 0, "", fmt.Errorf("扣减商品库存失败: %v", err)
 	}
 
 	// 5. 组装订单主表

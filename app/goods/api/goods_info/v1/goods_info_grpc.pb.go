@@ -45,6 +45,7 @@ type GoodsInfoClient interface {
 	Delete(ctx context.Context, in *GoodsInfoDeleteReq, opts ...grpc.CallOption) (*GoodsInfoDeleteRes, error)
 	// 获取商品库存
 	GetGoodsStock(ctx context.Context, in *GetGoodsStockReq, opts ...grpc.CallOption) (*GetGoodsStockRes, error)
+	// 扣减商品库存
 	DeductStock(ctx context.Context, in *DeductStockReq, opts ...grpc.CallOption) (*DeductStockRes, error)
 }
 
