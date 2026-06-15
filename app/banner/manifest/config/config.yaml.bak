@@ -4,7 +4,7 @@ grpc:
   logger:
     path: "./log" # 日志文件路径。默认为空，表示关闭，仅输出到终端
     file: "{Y-m-d}.log" # 日志文件格式。默认为"{Y-m-d}.log"
-    prefix: "公众号：王中阳：banner-service" # 日志内容输出前缀。方便在所有日志行里一眼认出是我们这个服务产生的。
+    prefix: "微信：xjtu915：banner-service" # 日志内容输出前缀。方便在所有日志行里一眼认出是我们这个服务产生的。
     level: "all" # 日志输出级别
     stdout: true  # 日志是否同时输出到终端。默认true
     rotateSize: 104857600   # 100MB切割日志文件
