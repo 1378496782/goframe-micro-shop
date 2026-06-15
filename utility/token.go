@@ -1,10 +1,11 @@
 package utility
 
 import (
+	"time"
+
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/util/grand"
 	"github.com/golang-jwt/jwt/v4"
-	"time"
 )
 
 // 自定义JWT声明
@@ -30,7 +31,7 @@ func EncryptPassword(password, salt string) string {
 
 // 生成JWT Token
 func GenerateToken(userId uint32) (string, time.Time, error) {
-	expireTime := time.Now().Add(24 * time.Hour)
+	expireTime := time.Now().Add(3 * 24 * time.Hour)
 	claims := CustomClaims{
 		UserId: userId,
 		RegisteredClaims: jwt.RegisteredClaims{

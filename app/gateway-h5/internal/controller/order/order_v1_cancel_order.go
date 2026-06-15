@@ -6,8 +6,10 @@ import (
 
 	order_info "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
 
-	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/order/v1"
+	v1 "shop-goframe-micro-service-refacotor/app/gateway-h5/api/order/v1"
 
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
@@ -16,8 +18,7 @@ func (c *ControllerV1) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) 
 	value := ctx.Value(middleware.CtxUserId)
 	userId, ok := value.(uint32)
 	if !ok {
-		// 处理类型不匹配的情况
-		panic("用户ID类型错误或不存在")
+		return nil, gerror.NewCode(gcode.CodeNotAuthorized, "无法获取用户信息，请重新登录")
 	}
 
 	grpcReq := &order_info.CancelOrderReq{

@@ -15,6 +15,7 @@ import (
 	goods "shop-goframe-micro-service-refacotor/app/order/utility/goods_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
 	"shop-goframe-micro-service-refacotor/utility"
+	consts_ctrl "shop-goframe-micro-service-refacotor/utility/consts"
 	"shop-goframe-micro-service-refacotor/utility/metrics"
 	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
 
@@ -338,7 +339,7 @@ func GetList(ctx context.Context, req *v1.OrderInfoGetListReq) ([]*v1.OrderListI
 }
 
 // UpdateOrderStatus 更新订单状态
-func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
+func UpdateOrderStatus(ctx context.Context, orderId, status int) error {
 	updateData := g.Map{
 		"status":     status,
 		"updated_at": gtime.Now(),
@@ -356,6 +357,46 @@ func UpdateOrderStatus(ctx context.Context, orderId int, status int) error {
 
 	g.Log().Infof(ctx, "订单状态更新成功, 订单ID: %d, 新状态: %d", orderId, status)
 	return nil
+}
+
+type OrderStatusTransitionReq struct {
+	UserId     uint32
+	OrderId    uint32
+	FromStatus int
+	ToStatus   int
+}
+
+// UpdateOrderStatusIfMatch 只有当前状态匹配时才更新订单状态
+func UpdateOrderStatusIfMatch(ctx context.Context, req *OrderStatusTransitionReq) (bool, error) {
+	updateData := g.Map{
+		"status":     req.ToStatus,
+		"updated_at": gtime.Now(),
+	}
+
+	// 只有当订单状态变为已支付(2)时才设置支付时间
+	if req.ToStatus == int(consts.OrderStatusPaid) {
+		updateData["pay_at"] = gtime.Now()
+	}
+
+	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		"id":      req.OrderId,
+		"user_id": req.UserId,
+		"status":  req.FromStatus,
+	}).Update(updateData)
+	if err != nil {
+		return false, fmt.Errorf("更新订单状态失败: %v", err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("获取订单状态更新结果失败: %v", err)
+	}
+	if rows == 0 {
+		return false, nil
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单ID: %d, 原状态: %d, 新状态: %d", req.OrderId, req.FromStatus, req.ToStatus)
+	return true, nil
 }
 
 // UpdateOrderStatus 更新订单状态
@@ -672,4 +713,97 @@ func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (or
 	}
 
 	return orderId, order.Number, nil
+}
+
+func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrderRes, err error) {
+	infoError := consts_ctrl.InfoError(consts_ctrl.OrderInfo, consts_ctrl.GetOrderRecord)
+
+	record, err := dao.OrderInfo.Ctx(ctx).Where("id", req.Id).One()
+
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	if record.IsEmpty() {
+		return &v1.CancelOrderRes{
+			Code:    1001,
+			Message: "订单不存在",
+			Data:    "",
+		}, nil
+	}
+
+	// 查 order_goods_info 商品快照
+	var goodsList []*entity.OrderGoodsInfo
+	err = dao.OrderGoodsInfo.Ctx(ctx).Where("order_id", req.Id).Scan(&goodsList)
+	if err != nil {
+		return &v1.CancelOrderRes{
+			Code:    1005,
+			Message: "查询订单商品失败",
+			Data:    "",
+		}, nil
+	}
+
+	// 只有待支付订单才允许取消
+	ok, err := UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
+		UserId:     req.UserId,
+		OrderId:    req.Id,
+		FromStatus: int(consts.OrderStatusPendingPayment),
+		ToStatus:   int(consts.OrderStatusCancelled),
+	})
+	if err != nil {
+		return &v1.CancelOrderRes{
+			Code:    1004,
+			Message: "系统错误，取消失败",
+			Data:    "",
+		}, nil
+	}
+	if !ok {
+		return &v1.CancelOrderRes{
+			Code:    1004,
+			Message: "订单不存在或状态不允许取消",
+			Data:    "",
+		}, nil
+	}
+
+	// 恢复库存
+	goodsIds := []uint32{}
+	counts := []uint32{}
+	for _, item := range goodsList {
+		goodsIds = append(goodsIds, uint32(item.GoodsId))
+		counts = append(counts, uint32(item.Count))
+	}
+	if _, err = goods.Client.RestoreStock(ctx, &goods_info.RestoreStockReq{
+		GoodsIds: goodsIds,
+		Counts:   counts,
+	}); err != nil {
+		g.Log().Errorf(ctx, "恢复商品库存失败: %v", err)
+
+		// 恢复库存失败，回滚订单状态
+		ok, err = UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
+			UserId:     req.UserId,
+			OrderId:    req.Id,
+			FromStatus: int(consts.OrderStatusCancelled),
+			ToStatus:   int(consts.OrderStatusPendingPayment),
+		})
+		if err != nil {
+			g.Log().Errorf(ctx, "回滚订单状态失败: %v", err)
+			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+		}
+		if !ok {
+			g.Log().Warningf(ctx, "回滚订单状态未生效, 订单ID: %d", req.Id)
+		}
+
+		return &v1.CancelOrderRes{
+			Code:    1006,
+			Message: "恢复商品库存失败",
+			Data:    "",
+		}, nil
+	}
+
+	return &v1.CancelOrderRes{
+		Code:    0,
+		Message: "订单取消成功",
+		Data:    "",
+	}, nil
 }
