@@ -53,8 +53,13 @@ func GetGoodsDetail(ctx context.Context, productId uint32) (*g.Var, error) {
 
 // DeleteGoodsDetail 删除商品详情数据缓存
 func DeleteGoodsDetail(ctx context.Context, productId uint32) error {
+	cache := GetGoodsCache()
+	if cache == nil {
+		return fmt.Errorf("goodsCache 未初始化")
+	}
+
 	key := fmt.Sprintf("%s%d", GoodsDetailKey, productId)
-	_, err := goodsCache.Remove(ctx, key)
+	_, err := cache.Remove(ctx, key)
 	return err
 }
 

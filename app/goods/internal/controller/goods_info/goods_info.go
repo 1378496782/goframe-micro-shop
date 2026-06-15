@@ -10,6 +10,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/goods/utility/goodsRedis"
 	"shop-goframe-micro-service-refacotor/utility"
 	"shop-goframe-micro-service-refacotor/utility/consts"
+	"slices"
 	"strings"
 	"time"
 
@@ -314,15 +315,23 @@ func (c *Controller) DeductStock(ctx context.Context, req *v1.DeductStockReq) (r
 		needMap[goodsId] += req.Counts[i]
 	}
 
+	goodsIds := make([]uint32, 0, len(needMap))
+
+	for goodsId := range needMap {
+		goodsIds = append(goodsIds, goodsId)
+	}
+	slices.Sort(goodsIds)
+
 	// 3. 原子扣减：UPDATE ... WHERE stock >= 扣量 AND id = ?，靠 RowsAffected 判断是否成功
 	//    用事务保证"要么全扣成功，要么全不扣"
 	affectedGoodsIds := make(map[uint32]struct{}, len(needMap))
 	err = dao.GoodsInfo.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
-		for goodsId, need := range needMap {
+		for _, goodsId := range goodsIds {
+			need := needMap[goodsId]
 			result, txErr := tx.Model(dao.GoodsInfo.Table()).
 				Where("id", goodsId).
 				Where("stock >= ?", need).
-				Increment("stock", -int(need))
+				Decrement("stock", need)
 			if txErr != nil {
 				return txErr
 			}
