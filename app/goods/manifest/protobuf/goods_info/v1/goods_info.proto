@@ -19,6 +19,7 @@ service goods_info {
   rpc Delete(GoodsInfoDeleteReq) returns (GoodsInfoDeleteRes) {}
   // 获取商品库存
   rpc GetGoodsStock(GetGoodsStockReq)returns(GetGoodsStockRes){}
+  rpc DeductStock(DeductStockReq)returns(DeductStockRes){}
 }
 
 message GoodsInfoGetDetailReq {
@@ -117,4 +118,12 @@ message GetGoodsStockReq{
 
 message GetGoodsStockRes{
   map<uint32,int32>goods_stock=1;
+}
+
+message DeductStockReq{
+  repeated uint32 goods_ids=1; // 商品列表
+  repeated uint32 counts=2; // 商品数量
+}
+
+message DeductStockRes{
 }

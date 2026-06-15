@@ -26,6 +26,7 @@ const (
 	GoodsInfo_Update_FullMethodName        = "/goods_info.v1.goods_info/Update"
 	GoodsInfo_Delete_FullMethodName        = "/goods_info.v1.goods_info/Delete"
 	GoodsInfo_GetGoodsStock_FullMethodName = "/goods_info.v1.goods_info/GetGoodsStock"
+	GoodsInfo_DeductStock_FullMethodName   = "/goods_info.v1.goods_info/DeductStock"
 )
 
 // GoodsInfoClient is the client API for GoodsInfo service.
@@ -44,6 +45,7 @@ type GoodsInfoClient interface {
 	Delete(ctx context.Context, in *GoodsInfoDeleteReq, opts ...grpc.CallOption) (*GoodsInfoDeleteRes, error)
 	// 获取商品库存
 	GetGoodsStock(ctx context.Context, in *GetGoodsStockReq, opts ...grpc.CallOption) (*GetGoodsStockRes, error)
+	DeductStock(ctx context.Context, in *DeductStockReq, opts ...grpc.CallOption) (*DeductStockRes, error)
 }
 
 type goodsInfoClient struct {
@@ -114,6 +116,16 @@ func (c *goodsInfoClient) GetGoodsStock(ctx context.Context, in *GetGoodsStockRe
 	return out, nil
 }
 
+func (c *goodsInfoClient) DeductStock(ctx context.Context, in *DeductStockReq, opts ...grpc.CallOption) (*DeductStockRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeductStockRes)
+	err := c.cc.Invoke(ctx, GoodsInfo_DeductStock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GoodsInfoServer is the server API for GoodsInfo service.
 // All implementations must embed UnimplementedGoodsInfoServer
 // for forward compatibility.
@@ -130,6 +142,7 @@ type GoodsInfoServer interface {
 	Delete(context.Context, *GoodsInfoDeleteReq) (*GoodsInfoDeleteRes, error)
 	// 获取商品库存
 	GetGoodsStock(context.Context, *GetGoodsStockReq) (*GetGoodsStockRes, error)
+	DeductStock(context.Context, *DeductStockReq) (*DeductStockRes, error)
 	mustEmbedUnimplementedGoodsInfoServer()
 }
 
@@ -157,6 +170,9 @@ func (UnimplementedGoodsInfoServer) Delete(context.Context, *GoodsInfoDeleteReq)
 }
 func (UnimplementedGoodsInfoServer) GetGoodsStock(context.Context, *GetGoodsStockReq) (*GetGoodsStockRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetGoodsStock not implemented")
+}
+func (UnimplementedGoodsInfoServer) DeductStock(context.Context, *DeductStockReq) (*DeductStockRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeductStock not implemented")
 }
 func (UnimplementedGoodsInfoServer) mustEmbedUnimplementedGoodsInfoServer() {}
 func (UnimplementedGoodsInfoServer) testEmbeddedByValue()                   {}
@@ -287,6 +303,24 @@ func _GoodsInfo_GetGoodsStock_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GoodsInfo_DeductStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeductStockReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoodsInfoServer).DeductStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoodsInfo_DeductStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoodsInfoServer).DeductStock(ctx, req.(*DeductStockReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GoodsInfo_ServiceDesc is the grpc.ServiceDesc for GoodsInfo service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -317,6 +351,10 @@ var GoodsInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGoodsStock",
 			Handler:    _GoodsInfo_GetGoodsStock_Handler,
+		},
+		{
+			MethodName: "DeductStock",
+			Handler:    _GoodsInfo_DeductStock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

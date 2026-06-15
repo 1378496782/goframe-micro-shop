@@ -928,6 +928,94 @@ func (x *GetGoodsStockRes) GetGoodsStock() map[uint32]int32 {
 	return nil
 }
 
+type DeductStockReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GoodsIds      []uint32               `protobuf:"varint,1,rep,packed,name=goods_ids,json=goodsIds,proto3" json:"goods_ids,omitempty" dc:"商品列表"` // 商品列表
+	Counts        []uint32               `protobuf:"varint,2,rep,packed,name=counts,proto3" json:"counts,omitempty" dc:"商品数量"`                     // 商品数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeductStockReq) Reset() {
+	*x = DeductStockReq{}
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeductStockReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeductStockReq) ProtoMessage() {}
+
+func (x *DeductStockReq) ProtoReflect() protoreflect.Message {
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeductStockReq.ProtoReflect.Descriptor instead.
+func (*DeductStockReq) Descriptor() ([]byte, []int) {
+	return file_goods_info_v1_goods_info_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeductStockReq) GetGoodsIds() []uint32 {
+	if x != nil {
+		return x.GoodsIds
+	}
+	return nil
+}
+
+func (x *DeductStockReq) GetCounts() []uint32 {
+	if x != nil {
+		return x.Counts
+	}
+	return nil
+}
+
+type DeductStockRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeductStockRes) Reset() {
+	*x = DeductStockRes{}
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeductStockRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeductStockRes) ProtoMessage() {}
+
+func (x *DeductStockRes) ProtoReflect() protoreflect.Message {
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeductStockRes.ProtoReflect.Descriptor instead.
+func (*DeductStockRes) Descriptor() ([]byte, []int) {
+	return file_goods_info_v1_goods_info_proto_rawDescGZIP(), []int{14}
+}
+
 var File_goods_info_v1_goods_info_proto protoreflect.FileDescriptor
 
 const file_goods_info_v1_goods_info_proto_rawDesc = "" +
@@ -1002,13 +1090,17 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"goodsStock\x1a=\n" +
 	"\x0fGoodsStockEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\rR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01*E\n" +
+	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\"E\n" +
+	"\x0eDeductStockReq\x12\x1b\n" +
+	"\tgoods_ids\x18\x01 \x03(\rR\bgoodsIds\x12\x16\n" +
+	"\x06counts\x18\x02 \x03(\rR\x06counts\"\x10\n" +
+	"\x0eDeductStockRes*E\n" +
 	"\bSortType\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\r\n" +
 	"\tPRICE_ASC\x10\x01\x12\x0e\n" +
 	"\n" +
 	"PRICE_DESC\x10\x02\x12\r\n" +
-	"\tSALE_DESC\x10\x032\x87\x04\n" +
+	"\tSALE_DESC\x10\x032\xd6\x04\n" +
 	"\n" +
 	"goods_info\x12S\n" +
 	"\aGetList\x12\".goods_info.v1.GoodsInfoGetListReq\x1a\".goods_info.v1.GoodsInfoGetListRes\"\x00\x12Y\n" +
@@ -1016,7 +1108,8 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x06Create\x12!.goods_info.v1.GoodsInfoCreateReq\x1a!.goods_info.v1.GoodsInfoCreateRes\"\x00\x12P\n" +
 	"\x06Update\x12!.goods_info.v1.GoodsInfoUpdateReq\x1a!.goods_info.v1.GoodsInfoUpdateRes\"\x00\x12P\n" +
 	"\x06Delete\x12!.goods_info.v1.GoodsInfoDeleteReq\x1a!.goods_info.v1.GoodsInfoDeleteRes\"\x00\x12S\n" +
-	"\rGetGoodsStock\x12\x1f.goods_info.v1.GetGoodsStockReq\x1a\x1f.goods_info.v1.GetGoodsStockRes\"\x00B8Z6shop-goframe-micro-service/app/goods/api/goods_info/v1b\x06proto3"
+	"\rGetGoodsStock\x12\x1f.goods_info.v1.GetGoodsStockReq\x1a\x1f.goods_info.v1.GetGoodsStockRes\"\x00\x12M\n" +
+	"\vDeductStock\x12\x1d.goods_info.v1.DeductStockReq\x1a\x1d.goods_info.v1.DeductStockRes\"\x00B8Z6shop-goframe-micro-service/app/goods/api/goods_info/v1b\x06proto3"
 
 var (
 	file_goods_info_v1_goods_info_proto_rawDescOnce sync.Once
@@ -1031,7 +1124,7 @@ func file_goods_info_v1_goods_info_proto_rawDescGZIP() []byte {
 }
 
 var file_goods_info_v1_goods_info_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_goods_info_v1_goods_info_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_goods_info_v1_goods_info_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_goods_info_v1_goods_info_proto_goTypes = []any{
 	(SortType)(0),                 // 0: goods_info.v1.SortType
 	(*GoodsInfoGetDetailReq)(nil), // 1: goods_info.v1.GoodsInfoGetDetailReq
@@ -1047,29 +1140,33 @@ var file_goods_info_v1_goods_info_proto_goTypes = []any{
 	(*GoodsInfoGetListRes)(nil),   // 11: goods_info.v1.GoodsInfoGetListRes
 	(*GetGoodsStockReq)(nil),      // 12: goods_info.v1.GetGoodsStockReq
 	(*GetGoodsStockRes)(nil),      // 13: goods_info.v1.GetGoodsStockRes
-	nil,                           // 14: goods_info.v1.GetGoodsStockRes.GoodsStockEntry
-	(*pbentity.GoodsInfo)(nil),    // 15: pbentity.GoodsInfo
+	(*DeductStockReq)(nil),        // 14: goods_info.v1.DeductStockReq
+	(*DeductStockRes)(nil),        // 15: goods_info.v1.DeductStockRes
+	nil,                           // 16: goods_info.v1.GetGoodsStockRes.GoodsStockEntry
+	(*pbentity.GoodsInfo)(nil),    // 17: pbentity.GoodsInfo
 }
 var file_goods_info_v1_goods_info_proto_depIdxs = []int32{
-	15, // 0: goods_info.v1.GoodsInfoGetDetailRes.data:type_name -> pbentity.GoodsInfo
+	17, // 0: goods_info.v1.GoodsInfoGetDetailRes.data:type_name -> pbentity.GoodsInfo
 	0,  // 1: goods_info.v1.GoodsInfoGetListReq.sort_type:type_name -> goods_info.v1.SortType
-	15, // 2: goods_info.v1.GoodsInfoListResponse.list:type_name -> pbentity.GoodsInfo
+	17, // 2: goods_info.v1.GoodsInfoListResponse.list:type_name -> pbentity.GoodsInfo
 	10, // 3: goods_info.v1.GoodsInfoGetListRes.data:type_name -> goods_info.v1.GoodsInfoListResponse
-	14, // 4: goods_info.v1.GetGoodsStockRes.goods_stock:type_name -> goods_info.v1.GetGoodsStockRes.GoodsStockEntry
+	16, // 4: goods_info.v1.GetGoodsStockRes.goods_stock:type_name -> goods_info.v1.GetGoodsStockRes.GoodsStockEntry
 	9,  // 5: goods_info.v1.goods_info.GetList:input_type -> goods_info.v1.GoodsInfoGetListReq
 	1,  // 6: goods_info.v1.goods_info.GetDetail:input_type -> goods_info.v1.GoodsInfoGetDetailReq
 	3,  // 7: goods_info.v1.goods_info.Create:input_type -> goods_info.v1.GoodsInfoCreateReq
 	5,  // 8: goods_info.v1.goods_info.Update:input_type -> goods_info.v1.GoodsInfoUpdateReq
 	7,  // 9: goods_info.v1.goods_info.Delete:input_type -> goods_info.v1.GoodsInfoDeleteReq
 	12, // 10: goods_info.v1.goods_info.GetGoodsStock:input_type -> goods_info.v1.GetGoodsStockReq
-	11, // 11: goods_info.v1.goods_info.GetList:output_type -> goods_info.v1.GoodsInfoGetListRes
-	2,  // 12: goods_info.v1.goods_info.GetDetail:output_type -> goods_info.v1.GoodsInfoGetDetailRes
-	4,  // 13: goods_info.v1.goods_info.Create:output_type -> goods_info.v1.GoodsInfoCreateRes
-	6,  // 14: goods_info.v1.goods_info.Update:output_type -> goods_info.v1.GoodsInfoUpdateRes
-	8,  // 15: goods_info.v1.goods_info.Delete:output_type -> goods_info.v1.GoodsInfoDeleteRes
-	13, // 16: goods_info.v1.goods_info.GetGoodsStock:output_type -> goods_info.v1.GetGoodsStockRes
-	11, // [11:17] is the sub-list for method output_type
-	5,  // [5:11] is the sub-list for method input_type
+	14, // 11: goods_info.v1.goods_info.DeductStock:input_type -> goods_info.v1.DeductStockReq
+	11, // 12: goods_info.v1.goods_info.GetList:output_type -> goods_info.v1.GoodsInfoGetListRes
+	2,  // 13: goods_info.v1.goods_info.GetDetail:output_type -> goods_info.v1.GoodsInfoGetDetailRes
+	4,  // 14: goods_info.v1.goods_info.Create:output_type -> goods_info.v1.GoodsInfoCreateRes
+	6,  // 15: goods_info.v1.goods_info.Update:output_type -> goods_info.v1.GoodsInfoUpdateRes
+	8,  // 16: goods_info.v1.goods_info.Delete:output_type -> goods_info.v1.GoodsInfoDeleteRes
+	13, // 17: goods_info.v1.goods_info.GetGoodsStock:output_type -> goods_info.v1.GetGoodsStockRes
+	15, // 18: goods_info.v1.goods_info.DeductStock:output_type -> goods_info.v1.DeductStockRes
+	12, // [12:19] is the sub-list for method output_type
+	5,  // [5:12] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1086,7 +1183,7 @@ func file_goods_info_v1_goods_info_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_goods_info_v1_goods_info_proto_rawDesc), len(file_goods_info_v1_goods_info_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
