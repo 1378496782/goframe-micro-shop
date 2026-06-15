@@ -302,6 +302,6 @@ func (c *Controller) DeductStock(ctx context.Context, req *v1.DeductStockReq) (r
 	return goods_info.DeductStock(ctx, req)
 }
 
-func (*Controller) ReturnStock(ctx context.Context, req *v1.ReturnStockReq) (res *v1.ReturnStockRes, err error) {
-	return nil, gerror.NewCode(gcode.CodeNotImplemented)
+func (*Controller) RestoreStock(ctx context.Context, req *v1.RestoreStockReq) (res *v1.RestoreStockRes, err error) {
+	return goods_info.RestoreStock(ctx, req)
 }

@@ -22,7 +22,7 @@ service goods_info {
   // 扣减商品库存
   rpc DeductStock(DeductStockReq) returns (DeductStockRes){}
   // 返回商品库存
-  rpc ReturnStock(ReturnStockReq) returns (ReturnStockRes){}
+  rpc RestoreStock(RestoreStockReq) returns (RestoreStockRes){}
 }
 
 message GoodsInfoGetDetailReq {
@@ -131,10 +131,10 @@ message DeductStockReq{
 message DeductStockRes{
 }
 
-message ReturnStockReq{
+message RestoreStockReq{
   repeated uint32 goods_ids=1; // 商品列表
   repeated uint32 counts=2; // 商品数量
 }
 
-message ReturnStockRes{
+message RestoreStockRes{
 }

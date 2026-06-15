@@ -27,7 +27,7 @@ const (
 	GoodsInfo_Delete_FullMethodName        = "/goods_info.v1.goods_info/Delete"
 	GoodsInfo_GetGoodsStock_FullMethodName = "/goods_info.v1.goods_info/GetGoodsStock"
 	GoodsInfo_DeductStock_FullMethodName   = "/goods_info.v1.goods_info/DeductStock"
-	GoodsInfo_ReturnStock_FullMethodName   = "/goods_info.v1.goods_info/ReturnStock"
+	GoodsInfo_RestoreStock_FullMethodName  = "/goods_info.v1.goods_info/RestoreStock"
 )
 
 // GoodsInfoClient is the client API for GoodsInfo service.
@@ -49,7 +49,7 @@ type GoodsInfoClient interface {
 	// 扣减商品库存
 	DeductStock(ctx context.Context, in *DeductStockReq, opts ...grpc.CallOption) (*DeductStockRes, error)
 	// 返回商品库存
-	ReturnStock(ctx context.Context, in *ReturnStockReq, opts ...grpc.CallOption) (*ReturnStockRes, error)
+	RestoreStock(ctx context.Context, in *RestoreStockReq, opts ...grpc.CallOption) (*RestoreStockRes, error)
 }
 
 type goodsInfoClient struct {
@@ -130,10 +130,10 @@ func (c *goodsInfoClient) DeductStock(ctx context.Context, in *DeductStockReq, o
 	return out, nil
 }
 
-func (c *goodsInfoClient) ReturnStock(ctx context.Context, in *ReturnStockReq, opts ...grpc.CallOption) (*ReturnStockRes, error) {
+func (c *goodsInfoClient) RestoreStock(ctx context.Context, in *RestoreStockReq, opts ...grpc.CallOption) (*RestoreStockRes, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ReturnStockRes)
-	err := c.cc.Invoke(ctx, GoodsInfo_ReturnStock_FullMethodName, in, out, cOpts...)
+	out := new(RestoreStockRes)
+	err := c.cc.Invoke(ctx, GoodsInfo_RestoreStock_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ type GoodsInfoServer interface {
 	// 扣减商品库存
 	DeductStock(context.Context, *DeductStockReq) (*DeductStockRes, error)
 	// 返回商品库存
-	ReturnStock(context.Context, *ReturnStockReq) (*ReturnStockRes, error)
+	RestoreStock(context.Context, *RestoreStockReq) (*RestoreStockRes, error)
 	mustEmbedUnimplementedGoodsInfoServer()
 }
 
@@ -191,8 +191,8 @@ func (UnimplementedGoodsInfoServer) GetGoodsStock(context.Context, *GetGoodsStoc
 func (UnimplementedGoodsInfoServer) DeductStock(context.Context, *DeductStockReq) (*DeductStockRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeductStock not implemented")
 }
-func (UnimplementedGoodsInfoServer) ReturnStock(context.Context, *ReturnStockReq) (*ReturnStockRes, error) {
-	return nil, status.Error(codes.Unimplemented, "method ReturnStock not implemented")
+func (UnimplementedGoodsInfoServer) RestoreStock(context.Context, *RestoreStockReq) (*RestoreStockRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method RestoreStock not implemented")
 }
 func (UnimplementedGoodsInfoServer) mustEmbedUnimplementedGoodsInfoServer() {}
 func (UnimplementedGoodsInfoServer) testEmbeddedByValue()                   {}
@@ -341,20 +341,20 @@ func _GoodsInfo_DeductStock_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GoodsInfo_ReturnStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReturnStockReq)
+func _GoodsInfo_RestoreStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RestoreStockReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GoodsInfoServer).ReturnStock(ctx, in)
+		return srv.(GoodsInfoServer).RestoreStock(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GoodsInfo_ReturnStock_FullMethodName,
+		FullMethod: GoodsInfo_RestoreStock_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoodsInfoServer).ReturnStock(ctx, req.(*ReturnStockReq))
+		return srv.(GoodsInfoServer).RestoreStock(ctx, req.(*RestoreStockReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -395,8 +395,8 @@ var GoodsInfo_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GoodsInfo_DeductStock_Handler,
 		},
 		{
-			MethodName: "ReturnStock",
-			Handler:    _GoodsInfo_ReturnStock_Handler,
+			MethodName: "RestoreStock",
+			Handler:    _GoodsInfo_RestoreStock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
