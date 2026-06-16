@@ -10,7 +10,6 @@ import (
 
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
-	"github.com/gogf/gf/v2/util/gconv"
 )
 
 func (c *ControllerV1) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrderRes, err error) {
@@ -30,12 +29,11 @@ func (c *ControllerV1) CancelOrder(ctx context.Context, req *v1.CancelOrderReq) 
 		return nil, err
 	}
 
-	res = &v1.CancelOrderRes{}
-
-	err = gconv.Struct(grpcRes, res)
-	if err != nil {
-		return nil, err
+	message := grpcRes.Message
+	if message == "" {
+		message = "订单取消成功"
 	}
-
-	return res, nil
+	return &v1.CancelOrderRes{
+		Message: message,
+	}, nil
 }

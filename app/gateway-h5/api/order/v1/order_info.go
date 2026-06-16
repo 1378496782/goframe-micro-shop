@@ -149,9 +149,7 @@ type CancelOrderReq struct {
 	Id     uint32 `json:"id"`
 }
 type CancelOrderRes struct {
-	Code    uint32 `json:"code"`
-	Message string `json:"message"`
-	Data    string `json:"data"`
+	Message string `json:"message" dc:"取消结果"`
 }
 
 type OrderInfoPreviewReq struct {

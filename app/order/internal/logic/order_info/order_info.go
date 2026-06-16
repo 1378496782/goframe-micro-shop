@@ -726,22 +726,14 @@ func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrd
 	}
 
 	if record.IsEmpty() {
-		return &v1.CancelOrderRes{
-			Code:    1001,
-			Message: "订单不存在",
-			Data:    "",
-		}, nil
+		return nil, gerror.NewCode(gcode.CodeNotFound, "订单不存在")
 	}
 
 	// 查 order_goods_info 商品快照
 	var goodsList []*entity.OrderGoodsInfo
 	err = dao.OrderGoodsInfo.Ctx(ctx).Where("order_id", req.Id).Scan(&goodsList)
 	if err != nil {
-		return &v1.CancelOrderRes{
-			Code:    1005,
-			Message: "查询订单商品失败",
-			Data:    "",
-		}, nil
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "查询订单商品失败")
 	}
 
 	// 只有待支付订单才允许取消
@@ -752,18 +744,10 @@ func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrd
 		ToStatus:   int(consts.OrderStatusCancelled),
 	})
 	if err != nil {
-		return &v1.CancelOrderRes{
-			Code:    1004,
-			Message: "系统错误，取消失败",
-			Data:    "",
-		}, nil
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "系统错误，取消失败")
 	}
 	if !ok {
-		return &v1.CancelOrderRes{
-			Code:    1004,
-			Message: "订单不存在或状态不允许取消",
-			Data:    "",
-		}, nil
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "订单不存在或状态不允许取消")
 	}
 
 	// 恢复库存
@@ -794,16 +778,10 @@ func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrd
 			g.Log().Warningf(ctx, "回滚订单状态未生效, 订单ID: %d", req.Id)
 		}
 
-		return &v1.CancelOrderRes{
-			Code:    1006,
-			Message: "恢复商品库存失败",
-			Data:    "",
-		}, nil
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "恢复商品库存失败")
 	}
 
 	return &v1.CancelOrderRes{
-		Code:    0,
 		Message: "订单取消成功",
-		Data:    "",
 	}, nil
 }

@@ -158,9 +158,7 @@ message CancelOrderReq {
   uint32 userId = 2;
 }
 message CancelOrderRes {
-  uint32 code = 1;
-  string message = 2;
-  string data = 3;
+  string message = 1;
 }
 
 message OrderInfoPreviewReq {

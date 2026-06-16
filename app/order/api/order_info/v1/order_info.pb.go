@@ -1111,9 +1111,7 @@ func (x *CancelOrderReq) GetUserId() uint32 {
 
 type CancelOrderRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          uint32                 `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Data          string                 `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1148,23 +1146,9 @@ func (*CancelOrderRes) Descriptor() ([]byte, []int) {
 	return file_order_info_v1_order_info_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *CancelOrderRes) GetCode() uint32 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
 func (x *CancelOrderRes) GetMessage() string {
 	if x != nil {
 		return x.Message
-	}
-	return ""
-}
-
-func (x *CancelOrderRes) GetData() string {
-	if x != nil {
-		return x.Data
 	}
 	return ""
 }
@@ -1544,11 +1528,9 @@ const file_order_info_v1_order_info_proto_rawDesc = "" +
 	"\tafterSale\x18\x05 \x01(\rR\tafterSale\"8\n" +
 	"\x0eCancelOrderReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x16\n" +
-	"\x06userId\x18\x02 \x01(\rR\x06userId\"R\n" +
-	"\x0eCancelOrderRes\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\rR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x12\n" +
-	"\x04data\x18\x03 \x01(\tR\x04data\"I\n" +
+	"\x06userId\x18\x02 \x01(\rR\x06userId\"*\n" +
+	"\x0eCancelOrderRes\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"I\n" +
 	"\x13OrderInfoPreviewReq\x12\x19\n" +
 	"\bcart_ids\x18\x01 \x03(\rR\acartIds\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\rR\x06userId\"\x92\x01\n" +
