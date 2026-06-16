@@ -115,6 +115,11 @@ func (*Controller) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.Notif
 		return &v1.NotifyRes{}, nil
 	}
 
+	err = order_info.IncreaseOrderGoodsSales(ctx, orderNumber)
+	if err != nil {
+		return nil, err
+	}
+
 	return &v1.NotifyRes{}, nil
 }
 

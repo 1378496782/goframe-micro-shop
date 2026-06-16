@@ -799,3 +799,46 @@ func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrd
 		Message: "订单取消成功",
 	}, nil
 }
+
+func IncreaseOrderGoodsSales(ctx context.Context, orderNumber string) error {
+	// 根据订单号查订单ID
+	var order entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).Where(dao.OrderInfo.Columns().Number, orderNumber).Scan(&order)
+	if err != nil {
+		g.Log().Errorf(ctx, "查询订单失败: %v", err)
+		return err
+	}
+	if order.Id == 0 {
+		return gerror.NewCode(gcode.CodeNotFound, "订单不存在")
+	}
+
+	// 查询订单商品
+	var orderGoodsList []*entity.OrderGoodsInfo
+	err = dao.OrderGoodsInfo.Ctx(ctx).Where(dao.OrderGoodsInfo.Columns().OrderId, order.Id).Scan(&orderGoodsList)
+	if err != nil {
+		g.Log().Errorf(ctx, "查询订单商品失败: %v", err)
+		return err
+	}
+	if len(orderGoodsList) == 0 {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "订单商品为空")
+	}
+
+	goodsIds := make([]uint32, 0, len(orderGoodsList))
+	counts := make([]uint32, 0, len(orderGoodsList))
+	for _, item := range orderGoodsList {
+		goodsIds = append(goodsIds, uint32(item.GoodsId))
+		counts = append(counts, uint32(item.Count))
+	}
+
+	// 调 goods-service IncreaseSales
+	_, err = goods.Client.IncreaseSales(ctx, &goods_info.IncreaseSalesReq{
+		GoodsIds: goodsIds,
+		Counts:   counts,
+	})
+	if err != nil {
+		g.Log().Errorf(ctx, "增加商品销售量失败: %v", err)
+		return err
+	}
+
+	return nil
+}
