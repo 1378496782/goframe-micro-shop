@@ -400,18 +400,21 @@ func UpdateOrderStatusIfMatch(ctx context.Context, req *OrderStatusTransitionReq
 }
 
 // UpdateOrderStatus 更新订单状态
-func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string, status int) error {
-	exists, err := dao.OrderInfo.Ctx(ctx).
-		Where("number", number).
-		Where("status", consts.OrderStatusPaid).
-		Exist()
-	if err != nil {
-		return gerror.WrapCode(gcode.CodeDbOperationError, err)
-	}
-	if exists {
-		g.Log().Infof(ctx, "{%s}订单的状态已修改，不需要再修改", number)
-		return nil
-	}
+// true  = 本次真的把订单从待支付改成已支付
+// false = 订单已经处理过，或者状态不是待支付
+// error = 数据库错误
+func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string, status int) (bool, error) {
+	// exists, err := dao.OrderInfo.Ctx(ctx).
+	// 	Where("number", number).
+	// 	Where("status", consts.OrderStatusPaid).
+	// 	Exist()
+	// if err != nil {
+	// 	return gerror.WrapCode(gcode.CodeDbOperationError, err)
+	// }
+	// if exists {
+	// 	g.Log().Infof(ctx, "{%s}订单的状态已修改，不需要再修改", number)
+	// 	return nil
+	// }
 
 	updateData := g.Map{
 		"status":         status,
@@ -420,16 +423,24 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 	}
 
 	// 更新订单状态
-	_, err = dao.OrderInfo.Ctx(ctx).Where(g.Map{
+	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
 		"number": number,
 		"status": consts.OrderStatusPendingPayment,
 	}).Update(updateData)
 	if err != nil {
-		return gerror.WrapCode(gcode.CodeDbOperationError, err)
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+	if rows == 0 {
+		g.Log().Infof(ctx, "订单状态未更新，可能已处理或状态不允许更新, 订单编号: %s", number)
+		return false, nil
 	}
 
-	g.Log().Infof(ctx, "订单状态更新成功, 订单编号:{%s}, 新状态: %d", number, status)
-	return nil
+	g.Log().Infof(ctx, "订单状态更新成功, 订单编号: %s, 新状态: %d", number, status)
+	return true, nil
 }
 
 // HandleCouponResult 处理优惠券扣减结果

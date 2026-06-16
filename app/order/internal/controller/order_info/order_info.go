@@ -107,11 +107,15 @@ func (*Controller) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.Notif
 	}
 
 	// 2) 修改订单状态
-	if err = order_info.UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(orderStatus.OrderStatusPaid)); err != nil {
+	success, err := order_info.UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(orderStatus.OrderStatusPaid))
+	if err != nil {
 		return nil, err
 	}
+	if !success {
+		return &v1.NotifyRes{}, nil
+	}
 
-	return nil, nil
+	return &v1.NotifyRes{}, nil
 }
 
 func (*Controller) GetCount(ctx context.Context, req *v1.OrderInfoGetCountReq) (res *v1.OrderInfoGetCountRes, err error) {
