@@ -3,7 +3,6 @@ package order_info
 import (
 	"context"
 	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
-	orderStatus "shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	order_info "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
 	"shop-goframe-micro-service-refacotor/app/order/utility/payment"
 	"shop-goframe-micro-service-refacotor/utility/consts"
@@ -106,17 +105,8 @@ func (*Controller) Notify(ctx context.Context, req *v1.NotifyReq) (res *v1.Notif
 		return nil, err
 	}
 
-	// 2) 修改订单状态
-	success, err := order_info.UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(orderStatus.OrderStatusPaid))
-	if err != nil {
-		return nil, err
-	}
-	if !success {
-		return &v1.NotifyRes{}, nil
-	}
-
-	err = order_info.IncreaseOrderGoodsSales(ctx, orderNumber)
-	if err != nil {
+	// 2) 处理支付成功后的订单状态和商品销量
+	if err = order_info.HandlePaidOrder(ctx, orderNumber, transactionId); err != nil {
 		return nil, err
 	}
 

@@ -443,6 +443,24 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 	return true, nil
 }
 
+// HandlePaidOrder 处理支付成功后的业务动作。
+// 返回 nil 且未更新订单时，表示该支付回调已经处理过，可以安全忽略。
+func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) error {
+	success, err := UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(consts.OrderStatusPaid))
+	if err != nil {
+		return err
+	}
+	if !success {
+		return nil
+	}
+
+	if err = IncreaseOrderGoodsSales(ctx, orderNumber); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // HandleCouponResult 处理优惠券扣减结果
 // goods服务通过userid和couponid在user_coupon_info表中定位数据
 // 如果找到数据且状态为"待使用"，则修改为"已使用"并返回成功
