@@ -420,7 +420,10 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 	}
 
 	// 更新订单状态
-	_, err = dao.OrderInfo.Ctx(ctx).Where("number", number).Update(updateData)
+	_, err = dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		"number": number,
+		"status": consts.OrderStatusPendingPayment,
+	}).Update(updateData)
 	if err != nil {
 		return gerror.WrapCode(gcode.CodeDbOperationError, err)
 	}
