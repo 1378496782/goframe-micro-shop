@@ -455,7 +455,9 @@ func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) err
 	}
 
 	if err = IncreaseOrderGoodsSales(ctx, orderNumber); err != nil {
-		return err
+		// 即使 IncreaseOrderGoodsSales 失败，也先记录错误日志并返回 nil。这样支付回调不会一直失败重试；补偿我们后面专门做。
+		g.Log().Errorf(ctx, "增加订单销量失败, 订单编号: %s, 错误: %v", orderNumber, err)
+		return nil
 	}
 
 	return nil
