@@ -305,3 +305,7 @@ func (c *Controller) DeductStock(ctx context.Context, req *v1.DeductStockReq) (r
 func (*Controller) RestoreStock(ctx context.Context, req *v1.RestoreStockReq) (res *v1.RestoreStockRes, err error) {
 	return goods_info.RestoreStock(ctx, req)
 }
+
+func (*Controller) IncreaseSales(ctx context.Context, req *v1.IncreaseSalesReq) (res *v1.IncreaseSalesRes, err error) {
+	return goods_info.IncreaseSales(ctx, req)
+}

@@ -1104,6 +1104,94 @@ func (*RestoreStockRes) Descriptor() ([]byte, []int) {
 	return file_goods_info_v1_goods_info_proto_rawDescGZIP(), []int{16}
 }
 
+type IncreaseSalesReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GoodsIds      []uint32               `protobuf:"varint,1,rep,packed,name=goods_ids,json=goodsIds,proto3" json:"goods_ids,omitempty" dc:"商品列表"` // 商品列表
+	Counts        []uint32               `protobuf:"varint,2,rep,packed,name=counts,proto3" json:"counts,omitempty" dc:"商品数量"`                     // 商品数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IncreaseSalesReq) Reset() {
+	*x = IncreaseSalesReq{}
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IncreaseSalesReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IncreaseSalesReq) ProtoMessage() {}
+
+func (x *IncreaseSalesReq) ProtoReflect() protoreflect.Message {
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IncreaseSalesReq.ProtoReflect.Descriptor instead.
+func (*IncreaseSalesReq) Descriptor() ([]byte, []int) {
+	return file_goods_info_v1_goods_info_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *IncreaseSalesReq) GetGoodsIds() []uint32 {
+	if x != nil {
+		return x.GoodsIds
+	}
+	return nil
+}
+
+func (x *IncreaseSalesReq) GetCounts() []uint32 {
+	if x != nil {
+		return x.Counts
+	}
+	return nil
+}
+
+type IncreaseSalesRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IncreaseSalesRes) Reset() {
+	*x = IncreaseSalesRes{}
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IncreaseSalesRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IncreaseSalesRes) ProtoMessage() {}
+
+func (x *IncreaseSalesRes) ProtoReflect() protoreflect.Message {
+	mi := &file_goods_info_v1_goods_info_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IncreaseSalesRes.ProtoReflect.Descriptor instead.
+func (*IncreaseSalesRes) Descriptor() ([]byte, []int) {
+	return file_goods_info_v1_goods_info_proto_rawDescGZIP(), []int{18}
+}
+
 var File_goods_info_v1_goods_info_proto protoreflect.FileDescriptor
 
 const file_goods_info_v1_goods_info_proto_rawDesc = "" +
@@ -1186,13 +1274,17 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x0fRestoreStockReq\x12\x1b\n" +
 	"\tgoods_ids\x18\x01 \x03(\rR\bgoodsIds\x12\x16\n" +
 	"\x06counts\x18\x02 \x03(\rR\x06counts\"\x11\n" +
-	"\x0fRestoreStockRes*E\n" +
+	"\x0fRestoreStockRes\"G\n" +
+	"\x10IncreaseSalesReq\x12\x1b\n" +
+	"\tgoods_ids\x18\x01 \x03(\rR\bgoodsIds\x12\x16\n" +
+	"\x06counts\x18\x02 \x03(\rR\x06counts\"\x12\n" +
+	"\x10IncreaseSalesRes*E\n" +
 	"\bSortType\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\r\n" +
 	"\tPRICE_ASC\x10\x01\x12\x0e\n" +
 	"\n" +
 	"PRICE_DESC\x10\x02\x12\r\n" +
-	"\tSALE_DESC\x10\x032\xa8\x05\n" +
+	"\tSALE_DESC\x10\x032\xfd\x05\n" +
 	"\n" +
 	"goods_info\x12S\n" +
 	"\aGetList\x12\".goods_info.v1.GoodsInfoGetListReq\x1a\".goods_info.v1.GoodsInfoGetListRes\"\x00\x12Y\n" +
@@ -1202,7 +1294,8 @@ const file_goods_info_v1_goods_info_proto_rawDesc = "" +
 	"\x06Delete\x12!.goods_info.v1.GoodsInfoDeleteReq\x1a!.goods_info.v1.GoodsInfoDeleteRes\"\x00\x12S\n" +
 	"\rGetGoodsStock\x12\x1f.goods_info.v1.GetGoodsStockReq\x1a\x1f.goods_info.v1.GetGoodsStockRes\"\x00\x12M\n" +
 	"\vDeductStock\x12\x1d.goods_info.v1.DeductStockReq\x1a\x1d.goods_info.v1.DeductStockRes\"\x00\x12P\n" +
-	"\fRestoreStock\x12\x1e.goods_info.v1.RestoreStockReq\x1a\x1e.goods_info.v1.RestoreStockRes\"\x00B8Z6shop-goframe-micro-service/app/goods/api/goods_info/v1b\x06proto3"
+	"\fRestoreStock\x12\x1e.goods_info.v1.RestoreStockReq\x1a\x1e.goods_info.v1.RestoreStockRes\"\x00\x12S\n" +
+	"\rIncreaseSales\x12\x1f.goods_info.v1.IncreaseSalesReq\x1a\x1f.goods_info.v1.IncreaseSalesRes\"\x00B8Z6shop-goframe-micro-service/app/goods/api/goods_info/v1b\x06proto3"
 
 var (
 	file_goods_info_v1_goods_info_proto_rawDescOnce sync.Once
@@ -1217,7 +1310,7 @@ func file_goods_info_v1_goods_info_proto_rawDescGZIP() []byte {
 }
 
 var file_goods_info_v1_goods_info_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_goods_info_v1_goods_info_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_goods_info_v1_goods_info_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_goods_info_v1_goods_info_proto_goTypes = []any{
 	(SortType)(0),                 // 0: goods_info.v1.SortType
 	(*GoodsInfoGetDetailReq)(nil), // 1: goods_info.v1.GoodsInfoGetDetailReq
@@ -1237,15 +1330,17 @@ var file_goods_info_v1_goods_info_proto_goTypes = []any{
 	(*DeductStockRes)(nil),        // 15: goods_info.v1.DeductStockRes
 	(*RestoreStockReq)(nil),       // 16: goods_info.v1.RestoreStockReq
 	(*RestoreStockRes)(nil),       // 17: goods_info.v1.RestoreStockRes
-	nil,                           // 18: goods_info.v1.GetGoodsStockRes.GoodsStockEntry
-	(*pbentity.GoodsInfo)(nil),    // 19: pbentity.GoodsInfo
+	(*IncreaseSalesReq)(nil),      // 18: goods_info.v1.IncreaseSalesReq
+	(*IncreaseSalesRes)(nil),      // 19: goods_info.v1.IncreaseSalesRes
+	nil,                           // 20: goods_info.v1.GetGoodsStockRes.GoodsStockEntry
+	(*pbentity.GoodsInfo)(nil),    // 21: pbentity.GoodsInfo
 }
 var file_goods_info_v1_goods_info_proto_depIdxs = []int32{
-	19, // 0: goods_info.v1.GoodsInfoGetDetailRes.data:type_name -> pbentity.GoodsInfo
+	21, // 0: goods_info.v1.GoodsInfoGetDetailRes.data:type_name -> pbentity.GoodsInfo
 	0,  // 1: goods_info.v1.GoodsInfoGetListReq.sort_type:type_name -> goods_info.v1.SortType
-	19, // 2: goods_info.v1.GoodsInfoListResponse.list:type_name -> pbentity.GoodsInfo
+	21, // 2: goods_info.v1.GoodsInfoListResponse.list:type_name -> pbentity.GoodsInfo
 	10, // 3: goods_info.v1.GoodsInfoGetListRes.data:type_name -> goods_info.v1.GoodsInfoListResponse
-	18, // 4: goods_info.v1.GetGoodsStockRes.goods_stock:type_name -> goods_info.v1.GetGoodsStockRes.GoodsStockEntry
+	20, // 4: goods_info.v1.GetGoodsStockRes.goods_stock:type_name -> goods_info.v1.GetGoodsStockRes.GoodsStockEntry
 	9,  // 5: goods_info.v1.goods_info.GetList:input_type -> goods_info.v1.GoodsInfoGetListReq
 	1,  // 6: goods_info.v1.goods_info.GetDetail:input_type -> goods_info.v1.GoodsInfoGetDetailReq
 	3,  // 7: goods_info.v1.goods_info.Create:input_type -> goods_info.v1.GoodsInfoCreateReq
@@ -1254,16 +1349,18 @@ var file_goods_info_v1_goods_info_proto_depIdxs = []int32{
 	12, // 10: goods_info.v1.goods_info.GetGoodsStock:input_type -> goods_info.v1.GetGoodsStockReq
 	14, // 11: goods_info.v1.goods_info.DeductStock:input_type -> goods_info.v1.DeductStockReq
 	16, // 12: goods_info.v1.goods_info.RestoreStock:input_type -> goods_info.v1.RestoreStockReq
-	11, // 13: goods_info.v1.goods_info.GetList:output_type -> goods_info.v1.GoodsInfoGetListRes
-	2,  // 14: goods_info.v1.goods_info.GetDetail:output_type -> goods_info.v1.GoodsInfoGetDetailRes
-	4,  // 15: goods_info.v1.goods_info.Create:output_type -> goods_info.v1.GoodsInfoCreateRes
-	6,  // 16: goods_info.v1.goods_info.Update:output_type -> goods_info.v1.GoodsInfoUpdateRes
-	8,  // 17: goods_info.v1.goods_info.Delete:output_type -> goods_info.v1.GoodsInfoDeleteRes
-	13, // 18: goods_info.v1.goods_info.GetGoodsStock:output_type -> goods_info.v1.GetGoodsStockRes
-	15, // 19: goods_info.v1.goods_info.DeductStock:output_type -> goods_info.v1.DeductStockRes
-	17, // 20: goods_info.v1.goods_info.RestoreStock:output_type -> goods_info.v1.RestoreStockRes
-	13, // [13:21] is the sub-list for method output_type
-	5,  // [5:13] is the sub-list for method input_type
+	18, // 13: goods_info.v1.goods_info.IncreaseSales:input_type -> goods_info.v1.IncreaseSalesReq
+	11, // 14: goods_info.v1.goods_info.GetList:output_type -> goods_info.v1.GoodsInfoGetListRes
+	2,  // 15: goods_info.v1.goods_info.GetDetail:output_type -> goods_info.v1.GoodsInfoGetDetailRes
+	4,  // 16: goods_info.v1.goods_info.Create:output_type -> goods_info.v1.GoodsInfoCreateRes
+	6,  // 17: goods_info.v1.goods_info.Update:output_type -> goods_info.v1.GoodsInfoUpdateRes
+	8,  // 18: goods_info.v1.goods_info.Delete:output_type -> goods_info.v1.GoodsInfoDeleteRes
+	13, // 19: goods_info.v1.goods_info.GetGoodsStock:output_type -> goods_info.v1.GetGoodsStockRes
+	15, // 20: goods_info.v1.goods_info.DeductStock:output_type -> goods_info.v1.DeductStockRes
+	17, // 21: goods_info.v1.goods_info.RestoreStock:output_type -> goods_info.v1.RestoreStockRes
+	19, // 22: goods_info.v1.goods_info.IncreaseSales:output_type -> goods_info.v1.IncreaseSalesRes
+	14, // [14:23] is the sub-list for method output_type
+	5,  // [5:14] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1280,7 +1377,7 @@ func file_goods_info_v1_goods_info_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_goods_info_v1_goods_info_proto_rawDesc), len(file_goods_info_v1_goods_info_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   18,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

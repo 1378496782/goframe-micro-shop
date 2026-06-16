@@ -261,3 +261,55 @@ func RestoreStock(ctx context.Context, req *v1.RestoreStockReq) (res *v1.Restore
 
 	return &v1.RestoreStockRes{}, nil
 }
+
+func IncreaseSales(ctx context.Context, req *v1.IncreaseSalesReq) (res *v1.IncreaseSalesRes, err error) {
+	if len(req.GoodsIds) == 0 || len(req.GoodsIds) != len(req.Counts) {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品ID与数量不匹配")
+	}
+	for i := range req.Counts {
+		if req.Counts[i] <= 0 {
+			return nil, gerror.NewCode(gcode.CodeInvalidParameter, "商品数量必须大于0")
+		}
+	}
+
+	needMap := make(map[uint32]uint32, len(req.GoodsIds))
+	for i, goodsId := range req.GoodsIds {
+		needMap[goodsId] += req.Counts[i]
+	}
+
+	goodsIds := make([]uint32, 0, len(needMap))
+	for goodsId := range needMap {
+		goodsIds = append(goodsIds, goodsId)
+	}
+	slices.Sort(goodsIds)
+
+	affectedGoodsIds := make(map[uint32]struct{}, len(needMap))
+	err = dao.GoodsInfo.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		for _, goodsId := range goodsIds {
+			result, txErr := tx.Model(dao.GoodsInfo.Table()).
+				Where("id", goodsId).
+				Increment("sale", needMap[goodsId])
+			if txErr != nil {
+				return txErr
+			}
+			rows, _ := result.RowsAffected()
+			if rows == 0 {
+				return gerror.NewCodef(gcode.CodeValidationFailed, "商品 %d 可能不存在", goodsId)
+			}
+			affectedGoodsIds[goodsId] = struct{}{}
+		}
+		return nil
+	})
+	if err != nil {
+		g.Log().Errorf(ctx, "增加商品销量失败: %v", err)
+		return nil, err
+	}
+
+	for goodsId := range affectedGoodsIds {
+		if delErr := goodsRedis.DeleteGoodsDetail(ctx, goodsId); delErr != nil {
+			g.Log().Warningf(ctx, "失效商品 %d 缓存失败: %v", goodsId, delErr)
+		}
+	}
+
+	return &v1.IncreaseSalesRes{}, nil
+}

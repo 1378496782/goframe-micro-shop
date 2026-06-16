@@ -23,6 +23,8 @@ service goods_info {
   rpc DeductStock(DeductStockReq) returns (DeductStockRes){}
   // 返回商品库存
   rpc RestoreStock(RestoreStockReq) returns (RestoreStockRes){}
+  // 增加商品销售量
+  rpc IncreaseSales(IncreaseSalesReq) returns (IncreaseSalesRes){}
 }
 
 message GoodsInfoGetDetailReq {
@@ -137,4 +139,12 @@ message RestoreStockReq{
 }
 
 message RestoreStockRes{
+}
+
+message IncreaseSalesReq{
+  repeated uint32 goods_ids=1; // 商品列表
+  repeated uint32 counts=2; // 商品数量
+}
+
+message IncreaseSalesRes{
 }
