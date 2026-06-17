@@ -421,6 +421,7 @@ CREATE TABLE `order_info`  (
            `price` int NOT NULL DEFAULT 0 COMMENT '订单金额 单位分',
            `coupon_price` int NOT NULL DEFAULT 0 COMMENT '优惠券金额 单位分',
            `actual_price` int NOT NULL DEFAULT 0 COMMENT '实际支付金额 单位分',
+           `sales_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '销量同步状态：0未同步 1已同步 2同步失败',
            `created_at` datetime DEFAULT NULL,
            `updated_at` datetime DEFAULT NULL,
            PRIMARY KEY (`id`)

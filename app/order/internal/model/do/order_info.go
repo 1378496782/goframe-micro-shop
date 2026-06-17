@@ -26,6 +26,7 @@ type OrderInfo struct {
 	Price            any         // 订单金额 单位分
 	CouponPrice      any         // 优惠券金额 单位分
 	ActualPrice      any         // 实际支付金额 单位分
+	SalesStatus      any         // 销量同步状态：0未同步 1已同步 2同步失败
 	CreatedAt        *gtime.Time //
 	UpdatedAt        *gtime.Time //
 }

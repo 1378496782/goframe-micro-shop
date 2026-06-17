@@ -24,6 +24,7 @@ type OrderInfo struct {
 	Price            int         `json:"price"            orm:"price"             description:"订单金额 单位分"`                                           // 订单金额 单位分
 	CouponPrice      int         `json:"couponPrice"      orm:"coupon_price"      description:"优惠券金额 单位分"`                                          // 优惠券金额 单位分
 	ActualPrice      int         `json:"actualPrice"      orm:"actual_price"      description:"实际支付金额 单位分"`                                         // 实际支付金额 单位分
+	SalesStatus      int         `json:"salesStatus"      orm:"sales_status"      description:"销量同步状态：0未同步 1已同步 2同步失败"`                             // 销量同步状态：0未同步 1已同步 2同步失败
 	CreatedAt        *gtime.Time `json:"createdAt"        orm:"created_at"        description:""`                                                   //
 	UpdatedAt        *gtime.Time `json:"updatedAt"        orm:"updated_at"        description:""`                                                   //
 }

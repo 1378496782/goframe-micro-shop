@@ -443,6 +443,21 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 	return true, nil
 }
 
+func UpdateOrderSalesStatusByNumber(ctx context.Context, number string, salesStatus consts.OrderSalesStatus) error {
+	_, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		dao.OrderInfo.Columns().Number: number,
+		dao.OrderInfo.Columns().Status: consts.OrderStatusPaid,
+	}).Data(g.Map{
+		dao.OrderInfo.Columns().SalesStatus: int(salesStatus),
+		dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
+	}).Update()
+	if err != nil {
+		return gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	return nil
+}
+
 // HandlePaidOrder 处理支付成功后的业务动作。
 // 返回 nil 且未更新订单时，表示该支付回调已经处理过，可以安全忽略。
 func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) error {
@@ -455,8 +470,16 @@ func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) err
 	}
 
 	if err = IncreaseOrderGoodsSales(ctx, orderNumber); err != nil {
-		// 即使 IncreaseOrderGoodsSales 失败，也先记录错误日志并返回 nil。这样支付回调不会一直失败重试；补偿我们后面专门做。
+		// 支付已成功，销量增加失败走后续补偿，避免支付平台反复重试回调。
 		g.Log().Errorf(ctx, "增加订单销量失败, 订单编号: %s, 错误: %v", orderNumber, err)
+		if updateErr := UpdateOrderSalesStatusByNumber(ctx, orderNumber, consts.OrderSalesStatusFailed); updateErr != nil {
+			g.Log().Errorf(ctx, "标记订单销量同步失败状态失败, 订单编号: %s, 错误: %v", orderNumber, updateErr)
+		}
+		return nil
+	}
+
+	if err = UpdateOrderSalesStatusByNumber(ctx, orderNumber, consts.OrderSalesStatusSynced); err != nil {
+		g.Log().Errorf(ctx, "标记订单销量已同步状态失败, 订单编号: %s, 错误: %v", orderNumber, err)
 		return nil
 	}
 
