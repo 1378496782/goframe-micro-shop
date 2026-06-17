@@ -146,3 +146,12 @@ func (*Controller) CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFr
 		Number: orderNumber,
 	}, nil
 }
+
+func (*Controller) Compensate(ctx context.Context, req *v1.OrderInfoCompensateReq) (res *v1.OrderInfoCompensateRes, err error) {
+	if err = order_info.CompensateFailedSales(ctx, int(req.Limit)); err != nil {
+		return nil, err
+	}
+	return &v1.OrderInfoCompensateRes{
+		Message: "订单销量补偿成功",
+	}, nil
+}

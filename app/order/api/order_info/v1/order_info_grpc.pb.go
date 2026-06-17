@@ -29,6 +29,7 @@ const (
 	OrderInfo_Notify_FullMethodName         = "/order_info.v1.order_info/Notify"
 	OrderInfo_CancelOrder_FullMethodName    = "/order_info.v1.order_info/CancelOrder"
 	OrderInfo_Preview_FullMethodName        = "/order_info.v1.order_info/Preview"
+	OrderInfo_Compensate_FullMethodName     = "/order_info.v1.order_info/Compensate"
 )
 
 // OrderInfoClient is the client API for OrderInfo service.
@@ -44,6 +45,7 @@ type OrderInfoClient interface {
 	Notify(ctx context.Context, in *NotifyReq, opts ...grpc.CallOption) (*NotifyRes, error)
 	CancelOrder(ctx context.Context, in *CancelOrderReq, opts ...grpc.CallOption) (*CancelOrderRes, error)
 	Preview(ctx context.Context, in *OrderInfoPreviewReq, opts ...grpc.CallOption) (*OrderInfoPreviewRes, error)
+	Compensate(ctx context.Context, in *OrderInfoCompensateReq, opts ...grpc.CallOption) (*OrderInfoCompensateRes, error)
 }
 
 type orderInfoClient struct {
@@ -144,6 +146,16 @@ func (c *orderInfoClient) Preview(ctx context.Context, in *OrderInfoPreviewReq, 
 	return out, nil
 }
 
+func (c *orderInfoClient) Compensate(ctx context.Context, in *OrderInfoCompensateReq, opts ...grpc.CallOption) (*OrderInfoCompensateRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OrderInfoCompensateRes)
+	err := c.cc.Invoke(ctx, OrderInfo_Compensate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderInfoServer is the server API for OrderInfo service.
 // All implementations must embed UnimplementedOrderInfoServer
 // for forward compatibility.
@@ -157,6 +169,7 @@ type OrderInfoServer interface {
 	Notify(context.Context, *NotifyReq) (*NotifyRes, error)
 	CancelOrder(context.Context, *CancelOrderReq) (*CancelOrderRes, error)
 	Preview(context.Context, *OrderInfoPreviewReq) (*OrderInfoPreviewRes, error)
+	Compensate(context.Context, *OrderInfoCompensateReq) (*OrderInfoCompensateRes, error)
 	mustEmbedUnimplementedOrderInfoServer()
 }
 
@@ -193,6 +206,9 @@ func (UnimplementedOrderInfoServer) CancelOrder(context.Context, *CancelOrderReq
 }
 func (UnimplementedOrderInfoServer) Preview(context.Context, *OrderInfoPreviewReq) (*OrderInfoPreviewRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method Preview not implemented")
+}
+func (UnimplementedOrderInfoServer) Compensate(context.Context, *OrderInfoCompensateReq) (*OrderInfoCompensateRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method Compensate not implemented")
 }
 func (UnimplementedOrderInfoServer) mustEmbedUnimplementedOrderInfoServer() {}
 func (UnimplementedOrderInfoServer) testEmbeddedByValue()                   {}
@@ -377,6 +393,24 @@ func _OrderInfo_Preview_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderInfo_Compensate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OrderInfoCompensateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderInfoServer).Compensate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderInfo_Compensate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderInfoServer).Compensate(ctx, req.(*OrderInfoCompensateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderInfo_ServiceDesc is the grpc.ServiceDesc for OrderInfo service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -419,6 +453,10 @@ var OrderInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Preview",
 			Handler:    _OrderInfo_Preview_Handler,
+		},
+		{
+			MethodName: "Compensate",
+			Handler:    _OrderInfo_Compensate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

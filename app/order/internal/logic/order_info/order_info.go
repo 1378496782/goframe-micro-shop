@@ -482,6 +482,7 @@ func TryUpdateOrderSalesStatus(ctx context.Context, number string, fromStatus, t
 // HandlePaidOrder 处理支付成功后的业务动作。
 // 返回 nil 且未更新订单时，表示该支付回调已经处理过，可以安全忽略。
 func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) error {
+	// 把订单从待支付改成已支付
 	success, err := UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(consts.OrderStatusPaid))
 	if err != nil {
 		return err
@@ -490,6 +491,7 @@ func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) err
 		return nil
 	}
 
+	// 增加商品销量
 	if err = IncreaseOrderGoodsSales(ctx, orderNumber); err != nil {
 		// 支付已成功，销量增加失败走后续补偿，避免支付平台反复重试回调。
 		g.Log().Errorf(ctx, "增加订单销量失败, 订单编号: %s, 错误: %v", orderNumber, err)

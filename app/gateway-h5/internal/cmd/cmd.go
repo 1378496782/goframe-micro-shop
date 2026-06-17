@@ -79,6 +79,7 @@ var (
 						orderController.RefundInfoGetList,
 						orderController.RefundInfoCreate,
 						orderController.OrderInfoPreview,
+						orderController.OrderInfoCompensate,
 						goodsController.Bargain_info_Create,
 						goodsController.Bargain_info_Get,
 						goodsController.Bargain_info_Delete,

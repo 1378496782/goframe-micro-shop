@@ -186,3 +186,12 @@ type OrderInfoCreateFromCartRes struct {
 	Id     uint32 `json:"id" dc:"订单ID"`
 	Number string `json:"number" dc:"订单编号"`
 }
+
+type OrderInfoCompensateReq struct {
+	g.Meta `path:"/order/sales/compensate" method:"post" tags:"订单管理" sm:"订单销量补偿"`
+	Limit  uint32 `json:"limit" d:"20" dc:"补偿订单数量"`
+}
+
+type OrderInfoCompensateRes struct {
+	Message string `json:"message" dc:"补偿结果"`
+}
