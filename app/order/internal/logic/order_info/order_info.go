@@ -445,9 +445,8 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 
 func UpdateOrderSalesStatusByNumber(ctx context.Context, number string, salesStatus consts.OrderSalesStatus) error {
 	_, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
-		dao.OrderInfo.Columns().Number:      number,
-		dao.OrderInfo.Columns().Status:      consts.OrderStatusPaid,
-		dao.OrderInfo.Columns().SalesStatus: consts.OrderSalesStatusSyncing,
+		dao.OrderInfo.Columns().Number: number,
+		dao.OrderInfo.Columns().Status: consts.OrderStatusPaid,
 	}).Data(g.Map{
 		dao.OrderInfo.Columns().SalesStatus: int(salesStatus),
 		dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
@@ -457,6 +456,27 @@ func UpdateOrderSalesStatusByNumber(ctx context.Context, number string, salesSta
 	}
 
 	return nil
+}
+
+func TryUpdateOrderSalesStatus(ctx context.Context, number string, fromStatus, toStatus consts.OrderSalesStatus) (bool, error) {
+	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		dao.OrderInfo.Columns().Number:      number,
+		dao.OrderInfo.Columns().Status:      consts.OrderStatusPaid,
+		dao.OrderInfo.Columns().SalesStatus: int(fromStatus),
+	}).Data(g.Map{
+		dao.OrderInfo.Columns().SalesStatus: int(toStatus),
+		dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
+	}).Update()
+	if err != nil {
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	return rows > 0, nil
 }
 
 // HandlePaidOrder 处理支付成功后的业务动作。
@@ -917,36 +937,30 @@ func CompensateFailedSales(ctx context.Context, limit int) error {
 	cnt_suc := 0
 	for _, order := range orders {
 		// 补偿时不要查出来就直接加销量，而是先“抢占”
-		result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
-			dao.OrderInfo.Columns().Number: order.Number,
-			dao.OrderInfo.Columns().Status: consts.OrderStatusPaid,
-		}).Data(g.Map{
-			dao.OrderInfo.Columns().SalesStatus: int(consts.OrderSalesStatusSyncing),
-			dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
-		}).Update()
+		success, err := TryUpdateOrderSalesStatus(
+			ctx,
+			order.Number,
+			consts.OrderSalesStatusFailed,
+			consts.OrderSalesStatusSyncing,
+		)
 		if err != nil {
 			g.Log().Errorf(ctx, "抢占订单销量补偿任务失败: %v", err)
 			continue
 		}
-		rows, err := result.RowsAffected()
-		if err != nil {
-			g.Log().Errorf(ctx, "获取订单销量补偿抢占结果失败: %v", err)
-			continue
-		}
-		if rows == 0 {
+		if !success {
 			continue
 		}
 
 		salesErr := IncreaseOrderGoodsSales(ctx, order.Number)
 		if salesErr != nil {
 			// 如果增加销量失败，更新 sales_status=同步失败，打印日志，继续处理下一单。
-			if updateErr := UpdateOrderSalesStatusByNumber(ctx, order.Number, consts.OrderSalesStatusFailed); updateErr != nil {
+			if _, updateErr := TryUpdateOrderSalesStatus(ctx, order.Number, consts.OrderSalesStatusSyncing, consts.OrderSalesStatusFailed); updateErr != nil {
 				g.Log().Errorf(ctx, "标记订单销量同步失败状态失败: %v", updateErr)
 			}
 			g.Log().Errorf(ctx, "补偿订单销量失败: %v", salesErr)
 		} else {
 			// 如果增加销量成功，把 sales_status 改成已同步。
-			if updateErr := UpdateOrderSalesStatusByNumber(ctx, order.Number, consts.OrderSalesStatusSynced); updateErr != nil {
+			if _, updateErr := TryUpdateOrderSalesStatus(ctx, order.Number, consts.OrderSalesStatusSyncing, consts.OrderSalesStatusSynced); updateErr != nil {
 				g.Log().Errorf(ctx, "标记订单销量已同步状态失败: %v", updateErr)
 			} else {
 				g.Log().Infof(ctx, "订单销量已同步, 订单编号: %s", order.Number)
