@@ -197,5 +197,5 @@ message OrderInfoCompensateReq {
 }
 
 message OrderInfoCompensateRes {
-  string message = 2;
+  string message = 1;
 }

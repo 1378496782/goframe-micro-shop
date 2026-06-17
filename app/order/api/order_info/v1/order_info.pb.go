@@ -1487,7 +1487,7 @@ func (x *OrderInfoCompensateReq) GetLimit() uint32 {
 
 type OrderInfoCompensateRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1648,7 +1648,7 @@ const file_order_info_v1_order_info_proto_rawDesc = "" +
 	"\x16OrderInfoCompensateReq\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\rR\x05limit\"2\n" +
 	"\x16OrderInfoCompensateRes\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xcd\x06\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\xcd\x06\n" +
 	"\n" +
 	"order_info\x12P\n" +
 	"\x06Create\x12!.order_info.v1.OrderInfoCreateReq\x1a!.order_info.v1.OrderInfoCreateRes\"\x00\x12`\n" +
