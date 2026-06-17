@@ -22,6 +22,7 @@ const (
 	OrderSalesStatusPending OrderSalesStatus = iota // 0 未同步
 	OrderSalesStatusSynced                          // 1 已同步
 	OrderSalesStatusFailed                          // 2 同步失败
+	OrderSalesStatusSyncing                         // 3 同步中
 )
 
 // RefundStatus 对应字段：refund_info.status。审核状态

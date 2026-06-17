@@ -35,7 +35,7 @@ type OrderInfoColumns struct {
 	Price            string // 订单金额 单位分
 	CouponPrice      string // 优惠券金额 单位分
 	ActualPrice      string // 实际支付金额 单位分
-	SalesStatus      string // 销量同步状态：0未同步 1已同步 2同步失败
+	SalesStatus      string // 销量同步状态：0未同步 1已同步 2同步失败 3同步中
 	CreatedAt        string //
 	UpdatedAt        string //
 }

@@ -445,8 +445,9 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 
 func UpdateOrderSalesStatusByNumber(ctx context.Context, number string, salesStatus consts.OrderSalesStatus) error {
 	_, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
-		dao.OrderInfo.Columns().Number: number,
-		dao.OrderInfo.Columns().Status: consts.OrderStatusPaid,
+		dao.OrderInfo.Columns().Number:      number,
+		dao.OrderInfo.Columns().Status:      consts.OrderStatusPaid,
+		dao.OrderInfo.Columns().SalesStatus: consts.OrderSalesStatusSyncing,
 	}).Data(g.Map{
 		dao.OrderInfo.Columns().SalesStatus: int(salesStatus),
 		dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
@@ -881,6 +882,82 @@ func IncreaseOrderGoodsSales(ctx context.Context, orderNumber string) error {
 	if err != nil {
 		g.Log().Errorf(ctx, "增加商品销售量失败: %v", err)
 		return err
+	}
+
+	return nil
+}
+
+/*
+- 查询 order_info 中 status=已支付 且 sales_status=同步失败 的订单。
+- limit 控制一次最多处理多少条，比如传 20。
+- 遍历这些订单，重新执行 IncreaseOrderGoodsSales(ctx, order.Number)。
+- 如果成功，把 sales_status 改成已同步。
+- 如果失败，保持 sales_status=同步失败，打印日志，继续处理下一单。
+- 整体方法不要因为某一单失败就中断全部补偿，除非查询失败这类全局错误。
+*/
+func CompensateFailedSales(ctx context.Context, limit int) error {
+	if limit <= 0 {
+		limit = 20
+	}
+	var orders []*entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).
+		Where(dao.OrderInfo.Columns().Status, consts.OrderStatusPaid).
+		Where(dao.OrderInfo.Columns().SalesStatus, consts.OrderSalesStatusFailed).
+		Limit(limit).
+		Scan(&orders)
+	if err != nil {
+		g.Log().Errorf(ctx, "查询订单失败: %v", err)
+		return err
+	}
+	if len(orders) == 0 {
+		g.Log().Infof(ctx, "没有需要补偿的订单")
+		return nil
+	}
+
+	cnt_suc := 0
+	for _, order := range orders {
+		// 补偿时不要查出来就直接加销量，而是先“抢占”
+		result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+			dao.OrderInfo.Columns().Number: order.Number,
+			dao.OrderInfo.Columns().Status: consts.OrderStatusPaid,
+		}).Data(g.Map{
+			dao.OrderInfo.Columns().SalesStatus: int(consts.OrderSalesStatusSyncing),
+			dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
+		}).Update()
+		if err != nil {
+			g.Log().Errorf(ctx, "抢占订单销量补偿任务失败: %v", err)
+			continue
+		}
+		rows, err := result.RowsAffected()
+		if err != nil {
+			g.Log().Errorf(ctx, "获取订单销量补偿抢占结果失败: %v", err)
+			continue
+		}
+		if rows == 0 {
+			continue
+		}
+
+		salesErr := IncreaseOrderGoodsSales(ctx, order.Number)
+		if salesErr != nil {
+			// 如果增加销量失败，更新 sales_status=同步失败，打印日志，继续处理下一单。
+			if updateErr := UpdateOrderSalesStatusByNumber(ctx, order.Number, consts.OrderSalesStatusFailed); updateErr != nil {
+				g.Log().Errorf(ctx, "标记订单销量同步失败状态失败: %v", updateErr)
+			}
+			g.Log().Errorf(ctx, "补偿订单销量失败: %v", salesErr)
+		} else {
+			// 如果增加销量成功，把 sales_status 改成已同步。
+			if updateErr := UpdateOrderSalesStatusByNumber(ctx, order.Number, consts.OrderSalesStatusSynced); updateErr != nil {
+				g.Log().Errorf(ctx, "标记订单销量已同步状态失败: %v", updateErr)
+			} else {
+				g.Log().Infof(ctx, "订单销量已同步, 订单编号: %s", order.Number)
+				cnt_suc++
+			}
+		}
+	}
+	if cnt_suc == len(orders) {
+		g.Log().Infof(ctx, "补偿订单销量成功, 订单数量: %d, 成功数量: %d", len(orders), cnt_suc)
+	} else {
+		g.Log().Errorf(ctx, "补偿订单销量出现了失败的情况, 订单数量: %d, 失败数量: %d", len(orders), len(orders)-cnt_suc)
 	}
 
 	return nil
