@@ -11,7 +11,6 @@ import (
 
 	"shop-goframe-micro-service-refacotor/app/order/internal/controller/order_info"
 	"shop-goframe-micro-service-refacotor/app/order/internal/controller/refund_info"
-	"shop-goframe-micro-service-refacotor/app/order/internal/job"
 	"shop-goframe-micro-service-refacotor/app/order/utility/consumer"
 	"shop-goframe-micro-service-refacotor/utility/rabbitmq"
 
@@ -71,7 +70,7 @@ var (
 			goods.Register()
 			cart_info.Register()
 
-			job.StartOrderCompensateJob(ctx)
+			// job.StartOrderCompensateJob(ctx)
 
 			s.Run()
 			return nil
