@@ -368,6 +368,12 @@ type OrderStatusTransitionReq struct {
 
 // UpdateOrderStatusIfMatch 只有当前状态匹配时才更新订单状态
 func UpdateOrderStatusIfMatch(ctx context.Context, req *OrderStatusTransitionReq) (bool, error) {
+	fromStatus := consts.OrderStatus(req.FromStatus)
+	toStatus := consts.OrderStatus(req.ToStatus)
+	if !CanTransitOrderStatus(fromStatus, toStatus) {
+		return false, fmt.Errorf("订单状态转换不合法: %d -> %d", req.FromStatus, req.ToStatus)
+	}
+
 	updateData := g.Map{
 		"status":     req.ToStatus,
 		"updated_at": gtime.Now(),
@@ -416,16 +422,25 @@ func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string
 	// 	return nil
 	// }
 
+	fromStatus := consts.OrderStatusPendingPayment
+	toStatus := consts.OrderStatus(status)
+	if !CanTransitOrderStatus(fromStatus, toStatus) {
+		return false, fmt.Errorf("订单状态转换不合法: %d -> %d", fromStatus, toStatus)
+	}
+
 	updateData := g.Map{
 		"status":         status,
 		"updated_at":     gtime.Now(),
 		"transaction_id": transactionId,
 	}
+	if toStatus == consts.OrderStatusPaid {
+		updateData["pay_at"] = gtime.Now()
+	}
 
 	// 更新订单状态
 	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
 		"number": number,
-		"status": consts.OrderStatusPendingPayment,
+		"status": fromStatus,
 	}).Update(updateData)
 	if err != nil {
 		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
@@ -1018,4 +1033,15 @@ func ResetStuckSalesSyncing(ctx context.Context, timeoutMinutes int, limit int) 
 	}
 
 	return resetCount, nil
+}
+
+func CanTransitOrderStatus(from, to consts.OrderStatus) bool {
+	switch from {
+	case consts.OrderStatusPendingPayment:
+		return to == consts.OrderStatusPaid || to == consts.OrderStatusCancelled
+	case consts.OrderStatusCancelled:
+		return to == consts.OrderStatusPendingPayment
+	default:
+		return false
+	}
 }
