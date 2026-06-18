@@ -80,6 +80,7 @@ var (
 						orderController.RefundInfoCreate,
 						orderController.OrderInfoPreview,
 						orderController.OrderInfoCompensate,
+						orderController.CancelTimeoutPendingOrders,
 						goodsController.Bargain_info_Create,
 						goodsController.Bargain_info_Get,
 						goodsController.Bargain_info_Delete,

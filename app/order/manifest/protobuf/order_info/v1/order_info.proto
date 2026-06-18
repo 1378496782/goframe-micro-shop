@@ -19,6 +19,7 @@ service order_info {
   rpc CancelOrder(CancelOrderReq)returns(CancelOrderRes){}
   rpc Preview(OrderInfoPreviewReq)returns(OrderInfoPreviewRes){}
   rpc Compensate(OrderInfoCompensateReq) returns (OrderInfoCompensateRes) {}
+  rpc CancelTimeout(CancelTimeoutPendingOrdersReq) returns (CancelTimeoutPendingOrdersRes) {}
 }
 
 // 创建订单请求
@@ -200,4 +201,14 @@ message OrderInfoCompensateRes {
   string message = 1;
   uint32 reset_count = 2;
   uint32 compensate_count = 3;
+}
+
+message CancelTimeoutPendingOrdersReq {
+  uint32 timeout_minutes = 1;
+  uint32 limit = 2;
+}
+
+message CancelTimeoutPendingOrdersRes {
+  string message = 1;
+  uint32 cancel_count = 2;
 }

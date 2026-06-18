@@ -163,3 +163,15 @@ func (*Controller) Compensate(ctx context.Context, req *v1.OrderInfoCompensateRe
 		CompensateCount: uint32(compensateCount),
 	}, nil
 }
+
+func (*Controller) CancelTimeout(ctx context.Context, req *v1.CancelTimeoutPendingOrdersReq) (res *v1.CancelTimeoutPendingOrdersRes, err error) {
+	cancelCount, err := order_info.CancelTimeoutPendingOrders(ctx, int(req.TimeoutMinutes), int(req.Limit))
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CancelTimeoutPendingOrdersRes{
+		Message:     "超时未支付订单取消完成",
+		CancelCount: uint32(cancelCount),
+	}, nil
+}

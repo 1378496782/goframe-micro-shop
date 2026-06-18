@@ -197,3 +197,14 @@ type OrderInfoCompensateRes struct {
 	ResetCount      uint32 `json:"reset_count" dc:"本次恢复的卡住同步订单数量"`
 	CompensateCount uint32 `json:"compensate_count" dc:"本次补偿成功的订单数量"`
 }
+
+type CancelTimeoutPendingOrdersReq struct {
+	g.Meta         `path:"/order/timeout/cancel" method:"post" tags:"订单管理" sm:"超时未支付订单取消"`
+	TimeoutMinutes uint32 `json:"timeout_minutes" d:"30" dc:"超时时间(分钟)"`
+	Limit          uint32 `json:"limit" d:"20" dc:"本次最多处理订单数量"`
+}
+
+type CancelTimeoutPendingOrdersRes struct {
+	Message     string `json:"message" dc:"处理结果"`
+	CancelCount uint32 `json:"cancel_count" dc:"本次取消成功的订单数量"`
+}

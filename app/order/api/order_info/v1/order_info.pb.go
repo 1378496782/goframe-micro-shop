@@ -1545,6 +1545,110 @@ func (x *OrderInfoCompensateRes) GetCompensateCount() uint32 {
 	return 0
 }
 
+type CancelTimeoutPendingOrdersReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TimeoutMinutes uint32                 `protobuf:"varint,1,opt,name=timeout_minutes,json=timeoutMinutes,proto3" json:"timeout_minutes,omitempty"`
+	Limit          uint32                 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CancelTimeoutPendingOrdersReq) Reset() {
+	*x = CancelTimeoutPendingOrdersReq{}
+	mi := &file_order_info_v1_order_info_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelTimeoutPendingOrdersReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelTimeoutPendingOrdersReq) ProtoMessage() {}
+
+func (x *CancelTimeoutPendingOrdersReq) ProtoReflect() protoreflect.Message {
+	mi := &file_order_info_v1_order_info_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelTimeoutPendingOrdersReq.ProtoReflect.Descriptor instead.
+func (*CancelTimeoutPendingOrdersReq) Descriptor() ([]byte, []int) {
+	return file_order_info_v1_order_info_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *CancelTimeoutPendingOrdersReq) GetTimeoutMinutes() uint32 {
+	if x != nil {
+		return x.TimeoutMinutes
+	}
+	return 0
+}
+
+func (x *CancelTimeoutPendingOrdersReq) GetLimit() uint32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type CancelTimeoutPendingOrdersRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	CancelCount   uint32                 `protobuf:"varint,2,opt,name=cancel_count,json=cancelCount,proto3" json:"cancel_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelTimeoutPendingOrdersRes) Reset() {
+	*x = CancelTimeoutPendingOrdersRes{}
+	mi := &file_order_info_v1_order_info_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelTimeoutPendingOrdersRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelTimeoutPendingOrdersRes) ProtoMessage() {}
+
+func (x *CancelTimeoutPendingOrdersRes) ProtoReflect() protoreflect.Message {
+	mi := &file_order_info_v1_order_info_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelTimeoutPendingOrdersRes.ProtoReflect.Descriptor instead.
+func (*CancelTimeoutPendingOrdersRes) Descriptor() ([]byte, []int) {
+	return file_order_info_v1_order_info_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *CancelTimeoutPendingOrdersRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CancelTimeoutPendingOrdersRes) GetCancelCount() uint32 {
+	if x != nil {
+		return x.CancelCount
+	}
+	return 0
+}
+
 var File_order_info_v1_order_info_proto protoreflect.FileDescriptor
 
 const file_order_info_v1_order_info_proto_rawDesc = "" +
@@ -1667,7 +1771,13 @@ const file_order_info_v1_order_info_proto_rawDesc = "" +
 	"\amessage\x18\x01 \x01(\tR\amessage\x12\x1f\n" +
 	"\vreset_count\x18\x02 \x01(\rR\n" +
 	"resetCount\x12)\n" +
-	"\x10compensate_count\x18\x03 \x01(\rR\x0fcompensateCount2\xcd\x06\n" +
+	"\x10compensate_count\x18\x03 \x01(\rR\x0fcompensateCount\"^\n" +
+	"\x1dCancelTimeoutPendingOrdersReq\x12'\n" +
+	"\x0ftimeout_minutes\x18\x01 \x01(\rR\x0etimeoutMinutes\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\rR\x05limit\"\\\n" +
+	"\x1dCancelTimeoutPendingOrdersRes\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x12!\n" +
+	"\fcancel_count\x18\x02 \x01(\rR\vcancelCount2\xbc\a\n" +
 	"\n" +
 	"order_info\x12P\n" +
 	"\x06Create\x12!.order_info.v1.OrderInfoCreateReq\x1a!.order_info.v1.OrderInfoCreateRes\"\x00\x12`\n" +
@@ -1680,7 +1790,8 @@ const file_order_info_v1_order_info_proto_rawDesc = "" +
 	"\vCancelOrder\x12\x1d.order_info.v1.CancelOrderReq\x1a\x1d.order_info.v1.CancelOrderRes\"\x00\x12S\n" +
 	"\aPreview\x12\".order_info.v1.OrderInfoPreviewReq\x1a\".order_info.v1.OrderInfoPreviewRes\"\x00\x12\\\n" +
 	"\n" +
-	"Compensate\x12%.order_info.v1.OrderInfoCompensateReq\x1a%.order_info.v1.OrderInfoCompensateRes\"\x00BBZ@shop-goframe-micro-service-refacotor/app/order/api/order_info/v1b\x06proto3"
+	"Compensate\x12%.order_info.v1.OrderInfoCompensateReq\x1a%.order_info.v1.OrderInfoCompensateRes\"\x00\x12m\n" +
+	"\rCancelTimeout\x12,.order_info.v1.CancelTimeoutPendingOrdersReq\x1a,.order_info.v1.CancelTimeoutPendingOrdersRes\"\x00BBZ@shop-goframe-micro-service-refacotor/app/order/api/order_info/v1b\x06proto3"
 
 var (
 	file_order_info_v1_order_info_proto_rawDescOnce sync.Once
@@ -1694,44 +1805,46 @@ func file_order_info_v1_order_info_proto_rawDescGZIP() []byte {
 	return file_order_info_v1_order_info_proto_rawDescData
 }
 
-var file_order_info_v1_order_info_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_order_info_v1_order_info_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_order_info_v1_order_info_proto_goTypes = []any{
-	(*OrderInfoCreateReq)(nil),         // 0: order_info.v1.OrderInfoCreateReq
-	(*OrderGoodsItem)(nil),             // 1: order_info.v1.OrderGoodsItem
-	(*OrderInfoCreateRes)(nil),         // 2: order_info.v1.OrderInfoCreateRes
-	(*OrderInfoGetDetailReq)(nil),      // 3: order_info.v1.OrderInfoGetDetailReq
-	(*OrderInfoGetDetailRes)(nil),      // 4: order_info.v1.OrderInfoGetDetailRes
-	(*OrderInfoGetListReq)(nil),        // 5: order_info.v1.OrderInfoGetListReq
-	(*OrderListInfo)(nil),              // 6: order_info.v1.OrderListInfo
-	(*OrderListGoodsInfo)(nil),         // 7: order_info.v1.OrderListGoodsInfo
-	(*OrderInfoListResponse)(nil),      // 8: order_info.v1.OrderInfoListResponse
-	(*OrderInfoGetListRes)(nil),        // 9: order_info.v1.OrderInfoGetListRes
-	(*PaymentReq)(nil),                 // 10: order_info.v1.PaymentReq
-	(*PaymentRes)(nil),                 // 11: order_info.v1.PaymentRes
-	(*NotifyReq)(nil),                  // 12: order_info.v1.NotifyReq
-	(*NotifyRes)(nil),                  // 13: order_info.v1.NotifyRes
-	(*OrderInfoGetCountReq)(nil),       // 14: order_info.v1.OrderInfoGetCountReq
-	(*OrderInfoGetCountRes)(nil),       // 15: order_info.v1.OrderInfoGetCountRes
-	(*CancelOrderReq)(nil),             // 16: order_info.v1.CancelOrderReq
-	(*CancelOrderRes)(nil),             // 17: order_info.v1.CancelOrderRes
-	(*OrderInfoPreviewReq)(nil),        // 18: order_info.v1.OrderInfoPreviewReq
-	(*OrderInfoPreviewRes)(nil),        // 19: order_info.v1.OrderInfoPreviewRes
-	(*OrderInfoPreviewItem)(nil),       // 20: order_info.v1.OrderInfoPreviewItem
-	(*OrderInfoCreateFromCartReq)(nil), // 21: order_info.v1.OrderInfoCreateFromCartReq
-	(*OrderInfoCompensateReq)(nil),     // 22: order_info.v1.OrderInfoCompensateReq
-	(*OrderInfoCompensateRes)(nil),     // 23: order_info.v1.OrderInfoCompensateRes
-	nil,                                // 24: order_info.v1.NotifyReq.HeadersEntry
-	(*pbentity.OrderInfo)(nil),         // 25: pbentity.OrderInfo
-	(*pbentity.OrderGoodsInfo)(nil),    // 26: pbentity.OrderGoodsInfo
+	(*OrderInfoCreateReq)(nil),            // 0: order_info.v1.OrderInfoCreateReq
+	(*OrderGoodsItem)(nil),                // 1: order_info.v1.OrderGoodsItem
+	(*OrderInfoCreateRes)(nil),            // 2: order_info.v1.OrderInfoCreateRes
+	(*OrderInfoGetDetailReq)(nil),         // 3: order_info.v1.OrderInfoGetDetailReq
+	(*OrderInfoGetDetailRes)(nil),         // 4: order_info.v1.OrderInfoGetDetailRes
+	(*OrderInfoGetListReq)(nil),           // 5: order_info.v1.OrderInfoGetListReq
+	(*OrderListInfo)(nil),                 // 6: order_info.v1.OrderListInfo
+	(*OrderListGoodsInfo)(nil),            // 7: order_info.v1.OrderListGoodsInfo
+	(*OrderInfoListResponse)(nil),         // 8: order_info.v1.OrderInfoListResponse
+	(*OrderInfoGetListRes)(nil),           // 9: order_info.v1.OrderInfoGetListRes
+	(*PaymentReq)(nil),                    // 10: order_info.v1.PaymentReq
+	(*PaymentRes)(nil),                    // 11: order_info.v1.PaymentRes
+	(*NotifyReq)(nil),                     // 12: order_info.v1.NotifyReq
+	(*NotifyRes)(nil),                     // 13: order_info.v1.NotifyRes
+	(*OrderInfoGetCountReq)(nil),          // 14: order_info.v1.OrderInfoGetCountReq
+	(*OrderInfoGetCountRes)(nil),          // 15: order_info.v1.OrderInfoGetCountRes
+	(*CancelOrderReq)(nil),                // 16: order_info.v1.CancelOrderReq
+	(*CancelOrderRes)(nil),                // 17: order_info.v1.CancelOrderRes
+	(*OrderInfoPreviewReq)(nil),           // 18: order_info.v1.OrderInfoPreviewReq
+	(*OrderInfoPreviewRes)(nil),           // 19: order_info.v1.OrderInfoPreviewRes
+	(*OrderInfoPreviewItem)(nil),          // 20: order_info.v1.OrderInfoPreviewItem
+	(*OrderInfoCreateFromCartReq)(nil),    // 21: order_info.v1.OrderInfoCreateFromCartReq
+	(*OrderInfoCompensateReq)(nil),        // 22: order_info.v1.OrderInfoCompensateReq
+	(*OrderInfoCompensateRes)(nil),        // 23: order_info.v1.OrderInfoCompensateRes
+	(*CancelTimeoutPendingOrdersReq)(nil), // 24: order_info.v1.CancelTimeoutPendingOrdersReq
+	(*CancelTimeoutPendingOrdersRes)(nil), // 25: order_info.v1.CancelTimeoutPendingOrdersRes
+	nil,                                   // 26: order_info.v1.NotifyReq.HeadersEntry
+	(*pbentity.OrderInfo)(nil),            // 27: pbentity.OrderInfo
+	(*pbentity.OrderGoodsInfo)(nil),       // 28: pbentity.OrderGoodsInfo
 }
 var file_order_info_v1_order_info_proto_depIdxs = []int32{
 	1,  // 0: order_info.v1.OrderInfoCreateReq.order_goods_info:type_name -> order_info.v1.OrderGoodsItem
-	25, // 1: order_info.v1.OrderInfoGetDetailRes.order_info:type_name -> pbentity.OrderInfo
-	26, // 2: order_info.v1.OrderInfoGetDetailRes.order_goods_infos:type_name -> pbentity.OrderGoodsInfo
+	27, // 1: order_info.v1.OrderInfoGetDetailRes.order_info:type_name -> pbentity.OrderInfo
+	28, // 2: order_info.v1.OrderInfoGetDetailRes.order_goods_infos:type_name -> pbentity.OrderGoodsInfo
 	7,  // 3: order_info.v1.OrderListInfo.goods_info:type_name -> order_info.v1.OrderListGoodsInfo
 	6,  // 4: order_info.v1.OrderInfoListResponse.list:type_name -> order_info.v1.OrderListInfo
 	8,  // 5: order_info.v1.OrderInfoGetListRes.data:type_name -> order_info.v1.OrderInfoListResponse
-	24, // 6: order_info.v1.NotifyReq.headers:type_name -> order_info.v1.NotifyReq.HeadersEntry
+	26, // 6: order_info.v1.NotifyReq.headers:type_name -> order_info.v1.NotifyReq.HeadersEntry
 	20, // 7: order_info.v1.OrderInfoPreviewRes.items:type_name -> order_info.v1.OrderInfoPreviewItem
 	0,  // 8: order_info.v1.order_info.Create:input_type -> order_info.v1.OrderInfoCreateReq
 	21, // 9: order_info.v1.order_info.CreateFromCart:input_type -> order_info.v1.OrderInfoCreateFromCartReq
@@ -1743,18 +1856,20 @@ var file_order_info_v1_order_info_proto_depIdxs = []int32{
 	16, // 15: order_info.v1.order_info.CancelOrder:input_type -> order_info.v1.CancelOrderReq
 	18, // 16: order_info.v1.order_info.Preview:input_type -> order_info.v1.OrderInfoPreviewReq
 	22, // 17: order_info.v1.order_info.Compensate:input_type -> order_info.v1.OrderInfoCompensateReq
-	2,  // 18: order_info.v1.order_info.Create:output_type -> order_info.v1.OrderInfoCreateRes
-	2,  // 19: order_info.v1.order_info.CreateFromCart:output_type -> order_info.v1.OrderInfoCreateRes
-	4,  // 20: order_info.v1.order_info.GetDetail:output_type -> order_info.v1.OrderInfoGetDetailRes
-	9,  // 21: order_info.v1.order_info.GetList:output_type -> order_info.v1.OrderInfoGetListRes
-	15, // 22: order_info.v1.order_info.GetCount:output_type -> order_info.v1.OrderInfoGetCountRes
-	11, // 23: order_info.v1.order_info.Payment:output_type -> order_info.v1.PaymentRes
-	13, // 24: order_info.v1.order_info.Notify:output_type -> order_info.v1.NotifyRes
-	17, // 25: order_info.v1.order_info.CancelOrder:output_type -> order_info.v1.CancelOrderRes
-	19, // 26: order_info.v1.order_info.Preview:output_type -> order_info.v1.OrderInfoPreviewRes
-	23, // 27: order_info.v1.order_info.Compensate:output_type -> order_info.v1.OrderInfoCompensateRes
-	18, // [18:28] is the sub-list for method output_type
-	8,  // [8:18] is the sub-list for method input_type
+	24, // 18: order_info.v1.order_info.CancelTimeout:input_type -> order_info.v1.CancelTimeoutPendingOrdersReq
+	2,  // 19: order_info.v1.order_info.Create:output_type -> order_info.v1.OrderInfoCreateRes
+	2,  // 20: order_info.v1.order_info.CreateFromCart:output_type -> order_info.v1.OrderInfoCreateRes
+	4,  // 21: order_info.v1.order_info.GetDetail:output_type -> order_info.v1.OrderInfoGetDetailRes
+	9,  // 22: order_info.v1.order_info.GetList:output_type -> order_info.v1.OrderInfoGetListRes
+	15, // 23: order_info.v1.order_info.GetCount:output_type -> order_info.v1.OrderInfoGetCountRes
+	11, // 24: order_info.v1.order_info.Payment:output_type -> order_info.v1.PaymentRes
+	13, // 25: order_info.v1.order_info.Notify:output_type -> order_info.v1.NotifyRes
+	17, // 26: order_info.v1.order_info.CancelOrder:output_type -> order_info.v1.CancelOrderRes
+	19, // 27: order_info.v1.order_info.Preview:output_type -> order_info.v1.OrderInfoPreviewRes
+	23, // 28: order_info.v1.order_info.Compensate:output_type -> order_info.v1.OrderInfoCompensateRes
+	25, // 29: order_info.v1.order_info.CancelTimeout:output_type -> order_info.v1.CancelTimeoutPendingOrdersRes
+	19, // [19:30] is the sub-list for method output_type
+	8,  // [8:19] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
 	8,  // [8:8] is the sub-list for extension extendee
 	0,  // [0:8] is the sub-list for field type_name
@@ -1771,7 +1886,7 @@ func file_order_info_v1_order_info_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_order_info_v1_order_info_proto_rawDesc), len(file_order_info_v1_order_info_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -49,7 +49,7 @@ type GoodsInfoClient interface {
 	GetGoodsStock(ctx context.Context, in *GetGoodsStockReq, opts ...grpc.CallOption) (*GetGoodsStockRes, error)
 	// 扣减商品库存
 	DeductStock(ctx context.Context, in *DeductStockReq, opts ...grpc.CallOption) (*DeductStockRes, error)
-	// 返回商品库存
+	// 恢复商品库存
 	RestoreStock(ctx context.Context, in *RestoreStockReq, opts ...grpc.CallOption) (*RestoreStockRes, error)
 	// 增加商品销售量
 	IncreaseSales(ctx context.Context, in *IncreaseSalesReq, opts ...grpc.CallOption) (*IncreaseSalesRes, error)

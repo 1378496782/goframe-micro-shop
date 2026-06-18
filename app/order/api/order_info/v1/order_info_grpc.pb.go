@@ -30,6 +30,7 @@ const (
 	OrderInfo_CancelOrder_FullMethodName    = "/order_info.v1.order_info/CancelOrder"
 	OrderInfo_Preview_FullMethodName        = "/order_info.v1.order_info/Preview"
 	OrderInfo_Compensate_FullMethodName     = "/order_info.v1.order_info/Compensate"
+	OrderInfo_CancelTimeout_FullMethodName  = "/order_info.v1.order_info/CancelTimeout"
 )
 
 // OrderInfoClient is the client API for OrderInfo service.
@@ -46,6 +47,7 @@ type OrderInfoClient interface {
 	CancelOrder(ctx context.Context, in *CancelOrderReq, opts ...grpc.CallOption) (*CancelOrderRes, error)
 	Preview(ctx context.Context, in *OrderInfoPreviewReq, opts ...grpc.CallOption) (*OrderInfoPreviewRes, error)
 	Compensate(ctx context.Context, in *OrderInfoCompensateReq, opts ...grpc.CallOption) (*OrderInfoCompensateRes, error)
+	CancelTimeout(ctx context.Context, in *CancelTimeoutPendingOrdersReq, opts ...grpc.CallOption) (*CancelTimeoutPendingOrdersRes, error)
 }
 
 type orderInfoClient struct {
@@ -156,6 +158,16 @@ func (c *orderInfoClient) Compensate(ctx context.Context, in *OrderInfoCompensat
 	return out, nil
 }
 
+func (c *orderInfoClient) CancelTimeout(ctx context.Context, in *CancelTimeoutPendingOrdersReq, opts ...grpc.CallOption) (*CancelTimeoutPendingOrdersRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CancelTimeoutPendingOrdersRes)
+	err := c.cc.Invoke(ctx, OrderInfo_CancelTimeout_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderInfoServer is the server API for OrderInfo service.
 // All implementations must embed UnimplementedOrderInfoServer
 // for forward compatibility.
@@ -170,6 +182,7 @@ type OrderInfoServer interface {
 	CancelOrder(context.Context, *CancelOrderReq) (*CancelOrderRes, error)
 	Preview(context.Context, *OrderInfoPreviewReq) (*OrderInfoPreviewRes, error)
 	Compensate(context.Context, *OrderInfoCompensateReq) (*OrderInfoCompensateRes, error)
+	CancelTimeout(context.Context, *CancelTimeoutPendingOrdersReq) (*CancelTimeoutPendingOrdersRes, error)
 	mustEmbedUnimplementedOrderInfoServer()
 }
 
@@ -209,6 +222,9 @@ func (UnimplementedOrderInfoServer) Preview(context.Context, *OrderInfoPreviewRe
 }
 func (UnimplementedOrderInfoServer) Compensate(context.Context, *OrderInfoCompensateReq) (*OrderInfoCompensateRes, error) {
 	return nil, status.Error(codes.Unimplemented, "method Compensate not implemented")
+}
+func (UnimplementedOrderInfoServer) CancelTimeout(context.Context, *CancelTimeoutPendingOrdersReq) (*CancelTimeoutPendingOrdersRes, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelTimeout not implemented")
 }
 func (UnimplementedOrderInfoServer) mustEmbedUnimplementedOrderInfoServer() {}
 func (UnimplementedOrderInfoServer) testEmbeddedByValue()                   {}
@@ -411,6 +427,24 @@ func _OrderInfo_Compensate_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderInfo_CancelTimeout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelTimeoutPendingOrdersReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderInfoServer).CancelTimeout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderInfo_CancelTimeout_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderInfoServer).CancelTimeout(ctx, req.(*CancelTimeoutPendingOrdersReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderInfo_ServiceDesc is the grpc.ServiceDesc for OrderInfo service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -457,6 +491,10 @@ var OrderInfo_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Compensate",
 			Handler:    _OrderInfo_Compensate_Handler,
+		},
+		{
+			MethodName: "CancelTimeout",
+			Handler:    _OrderInfo_CancelTimeout_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

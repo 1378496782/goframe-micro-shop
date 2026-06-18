@@ -18,6 +18,7 @@ import (
 	consts_ctrl "shop-goframe-micro-service-refacotor/utility/consts"
 	"shop-goframe-micro-service-refacotor/utility/metrics"
 	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
+	"time"
 
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -1043,5 +1044,91 @@ func CanTransitOrderStatus(from, to consts.OrderStatus) bool {
 		return to == consts.OrderStatusPendingPayment
 	default:
 		return false
+	}
+}
+
+func CancelTimeoutPendingOrders(ctx context.Context, timeoutMinutes int, limit int) (cancelCount int, err error) {
+	if timeoutMinutes <= 0 {
+		timeoutMinutes = 30
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+	expireTime := gtime.Now().Add(-time.Duration(timeoutMinutes) * time.Minute)
+	var orders []*entity.OrderInfo
+	err = dao.OrderInfo.Ctx(ctx).
+		Where(dao.OrderInfo.Columns().Status, consts.OrderStatusPendingPayment).
+		WhereLT(dao.OrderInfo.Columns().CreatedAt, expireTime).
+		Limit(limit).
+		Scan(&orders)
+	if err != nil {
+		return 0, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	for _, order := range orders {
+		success, err := UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
+			UserId:     uint32(order.UserId),
+			OrderId:    uint32(order.Id),
+			FromStatus: int(consts.OrderStatusPendingPayment),
+			ToStatus:   int(consts.OrderStatusCancelled),
+		})
+		if err != nil {
+			g.Log().Errorf(ctx, "取消订单状态失败: %v", err)
+			continue
+		}
+		if !success {
+			g.Log().Warningf(ctx, "取消订单状态未生效, 订单ID: %d", order.Id)
+			continue
+		}
+
+		// 恢复库存
+		var orderGoodsList []*entity.OrderGoodsInfo
+		err = dao.OrderGoodsInfo.Ctx(ctx).Where(dao.OrderGoodsInfo.Columns().OrderId, order.Id).Scan(&orderGoodsList)
+		if err != nil {
+			g.Log().Errorf(ctx, "查询订单商品失败: %v", err)
+			// 回滚订单状态
+			rollbackTimeoutCancelledOrder(ctx, order)
+			continue
+		}
+
+		goodsIds := make([]uint32, 0, len(orderGoodsList))
+		counts := make([]uint32, 0, len(orderGoodsList))
+		for _, item := range orderGoodsList {
+			goodsIds = append(goodsIds, uint32(item.GoodsId))
+			counts = append(counts, uint32(item.Count))
+		}
+
+		if len(goodsIds) == 0 {
+			g.Log().Warningf(ctx, "超时订单没有商品快照, order_id:%d", order.Id)
+			// 回滚订单状态
+			rollbackTimeoutCancelledOrder(ctx, order)
+			continue
+		}
+
+		_, err = goods.Client.RestoreStock(ctx, &goods_info.RestoreStockReq{
+			GoodsIds: goodsIds,
+			Counts:   counts,
+		})
+		if err != nil {
+			g.Log().Errorf(ctx, "超时取消后恢复库存失败, order_id:%d, err:%v", order.Id, err)
+
+			// 回滚订单状态
+			rollbackTimeoutCancelledOrder(ctx, order)
+			continue
+		}
+		cancelCount++
+	}
+	return
+}
+
+func rollbackTimeoutCancelledOrder(ctx context.Context, order *entity.OrderInfo) {
+	_, rollbackErr := UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
+		UserId:     uint32(order.UserId),
+		OrderId:    uint32(order.Id),
+		FromStatus: int(consts.OrderStatusCancelled),
+		ToStatus:   int(consts.OrderStatusPendingPayment),
+	})
+	if rollbackErr != nil {
+		g.Log().Errorf(ctx, "回滚超时取消订单状态失败, order_id:%d, err:%v", order.Id, rollbackErr)
 	}
 }
