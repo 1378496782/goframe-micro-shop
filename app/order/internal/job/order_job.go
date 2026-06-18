@@ -19,7 +19,7 @@ func StartOrderCompensateJob(ctx context.Context) {
 	// 用 goroutine 启动后台任务，避免阻塞 order-service 后面的 gRPC 服务启动。
 	go func() {
 		// ticker 每隔 30 秒向 ticker.C 发送一次信号，用来触发一轮补偿。
-		ticker := time.NewTicker(30 * time.Second)
+		ticker := time.NewTicker(300 * time.Second)
 		defer ticker.Stop()
 
 		// running 用来防止同一个服务实例内重复执行：
