@@ -917,10 +917,11 @@ func IncreaseOrderGoodsSales(ctx context.Context, orderNumber string) error {
 - 如果失败，保持 sales_status=同步失败，打印日志，继续处理下一单。
 - 整体方法不要因为某一单失败就中断全部补偿，除非查询失败这类全局错误。
 */
-func CompensateFailedSales(ctx context.Context, limit int) error {
+func CompensateFailedSales(ctx context.Context, limit int) (int, error) {
 	if limit <= 0 {
 		limit = 20
 	}
+
 	var orders []*entity.OrderInfo
 	err := dao.OrderInfo.Ctx(ctx).
 		Where(dao.OrderInfo.Columns().Status, consts.OrderStatusPaid).
@@ -929,11 +930,11 @@ func CompensateFailedSales(ctx context.Context, limit int) error {
 		Scan(&orders)
 	if err != nil {
 		g.Log().Errorf(ctx, "查询订单失败: %v", err)
-		return err
+		return 0, err
 	}
 	if len(orders) == 0 {
 		g.Log().Infof(ctx, "没有需要补偿的订单")
-		return nil
+		return 0, nil
 	}
 
 	cnt_suc := 0
@@ -976,5 +977,45 @@ func CompensateFailedSales(ctx context.Context, limit int) error {
 		g.Log().Errorf(ctx, "补偿订单销量出现了失败的情况, 订单数量: %d, 失败数量: %d", len(orders), len(orders)-cnt_suc)
 	}
 
-	return nil
+	return cnt_suc, nil
+}
+
+// 补偿任务健壮性：处理 sales_status=3 同步中 卡住的问题。
+func ResetStuckSalesSyncing(ctx context.Context, timeoutMinutes int, limit int) (int, error) {
+	if timeoutMinutes <= 0 {
+		timeoutMinutes = 10
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+
+	var orders []*entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).
+		Where(dao.OrderInfo.Columns().Status, consts.OrderStatusPaid).
+		Where(dao.OrderInfo.Columns().SalesStatus, consts.OrderSalesStatusSyncing).
+		Where(fmt.Sprintf("%s < DATE_SUB(NOW(), INTERVAL ? MINUTE)", dao.OrderInfo.Columns().UpdatedAt), timeoutMinutes).
+		Limit(limit).
+		Scan(&orders)
+	if err != nil {
+		return 0, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	resetCount := 0
+	for _, order := range orders {
+		success, err := TryUpdateOrderSalesStatus(
+			ctx,
+			order.Number,
+			consts.OrderSalesStatusSyncing,
+			consts.OrderSalesStatusFailed,
+		)
+		if err != nil {
+			g.Log().Errorf(ctx, "恢复卡住的销量同步订单失败, order_number:%s, err:%v", order.Number, err)
+			continue
+		}
+		if success {
+			resetCount++
+		}
+	}
+
+	return resetCount, nil
 }

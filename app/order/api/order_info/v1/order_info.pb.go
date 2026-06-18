@@ -1486,10 +1486,12 @@ func (x *OrderInfoCompensateReq) GetLimit() uint32 {
 }
 
 type OrderInfoCompensateRes struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Message         string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	ResetCount      uint32                 `protobuf:"varint,2,opt,name=reset_count,json=resetCount,proto3" json:"reset_count,omitempty"`
+	CompensateCount uint32                 `protobuf:"varint,3,opt,name=compensate_count,json=compensateCount,proto3" json:"compensate_count,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *OrderInfoCompensateRes) Reset() {
@@ -1527,6 +1529,20 @@ func (x *OrderInfoCompensateRes) GetMessage() string {
 		return x.Message
 	}
 	return ""
+}
+
+func (x *OrderInfoCompensateRes) GetResetCount() uint32 {
+	if x != nil {
+		return x.ResetCount
+	}
+	return 0
+}
+
+func (x *OrderInfoCompensateRes) GetCompensateCount() uint32 {
+	if x != nil {
+		return x.CompensateCount
+	}
+	return 0
 }
 
 var File_order_info_v1_order_info_proto protoreflect.FileDescriptor
@@ -1646,9 +1662,12 @@ const file_order_info_v1_order_info_proto_rawDesc = "" +
 	"\auser_id\x18\x06 \x01(\rR\x06userId\x12\x1b\n" +
 	"\tcoupon_id\x18\a \x01(\rR\bcouponId\".\n" +
 	"\x16OrderInfoCompensateReq\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\rR\x05limit\"2\n" +
+	"\x05limit\x18\x01 \x01(\rR\x05limit\"~\n" +
 	"\x16OrderInfoCompensateRes\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2\xcd\x06\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x12\x1f\n" +
+	"\vreset_count\x18\x02 \x01(\rR\n" +
+	"resetCount\x12)\n" +
+	"\x10compensate_count\x18\x03 \x01(\rR\x0fcompensateCount2\xcd\x06\n" +
 	"\n" +
 	"order_info\x12P\n" +
 	"\x06Create\x12!.order_info.v1.OrderInfoCreateReq\x1a!.order_info.v1.OrderInfoCreateRes\"\x00\x12`\n" +

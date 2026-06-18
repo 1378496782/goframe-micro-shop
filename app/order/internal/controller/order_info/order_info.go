@@ -148,10 +148,18 @@ func (*Controller) CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFr
 }
 
 func (*Controller) Compensate(ctx context.Context, req *v1.OrderInfoCompensateReq) (res *v1.OrderInfoCompensateRes, err error) {
-	if err = order_info.CompensateFailedSales(ctx, int(req.Limit)); err != nil {
+	resetCount, err := order_info.ResetStuckSalesSyncing(ctx, 10, int(req.Limit))
+	if err != nil {
+		return nil, err
+	}
+
+	compensateCount, err := order_info.CompensateFailedSales(ctx, int(req.Limit))
+	if err != nil {
 		return nil, err
 	}
 	return &v1.OrderInfoCompensateRes{
-		Message: "订单销量补偿成功",
+		Message:         "订单销量补偿完成",
+		ResetCount:      uint32(resetCount),
+		CompensateCount: uint32(compensateCount),
 	}, nil
 }

@@ -16,6 +16,8 @@ func (c *ControllerV1) OrderInfoCompensate(ctx context.Context, req *v1.OrderInf
 	}
 
 	return &v1.OrderInfoCompensateRes{
-		Message: grpcRes.Message,
+		Message:         grpcRes.Message,
+		ResetCount:      grpcRes.ResetCount,
+		CompensateCount: grpcRes.CompensateCount,
 	}, nil
 }

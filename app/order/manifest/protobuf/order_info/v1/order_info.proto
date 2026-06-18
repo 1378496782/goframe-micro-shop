@@ -198,4 +198,6 @@ message OrderInfoCompensateReq {
 
 message OrderInfoCompensateRes {
   string message = 1;
+  uint32 reset_count = 2;
+  uint32 compensate_count = 3;
 }

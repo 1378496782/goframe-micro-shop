@@ -193,5 +193,7 @@ type OrderInfoCompensateReq struct {
 }
 
 type OrderInfoCompensateRes struct {
-	Message string `json:"message" dc:"补偿结果"`
+	Message         string `json:"message" dc:"补偿结果"`
+	ResetCount      uint32 `json:"reset_count" dc:"本次恢复的卡住同步订单数量"`
+	CompensateCount uint32 `json:"compensate_count" dc:"本次补偿成功的订单数量"`
 }
