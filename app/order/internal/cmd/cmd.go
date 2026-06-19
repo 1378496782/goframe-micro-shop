@@ -73,6 +73,9 @@ var (
 
 			job.StartOrderCompensateJob(ctx)
 
+			// 启动 Outbox 中继任务：轮询发件箱并投递到 RabbitMQ
+			job.StartOutboxRelayJob(ctx)
+
 			s.Run()
 			return nil
 		},

@@ -25,6 +25,19 @@ const (
 	OrderSalesStatusSyncing                         // 3 同步中
 )
 
+// OutboxStatus 对应字段：order_outbox_message.status。事务消息发件箱投递状态
+type OutboxStatus int
+
+const (
+	OutboxStatusPending OutboxStatus = iota // 0 待发送
+	OutboxStatusSending                     // 1 发送中
+	OutboxStatusSent                        // 2 发送成功
+	OutboxStatusFailed                      // 3 发送失败
+)
+
+// OrderPaidEventType 订单支付成功事件类型，写入 order_outbox_message.event_type
+const OrderPaidEventType = "order.paid"
+
 // RefundStatus 对应字段：refund_info.status。审核状态
 type RefundStatus int
 

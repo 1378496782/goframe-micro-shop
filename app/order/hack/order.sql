@@ -94,3 +94,28 @@ CREATE TABLE `refund_info`  (
 -- Records of refund_info
 -- ----------------------------
 INSERT INTO `refund_info` VALUES (1, 'refund1659247832739250000428', 1, 1, '不想要了', 1, 1, '2022-07-31 14:10:32', '2022-07-31 14:10:32', NULL);
+
+-- ----------------------------
+-- Table structure for order_outbox_message
+-- ----------------------------
+DROP TABLE IF EXISTS `order_outbox_message`;
+CREATE TABLE `order_outbox_message`  (
+    `id` bigint(0) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `event_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '事件唯一id，用于幂等去重',
+    `event_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '事件类型',
+    `aggregate_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '聚合根id，如订单id',
+    `exchange` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '消息投递的 exchange',
+    `routing_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '消息投递的 routing key',
+    `payload` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '消息体内容',
+    `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '发送状态：0待发送 1发送中 2发送成功 3发送失败',
+    `retry_count` int(0) NOT NULL DEFAULT 0 COMMENT '已重试次数',
+    `next_retry_at` datetime(0) DEFAULT NULL COMMENT '下次重试时间',
+    `last_error` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '最近一次失败原因',
+    `created_at` datetime(0) DEFAULT NULL COMMENT '创建时间',
+    `updated_at` datetime(0) DEFAULT NULL COMMENT '更新时间',
+    `sent_at` datetime(0) DEFAULT NULL COMMENT '发送成功时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE INDEX `uk_event_id`(`event_id`) USING BTREE,
+    INDEX `idx_status_next_retry`(`status`, `next_retry_at`) USING BTREE,
+    INDEX `idx_aggregate_id`(`aggregate_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '订单事件发件箱表（事务消息）' ROW_FORMAT = Dynamic;

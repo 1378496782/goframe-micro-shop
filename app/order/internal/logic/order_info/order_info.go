@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	cartApi "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
@@ -20,12 +21,14 @@ import (
 	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
 	"time"
 
+	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/gogf/gf/v2/util/guid"
 )
 
 // Create 创建订单（包含完整的事务处理）
@@ -497,31 +500,61 @@ func TryUpdateOrderSalesStatus(ctx context.Context, number string, fromStatus, t
 }
 
 // HandlePaidOrder 处理支付成功后的业务动作。
-// 返回 nil 且未更新订单时，表示该支付回调已经处理过，可以安全忽略。
+//
+// 采用事务消息发件箱（Transactional Outbox）模式：在同一个本地事务里
+// 完成「订单改为已支付」和「写入 order_outbox_message」两件事，二者要么
+// 同时成功、要么同时回滚，从而保证订单状态与待发送事件的最终一致性。
+// 真正的 RabbitMQ 投递由独立的 Outbox 中继任务异步轮询发送，不在本函数内进行。
+//
+// 当订单状态未发生变更（rows==0）时，表示该支付回调已处理过，提交空事务并安全忽略。
 func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) error {
-	// 把订单从待支付改成已支付
-	success, err := UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(consts.OrderStatusPaid))
-	if err != nil {
-		return err
-	}
-	if !success {
+	return dao.OrderInfo.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		// 1. 把订单从待支付改成已支付（事务内执行，ctx 已携带事务）
+		success, err := UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(consts.OrderStatusPaid))
+		if err != nil {
+			return err
+		}
+		if !success {
+			// 幂等：订单已是已支付状态，无需再写 Outbox，提交空事务即可
+			g.Log().Infof(ctx, "订单状态未变更，跳过 Outbox 写入, order=%s", orderNumber)
+			return nil
+		}
+
+		// 2. 在同一事务内写入 Outbox 消息
+		event := grabbitmq.OrderPaidEvent{
+			OrderNumber:   orderNumber,
+			TransactionId: transactionId,
+			PaidAt:        gtime.Now().Format("2006-01-02 15:04:05"),
+		}
+		payload, err := json.Marshal(event)
+		if err != nil {
+			return gerror.WrapCode(gcode.CodeInternalError, err)
+		}
+
+		// exchange / routingKey 与 PublishOrderPaidEvent 保持一致，供中继任务投递时使用
+		exchange := g.Cfg().MustGet(ctx, "rabbitmq.exchange.orderExchange").String()
+		routingKey := g.Cfg().MustGet(ctx, "rabbitmq.routingKey.orderPaid").String()
+
+		cols := dao.OrderOutboxMessage.Columns()
+		_, err = dao.OrderOutboxMessage.Ctx(ctx).Data(g.Map{
+			cols.EventId:     guid.S(),
+			cols.EventType:   consts.OrderPaidEventType,
+			cols.AggregateId: orderNumber,
+			cols.Exchange:    exchange,
+			cols.RoutingKey:  routingKey,
+			cols.Payload:     string(payload),
+			cols.Status:      int(consts.OutboxStatusPending),
+			cols.RetryCount:  0,
+			cols.CreatedAt:   gtime.Now(),
+			cols.UpdatedAt:   gtime.Now(),
+		}).Insert()
+		if err != nil {
+			return gerror.WrapCode(gcode.CodeDbOperationError, err)
+		}
+
+		g.Log().Infof(ctx, "订单已支付并写入 Outbox, order=%s", orderNumber)
 		return nil
-	}
-
-	event := grabbitmq.OrderPaidEvent{
-		OrderNumber:   orderNumber,
-		TransactionId: transactionId,
-		PaidAt:        gtime.Now().Format("2006-01-02 15:04:05"),
-	}
-
-	err = grabbitmq.PublishOrderPaidEvent(ctx, event)
-	if err != nil {
-		g.Log().Errorf(ctx, "发布支付成功事件失败, order=%s, err=%v", orderNumber, err)
-		_ = UpdateOrderSalesStatusByNumber(ctx, orderNumber, consts.OrderSalesStatusFailed)
-		return nil
-	}
-
-	return nil
+	})
 }
 
 // HandleCouponResult 处理优惠券扣减结果
