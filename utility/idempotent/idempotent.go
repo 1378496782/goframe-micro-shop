@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
 )
 
@@ -39,6 +40,24 @@ func NewRedisIdempotentService(redisClient interface{}) IdempotentService {
 // 3. 使用链式调用模式（.SetNX().Result()）适配GoFrame Redis客户端的API风格
 // 4. 将当前时间戳（纳秒级）作为锁值，便于后续可能的锁持有时间分析
 func (s *redisIdempotentService) TryLock(ctx context.Context, key string, expiration time.Duration) (bool, error) {
+	if client, ok := s.redisClient.(interface {
+		GroupString() gredis.IGroupString
+	}); ok {
+		expireSeconds := int64(expiration / time.Second)
+		if expireSeconds <= 0 {
+			expireSeconds = 1
+		}
+		v, err := client.GroupString().Set(ctx, key, time.Now().UnixNano(), gredis.SetOption{
+			TTLOption: gredis.TTLOption{EX: &expireSeconds},
+			NX:        true,
+		})
+		if err != nil {
+			g.Log().Errorf(ctx, "获取幂等锁失败: key=%s, error=%v", key, err)
+			return false, fmt.Errorf("获取幂等锁失败: %v", err)
+		}
+		return !v.IsNil(), nil
+	}
+
 	// 使用类型断言将redisClient转换为具有SetNX方法的接口类型
 	// 这种设计允许我们注入任何实现了相同方法签名的Redis客户端或Mock对象
 	result, err := s.redisClient.(interface {
@@ -59,6 +78,17 @@ func (s *redisIdempotentService) TryLock(ctx context.Context, key string, expira
 
 // ReleaseLock 释放幂等锁
 func (s *redisIdempotentService) ReleaseLock(ctx context.Context, key string) error {
+	if client, ok := s.redisClient.(interface {
+		GroupGeneric() gredis.IGroupGeneric
+	}); ok {
+		_, err := client.GroupGeneric().Del(ctx, key)
+		if err != nil {
+			g.Log().Errorf(ctx, "释放幂等锁失败: key=%s, error=%v", key, err)
+			return fmt.Errorf("释放幂等锁失败: %v", err)
+		}
+		return nil
+	}
+
 	// 直接删除键来释放锁，适配GoFrame Redis客户端
 	_, err := s.redisClient.(interface {
 		Del(ctx context.Context, keys ...string) interface{ Result() (int64, error) }

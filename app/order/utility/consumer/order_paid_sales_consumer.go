@@ -2,6 +2,8 @@ package consumer
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"shop-goframe-micro-service-refacotor/app/order/internal/consts"
 	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
 	order_logic "shop-goframe-micro-service-refacotor/app/order/internal/logic/order_info"
@@ -72,6 +74,10 @@ func (c *OrderPaidSalesConsumer) HandleMessage(ctx context.Context, msg amqp.Del
 	var order entity.OrderInfo
 	err = dao.OrderInfo.Ctx(ctx).Where(dao.OrderInfo.Columns().Number, event.OrderNumber).Scan(&order)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			g.Log().Warningf(ctx, "订单不存在，跳过支付成功事件, order=%s", event.OrderNumber)
+			return nil
+		}
 		g.Log().Errorf(ctx, "查询订单失败: %v", err)
 		return err
 	}
