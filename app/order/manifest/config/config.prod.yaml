@@ -34,9 +34,11 @@ rabbitmq:
     orderExchange: "order.events.exchange"
     goodsStockExchange: "goods.stock.exchange"
   queue:
+    orderPaidSalesQueue: "order.paid.sales.queue"
     orderTimeoutQueue: "order.timeout.queue"
     couponConfirmResultQueue: "coupon.confirm.result.queue"
   routingKey:
+    orderPaid: "order.paid"
     orderTimeout: "order.timeout"
     couponConfirm: "coupon.confirm.request"
     couponConfirmResult: "coupon.confirm.result"
@@ -57,4 +59,3 @@ payment:
     refundNotifyUrl: "https://business.dayu.club/frontend/refundNotify" # 退款回调地址
     privateKey: |
       CHANGE_ME_WECHAT_PRIVATE_KEY
-      -----END PRIVATE KEY-----

@@ -89,6 +89,10 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	orderTimeoutConsumer := consumer.NewOrderTimeoutConsumer(ctx)
 	manager.AddConsumer(orderTimeoutConsumer)
 
+	// 添加订单支付成功消费者
+	orderPaidSalesConsumer := consumer.NewOrderPaidSalesConsumer(ctx)
+	manager.AddConsumer(orderPaidSalesConsumer)
+
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)
 	// manager.AddConsumer(anotherConsumer)

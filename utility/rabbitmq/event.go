@@ -2,8 +2,9 @@ package rabbitmq
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
 	"time"
+
+	"github.com/gogf/gf/v2/frame/g"
 )
 
 const (
@@ -265,4 +266,40 @@ func PublishReturnStockEvent(orderId int, goodsInfo []*OrderGoodsInfo) {
 	} else {
 		g.Log().Infof(ctx, "Published PublishReturnStockEvent: %+v", goodsInfo)
 	}
+}
+
+// 订单支付成功事件
+type OrderPaidEvent struct {
+	OrderNumber   string `json:"order_number"`
+	TransactionId string `json:"transaction_id"`
+	PaidAt        string `json:"paid_at"`
+}
+
+// PublishOrderPaidEvent 发布订单支付成功事件
+func PublishOrderPaidEvent(ctx context.Context, event OrderPaidEvent) (err error) {
+	// 初始化RabbitMQ连接
+	rb, err := NewRabbitMQ(ctx)
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to connect to RabbitMQ: %v", err)
+		return
+	}
+	defer rb.Close()
+
+	// 声明交换机
+	exchange := g.Cfg().MustGet(ctx, "rabbitmq.exchange.orderExchange").String()
+	err = rb.DeclareExchange(exchange, "topic")
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to declare exchange: %v", err)
+		return
+	}
+
+	// 发布事件
+	routingKey := g.Cfg().MustGet(ctx, "rabbitmq.routingKey.orderPaid").String()
+	if err = rb.Publish(exchange, routingKey, event); err != nil {
+		g.Log().Errorf(ctx, "Failed to publish OrderPaidEvent: %v", err)
+		return
+	}
+
+	g.Log().Infof(ctx, "Published OrderPaidEvent: %+v", event)
+	return
 }

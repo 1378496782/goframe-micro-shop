@@ -474,6 +474,7 @@ func UpdateOrderSalesStatusByNumber(ctx context.Context, number string, salesSta
 	return nil
 }
 
+// TryUpdateOrderSalesStatus 订单销量的状态更新
 func TryUpdateOrderSalesStatus(ctx context.Context, number string, fromStatus, toStatus consts.OrderSalesStatus) (bool, error) {
 	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
 		dao.OrderInfo.Columns().Number:      number,
@@ -507,18 +508,16 @@ func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) err
 		return nil
 	}
 
-	// 增加商品销量
-	if err = IncreaseOrderGoodsSales(ctx, orderNumber); err != nil {
-		// 支付已成功，销量增加失败走后续补偿，避免支付平台反复重试回调。
-		g.Log().Errorf(ctx, "增加订单销量失败, 订单编号: %s, 错误: %v", orderNumber, err)
-		if updateErr := UpdateOrderSalesStatusByNumber(ctx, orderNumber, consts.OrderSalesStatusFailed); updateErr != nil {
-			g.Log().Errorf(ctx, "标记订单销量同步失败状态失败, 订单编号: %s, 错误: %v", orderNumber, updateErr)
-		}
-		return nil
+	event := grabbitmq.OrderPaidEvent{
+		OrderNumber:   orderNumber,
+		TransactionId: transactionId,
+		PaidAt:        gtime.Now().Format("2006-01-02 15:04:05"),
 	}
 
-	if err = UpdateOrderSalesStatusByNumber(ctx, orderNumber, consts.OrderSalesStatusSynced); err != nil {
-		g.Log().Errorf(ctx, "标记订单销量已同步状态失败, 订单编号: %s, 错误: %v", orderNumber, err)
+	err = grabbitmq.PublishOrderPaidEvent(ctx, event)
+	if err != nil {
+		g.Log().Errorf(ctx, "发布支付成功事件失败, order=%s, err=%v", orderNumber, err)
+		_ = UpdateOrderSalesStatusByNumber(ctx, orderNumber, consts.OrderSalesStatusFailed)
 		return nil
 	}
 
