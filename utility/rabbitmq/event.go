@@ -303,3 +303,39 @@ func PublishOrderPaidEvent(ctx context.Context, event OrderPaidEvent) (err error
 	g.Log().Infof(ctx, "Published OrderPaidEvent: %+v", event)
 	return
 }
+
+// 订单取消事件
+type OrderCancelledEvent struct {
+	OrderNumber string `json:"order_number"`
+	Reason      string `json:"reason"`
+	CancelledAt string `json:"cancelled_at"`
+}
+
+// PublishOrderCancelledEvent 发布订单取消事件
+func PublishOrderCancelledEvent(ctx context.Context, event OrderCancelledEvent) (err error) {
+	// 初始化RabbitMQ连接
+	rb, err := NewRabbitMQ(ctx)
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to connect to RabbitMQ: %v", err)
+		return
+	}
+	defer rb.Close()
+
+	// 声明交换机
+	exchange := g.Cfg().MustGet(ctx, "rabbitmq.exchange.orderCancelledExchange").String()
+	err = rb.DeclareExchange(exchange, "topic")
+	if err != nil {
+		g.Log().Errorf(ctx, "Failed to declare exchange: %v", err)
+		return
+	}
+
+	// 发布事件
+	routingKey := g.Cfg().MustGet(ctx, "rabbitmq.routingKey.orderCancelled").String()
+	if err = rb.Publish(exchange, routingKey, event); err != nil {
+		g.Log().Errorf(ctx, "Failed to publish OrderCancelledEvent: %v", err)
+		return
+	}
+
+	g.Log().Infof(ctx, "Published OrderCancelledEvent: %+v", event)
+	return
+}

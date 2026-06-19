@@ -26,7 +26,7 @@ type Consumer interface {
 
 	// HandleMessage 处理消息
 	HandleMessage(ctx context.Context, msg amqp.Delivery) error
-	
+
 	// GetBusinessID 从消息中提取业务ID，用于幂等性检查（可选实现）
 	// 如果不实现，将使用消息头中的business_id或空字符串
 	GetBusinessID(data []byte, event map[string]interface{}) string
@@ -264,7 +264,8 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 		consumer.GetName(), msg.Exchange, msg.RoutingKey, msg.MessageId)
 
 	// 幂等性检查
-	if err := cm.checkIdempotency(consumer, msg); err != nil {
+	idempotentKey, err := cm.checkIdempotency(consumer, msg)
+	if err != nil {
 		g.Log().Warningf(cm.ctx, "消息幂等性检查失败或已处理: consumer=%s, messageID=%s, error=%v",
 			consumer.GetName(), msg.MessageId, err)
 		// 已处理过的消息直接确认
@@ -275,7 +276,7 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 	}
 
 	start := time.Now()
-	err := consumer.HandleMessage(cm.ctx, msg)
+	err = consumer.HandleMessage(cm.ctx, msg)
 	duration := time.Since(start)
 
 	if err != nil {
@@ -285,27 +286,34 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 		// 检查重试次数
 		retryCount := cm.getMessageRetryCount(msg)
 		config := consumer.GetConfig()
-		
+
 		// 根据错误类型和重试次数决定是否重新入队
 		if shouldRequeue(err) && (config.MaxRetries <= 0 || retryCount < config.MaxRetries) {
+			if idempotentKey != "" {
+				if releaseErr := idempotent.ReleaseLock(cm.ctx, idempotentKey); releaseErr != nil {
+					g.Log().Warningf(cm.ctx, "释放消息幂等锁失败，可能影响后续重试: consumer=%s, key=%s, error=%v",
+						consumer.GetName(), idempotentKey, releaseErr)
+				}
+			}
+
 			// 增加重试计数
 			newRetryCount := retryCount + 1
-			g.Log().Infof(cm.ctx, "消息将重新入队，当前重试次数: %d, 最大重试次数: %d", 
+			g.Log().Infof(cm.ctx, "消息将重新入队，当前重试次数: %d, 最大重试次数: %d",
 				newRetryCount, config.MaxRetries)
-			
+
 			// 更新消息头中的重试次数
 			if msg.Headers == nil {
 				msg.Headers = make(amqp.Table)
 			}
 			msg.Headers["x-retry-count"] = newRetryCount
-			
+
 			// 在重新入队前发布一条带有更新后重试次数的消息
 			// 注意：这里我们仍然使用Nack让消息重新入队，但会记录重试次数
 			// 在实际场景中，如果需要更精确的控制，可以先Nack(false,false)然后重新发布带有新header的消息
 			msg.Nack(false, true) // 重新入队
 		} else {
-			g.Log().Warningf(cm.ctx, "消息达到最大重试次数或为永久性错误，不再重试，重试次数: %d, 最大重试次数: %d", 
-			retryCount, config.MaxRetries)
+			g.Log().Warningf(cm.ctx, "消息达到最大重试次数或为永久性错误，不再重试，重试次数: %d, 最大重试次数: %d",
+				retryCount, config.MaxRetries)
 			msg.Nack(false, false) // 不重新入队
 		}
 		return
@@ -319,8 +327,8 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 	}
 }
 
-// checkIdempotency 检查消息的幂等性
-func (cm *ConsumerManager) checkIdempotency(consumer Consumer, msg amqp.Delivery) error {
+// checkIdempotency 检查消息的幂等性，并返回本次成功获取到的幂等 key。
+func (cm *ConsumerManager) checkIdempotency(consumer Consumer, msg amqp.Delivery) (string, error) {
 	// 获取消息相关信息
 	messageID := msg.MessageId
 	if messageID == "" {
@@ -336,7 +344,7 @@ func (cm *ConsumerManager) checkIdempotency(consumer Consumer, msg amqp.Delivery
 	if err := UnmarshalEvent(msg.Body, &event); err == nil {
 		businessID = consumer.GetBusinessID(msg.Body, event)
 	}
-	
+
 	// 2. 如果消费者没有提供业务ID，尝试从消息头获取
 	if businessID == "" {
 		if businessIDHeader, exists := msg.Headers["business_id"]; exists {
@@ -365,15 +373,15 @@ func (cm *ConsumerManager) checkIdempotency(consumer Consumer, msg amqp.Delivery
 	if err != nil {
 		// 幂等性服务错误，为了不阻塞业务流程，暂时允许继续处理
 		g.Log().Errorf(cm.ctx, "幂等性检查服务错误: key=%s, error=%v", key, err)
-		return nil // 允许处理，不视为错误
+		return "", nil // 允许处理，不视为错误
 	}
 
 	if !locked {
 		// 已存在幂等锁，说明消息已处理过
-		return fmt.Errorf("消息已处理过")
+		return "", fmt.Errorf("消息已处理过")
 	}
 
-	return nil
+	return key, nil
 }
 
 // 定义错误类型，用于控制重试行为
@@ -382,7 +390,7 @@ type (
 	TemporaryError struct {
 		Err error
 	}
-	
+
 	// PermanentError 永久性错误，表示不应该重试
 	PermanentError struct {
 		Err error
@@ -438,7 +446,7 @@ func shouldRequeue(err error) bool {
 	if errors.As(err, &tempErr) {
 		return true
 	}
-	
+
 	// 对于其他类型的错误，可以根据错误信息判断
 	// 例如网络错误、连接错误等临时性问题可以重试
 	errMsg := err.Error()
@@ -451,13 +459,13 @@ func shouldRequeue(err error) bool {
 		"reset by peer",
 		"deadline exceeded",
 	}
-	
+
 	for _, pattern := range temporaryErrorPatterns {
 		if strings.Contains(strings.ToLower(errMsg), strings.ToLower(pattern)) {
 			return true
 		}
 	}
-	
+
 	// 默认不重新入队
 	return false
 }

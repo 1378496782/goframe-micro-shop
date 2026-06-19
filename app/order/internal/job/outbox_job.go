@@ -17,8 +17,8 @@ import (
 // 投递到 RabbitMQ，成功标记 sent，失败按指数退避重试。
 func StartOutboxRelayJob(ctx context.Context) {
 	go func() {
-		// 每 5 秒扫一轮。Outbox 消息要尽快发出去，间隔比销量补偿任务短。
-		ticker := time.NewTicker(5 * time.Second)
+		// 每 50 秒扫一轮。Outbox 消息要尽快发出去，间隔比销量补偿任务短。
+		ticker := time.NewTicker(50 * time.Second)
 		defer ticker.Stop()
 
 		// running 防止同一进程内上一轮还没跑完就重入。

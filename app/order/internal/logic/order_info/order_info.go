@@ -857,11 +857,10 @@ func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrd
 		return nil, gerror.NewCode(gcode.CodeNotFound, "订单不存在")
 	}
 
-	// 查 order_goods_info 商品快照
-	var goodsList []*entity.OrderGoodsInfo
-	err = dao.OrderGoodsInfo.Ctx(ctx).Where("order_id", req.Id).Scan(&goodsList)
+	var order entity.OrderInfo
+	err = record.Struct(&order)
 	if err != nil {
-		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "查询订单商品失败")
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "查询订单失败")
 	}
 
 	// 只有待支付订单才允许取消
@@ -878,35 +877,15 @@ func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrd
 		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "订单不存在或状态不允许取消")
 	}
 
-	// 恢复库存
-	goodsIds := []uint32{}
-	counts := []uint32{}
-	for _, item := range goodsList {
-		goodsIds = append(goodsIds, uint32(item.GoodsId))
-		counts = append(counts, uint32(item.Count))
+	event := grabbitmq.OrderCancelledEvent{
+		OrderNumber: order.Number,
+		Reason:      "user_cancel",
+		CancelledAt: gtime.Now().Format("2006-01-02 15:04:05"),
 	}
-	if _, err = goods.Client.RestoreStock(ctx, &goods_info.RestoreStockReq{
-		GoodsIds: goodsIds,
-		Counts:   counts,
-	}); err != nil {
-		g.Log().Errorf(ctx, "恢复商品库存失败: %v", err)
 
-		// 恢复库存失败，回滚订单状态
-		ok, err = UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
-			UserId:     req.UserId,
-			OrderId:    req.Id,
-			FromStatus: int(consts.OrderStatusCancelled),
-			ToStatus:   int(consts.OrderStatusPendingPayment),
-		})
-		if err != nil {
-			g.Log().Errorf(ctx, "回滚订单状态失败: %v", err)
-			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
-		}
-		if !ok {
-			g.Log().Warningf(ctx, "回滚订单状态未生效, 订单ID: %d", req.Id)
-		}
-
-		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "恢复商品库存失败")
+	err = grabbitmq.PublishOrderCancelledEvent(ctx, event)
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "订单已取消，但发布库存恢复事件失败")
 	}
 
 	return &v1.CancelOrderRes{

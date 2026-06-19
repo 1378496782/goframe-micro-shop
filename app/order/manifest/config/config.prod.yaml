@@ -42,13 +42,16 @@ rabbitmq:
     couponConfirmExchange: "coupon.confirm.exchange"
     couponConfirmResultExchange: "coupon.confirm.result.exchange"
     orderExchange: "order.events.exchange"
+    orderCancelledExchange: "order.cancelled.exchange"
     goodsStockExchange: "goods.stock.exchange"
   queue:
     orderPaidSalesQueue: "order.paid.sales.queue"
+    orderCancelledQueue: "order.cancelled.stock.queue"
     orderTimeoutQueue: "order.timeout.queue"
     couponConfirmResultQueue: "coupon.confirm.result.queue"
   routingKey:
     orderPaid: "order.paid"
+    orderCancelled: "order.cancelled"
     orderTimeout: "order.timeout"
     couponConfirm: "coupon.confirm.request"
     couponConfirmResult: "coupon.confirm.result"

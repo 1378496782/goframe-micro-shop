@@ -96,6 +96,10 @@ func setupConsumers(ctx context.Context, manager *rabbitmq.ConsumerManager) {
 	orderPaidSalesConsumer := consumer.NewOrderPaidSalesConsumer(ctx)
 	manager.AddConsumer(orderPaidSalesConsumer)
 
+	// 添加订单取消消费者
+	orderCancelledConsumer := consumer.NewOrderCancelledConsumer(ctx)
+	manager.AddConsumer(orderCancelledConsumer)
+
 	// 可以继续添加更多消费者...
 	// anotherConsumer := consumer.NewAnotherConsumer(ctx)
 	// manager.AddConsumer(anotherConsumer)
