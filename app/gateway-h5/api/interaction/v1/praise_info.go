@@ -21,8 +21,8 @@ type PraiseInfoCreateRes struct {
 type PraiseInfoDeleteReq struct {
 	g.Meta   `path:"/praise" method:"delete" tags:"点赞管理" summary:"删除点赞"`
 	Id       uint32 `json:"id"       v:"required" dc:"点赞ID"`
-	Type     uint32 `json:"type"     v:"required|in:1,2" dc:"点赞类型：1商品 2文章"`
-	ObjectId uint32 `json:"objectId" v:"required" dc:"对象ID"`
+	Type     uint32 `json:"type"     v:"in:1,2" dc:"点赞类型：1商品 2文章"`
+	ObjectId uint32 `json:"objectId" dc:"对象ID"`
 }
 
 // PraiseInfoDeleteRes 删除点赞响应

@@ -14,8 +14,9 @@ service praise_info {
 
 // 新增消息定义
 message PraiseInfoCreateReq {
-  uint32                     ObjectId  = 1; // 对象id
-  uint32                     Type      = 2; // 收藏类型：1商品 2文章
+  uint32 object_id = 1; // 对象id
+  uint32 type = 2; // 收藏类型：1商品 2文章
+  uint32 user_id = 3; // 用户id
 }
 
 message PraiseInfoCreateRes {
@@ -23,9 +24,10 @@ message PraiseInfoCreateRes {
 }
 
 message PraiseInfoDeleteReq {
-  uint32                     Id        = 1; //
-  uint32                     Type      = 2; // 收藏类型：1商品 2文章
-  uint32                     ObjectId  = 3; // 对象id
+  uint32 id = 1; //
+  uint32 type = 2; // 收藏类型：1商品 2文章
+  uint32 object_id = 3; // 对象id
+  uint32 user_id = 4; // 用户id
 }
 
 message PraiseInfoDeleteRes {
