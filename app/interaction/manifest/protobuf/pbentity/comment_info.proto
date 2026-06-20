@@ -20,4 +20,5 @@ message CommentInfo {
     google.protobuf.Timestamp CreatedAt = 7; //
     google.protobuf.Timestamp UpdatedAt = 8; //
     google.protobuf.Timestamp DeletedAt = 9; //
+    repeated CommentInfo      Replies   = 10; // 子回复列表
 }

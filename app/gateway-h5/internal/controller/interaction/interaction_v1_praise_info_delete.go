@@ -17,8 +17,8 @@ func (c *ControllerV1) PraiseInfoDelete(ctx context.Context, req *v1.PraiseInfoD
 	if err := gconv.Struct(req, grpcReq); err != nil {
 		return nil, err
 	}
-	Value := ctx.Value(middleware.CtxUserId)
-	userId, ok := Value.(uint32)
+	value := ctx.Value(middleware.CtxUserId)
+	userId, ok := value.(uint32)
 	if !ok {
 		return nil, fmt.Errorf("用户ID类型错误或不存在")
 	}

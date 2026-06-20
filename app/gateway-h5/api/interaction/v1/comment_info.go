@@ -7,9 +7,12 @@ import (
 
 // 评论分页查询
 type CommentInfoGetListReq struct {
-	g.Meta `path:"/comment" method:"get" tags:"评论管理" sm:"评论分页列表"`
-	Page   uint32 `json:"page" d:"1"  v:"min:1" dc:"页码"`
-	Size   uint32 `json:"size" d:"10" v:"max:100" dc:"每页数量"`
+	g.Meta   `path:"/comment" method:"get" tags:"评论管理" sm:"评论分页列表"`
+	ObjectId uint32 `json:"object_id" v:"required" dc:"对象ID"`
+	Type     uint32 `json:"type" v:"required|in:1,2" dc:"评论类型：1商品 2文章"`
+	ParentId uint32 `json:"parent_id" d:"0" dc:"父级评论ID，0 表示一级评论"`
+	Page     uint32 `json:"page" d:"1"  v:"min:1" dc:"页码"`
+	Size     uint32 `json:"size" d:"10" v:"max:100" dc:"每页数量"`
 }
 
 type CommentInfoGetListRes struct {
@@ -28,6 +31,7 @@ type CommentInfoItem struct {
 	Content   string                 `json:"content" dc:"评论内容"`
 	CreatedAt *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
 	UpdatedAt *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
+	Replies   []*CommentInfoItem     `json:"replies" dc:"子回复列表"`
 }
 
 // 创建评论

@@ -30,6 +30,7 @@ type CommentInfoCreateReq struct {
 	Type          uint32                 `protobuf:"varint,2,opt,name=Type,proto3" json:"Type,omitempty" dc:"评论类型：1商品 2文章"`   // 评论类型：1商品 2文章
 	ParentId      uint32                 `protobuf:"varint,3,opt,name=ParentId,proto3" json:"ParentId,omitempty" dc:"父级评论id"` // 父级评论id
 	Content       string                 `protobuf:"bytes,4,opt,name=Content,proto3" json:"Content,omitempty" dc:"评论内容"`      // 评论内容
+	UserID        uint32                 `protobuf:"varint,5,opt,name=UserID,proto3" json:"UserID,omitempty" dc:"用户id"`       // 用户id
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -92,6 +93,13 @@ func (x *CommentInfoCreateReq) GetContent() string {
 	return ""
 }
 
+func (x *CommentInfoCreateReq) GetUserID() uint32 {
+	if x != nil {
+		return x.UserID
+	}
+	return 0
+}
+
 type CommentInfoCreateRes struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -139,6 +147,7 @@ func (x *CommentInfoCreateRes) GetId() uint32 {
 type CommentInfoDeleteReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        uint32                 `protobuf:"varint,2,opt,name=userId,proto3" json:"userId,omitempty" dc:"用户id"` // 用户id
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -176,6 +185,13 @@ func (*CommentInfoDeleteReq) Descriptor() ([]byte, []int) {
 func (x *CommentInfoDeleteReq) GetId() uint32 {
 	if x != nil {
 		return x.Id
+	}
+	return 0
+}
+
+func (x *CommentInfoDeleteReq) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
 	}
 	return 0
 }
@@ -226,8 +242,11 @@ func (x *CommentInfoDeleteRes) GetId() uint32 {
 
 type CommentInfoGetListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          uint32                 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"` // 修改：字段编号必须从1开始递增
+	ObjectId      uint32                 `protobuf:"varint,1,opt,name=object_id,json=objectId,proto3" json:"object_id,omitempty" dc:"对象id"`            // 对象id
+	Type          uint32                 `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty" dc:"评论类型：1商品 2文章"`                            // 评论类型：1商品 2文章
+	ParentId      uint32                 `protobuf:"varint,3,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty" dc:"父级评论id，0 表示一级评论"` // 父级评论id，0 表示一级评论
+	Page          uint32                 `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`
+	Size          uint32                 `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"` // 修改：字段编号必须从1开始递增
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -260,6 +279,27 @@ func (x *CommentInfoGetListReq) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CommentInfoGetListReq.ProtoReflect.Descriptor instead.
 func (*CommentInfoGetListReq) Descriptor() ([]byte, []int) {
 	return file_comment_info_v1_comment_info_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CommentInfoGetListReq) GetObjectId() uint32 {
+	if x != nil {
+		return x.ObjectId
+	}
+	return 0
+}
+
+func (x *CommentInfoGetListReq) GetType() uint32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *CommentInfoGetListReq) GetParentId() uint32 {
+	if x != nil {
+		return x.ParentId
+	}
+	return 0
 }
 
 func (x *CommentInfoGetListReq) GetPage() uint32 {
@@ -392,21 +432,26 @@ var File_comment_info_v1_comment_info_proto protoreflect.FileDescriptor
 
 const file_comment_info_v1_comment_info_proto_rawDesc = "" +
 	"\n" +
-	"\"comment_info/v1/comment_info.proto\x12\x0fcomment_info.v1\x1a\x1bpbentity/comment_info.proto\"|\n" +
+	"\"comment_info/v1/comment_info.proto\x12\x0fcomment_info.v1\x1a\x1bpbentity/comment_info.proto\"\x94\x01\n" +
 	"\x14CommentInfoCreateReq\x12\x1a\n" +
 	"\bObjectId\x18\x01 \x01(\rR\bObjectId\x12\x12\n" +
 	"\x04Type\x18\x02 \x01(\rR\x04Type\x12\x1a\n" +
 	"\bParentId\x18\x03 \x01(\rR\bParentId\x12\x18\n" +
-	"\aContent\x18\x04 \x01(\tR\aContent\"&\n" +
+	"\aContent\x18\x04 \x01(\tR\aContent\x12\x16\n" +
+	"\x06UserID\x18\x05 \x01(\rR\x06UserID\"&\n" +
 	"\x14CommentInfoCreateRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"&\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\">\n" +
 	"\x14CommentInfoDeleteReq\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"&\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12\x16\n" +
+	"\x06userId\x18\x02 \x01(\rR\x06userId\"&\n" +
 	"\x14CommentInfoDeleteRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"?\n" +
-	"\x15CommentInfoGetListReq\x12\x12\n" +
-	"\x04page\x18\x01 \x01(\rR\x04page\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\rR\x04size\"\x82\x01\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"\x8d\x01\n" +
+	"\x15CommentInfoGetListReq\x12\x1b\n" +
+	"\tobject_id\x18\x01 \x01(\rR\bobjectId\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\rR\x04type\x12\x1b\n" +
+	"\tparent_id\x18\x03 \x01(\rR\bparentId\x12\x12\n" +
+	"\x04page\x18\x04 \x01(\rR\x04page\x12\x12\n" +
+	"\x04size\x18\x05 \x01(\rR\x04size\"\x82\x01\n" +
 	"\x17CommentInfoListResponse\x12)\n" +
 	"\x04list\x18\x01 \x03(\v2\x15.pbentity.CommentInfoR\x04list\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +

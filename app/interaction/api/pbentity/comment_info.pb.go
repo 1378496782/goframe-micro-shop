@@ -38,6 +38,7 @@ type CommentInfo struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`            //
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`            //
 	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=DeletedAt,proto3" json:"DeletedAt,omitempty"`            //
+	Replies       []*CommentInfo         `protobuf:"bytes,10,rep,name=Replies,proto3" json:"Replies,omitempty" dc:"子回复列表"`    // 子回复列表
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -135,11 +136,18 @@ func (x *CommentInfo) GetDeletedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *CommentInfo) GetReplies() []*CommentInfo {
+	if x != nil {
+		return x.Replies
+	}
+	return nil
+}
+
 var File_pbentity_comment_info_proto protoreflect.FileDescriptor
 
 const file_pbentity_comment_info_proto_rawDesc = "" +
 	"\n" +
-	"\x1bpbentity/comment_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc9\x02\n" +
+	"\x1bpbentity/comment_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfa\x02\n" +
 	"\vCommentInfo\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\x05R\x02Id\x12\x1a\n" +
 	"\bParentId\x18\x02 \x01(\x05R\bParentId\x12\x16\n" +
@@ -149,7 +157,9 @@ const file_pbentity_comment_info_proto_rawDesc = "" +
 	"\aContent\x18\x06 \x01(\tR\aContent\x128\n" +
 	"\tCreatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\x128\n" +
 	"\tUpdatedAt\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tUpdatedAt\x128\n" +
-	"\tDeletedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAtBCZAshop-goframe-micro-service-refacotor/app/interaction/api/pbentityb\x06proto3"
+	"\tDeletedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAt\x12/\n" +
+	"\aReplies\x18\n" +
+	" \x03(\v2\x15.pbentity.CommentInfoR\aRepliesBCZAshop-goframe-micro-service-refacotor/app/interaction/api/pbentityb\x06proto3"
 
 var (
 	file_pbentity_comment_info_proto_rawDescOnce sync.Once
@@ -172,11 +182,12 @@ var file_pbentity_comment_info_proto_depIdxs = []int32{
 	1, // 0: pbentity.CommentInfo.CreatedAt:type_name -> google.protobuf.Timestamp
 	1, // 1: pbentity.CommentInfo.UpdatedAt:type_name -> google.protobuf.Timestamp
 	1, // 2: pbentity.CommentInfo.DeletedAt:type_name -> google.protobuf.Timestamp
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0, // 3: pbentity.CommentInfo.Replies:type_name -> pbentity.CommentInfo
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_pbentity_comment_info_proto_init() }
