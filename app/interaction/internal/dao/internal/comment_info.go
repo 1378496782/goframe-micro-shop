@@ -29,6 +29,8 @@ type CommentInfoColumns struct {
 	ObjectId    string //
 	Type        string // 评论类型：1商品 2文章
 	Content     string // 评论内容
+	LikeCount   string // 点赞数
+	ReplyCount  string // 回复数
 	CreatedAt   string //
 	UpdatedAt   string //
 	DeletedAt   string //
@@ -44,6 +46,8 @@ var commentInfoColumns = CommentInfoColumns{
 	ObjectId:    "object_id",
 	Type:        "type",
 	Content:     "content",
+	LikeCount:   "like_count",
+	ReplyCount:  "reply_count",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 	DeletedAt:   "deleted_at",

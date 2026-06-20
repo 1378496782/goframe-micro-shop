@@ -20,6 +20,8 @@ type CommentInfo struct {
 	ObjectId    interface{} //
 	Type        interface{} // 评论类型：1商品 2文章
 	Content     interface{} // 评论内容
+	LikeCount   interface{} // 点赞数
+	ReplyCount  interface{} // 回复数
 	CreatedAt   *gtime.Time //
 	UpdatedAt   *gtime.Time //
 	DeletedAt   *gtime.Time //

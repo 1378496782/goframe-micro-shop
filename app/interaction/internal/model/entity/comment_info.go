@@ -18,6 +18,8 @@ type CommentInfo struct {
 	ObjectId    int         `json:"objectId"    orm:"object_id"     description:""`             //
 	Type        int         `json:"type"        orm:"type"          description:"评论类型：1商品 2文章"` // 评论类型：1商品 2文章
 	Content     string      `json:"content"     orm:"content"       description:"评论内容"`         // 评论内容
+	LikeCount   int         `json:"likeCount"   orm:"like_count"    description:"点赞数"`          // 点赞数
+	ReplyCount  int         `json:"replyCount"  orm:"reply_count"   description:"回复数"`          // 回复数
 	CreatedAt   *gtime.Time `json:"createdAt"   orm:"created_at"    description:""`             //
 	UpdatedAt   *gtime.Time `json:"updatedAt"   orm:"updated_at"    description:""`             //
 	DeletedAt   *gtime.Time `json:"deletedAt"   orm:"deleted_at"    description:""`             //
