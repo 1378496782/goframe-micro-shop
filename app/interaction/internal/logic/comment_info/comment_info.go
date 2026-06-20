@@ -60,8 +60,16 @@ func Create(ctx context.Context, req *v1.CommentInfoCreateReq) (res *v1.CommentI
 	return &v1.CommentInfoCreateRes{Id: uint32(result)}, nil
 }
 
+// GetList 分页查询某个对象（如商品/文章）的评论列表。
+//
+// 评论展示为两段：顶层评论（parent_id=0）和它们下面的回复列表。
+// 当请求查询顶层评论（req.ParentId==0）时，本方法会额外把这一页每条顶层评论
+// 的所有后代回复一并查出并挂到 Replies 字段；查询某条评论下的回复时（req.ParentId!=0）
+// 则只返回该层数据，不再向下展开。
+//
+// 回复采用「一次性批量查询 + 内存分组」的方式挂载，避免对每条顶层评论各查一次（N+1）。
 func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.CommentInfoGetListRes, err error) {
-	// 初始化响应结构
+	// 初始化响应结构：List 预置为空切片，避免无数据时返回 null
 	response := &v1.CommentInfoListResponse{
 		List:  make([]*pbentity.CommentInfo, 0),
 		Page:  req.Page,
@@ -71,13 +79,15 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 	// 错误类型
 	infoError := consts.InfoError(consts.CommentInfo, consts.GetListFail)
 
+	// 基础查询条件：限定对象、评论类型、父级（parent_id），并排除软删除的记录。
+	// req.ParentId==0 表示查顶层评论，非 0 表示查某条评论下的回复。
 	query := dao.CommentInfo.Ctx(ctx).
 		Where(dao.CommentInfo.Columns().ObjectId, req.ObjectId).
 		Where(dao.CommentInfo.Columns().Type, req.Type).
 		Where(dao.CommentInfo.Columns().ParentId, req.ParentId).
 		WhereNull(dao.CommentInfo.Columns().DeletedAt)
 
-	// 查询总数
+	// 查询总数（用于前端分页，反映满足条件的全部条数，与本页返回条数无关）
 	total, err := query.Count()
 	if err != nil {
 		// 记录错误日志
@@ -86,7 +96,7 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 	}
 	response.Total = uint32(total)
 
-	// 查询当前页数据
+	// 查询当前页数据，按 id 倒序（最新的评论排在前面）
 	commentRecords, err := query.
 		Page(int(req.Page), int(req.Size)).
 		OrderDesc(dao.CommentInfo.Columns().Id).
@@ -96,25 +106,31 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 
-	parentIds := make([]int, 0, len(commentRecords))
+	// 逐条转换为 pb 结构填入响应；同时收集本页顶层评论的 id，供后续批量查回复用。
+	rootIds := make([]int, 0, len(commentRecords))
 	for _, record := range commentRecords {
 		var comment entity.CommentInfo
+		// 单条转换失败只跳过该条，不中断整批
 		if err := record.Struct(&comment); err != nil {
 			continue
 		}
 
 		pbComment := convertCommentEntity(comment)
 		response.List = append(response.List, pbComment)
+		// 只有在查顶层评论时才需要继续查它们的回复
 		if req.ParentId == 0 {
-			parentIds = append(parentIds, comment.Id)
+			rootIds = append(rootIds, comment.Id)
 		}
 	}
 
-	if req.ParentId == 0 && len(parentIds) > 0 {
+	// 查顶层评论时，批量加载这一页所有顶层评论的回复并挂载到对应评论上
+	if req.ParentId == 0 && len(rootIds) > 0 {
+		// 用 root_id IN (...) 一次查出本页所有顶层评论的回复，避免 N+1 查询。
+		// 回复按 id 升序（同一条评论下按时间正序展示）。
 		replyRecords, err := dao.CommentInfo.Ctx(ctx).
 			Where(dao.CommentInfo.Columns().ObjectId, req.ObjectId).
 			Where(dao.CommentInfo.Columns().Type, req.Type).
-			WhereIn(dao.CommentInfo.Columns().ParentId, parentIds).
+			WhereIn(dao.CommentInfo.Columns().RootId, rootIds).
 			WhereNull(dao.CommentInfo.Columns().DeletedAt).
 			OrderAsc(dao.CommentInfo.Columns().Id).
 			All()
@@ -123,6 +139,7 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 		}
 
+		// 按 root_id 把回复分组到 map：root_id -> 该顶层评论的回复列表
 		replyMap := make(map[int32][]*pbentity.CommentInfo)
 		for _, record := range replyRecords {
 			var reply entity.CommentInfo
@@ -131,9 +148,10 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 			}
 
 			pbReply := convertCommentEntity(reply)
-			replyMap[pbReply.ParentId] = append(replyMap[pbReply.ParentId], pbReply)
+			replyMap[pbReply.RootId] = append(replyMap[pbReply.RootId], pbReply)
 		}
 
+		// 把分组好的回复回填到对应顶层评论的 Replies 字段
 		for _, comment := range response.List {
 			if replies, ok := replyMap[comment.Id]; ok {
 				comment.Replies = replies
