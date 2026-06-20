@@ -6,6 +6,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/goods"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/interaction"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/order"
+	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/search"
 	"shop-goframe-micro-service-refacotor/app/gateway-h5/internal/controller/user"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 
@@ -28,6 +29,7 @@ var (
 			bannerController := banner.NewV1()
 			interactionController := interaction.NewV1()
 			orderController := order.NewV1()
+			searchController := search.NewV1()
 			// flashSaleController := flash_sale.NewV1()
 
 			s.Group("/frontend", func(group *ghttp.RouterGroup) {
@@ -47,6 +49,7 @@ var (
 						goodsController.GoodsInfoGetList,
 						bannerController,
 						goodsController.RecommendGoodsInfoGetList,
+						searchController.SearchGoods,
 						// 秒杀相关接口 - 无需认证
 						// flashSaleController.FlashSaleGoodsList,
 						// flashSaleController.FlashSaleGoodsDetail,

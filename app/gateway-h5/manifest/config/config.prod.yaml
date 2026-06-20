@@ -15,3 +15,6 @@ server:
 
 etcd:
   address: "etcd:2379"
+
+search:
+  serviceUrl: "http://search-service:8499"

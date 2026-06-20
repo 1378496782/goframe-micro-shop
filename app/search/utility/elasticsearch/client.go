@@ -87,7 +87,16 @@ func createGoodsIndex(ctx context.Context) error {
 				},
 				"stock": {"type": "long"},
 				"sale": {"type": "long"},
-				"tags": {"type": "keyword"},
+				"tags": {
+					"type": "keyword",
+					"fields": {
+						"text": {
+							"type": "text",
+							"analyzer": "ik_max_word",
+							"search_analyzer": "ik_smart"
+						}
+					}
+				},
 				"detail_info": {"type": "text"},
 				"created_at": {"type": "text"},
 				"updated_at": {"type": "text"},
