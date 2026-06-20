@@ -9,7 +9,7 @@ import (
 type PraiseInfoCreateReq struct {
 	g.Meta   `path:"/praise" method:"post" tags:"点赞管理" summary:"创建点赞"`
 	ObjectId uint32 `json:"objectId" v:"required" dc:"对象ID"`
-	Type     uint32 `json:"type"     v:"required|in:1,2" dc:"点赞类型：1商品 2文章"`
+	Type     uint32 `json:"type"     v:"required|in:1,2" dc:"点赞类型：1文章 2评论/回复"`
 }
 
 // PraiseInfoCreateRes 创建点赞响应
@@ -21,7 +21,7 @@ type PraiseInfoCreateRes struct {
 type PraiseInfoDeleteReq struct {
 	g.Meta   `path:"/praise" method:"delete" tags:"点赞管理" summary:"删除点赞"`
 	Id       uint32 `json:"id"       v:"required" dc:"点赞ID"`
-	Type     uint32 `json:"type"     v:"in:1,2" dc:"点赞类型：1商品 2文章"`
+	Type     uint32 `json:"type"     v:"required|in:1,2" dc:"点赞类型：1文章 2评论/回复"`
 	ObjectId uint32 `json:"objectId" dc:"对象ID"`
 }
 
@@ -33,7 +33,7 @@ type PraiseInfoDeleteRes struct {
 // PraiseInfoGetListReq 获取点赞列表请求
 type PraiseInfoGetListReq struct {
 	g.Meta `path:"/praise" method:"get" tags:"点赞管理" summary:"获取点赞列表"`
-	Type   uint32 `json:"type" v:"required|in:1,2" dc:"点赞类型：1商品 2文章"`
+	Type   uint32 `json:"type" v:"required|in:1,2" dc:"点赞类型：1文章 2评论/回复"`
 	Page   uint32 `json:"page" v:"min:1" dc:"页码" d:"1"`
 	Size   uint32 `json:"size" v:"max:100" dc:"每页数量" d:"10"`
 }
@@ -50,7 +50,7 @@ type PraiseInfoGetListRes struct {
 type PraiseInfoItem struct {
 	Id        uint32                 `json:"id"        dc:"点赞ID"`
 	UserId    uint32                 `json:"userId"    dc:"用户ID"`
-	Type      uint32                 `json:"type"      dc:"点赞类型：1商品 2文章"`
+	Type      uint32                 `json:"type"      dc:"点赞类型：1文章 2评论/回复"`
 	ObjectId  uint32                 `json:"objectId"  dc:"点赞对象ID"`
 	CreatedAt *timestamppb.Timestamp `json:"createdAt" dc:"创建时间"`
 	UpdatedAt *timestamppb.Timestamp `json:"updatedAt" dc:"更新时间"`
