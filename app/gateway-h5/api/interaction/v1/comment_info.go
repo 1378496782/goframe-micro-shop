@@ -23,15 +23,17 @@ type CommentInfoGetListRes struct {
 }
 
 type CommentInfoItem struct {
-	Id        uint32                 `json:"id" dc:"评论ID"`
-	UserId    uint32                 `json:"user_id" dc:"用户ID"`
-	ObjectId  uint32                 `json:"object_id" dc:"对象ID"`
-	Type      uint32                 `json:"type" dc:"评论类型：1商品 2文章"`
-	ParentId  uint32                 `json:"parent_id" dc:"父级评论ID"`
-	Content   string                 `json:"content" dc:"评论内容"`
-	CreatedAt *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
-	UpdatedAt *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
-	Replies   []*CommentInfoItem     `json:"replies" dc:"子回复列表"`
+	Id          uint32                 `json:"id" dc:"评论ID"`
+	UserId      uint32                 `json:"user_id" dc:"用户ID"`
+	ObjectId    uint32                 `json:"object_id" dc:"对象ID"`
+	Type        uint32                 `json:"type" dc:"评论类型：1商品 2文章"`
+	ParentId    uint32                 `json:"parent_id" dc:"父级评论ID"`
+	Content     string                 `json:"content" dc:"评论内容"`
+	RootId      uint32                 `json:"root_id" dc:"一级评论ID"`
+	ReplyUserId uint32                 `json:"reply_user_id" dc:"被回复用户ID"`
+	CreatedAt   *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
+	UpdatedAt   *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
+	Replies     []*CommentInfoItem     `json:"replies" dc:"子回复列表"`
 }
 
 // 创建评论

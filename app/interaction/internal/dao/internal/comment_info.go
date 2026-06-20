@@ -21,28 +21,32 @@ type CommentInfoDao struct {
 
 // CommentInfoColumns defines and stores column names for the table comment_info.
 type CommentInfoColumns struct {
-	Id        string //
-	ParentId  string // 父级评论id
-	UserId    string //
-	ObjectId  string //
-	Type      string // 评论类型：1商品 2文章
-	Content   string // 评论内容
-	CreatedAt string //
-	UpdatedAt string //
-	DeletedAt string //
+	Id          string //
+	ParentId    string // 父级评论id
+	RootId      string // 一级评论id
+	UserId      string //
+	ReplyUserId string // 被回复用户id
+	ObjectId    string //
+	Type        string // 评论类型：1商品 2文章
+	Content     string // 评论内容
+	CreatedAt   string //
+	UpdatedAt   string //
+	DeletedAt   string //
 }
 
 // commentInfoColumns holds the columns for the table comment_info.
 var commentInfoColumns = CommentInfoColumns{
-	Id:        "id",
-	ParentId:  "parent_id",
-	UserId:    "user_id",
-	ObjectId:  "object_id",
-	Type:      "type",
-	Content:   "content",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
-	DeletedAt: "deleted_at",
+	Id:          "id",
+	ParentId:    "parent_id",
+	RootId:      "root_id",
+	UserId:      "user_id",
+	ReplyUserId: "reply_user_id",
+	ObjectId:    "object_id",
+	Type:        "type",
+	Content:     "content",
+	CreatedAt:   "created_at",
+	UpdatedAt:   "updated_at",
+	DeletedAt:   "deleted_at",
 }
 
 // NewCommentInfoDao creates and returns a new DAO object for table data access.

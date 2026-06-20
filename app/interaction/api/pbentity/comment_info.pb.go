@@ -29,16 +29,18 @@ const (
 
 type CommentInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`                         //
-	ParentId      int32                  `protobuf:"varint,2,opt,name=ParentId,proto3" json:"ParentId,omitempty" dc:"父级评论id"` // 父级评论id
-	UserId        int32                  `protobuf:"varint,3,opt,name=UserId,proto3" json:"UserId,omitempty"`                 //
-	ObjectId      int32                  `protobuf:"varint,4,opt,name=ObjectId,proto3" json:"ObjectId,omitempty"`             //
-	Type          int32                  `protobuf:"varint,5,opt,name=Type,proto3" json:"Type,omitempty" dc:"评论类型：1商品 2文章"`   // 评论类型：1商品 2文章
-	Content       string                 `protobuf:"bytes,6,opt,name=Content,proto3" json:"Content,omitempty" dc:"评论内容"`      // 评论内容
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`            //
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`            //
-	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=DeletedAt,proto3" json:"DeletedAt,omitempty"`            //
-	Replies       []*CommentInfo         `protobuf:"bytes,10,rep,name=Replies,proto3" json:"Replies,omitempty" dc:"子回复列表"`    // 子回复列表
+	Id            int32                  `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
+	ParentId      int32                  `protobuf:"varint,2,opt,name=ParentId,proto3" json:"ParentId,omitempty"`
+	RootId        int32                  `protobuf:"varint,3,opt,name=RootId,proto3" json:"RootId,omitempty" dc:"一级评论id"` // 一级评论id
+	UserId        int32                  `protobuf:"varint,4,opt,name=UserId,proto3" json:"UserId,omitempty"`
+	ReplyUserId   int32                  `protobuf:"varint,5,opt,name=ReplyUserId,proto3" json:"ReplyUserId,omitempty" dc:"被回复用户id"` // 被回复用户id
+	ObjectId      int32                  `protobuf:"varint,6,opt,name=ObjectId,proto3" json:"ObjectId,omitempty"`
+	Type          int32                  `protobuf:"varint,7,opt,name=Type,proto3" json:"Type,omitempty"`
+	Content       string                 `protobuf:"bytes,8,opt,name=Content,proto3" json:"Content,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=DeletedAt,proto3" json:"DeletedAt,omitempty"`
+	Replies       []*CommentInfo         `protobuf:"bytes,12,rep,name=Replies,proto3" json:"Replies,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -87,9 +89,23 @@ func (x *CommentInfo) GetParentId() int32 {
 	return 0
 }
 
+func (x *CommentInfo) GetRootId() int32 {
+	if x != nil {
+		return x.RootId
+	}
+	return 0
+}
+
 func (x *CommentInfo) GetUserId() int32 {
 	if x != nil {
 		return x.UserId
+	}
+	return 0
+}
+
+func (x *CommentInfo) GetReplyUserId() int32 {
+	if x != nil {
+		return x.ReplyUserId
 	}
 	return 0
 }
@@ -147,19 +163,21 @@ var File_pbentity_comment_info_proto protoreflect.FileDescriptor
 
 const file_pbentity_comment_info_proto_rawDesc = "" +
 	"\n" +
-	"\x1bpbentity/comment_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfa\x02\n" +
+	"\x1bpbentity/comment_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb4\x03\n" +
 	"\vCommentInfo\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\x05R\x02Id\x12\x1a\n" +
 	"\bParentId\x18\x02 \x01(\x05R\bParentId\x12\x16\n" +
-	"\x06UserId\x18\x03 \x01(\x05R\x06UserId\x12\x1a\n" +
-	"\bObjectId\x18\x04 \x01(\x05R\bObjectId\x12\x12\n" +
-	"\x04Type\x18\x05 \x01(\x05R\x04Type\x12\x18\n" +
-	"\aContent\x18\x06 \x01(\tR\aContent\x128\n" +
-	"\tCreatedAt\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\x128\n" +
-	"\tUpdatedAt\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tUpdatedAt\x128\n" +
-	"\tDeletedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAt\x12/\n" +
-	"\aReplies\x18\n" +
-	" \x03(\v2\x15.pbentity.CommentInfoR\aRepliesBCZAshop-goframe-micro-service-refacotor/app/interaction/api/pbentityb\x06proto3"
+	"\x06RootId\x18\x03 \x01(\x05R\x06RootId\x12\x16\n" +
+	"\x06UserId\x18\x04 \x01(\x05R\x06UserId\x12 \n" +
+	"\vReplyUserId\x18\x05 \x01(\x05R\vReplyUserId\x12\x1a\n" +
+	"\bObjectId\x18\x06 \x01(\x05R\bObjectId\x12\x12\n" +
+	"\x04Type\x18\a \x01(\x05R\x04Type\x12\x18\n" +
+	"\aContent\x18\b \x01(\tR\aContent\x128\n" +
+	"\tCreatedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\x128\n" +
+	"\tUpdatedAt\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tUpdatedAt\x128\n" +
+	"\tDeletedAt\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAt\x12/\n" +
+	"\aReplies\x18\f \x03(\v2\x15.pbentity.CommentInfoR\aRepliesBCZAshop-goframe-micro-service-refacotor/app/interaction/api/pbentityb\x06proto3"
 
 var (
 	file_pbentity_comment_info_proto_rawDescOnce sync.Once

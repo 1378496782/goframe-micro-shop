@@ -11,14 +11,16 @@ import (
 
 // CommentInfo is the golang structure of table comment_info for DAO operations like Where/Data.
 type CommentInfo struct {
-	g.Meta    `orm:"table:comment_info, do:true"`
-	Id        interface{} //
-	ParentId  interface{} // 父级评论id
-	UserId    interface{} //
-	ObjectId  interface{} //
-	Type      interface{} // 评论类型：1商品 2文章
-	Content   interface{} // 评论内容
-	CreatedAt *gtime.Time //
-	UpdatedAt *gtime.Time //
-	DeletedAt *gtime.Time //
+	g.Meta      `orm:"table:comment_info, do:true"`
+	Id          interface{} //
+	ParentId    interface{} // 父级评论id
+	RootId      interface{} // 一级评论id
+	UserId      interface{} //
+	ReplyUserId interface{} // 被回复用户id
+	ObjectId    interface{} //
+	Type        interface{} // 评论类型：1商品 2文章
+	Content     interface{} // 评论内容
+	CreatedAt   *gtime.Time //
+	UpdatedAt   *gtime.Time //
+	DeletedAt   *gtime.Time //
 }

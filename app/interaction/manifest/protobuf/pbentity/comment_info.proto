@@ -11,14 +11,16 @@ option go_package = "shop-goframe-micro-service-refacotor/app/interaction/api/pb
 import "google/protobuf/timestamp.proto";
 
 message CommentInfo {
-    int32                     Id        = 1; //
-    int32                     ParentId  = 2; // 父级评论id
-    int32                     UserId    = 3; //
-    int32                     ObjectId  = 4; //
-    int32                     Type      = 5; // 评论类型：1商品 2文章
-    string                    Content   = 6; // 评论内容
-    google.protobuf.Timestamp CreatedAt = 7; //
-    google.protobuf.Timestamp UpdatedAt = 8; //
-    google.protobuf.Timestamp DeletedAt = 9; //
-    repeated CommentInfo      Replies   = 10; // 子回复列表
+    int32 Id          = 1;
+    int32 ParentId    = 2;
+    int32 RootId      = 3; // 一级评论id
+    int32 UserId      = 4;
+    int32 ReplyUserId = 5; // 被回复用户id
+    int32 ObjectId    = 6;
+    int32 Type        = 7;
+    string Content    = 8;
+    google.protobuf.Timestamp CreatedAt = 9;
+    google.protobuf.Timestamp UpdatedAt = 10;
+    google.protobuf.Timestamp DeletedAt = 11;
+    repeated CommentInfo Replies = 12;
 }

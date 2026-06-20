@@ -3,11 +3,12 @@ package interaction
 import (
 	"context"
 
-	"github.com/gogf/gf/v2/util/gconv"
 	comment "shop-goframe-micro-service-refacotor/app/interaction/api/comment_info/v1"
 	"shop-goframe-micro-service-refacotor/app/interaction/api/pbentity"
 
-	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/interaction/v1"
+	"github.com/gogf/gf/v2/util/gconv"
+
+	v1 "shop-goframe-micro-service-refacotor/app/gateway-h5/api/interaction/v1"
 )
 
 func convertCommentInfoItem(comment *pbentity.CommentInfo) *v1.CommentInfoItem {
@@ -15,15 +16,17 @@ func convertCommentInfoItem(comment *pbentity.CommentInfo) *v1.CommentInfoItem {
 		return nil
 	}
 	item := &v1.CommentInfoItem{
-		Id:        uint32(comment.Id),
-		UserId:    uint32(comment.UserId),
-		ObjectId:  uint32(comment.ObjectId),
-		Type:      uint32(comment.Type),
-		ParentId:  uint32(comment.ParentId),
-		Content:   comment.Content,
-		CreatedAt: comment.CreatedAt,
-		UpdatedAt: comment.UpdatedAt,
-		Replies:   make([]*v1.CommentInfoItem, 0, len(comment.Replies)),
+		Id:          uint32(comment.Id),
+		UserId:      uint32(comment.UserId),
+		ObjectId:    uint32(comment.ObjectId),
+		Type:        uint32(comment.Type),
+		ParentId:    uint32(comment.ParentId),
+		Content:     comment.Content,
+		RootId:      uint32(comment.RootId),
+		ReplyUserId: uint32(comment.ReplyUserId),
+		CreatedAt:   comment.CreatedAt,
+		UpdatedAt:   comment.UpdatedAt,
+		Replies:     make([]*v1.CommentInfoItem, 0, len(comment.Replies)),
 	}
 	for _, reply := range comment.Replies {
 		item.Replies = append(item.Replies, convertCommentInfoItem(reply))

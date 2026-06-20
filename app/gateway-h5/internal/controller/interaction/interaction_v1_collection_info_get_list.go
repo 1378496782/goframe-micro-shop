@@ -2,13 +2,16 @@ package interaction
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/util/gconv"
 	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
 	collection "shop-goframe-micro-service-refacotor/app/interaction/api/collection_info/v1"
 	"shop-goframe-micro-service-refacotor/utility/middleware"
 
-	"shop-goframe-micro-service-refacotor/app/gateway-h5/api/interaction/v1"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
+
+	v1 "shop-goframe-micro-service-refacotor/app/gateway-h5/api/interaction/v1"
 )
 
 func (c *ControllerV1) CollectionInfoGetList(ctx context.Context, req *v1.CollectionInfoGetListReq) (res *v1.CollectionInfoGetListRes, err error) {
@@ -22,8 +25,7 @@ func (c *ControllerV1) CollectionInfoGetList(ctx context.Context, req *v1.Collec
 	value := ctx.Value(middleware.CtxUserId)
 	userId, ok := value.(uint32)
 	if !ok {
-		// 处理类型不匹配的情况
-		panic("用户ID类型错误或不存在")
+		return nil, gerror.NewCode(gcode.CodeValidationFailed, "用户ID类型错误或不存在")
 	}
 	grpcReq.UserId = userId
 
