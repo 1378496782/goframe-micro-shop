@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/frame/g"
+	"math/rand"
 	"time"
 )
 
@@ -15,11 +16,18 @@ const (
 	EmptyValue     = "__EMPTY__"
 )
 
+func ttlWithJitter(base time.Duration, maxJitter time.Duration) time.Duration {
+	if maxJitter <= 0 {
+		return base
+	}
+	return base + time.Duration(rand.Int63n(int64(maxJitter)))
+}
+
 // SetEmptyGoodsDetail 添加设置空缓存的函数，防止缓存穿透
 func SetEmptyGoodsDetail(ctx context.Context, productId uint32) error {
 	key := fmt.Sprintf("%s%d", GoodsDetailKey, productId)
 	// 设置一个短时间的空值，防止缓存穿透
-	return goodsCache.Set(ctx, key, EmptyValue, 1*time.Minute)
+	return goodsCache.Set(ctx, key, EmptyValue, ttlWithJitter(1*time.Minute, 30*time.Second))
 }
 
 // SetGoodsDetail 设置商品详情缓存
@@ -32,7 +40,7 @@ func SetGoodsDetail(ctx context.Context, productId uint32, data interface{}) err
 		return err
 	}
 
-	return goodsCache.Set(ctx, key, jsonData, time.Hour)
+	return goodsCache.Set(ctx, key, jsonData, ttlWithJitter(time.Hour, 10*time.Minute))
 }
 
 // GetGoodsDetail 获取商品详情缓存

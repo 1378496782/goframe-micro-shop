@@ -11,6 +11,7 @@ import (
 	"shop-goframe-micro-service-refacotor/utility"
 	"shop-goframe-micro-service-refacotor/utility/consts"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -27,8 +28,34 @@ type Controller struct {
 	v1.UnimplementedGoodsInfoServer
 }
 
+var goodsDetailLoadLocks sync.Map
+
 func Register(s *grpcx.GrpcServer) {
 	v1.RegisterGoodsInfoServer(s.Server, &Controller{})
+}
+
+func getCachedGoodsDetail(ctx context.Context, goodsId uint32) (*v1.GoodsInfoGetDetailRes, bool, error) {
+	detail, err := goodsRedis.GetGoodsDetail(ctx, goodsId)
+	if err != nil {
+		g.Log().Infof(ctx, "商品详情缓存读取失败，降级查询MySQL: goods_id=%d, err=%v", goodsId, err)
+		return nil, false, nil
+	}
+	if detail.IsNil() {
+		return nil, false, nil
+	}
+	if detail.String() == goodsRedis.EmptyValue {
+		g.Log().Infof(ctx, "商品详情命中空缓存: goods_id=%d", goodsId)
+		return nil, true, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
+	}
+
+	var cachedRes v1.GoodsInfoGetDetailRes
+	if err := detail.Struct(&cachedRes); err != nil {
+		g.Log().Errorf(ctx, "商品详情缓存反序列化失败，降级查询MySQL: goods_id=%d, err=%v", goodsId, err)
+		return nil, false, nil
+	}
+
+	g.Log().Infof(ctx, "商品详情命中缓存: goods_id=%d", goodsId)
+	return &cachedRes, true, nil
 }
 
 func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (res *v1.GoodsInfoGetListRes, err error) {
@@ -131,28 +158,21 @@ func (*Controller) GetList(ctx context.Context, req *v1.GoodsInfoGetListReq) (re
 }
 
 func (*Controller) GetDetail(ctx context.Context, req *v1.GoodsInfoGetDetailReq) (res *v1.GoodsInfoGetDetailRes, err error) {
-	// 先尝试从Redis获取
-	detail, err := goodsRedis.GetGoodsDetail(ctx, req.Id)
-	if err != nil {
-		g.Log().Infof(ctx, "商品详情缓存读取失败，降级查询MySQL: goods_id=%d, err=%v", req.Id, err)
-		// 继续查询数据库，不直接返回错误
-	} else if !detail.IsNil() {
-		// 检查是否为空缓存标记
-		if detail.String() == goodsRedis.EmptyValue {
-			g.Log().Infof(ctx, "商品详情命中空缓存: goods_id=%d", req.Id)
-			return nil, gerror.NewCode(gcode.CodeNotFound, "商品不存在")
-		}
-		// 缓存命中，反序列化数据
-		var cachedRes v1.GoodsInfoGetDetailRes
-		if err := detail.Struct(&cachedRes); err != nil {
-			g.Log().Errorf(ctx, "商品详情缓存反序列化失败，降级查询MySQL: goods_id=%d, err=%v", req.Id, err)
-			// 继续查询数据库
-		} else {
-			g.Log().Infof(ctx, "商品详情命中缓存: goods_id=%d", req.Id)
-			return &cachedRes, nil
-		}
+	if cachedRes, ok, err := getCachedGoodsDetail(ctx, req.Id); ok || err != nil {
+		return cachedRes, err
 	}
-	// 缓存未命中，查询数据库
+
+	lockKey := fmt.Sprintf("%s%d", goodsRedis.GoodsDetailKey, req.Id)
+	actual, _ := goodsDetailLoadLocks.LoadOrStore(lockKey, &sync.Mutex{})
+	mutex := actual.(*sync.Mutex)
+	mutex.Lock()
+	defer mutex.Unlock()
+	defer goodsDetailLoadLocks.Delete(lockKey)
+
+	if cachedRes, ok, err := getCachedGoodsDetail(ctx, req.Id); ok || err != nil {
+		return cachedRes, err
+	}
+
 	g.Log().Infof(ctx, "商品详情缓存未命中，查询MySQL: goods_id=%d", req.Id)
 	infoError := consts.InfoError(consts.GoodsInfo, consts.GetDetailFail)
 	record, err := dao.GoodsInfo.Ctx(ctx).Where("id", req.Id).One()
@@ -243,6 +263,13 @@ func (*Controller) Delete(ctx context.Context, req *v1.GoodsInfoDeleteReq) (res 
 	if err != nil {
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+	}
+
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
+	defer cancel()
+
+	if err := goodsRedis.DeleteGoodsDetail(ctxWithTimeout, req.Id); err != nil {
+		g.Log().Warningf(ctx, "删除商品详情缓存失败: goods_id=%d, err=%v", req.Id, err)
 	}
 
 	// 返回删除成功的空响应
