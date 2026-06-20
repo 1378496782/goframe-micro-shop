@@ -312,6 +312,8 @@ CREATE TABLE `comment_info`  (
          `object_id` int NOT NULL DEFAULT 0,
          `type` tinyint(1) NOT NULL DEFAULT 0 COMMENT '评论类型：1商品 2文章',
          `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '评论内容',
+         `like_count` int NOT NULL DEFAULT 0 COMMENT '点赞数',
+         `reply_count` int NOT NULL DEFAULT 0 COMMENT '回复数',
          `created_at` datetime DEFAULT NULL,
          `updated_at` datetime DEFAULT NULL,
          `deleted_at` datetime DEFAULT NULL,
@@ -324,11 +326,11 @@ CREATE TABLE `comment_info`  (
 -- ----------------------------
 -- Records of comment_info
 -- ----------------------------
-INSERT INTO `comment_info` VALUES (4, 0, 0, 1, 0, 1, 2, '好评 下次还会买', '2022-07-31 17:23:48', '2022-07-31 17:23:48', NULL);
-INSERT INTO `comment_info` VALUES (5, 0, 0, 1, 0, 1, 2, '来个评论', '2022-07-31 17:24:10', '2022-07-31 17:24:10', NULL);
-INSERT INTO `comment_info` VALUES (7, 5, 5, 1, 1, 1, 2, '来个评论', '2022-07-31 17:24:59', '2022-07-31 17:24:59', NULL);
-INSERT INTO `comment_info` VALUES (10, 1, 0, 4, 0, 1, 1, 'labore', '2023-01-19 14:25:24', '2023-01-19 14:25:24', NULL);
-INSERT INTO `comment_info` VALUES (11, 1, 0, 4, 0, 1, 1, 'xxxxx', '2023-01-19 14:26:50', '2023-01-19 14:26:50', NULL);
+INSERT INTO `comment_info` VALUES (4, 0, 0, 1, 0, 1, 2, '好评 下次还会买', 0, 0, '2022-07-31 17:23:48', '2022-07-31 17:23:48', NULL);
+INSERT INTO `comment_info` VALUES (5, 0, 0, 1, 0, 1, 2, '来个评论', 0, 1, '2022-07-31 17:24:10', '2022-07-31 17:24:10', NULL);
+INSERT INTO `comment_info` VALUES (7, 5, 5, 1, 1, 1, 2, '来个评论', 0, 0, '2022-07-31 17:24:59', '2022-07-31 17:24:59', NULL);
+INSERT INTO `comment_info` VALUES (10, 1, 0, 4, 0, 1, 1, 'labore', 0, 0, '2023-01-19 14:25:24', '2023-01-19 14:25:24', NULL);
+INSERT INTO `comment_info` VALUES (11, 1, 0, 4, 0, 1, 1, 'xxxxx', 0, 0, '2023-01-19 14:26:50', '2023-01-19 14:26:50', NULL);
 
 
 -- ----------------------------

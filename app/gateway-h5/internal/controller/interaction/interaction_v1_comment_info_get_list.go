@@ -24,6 +24,8 @@ func convertCommentInfoItem(comment *pbentity.CommentInfo) *v1.CommentInfoItem {
 		Content:     comment.Content,
 		RootId:      uint32(comment.RootId),
 		ReplyUserId: uint32(comment.ReplyUserId),
+		LikeCount:   uint32(comment.LikeCount),
+		ReplyCount:  uint32(comment.ReplyCount),
 		CreatedAt:   comment.CreatedAt,
 		UpdatedAt:   comment.UpdatedAt,
 		Replies:     make([]*v1.CommentInfoItem, 0, len(comment.Replies)),

@@ -19,8 +19,10 @@ message CommentInfo {
     int32 ObjectId    = 6;
     int32 Type        = 7;
     string Content    = 8;
-    google.protobuf.Timestamp CreatedAt = 9;
-    google.protobuf.Timestamp UpdatedAt = 10;
-    google.protobuf.Timestamp DeletedAt = 11;
-    repeated CommentInfo Replies = 12;
+    int32 LikeCount   = 9;
+    int32 ReplyCount  = 10;
+    google.protobuf.Timestamp CreatedAt = 11;
+    google.protobuf.Timestamp UpdatedAt = 12;
+    google.protobuf.Timestamp DeletedAt = 13;
+    repeated CommentInfo Replies = 14;
 }

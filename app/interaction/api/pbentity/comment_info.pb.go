@@ -37,10 +37,12 @@ type CommentInfo struct {
 	ObjectId      int32                  `protobuf:"varint,6,opt,name=ObjectId,proto3" json:"ObjectId,omitempty"`
 	Type          int32                  `protobuf:"varint,7,opt,name=Type,proto3" json:"Type,omitempty"`
 	Content       string                 `protobuf:"bytes,8,opt,name=Content,proto3" json:"Content,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
-	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=DeletedAt,proto3" json:"DeletedAt,omitempty"`
-	Replies       []*CommentInfo         `protobuf:"bytes,12,rep,name=Replies,proto3" json:"Replies,omitempty"`
+	LikeCount     int32                  `protobuf:"varint,9,opt,name=LikeCount,proto3" json:"LikeCount,omitempty"`
+	ReplyCount    int32                  `protobuf:"varint,10,opt,name=ReplyCount,proto3" json:"ReplyCount,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=CreatedAt,proto3" json:"CreatedAt,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=DeletedAt,proto3" json:"DeletedAt,omitempty"`
+	Replies       []*CommentInfo         `protobuf:"bytes,14,rep,name=Replies,proto3" json:"Replies,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -131,6 +133,20 @@ func (x *CommentInfo) GetContent() string {
 	return ""
 }
 
+func (x *CommentInfo) GetLikeCount() int32 {
+	if x != nil {
+		return x.LikeCount
+	}
+	return 0
+}
+
+func (x *CommentInfo) GetReplyCount() int32 {
+	if x != nil {
+		return x.ReplyCount
+	}
+	return 0
+}
+
 func (x *CommentInfo) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
@@ -163,7 +179,7 @@ var File_pbentity_comment_info_proto protoreflect.FileDescriptor
 
 const file_pbentity_comment_info_proto_rawDesc = "" +
 	"\n" +
-	"\x1bpbentity/comment_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb4\x03\n" +
+	"\x1bpbentity/comment_info.proto\x12\bpbentity\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf2\x03\n" +
 	"\vCommentInfo\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\x05R\x02Id\x12\x1a\n" +
 	"\bParentId\x18\x02 \x01(\x05R\bParentId\x12\x16\n" +
@@ -172,12 +188,16 @@ const file_pbentity_comment_info_proto_rawDesc = "" +
 	"\vReplyUserId\x18\x05 \x01(\x05R\vReplyUserId\x12\x1a\n" +
 	"\bObjectId\x18\x06 \x01(\x05R\bObjectId\x12\x12\n" +
 	"\x04Type\x18\a \x01(\x05R\x04Type\x12\x18\n" +
-	"\aContent\x18\b \x01(\tR\aContent\x128\n" +
-	"\tCreatedAt\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\x128\n" +
-	"\tUpdatedAt\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\tUpdatedAt\x128\n" +
-	"\tDeletedAt\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAt\x12/\n" +
-	"\aReplies\x18\f \x03(\v2\x15.pbentity.CommentInfoR\aRepliesBCZAshop-goframe-micro-service-refacotor/app/interaction/api/pbentityb\x06proto3"
+	"\aContent\x18\b \x01(\tR\aContent\x12\x1c\n" +
+	"\tLikeCount\x18\t \x01(\x05R\tLikeCount\x12\x1e\n" +
+	"\n" +
+	"ReplyCount\x18\n" +
+	" \x01(\x05R\n" +
+	"ReplyCount\x128\n" +
+	"\tCreatedAt\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tCreatedAt\x128\n" +
+	"\tUpdatedAt\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tUpdatedAt\x128\n" +
+	"\tDeletedAt\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tDeletedAt\x12/\n" +
+	"\aReplies\x18\x0e \x03(\v2\x15.pbentity.CommentInfoR\aRepliesBCZAshop-goframe-micro-service-refacotor/app/interaction/api/pbentityb\x06proto3"
 
 var (
 	file_pbentity_comment_info_proto_rawDescOnce sync.Once

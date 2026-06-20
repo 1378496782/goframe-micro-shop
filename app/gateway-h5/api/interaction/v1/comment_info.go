@@ -31,6 +31,8 @@ type CommentInfoItem struct {
 	Content     string                 `json:"content" dc:"评论内容"`
 	RootId      uint32                 `json:"root_id" dc:"一级评论ID"`
 	ReplyUserId uint32                 `json:"reply_user_id" dc:"被回复用户ID"`
+	LikeCount   uint32                 `json:"like_count" dc:"点赞数"`
+	ReplyCount  uint32                 `json:"reply_count" dc:"回复数"`
 	CreatedAt   *timestamppb.Timestamp `json:"created_at" dc:"创建时间"`
 	UpdatedAt   *timestamppb.Timestamp `json:"updated_at" dc:"更新时间"`
 	Replies     []*CommentInfoItem     `json:"replies" dc:"子回复列表"`

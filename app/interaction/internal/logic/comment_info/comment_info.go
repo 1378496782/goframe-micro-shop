@@ -56,6 +56,16 @@ func Create(ctx context.Context, req *v1.CommentInfoCreateReq) (res *v1.CommentI
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
 
+	// 若他不是根评论，增加回复数
+	if req.ParentId > 0 {
+		_, err = dao.CommentInfo.Ctx(ctx).
+			Where(dao.CommentInfo.Columns().Id, rootId).
+			Increment(dao.CommentInfo.Columns().ReplyCount, 1)
+		if err != nil {
+			g.Log().Errorf(ctx, "%v %v", infoError, err)
+			return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
+		}
+	}
 	// 返回创建成功响应，包含新创建的ID
 	return &v1.CommentInfoCreateRes{Id: uint32(result)}, nil
 }
@@ -171,6 +181,8 @@ func convertCommentEntity(comment entity.CommentInfo) *pbentity.CommentInfo {
 		ObjectId:    int32(comment.ObjectId),
 		Type:        int32(comment.Type),
 		ReplyUserId: int32(comment.ReplyUserId),
+		LikeCount:   int32(comment.LikeCount),
+		ReplyCount:  int32(comment.ReplyCount),
 		Content:     comment.Content,
 		CreatedAt:   utility.SafeConvertTime(comment.CreatedAt),
 		UpdatedAt:   utility.SafeConvertTime(comment.UpdatedAt),
