@@ -2,9 +2,10 @@ package binlog
 
 import (
 	"context"
-	"github.com/go-mysql-org/go-mysql/mysql"
 	"shop-goframe-micro-service-refacotor/app/search/utility/elasticsearch"
 	"time"
+
+	"github.com/go-mysql-org/go-mysql/mysql"
 
 	"github.com/go-mysql-org/go-mysql/replication"
 	"github.com/gogf/gf/v2/frame/g"
@@ -90,6 +91,9 @@ func handleInsert(ctx context.Context, rows [][]interface{}) {
 	for _, row := range rows {
 		// 将行数据转换为 map
 		columnMap := parseRowData(row)
+
+		logGoodsCDC(ctx, "INSERT", nil, columnMap)
+
 		upsertToES(ctx, columnMap)
 	}
 }
@@ -98,10 +102,14 @@ func handleInsert(ctx context.Context, rows [][]interface{}) {
 func handleUpdate(ctx context.Context, rows [][]interface{}) {
 	// 更新事件的行数据格式为 [旧行数据, 新行数据]
 	for i := 0; i < len(rows); i += 2 {
-		if i+1 < len(rows) {
-			columnMap := parseRowData(rows[i+1]) // 取新数据
-			upsertToES(ctx, columnMap)
+		if i+1 >= len(rows) {
+			g.Log().Warningf(ctx, "CDC UPDATE rows length invaild: %d", len(rows))
+			continue
 		}
+		oldMap := parseRowData(rows[i])
+		newMap := parseRowData(rows[i+1])
+		logGoodsCDC(ctx, "UPDATE", oldMap, newMap)
+		upsertToES(ctx, newMap)
 	}
 }
 
@@ -109,6 +117,7 @@ func handleUpdate(ctx context.Context, rows [][]interface{}) {
 func handleDelete(ctx context.Context, rows [][]interface{}) {
 	for _, row := range rows {
 		columnMap := parseRowData(row)
+		logGoodsCDC(ctx, "DELETE", columnMap, nil)
 		deleteFromES(ctx, columnMap)
 	}
 }
@@ -120,7 +129,7 @@ func parseRowData(row []interface{}) map[string]interface{} {
 		"id", "name", "pic_url", "images", "price", "level1_category_id",
 		"level2_category_id", "level3_category_id", "brand",
 		"stock", "sale", "tags", "sort", "detail_info",
-		"created_at", "updated_at", "deleted_at",
+		"enable_bargain", "bargain_price", "created_at", "updated_at", "deleted_at",
 	}
 
 	result := make(map[string]interface{})
@@ -199,4 +208,14 @@ func deleteFromES(ctx context.Context, data map[string]interface{}) {
 	} else {
 		g.Log().Debugf(ctx, "成功从ES删除商品: ID=%s", id)
 	}
+}
+
+func logGoodsCDC(ctx context.Context, operation string, oldData, newData map[string]interface{}) {
+	id := ""
+	if oldData == nil {
+		id = gconv.String(newData["id"])
+	} else {
+		id = gconv.String(oldData["id"])
+	}
+	g.Log().Debugf(ctx, "商品CDC事件: %s, ID=%s, 旧数据=%v, 新数据=%v", operation, id, oldData, newData)
 }

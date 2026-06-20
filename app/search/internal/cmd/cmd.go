@@ -21,6 +21,7 @@ var (
 				group.Bind(
 					search.NewV1().SearchGoods,
 					search.NewV1().SearchGoodsMysql,
+					search.NewV1().SyncGoods,
 				)
 			})
 			s.Run()

@@ -92,12 +92,6 @@ func (c *ControllerV1) SearchGoods(ctx context.Context, req *v1.SearchGoodsReq) 
 		PostTags("</em>")
 	searchService.Highlight(highlight)
 
-	// 调试：打印ES查询
-	source := searchService.Source
-	g.Log().Debugf(ctx, "ES source: %s", source)
-	sourceJson, _ := json.MarshalIndent(source, "", "  ")
-	g.Log().Debugf(ctx, "ES Query: %s", string(sourceJson))
-
 	// 4. 执行搜索
 	searchResult, err := searchService.Do(ctx)
 	if err != nil {
