@@ -244,7 +244,8 @@ type PraiseInfoGetListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          uint32                 `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty" dc:"收藏类型：1商品 2文章"` // 收藏类型：1商品 2文章
 	Page          uint32                 `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	Size          uint32                 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"` // 修改：字段编号必须从1开始递增
+	Size          uint32                 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty" dc:"修改：字段编号必须从1开始递增"`        // 修改：字段编号必须从1开始递增
+	UserId        uint32                 `protobuf:"varint,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" dc:"用户id"` // 用户id
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -296,6 +297,13 @@ func (x *PraiseInfoGetListReq) GetPage() uint32 {
 func (x *PraiseInfoGetListReq) GetSize() uint32 {
 	if x != nil {
 		return x.Size
+	}
+	return 0
+}
+
+func (x *PraiseInfoGetListReq) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
 	}
 	return 0
 }
@@ -429,11 +437,12 @@ const file_praise_info_v1_praise_info_proto_rawDesc = "" +
 	"\tobject_id\x18\x03 \x01(\rR\bobjectId\x12\x17\n" +
 	"\auser_id\x18\x04 \x01(\rR\x06userId\"%\n" +
 	"\x13PraiseInfoDeleteRes\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\"R\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\"k\n" +
 	"\x14PraiseInfoGetListReq\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\rR\x04type\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +
-	"\x04size\x18\x03 \x01(\rR\x04size\"\x80\x01\n" +
+	"\x04size\x18\x03 \x01(\rR\x04size\x12\x17\n" +
+	"\auser_id\x18\x04 \x01(\rR\x06userId\"\x80\x01\n" +
 	"\x16PraiseInfoListResponse\x12(\n" +
 	"\x04list\x18\x01 \x03(\v2\x14.pbentity.PraiseInfoR\x04list\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\rR\x04page\x12\x12\n" +

@@ -49,14 +49,6 @@ func Delete(ctx context.Context, req *v1.PraiseInfoDeleteReq) (res *v1.PraiseInf
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
 		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 	}
-	// rows, err := result.RowsAffected()
-	// if err != nil {
-	// 	g.Log().Errorf(ctx, "%v %v", infoError, err)
-	// 	return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
-	// }
-	// if rows == 0 {
-	// return nil, gerror.New("点赞不存在")
-	// }
 
 	// 返回删除成功的空响应
 	return &v1.PraiseInfoDeleteRes{Id: req.Id}, nil // 返回空结构体

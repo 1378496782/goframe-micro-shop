@@ -38,6 +38,7 @@ message PraiseInfoGetListReq {
   uint32 type = 1; // 收藏类型：1商品 2文章
   uint32 page = 2;
   uint32 size = 3;  // 修改：字段编号必须从1开始递增
+  uint32 user_id = 4; // 用户id
 }
 
 

@@ -38,7 +38,10 @@ func (*Controller) GetList(ctx context.Context, req *v1.PraiseInfoGetListReq) (r
 	// 错误类型
 	infoError := consts.InfoError(consts.PraiseInfo, consts.GetListFail)
 	// 查询总数
-	total, err := dao.PraiseInfo.Ctx(ctx).Count()
+	total, err := dao.PraiseInfo.Ctx(ctx).
+		Where(dao.PraiseInfo.Columns().Type, req.Type).
+		Where(dao.PraiseInfo.Columns().UserId, req.UserId).
+		Count()
 	if err != nil {
 		// 记录错误日志
 		g.Log().Errorf(ctx, "%v %v", infoError, err)
@@ -48,6 +51,8 @@ func (*Controller) GetList(ctx context.Context, req *v1.PraiseInfoGetListReq) (r
 
 	// 查询当前页数据
 	praiseRecords, err := dao.PraiseInfo.Ctx(ctx).
+		Where(dao.PraiseInfo.Columns().Type, req.Type).
+		Where(dao.PraiseInfo.Columns().UserId, req.UserId).
 		Page(int(req.Page), int(req.Size)).
 		All()
 	if err != nil {
