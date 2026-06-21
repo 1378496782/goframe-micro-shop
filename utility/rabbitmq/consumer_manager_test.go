@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 // TestIntegration 简单的集成测试，验证代码可以编译
@@ -17,6 +19,18 @@ func TestIntegration(t *testing.T) {
 	}
 	// 输出成功信息
 	fmt.Println("RabbitMQ消息处理优化实现验证成功")
+}
+
+func TestMessageIDFromDeliveryWithShortBodyAndEmptyMessageID(t *testing.T) {
+	msg := amqp.Delivery{Body: []byte(`{"user_id":8}`)}
+
+	messageID := messageIDFromDelivery(msg)
+	if messageID == "" {
+		t.Fatal("expected non-empty message id")
+	}
+	if len(messageID) != 64 {
+		t.Fatalf("expected sha256 hex length 64, got %d", len(messageID))
+	}
 }
 
 // 注意：完整的集成测试需要RabbitMQ服务器

@@ -2,6 +2,7 @@ package rabbitmq
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -330,11 +331,7 @@ func (cm *ConsumerManager) handleMessage(consumer Consumer, msg amqp.Delivery) {
 // checkIdempotency 检查消息的幂等性，并返回本次成功获取到的幂等 key。
 func (cm *ConsumerManager) checkIdempotency(consumer Consumer, msg amqp.Delivery) (string, error) {
 	// 获取消息相关信息
-	messageID := msg.MessageId
-	if messageID == "" {
-		// 如果没有messageID，生成一个基于消息体的简单标识
-		messageID = fmt.Sprintf("%x", msg.Body[:32]) // 使用消息体前32字节作为标识
-	}
+	messageID := messageIDFromDelivery(msg)
 
 	// 尝试从消息中提取业务ID
 	// 1. 首先尝试使用消费者的GetBusinessID方法
@@ -382,6 +379,15 @@ func (cm *ConsumerManager) checkIdempotency(consumer Consumer, msg amqp.Delivery
 	}
 
 	return key, nil
+}
+
+func messageIDFromDelivery(msg amqp.Delivery) string {
+	if msg.MessageId != "" {
+		return msg.MessageId
+	}
+	// 如果没有 messageID，使用完整消息体的摘要作为稳定标识，避免短消息体切片越界。
+	sum := sha256.Sum256(msg.Body)
+	return fmt.Sprintf("%x", sum[:])
 }
 
 // 定义错误类型，用于控制重试行为
