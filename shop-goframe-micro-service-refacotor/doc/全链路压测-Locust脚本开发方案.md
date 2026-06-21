@@ -63,7 +63,7 @@ class BaseUser(FastHttpUser):
         # 登录逻辑，获取token
         login_data = {
             "username": "test_user",
-            "password": "test_password"
+            "password": "CHANGE_ME_SECRET"
         }
         headers = generate_pressure_test_header()  # 添加压测标记
         
@@ -463,7 +463,7 @@ def generate_test_users(count=100):
     for i in range(count):
         user = {
             "username": f"test_user_{i:04d}",
-            "password": "test123456",
+            "password": "CHANGE_ME_SECRET",
             "nickname": f"测试用户{i:04d}",
             "phone": f"138{random.randint(10000000, 99999999)}",
             "email": f"test_user_{i:04d}@example.com"

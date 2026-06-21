@@ -41,7 +41,7 @@
         </li>
       </ul>
     </el-scrollbar>
-    <Contextmenu :dropdown="dropdown" ref="contextmenuRef" @currentContextmenuClick="DEMO_WECHAT_OPEN_ID" />
+    <Contextmenu :dropdown="dropdown" ref="contextmenuRef" @currentContextmenuClick="onCurrentContextmenuClick" />
   </div>
 </template>
 
@@ -258,7 +258,7 @@ defineOptions({ name: "layoutTagsView"})
       const item = state.tagsViewList.find((v: any) => (getThemeConfig.value.isShareTagsView ? v.path === fullPath : v.url === fullPath));
       if (item != null) {
         await storesKeepALiveNames.delCachedView(item);
-        proxy.mittBus.emit('DEMO_WECHAT_OPEN_ID', fullPath);
+        proxy.mittBus.emit('onTagsViewRefreshRouterView', fullPath);
         if (item.meta.isKeepAlive) storesKeepALiveNames.addCachedView(item);
       }
     };
@@ -355,7 +355,7 @@ defineOptions({ name: "layoutTagsView"})
       });
     };
     // 当前项右键菜单点击
-    const DEMO_WECHAT_OPEN_ID = async (item: CurrentContextmenu) => {
+    const onCurrentContextmenuClick = async (item: CurrentContextmenu) => {
       const cParams = item.meta.isDynamic ? item.params : item.query;
       if (!getCurrentRouteItem(item.path, cParams)) return ElMessage({ type: 'warning', message: '请正确输入路径及完整参数（query、params）' });
       const { path, name, params, query, meta, url } = getCurrentRouteItem(item.path, cParams);
@@ -517,8 +517,8 @@ defineOptions({ name: "layoutTagsView"})
       // 拖动问题，https://gitee.com/lyt-top/vue-next-admin/issues/I3ZRRI
       window.addEventListener('resize', onSortableResize);
       // 监听非本页面调用 0 刷新当前，1 关闭当前，2 关闭其它，3 关闭全部 4 当前页全屏
-      proxy.mittBus.on('DEMO_WECHAT_OPEN_ID', (data: CurrentContextmenu) => {
-        DEMO_WECHAT_OPEN_ID(data);
+      proxy.mittBus.on('onCurrentContextmenuClick', (data: CurrentContextmenu) => {
+        onCurrentContextmenuClick(data);
       });
       // 监听布局配置界面开启/关闭拖拽
       proxy.mittBus.on('openOrCloseSortable', () => {
@@ -541,7 +541,7 @@ defineOptions({ name: "layoutTagsView"})
     // 页面卸载时
     onUnmounted(() => {
       // 取消非本页面调用监听
-      proxy.mittBus.off('DEMO_WECHAT_OPEN_ID', () => {});
+      proxy.mittBus.off('onCurrentContextmenuClick', () => {});
       // 取消监听布局配置界面开启/关闭拖拽
       proxy.mittBus.off('openOrCloseSortable', () => {});
       // 取消监听布局配置开启 TagsView 共用

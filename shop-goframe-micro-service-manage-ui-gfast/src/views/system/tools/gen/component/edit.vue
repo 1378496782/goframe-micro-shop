@@ -165,7 +165,7 @@ const goNext = () => {
 };
 //取消返回
 const close = ()=>{
-  proxy.mittBus.emit('DEMO_WECHAT_OPEN_ID', Object.assign({}, { contextMenuClickId: 1, ...route }));
+  proxy.mittBus.emit('onCurrentContextmenuClick', Object.assign({}, { contextMenuClickId: 1, ...route }));
 }
 </script>
 

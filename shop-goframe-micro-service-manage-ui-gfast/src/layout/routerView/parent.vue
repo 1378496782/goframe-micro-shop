@@ -48,7 +48,7 @@ export default defineComponent({
 		// 页面加载前，处理缓存，页面刷新时路由缓存处理
 		onBeforeMount(() => {
 			state.keepAliveNameList = keepAliveNames.value;
-			proxy.mittBus.on('DEMO_WECHAT_OPEN_ID', (fullPath: string) => {
+			proxy.mittBus.on('onTagsViewRefreshRouterView', (fullPath: string) => {
 				state.keepAliveNameList = keepAliveNames.value.filter((name: string) => route.name !== name);
 				state.refreshRouterViewKey = null;
 				nextTick(() => {
@@ -69,7 +69,7 @@ export default defineComponent({
 		});
 		// 页面卸载时
 		onUnmounted(() => {
-			proxy.mittBus.off('DEMO_WECHAT_OPEN_ID', () => {});
+			proxy.mittBus.off('onTagsViewRefreshRouterView', () => {});
 		});
 		// 监听路由变化，防止 tagsView 多标签时，切换动画消失
 		watch(

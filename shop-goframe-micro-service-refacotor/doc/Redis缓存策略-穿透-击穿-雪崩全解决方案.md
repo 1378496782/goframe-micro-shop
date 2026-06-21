@@ -454,14 +454,14 @@ func InitRedisCache() error {
 	// 从配置获取Redis连接信息
 	host := g.Cfg().MustGet(ctx, "redis.host").String()
 	port := g.Cfg().MustGet(ctx, "redis.port").String()
-	password := g.Cfg().MustGet(ctx, "redis.password").String()
+	password :CHANGE_ME_SECRET"redis.password").String()
 	db := g.Cfg().MustGet(ctx, "redis.db").Int()
 
 	// 创建Redis实例
 	redisClient := gredis.New(gredis.Config{
 		Host:     host,
 		Port:     port,
-		Password: password,
+		Password: CHANGE_ME_SECRET
 		DB:       db,
 	})
 

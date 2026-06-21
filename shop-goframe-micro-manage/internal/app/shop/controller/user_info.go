@@ -89,7 +89,7 @@ func (c *userInfoController) Export(ctx context.Context, req *shop.UserInfoExpor
 	if err != nil {
 		return
 	}
-	r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
+	r.Response.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	r.Response.Header().Set("Accept-Ranges", "bytes")
 	r.Response.Header().Set("Access-Control-Expose-Headers", "*")
 	r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("用户")+".xlsx")

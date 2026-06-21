@@ -1,6 +1,6 @@
 # 环境变量定义
 x-mysql-env: &mysql-env
-  MYSQL_ROOT_PASSWORD: 'CHANGE_ME_MYSQL_ROOT_PASSWORD'
+  MYSQL_ROOT_PASSWORD: 'CHANGE_ME_SECRET'
 
 x-rabbitmq-env: &rabbitmq-env
   RABBITMQ_DEFAULT_USER: root

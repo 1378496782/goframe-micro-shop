@@ -14,7 +14,7 @@ grpc:
 
 database:
   default:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/goods"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/goods"
     debug: false
 
 etcd:
@@ -43,7 +43,7 @@ rabbitmq:
     host: "rabbitmq"
     port: "5672"
     user: "root"
-    password: "root"
+    password: "CHANGE_ME_SECRET"
     vhost: "/"
   exchange:
     user: "user_events"

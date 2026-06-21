@@ -4,10 +4,10 @@
 gfcli:
   gen:
     dao:
-      - link: "mysql:root:root@tcp(127.0.0.1:3306)/goods"
+      - link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(127.0.0.1:3306)/goods"
         descriptionTag: true
     pbentity:
-      - link: "mysql:root:root@tcp(127.0.0.1:3306)/goods"
+      - link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(127.0.0.1:3306)/goods"
 
   docker:
     build: "-a amd64 -s linux -p temp -ew"

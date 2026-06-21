@@ -31,8 +31,8 @@ database:
     Path: "resource/log/sql"
 
   default:
-    link:   "mysql:root:root@tcp(101.42.249.106:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
-#    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link:   "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(101.42.249.106:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+#    link:   "mysql:gfast3:CHANGE_ME_MYSQL_PASSWORD@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
     #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
 #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug:  true
@@ -44,10 +44,10 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   goods:
-#    link: "mysql:root:111111@tcp(127.0.0.1:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
+#    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(127.0.0.1:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
 #    线上
-    link: "mysql:root:root@tcp(101.42.249.106:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
-    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(101.42.249.106:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:CHANGE_ME_MYSQL_PASSWORD@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
     #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
     #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug: true
@@ -59,8 +59,8 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   user:
-    link: "mysql:root:root@tcp(101.42.249.106:3306)/user?charset=utf8mb4&parseTime=true&loc=Local"
-    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(101.42.249.106:3306)/user?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:CHANGE_ME_MYSQL_PASSWORD@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
     #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
     #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug: true
@@ -72,8 +72,8 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   interaction:
-    link: "mysql:root:root@tcp(101.42.249.106:3306)/interaction?charset=utf8mb4&parseTime=true&loc=Local"
-    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(101.42.249.106:3306)/interaction?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:CHANGE_ME_MYSQL_PASSWORD@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
     #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
     #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug: true
@@ -85,8 +85,8 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   order:
-    link: "mysql:root:root@tcp(101.42.249.106:3306)/order?charset=utf8mb4&parseTime=true&loc=Local"
-    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(101.42.249.106:3306)/order?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:CHANGE_ME_MYSQL_PASSWORD@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
     #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
     #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug: true
@@ -98,8 +98,8 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   resource:
-    link: "mysql:root:root@tcp(101.42.249.106:3306)/resource?charset=utf8mb4&parseTime=true&loc=Local"
-    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(101.42.249.106:3306)/resource?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:CHANGE_ME_MYSQL_PASSWORD@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
     #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
     #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug: true
@@ -111,8 +111,8 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   banner:
-    link: "mysql:root:root@tcp(101.42.249.106:3306)/banner?charset=utf8mb4&parseTime=true&loc=Local"
-    #    link:   "mysql:gfast3:gfast333@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(101.42.249.106:3306)/banner?charset=utf8mb4&parseTime=true&loc=Local"
+    #    link:   "mysql:gfast3:CHANGE_ME_MYSQL_PASSWORD@tcp(192.168.0.212:3306)/gfast-v32mandate?charset=utf8mb4&parseTime=true&loc=Local"
     #link:   "pgsql:postgres:123456@tcp(192.168.0.214:5432)/gfast-v32"
     #    link: "dm:GFAST:12345678@tcp(127.0.0.1:5236)/GFASTV32"
     debug: true

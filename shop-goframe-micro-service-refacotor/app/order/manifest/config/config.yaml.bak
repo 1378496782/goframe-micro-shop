@@ -15,7 +15,7 @@ grpc:
 
 database:
   default:
-    link:  "mysql:root:root@tcp(127.0.0.1:3306)/order"
+    link:  "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(127.0.0.1:3306)/order"
     debug:
 
 
@@ -64,4 +64,4 @@ payment:
     notifyUrl: "https://business.dayu.club/frontend/notify"         # 支付回调地址
     refundNotifyUrl: "https://business.dayu.club/frontend/refundNotify" # 退款回调地址
     privateKey: |
-      CHANGE_ME_WECHAT_PRIVATE_KEY
+    CHANGE_ME_WECHAT_PRIVATE_KEY

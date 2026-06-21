@@ -1,12 +1,12 @@
 <template>
 	<div class="layout-columns-aside">
 		<el-scrollbar>
-			<ul @mouseleave="DEMO_WECHAT_OPEN_ID()">
+			<ul @mouseleave="onColumnsAsideMenuMouseleave()">
 				<li
 					v-for="(v, k) in columnsAsideList"
 					:key="k"
 					@click="onColumnsAsideMenuClick(v, k)"
-					@mouseenter="DEMO_WECHAT_OPEN_ID(v, k)"
+					@mouseenter="onColumnsAsideMenuMouseenter(v, k)"
 					:ref="
 						(el) => {
 							if (el) columnsAsideOffsetTopRefs[k] = el;
@@ -95,7 +95,7 @@ const onColumnsAsideMenuClick = (v: Object, k: number) => {
   else router.push(path);
 };
 // 鼠标移入时，显示当前的子级菜单
-const DEMO_WECHAT_OPEN_ID = (v: RouteRecordRaw, k: number) => {
+const onColumnsAsideMenuMouseenter = (v: RouteRecordRaw, k: number) => {
   if (!themeConfig.value.isColumnsMenuHoverPreload) return false;
   let { path } = v;
   state.liOldPath = path;
@@ -106,7 +106,7 @@ const DEMO_WECHAT_OPEN_ID = (v: RouteRecordRaw, k: number) => {
   stores.setColumnsNavHover(true);
 };
 // 鼠标移走时，显示原来的子级菜单
-const DEMO_WECHAT_OPEN_ID = async () => {
+const onColumnsAsideMenuMouseleave = async () => {
   await stores.setColumnsNavHover(false);
   // 添加延时器，防止拿到的 store.state.routesList 值不是最新的
   setTimeout(() => {

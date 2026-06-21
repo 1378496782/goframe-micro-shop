@@ -15,7 +15,7 @@ server:
 
 database:
   default:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/resource"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/resource"
     debug: false
 
 etcd:

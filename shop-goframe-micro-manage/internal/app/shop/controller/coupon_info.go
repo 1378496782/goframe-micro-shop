@@ -104,7 +104,7 @@ func (c *couponInfoController) Export(ctx context.Context, req *shop.CouponInfoE
 	if err != nil {
 		return
 	}
-	r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
+	r.Response.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	r.Response.Header().Set("Accept-Ranges", "bytes")
 	r.Response.Header().Set("Access-Control-Expose-Headers", "*")
 	r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("优惠券")+".xlsx")
@@ -131,7 +131,7 @@ func (c *couponInfoController) ExcelTemplate(ctx context.Context, req *shop.Coup
 	if err != nil {
 		return
 	}
-	r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
+	r.Response.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	r.Response.Header().Set("Accept-Ranges", "bytes")
 	r.Response.Header().Set("Access-Control-Expose-Headers", "*")
 	r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("优惠券模板")+".xlsx")

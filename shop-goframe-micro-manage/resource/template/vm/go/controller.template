@@ -346,7 +346,7 @@ func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.Mo
     if err != nil {
         return
     }
-    r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
+    r.Response.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     r.Response.Header().Set("Accept-Ranges", "bytes")
     r.Response.Header().Set("Access-Control-Expose-Headers", "*")
     r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("{{.table.TableComment}}")+".xlsx")
@@ -382,7 +382,7 @@ func (c *{{$structName}}Controller) ExcelTemplate(ctx context.Context,req *{{.ta
     if err != nil {
         return
     }
-    r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
+    r.Response.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     r.Response.Header().Set("Accept-Ranges", "bytes")
     r.Response.Header().Set("Access-Control-Expose-Headers", "*")
     r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("{{.table.TableComment}}模板")+".xlsx")

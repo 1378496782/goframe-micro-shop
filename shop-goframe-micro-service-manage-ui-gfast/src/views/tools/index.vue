@@ -12,7 +12,7 @@
 			<el-form-item label="验证百分比（可以小数）:" prop="a23" class="mt20">
 				<div class="tools-warp-form-msg">验证可以输入大于0小于100的数字</div>
 				<div>
-					<el-input v-model="ruleForm.a23" @input="DEMO_WECHAT_OPEN_ID($event)" placeholder="请输入数字进行测试">
+					<el-input v-model="ruleForm.a23" @input="onVerifyNumberPercentageFloat($event)" placeholder="请输入数字进行测试">
 						<template #append> % </template>
 					</el-input>
 				</div>
@@ -22,7 +22,7 @@
 					验证可以输入小数或整数，0 开始， . 只能出现一次，保留小数点后保留2位小数。(负数时，模拟拼接负号给后台)。
 				</div>
 				<div>
-					<el-input v-model="ruleForm.a1" @input="DEMO_WECHAT_OPEN_ID($event)" placeholder="请输入小数或整数进行测试"> </el-input>
+					<el-input v-model="ruleForm.a1" @input="onVerifyNumberIntegerAndFloat($event)" placeholder="请输入小数或整数进行测试"> </el-input>
 				</div>
 			</el-form-item>
 			<el-form-item label="正整数:" prop="a2" class="mt20">
@@ -66,7 +66,7 @@
 					验证数字转成中文的大写。<span class="tools-warp-form-msg-red">{{ cnText }}</span>
 				</div>
 				<div>
-					<el-input v-model="ruleForm.a8" @input="DEMO_WECHAT_OPEN_ID($event)" placeholder="请输入金额进行测试"> </el-input>
+					<el-input v-model="ruleForm.a8" @input="onVerifyNumberCnUppercase($event)" placeholder="请输入金额进行测试"> </el-input>
 				</div>
 			</el-form-item>
 			<el-form-item label="手机号码:" prop="a9" class="mt20">
@@ -348,11 +348,11 @@ export default defineComponent({
 			state.ruleForm.a22 = verifyNumberPercentage(val);
 		};
 		// 验证百分比（可以小数）
-		const DEMO_WECHAT_OPEN_ID = (val: string) => {
+		const onVerifyNumberPercentageFloat = (val: string) => {
 			state.ruleForm.a23 = verifyNumberPercentageFloat(val);
 		};
 		// 小数或整数
-		const DEMO_WECHAT_OPEN_ID = (val: string) => {
+		const onVerifyNumberIntegerAndFloat = (val: string) => {
 			state.ruleForm.a1 = verifyNumberIntegerAndFloat(val);
 		};
 		// 正整数
@@ -382,7 +382,7 @@ export default defineComponent({
 			else state.text = verifyTextColor(state.ruleForm.a7, state.text);
 		};
 		// 数字转中文大写
-		const DEMO_WECHAT_OPEN_ID = (val: string) => {
+		const onVerifyNumberCnUppercase = (val: string) => {
 			state.ruleForm.a8 = verifyNumberIntegerAndFloat(val);
 			if (state.ruleForm.a8 === '') state.cnText = '';
 			else state.cnText = verifyNumberCnUppercase(state.ruleForm.a8);
@@ -451,15 +451,15 @@ export default defineComponent({
 		};
 		return {
 			onVerifyNumberPercentage,
-			DEMO_WECHAT_OPEN_ID,
-			DEMO_WECHAT_OPEN_ID,
+			onVerifyNumberPercentageFloat,
+			onVerifyNumberIntegerAndFloat,
 			onVerifiyNumberInteger,
 			onVerifyCnAndSpace,
 			onVerifyEnAndSpace,
 			onVerifyAndSpace,
 			onVerifyNumberComma,
 			onVerifyTextColor,
-			DEMO_WECHAT_OPEN_ID,
+			onVerifyNumberCnUppercase,
 			onVerifyPhone,
 			onVerifyTelPhone,
 			onVerifyAccount,

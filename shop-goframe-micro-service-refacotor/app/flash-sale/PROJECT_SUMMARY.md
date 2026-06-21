@@ -257,7 +257,7 @@ err := g.DB().Transaction(ctx, func(ctx context.Context, tx *gdb.TX) error {
 ```go
 // JWT Token验证
 func JWTAuth(r *ghttp.Request) {
-    token := r.Header.Get("Authorization")
+    token :CHANGE_ME_SECRET"Authorization")
     if token == "" {
         r.Response.WriteStatusExit(401, "Missing authorization token")
     }

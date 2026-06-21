@@ -14,7 +14,7 @@ grpc:
 
 database:
   default:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/user"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/user"
     debug: false
 
 etcd:
@@ -25,7 +25,7 @@ rabbitmq:
     host: "rabbitmq"
     port: "5672"
     user: "root"
-    password: "root"
+    password: "CHANGE_ME_SECRET"
     vhost: "/"
   exchange:
     user: "user_events"
@@ -37,5 +37,5 @@ rabbitmq:
       registered: "user.registered"
 
 wxMiniConf:
-  appId: CHANGE_ME_WECHAT_APP_ID
-  secret: 1faee0008ac4456ba196289330c7b0f8
+  appId: CHANGE_ME_SECRET
+  secret: CHANGE_ME_SECRET

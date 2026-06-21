@@ -100,7 +100,7 @@
 						<el-switch
 							v-model="getThemeConfig.isColumnsMenuBarColorGradual"
 							size="small"
-							@change="DEMO_WECHAT_OPEN_ID"
+							@change="onColumnsMenuBarGradualChange"
 							:disabled="getThemeConfig.layout !== 'columns'"
 						></el-switch>
 					</div>
@@ -455,7 +455,7 @@ const onBgColorPickerChange = (bg: string) => {
   }
   onTopBarGradualChange();
   onMenuBarGradualChange();
-  DEMO_WECHAT_OPEN_ID();
+  onColumnsMenuBarGradualChange();
   setDispatchThemeConfig();
 };
 // 2、菜单 / 顶栏 --> 顶栏背景渐变
@@ -467,7 +467,7 @@ const onMenuBarGradualChange = () => {
   setGraduaFun('.layout-container .el-aside', getThemeConfig.value.isMenuBarColorGradual, getThemeConfig.value.menuBar);
 };
 // 2、菜单 / 顶栏 --> 分栏菜单背景渐变
-const DEMO_WECHAT_OPEN_ID = () => {
+const onColumnsMenuBarGradualChange = () => {
   setGraduaFun('.layout-container .layout-columns-aside', getThemeConfig.value.isColumnsMenuBarColorGradual, getThemeConfig.value.columnsMenuBar);
 };
 // 2、菜单 / 顶栏 --> 背景渐变函数
@@ -612,7 +612,7 @@ const initSetStyle = () => {
   // 2、菜单 / 顶栏 --> 菜单背景渐变
   onMenuBarGradualChange();
   // 2、菜单 / 顶栏 --> 分栏菜单背景渐变
-  DEMO_WECHAT_OPEN_ID();
+  onColumnsMenuBarGradualChange();
 };
 onMounted(() => {
   nextTick(() => {

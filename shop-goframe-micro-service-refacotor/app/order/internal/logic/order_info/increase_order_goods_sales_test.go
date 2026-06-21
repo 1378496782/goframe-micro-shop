@@ -23,7 +23,7 @@ import (
 func TestMain(m *testing.M) {
 	dbLink := os.Getenv("ORDER_TEST_DB_LINK")
 	if dbLink == "" {
-		dbLink = "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(127.0.0.1:3306)/order"
+		dbLink = "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(127.0.0.1:3306)/order"
 	}
 
 	if err := gdb.SetConfig(gdb.Config{

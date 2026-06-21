@@ -15,7 +15,7 @@ type CustomClaims struct {
 }
 
 const (
-	JWTSecretKey = "yemcry@163.com"
+	JWTSecretKey = "CHANGE_ME_JWT_SECRET"
 )
 
 // 生成随机盐值

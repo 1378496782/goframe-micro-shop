@@ -49,7 +49,7 @@
   },
   "compileType": "miniprogram",
   "libVersion": "3.10.2",
-  "appid": "CHANGE_ME_WECHAT_APP_ID",
+  "appid": "CHANGE_ME_SECRET",
   "projectname": "shop-goframe-micro-uniapp",
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},

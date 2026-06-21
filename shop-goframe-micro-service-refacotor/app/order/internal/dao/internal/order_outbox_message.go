@@ -37,8 +37,8 @@ type OrderOutboxMessageColumns struct {
 	SentAt      string // 发送成功时间
 }
 
-// DEMO_WECHAT_OPEN_ID holds the columns for the table order_outbox_message.
-var DEMO_WECHAT_OPEN_ID = OrderOutboxMessageColumns{
+// orderOutboxMessageColumns holds the columns for the table order_outbox_message.
+var orderOutboxMessageColumns = OrderOutboxMessageColumns{
 	Id:          "id",
 	EventId:     "event_id",
 	EventType:   "event_type",
@@ -60,7 +60,7 @@ func NewOrderOutboxMessageDao(handlers ...gdb.ModelHandler) *OrderOutboxMessageD
 	return &OrderOutboxMessageDao{
 		group:    "default",
 		table:    "order_outbox_message",
-		columns:  DEMO_WECHAT_OPEN_ID,
+		columns:  orderOutboxMessageColumns,
 		handlers: handlers,
 	}
 }

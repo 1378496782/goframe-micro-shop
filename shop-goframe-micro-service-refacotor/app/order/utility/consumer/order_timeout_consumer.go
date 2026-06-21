@@ -25,7 +25,7 @@ func NewOrderTimeoutConsumer(ctx context.Context) *OrderTimeoutConsumer {
 		ExchangeType:  "x-delayed-message",
 		Queue:         g.Cfg().MustGet(ctx, "rabbitmq.queue.orderTimeoutQueue").String(),
 		RoutingKey:    g.Cfg().MustGet(ctx, "rabbitmq.routingKey.orderTimeout").String(),
-		ConsumerTag:   "DEMO_WECHAT_OPEN_ID",
+		ConsumerTag:   "order_service_order_timeout",
 		AutoAck:       false,
 		PrefetchCount: 1,
 		Durable:       true,

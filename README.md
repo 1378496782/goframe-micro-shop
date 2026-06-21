@@ -86,6 +86,24 @@ docker compose -f docker-compose.prod.yml up -d
 | Elasticsearch | http://localhost:9200 |
 | Kibana | http://localhost:5601 |
 
+## 公开仓库发布
+
+本地开发仓库里可以继续保留真实部署配置；发布到 GitHub 前，使用脚本生成一个独立的公开副本，并在副本中替换已知敏感值、排除构建产物、执行基础扫描。
+
+只生成发布副本并提交：
+
+```bash
+./scripts/publish-github.sh -m "docs: update project readme"
+```
+
+确认无误后直接推送：
+
+```bash
+./scripts/publish-github.sh -m "feat: update order flow" --push
+```
+
+默认发布副本目录为 `.github-publish/goframe-micro-shop`，不会修改各子项目本地 Git 仓库，也不会影响本地 Docker Compose 部署使用的真实配置。
+
 ## 项目定位
 
 这个仓库主要用于展示从单体电商到微服务电商的工程实践过程。代码和文档更关注服务端核心链路、分布式系统常见问题和可运行部署闭环，而不是追求完整商业化产品形态。

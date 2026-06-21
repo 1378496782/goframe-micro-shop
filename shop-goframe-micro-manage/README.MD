@@ -78,7 +78,7 @@ gfToken:
   timeOut: 10800         #token超时时间（秒）
   maxRefresh: 5400       #token自动刷新时间（秒）
   multiLogin: true       #是否允许一个账号多人同时登录
-  encryptKey: "CHANGE_ME_GFTOKEN_ENCRYPT_KEY"    #加密key (32位)
+  encryptKey: "CHANGE_ME_SECRET"    #加密key (32位)
   cacheModel: "redis"    #存储引擎 （memory使用内存|redis使用redis）
   excludePaths:          #排除不做登录验证的路由地址
     - "/api/v1/system/login"

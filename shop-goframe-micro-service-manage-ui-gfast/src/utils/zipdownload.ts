@@ -2,7 +2,7 @@ import axios from 'axios'
 import {baseURL, getToken} from "/@/utils/gfast"
 import { ElMessage,ElLoading } from 'element-plus';
 const mimeMap = {
-  xlsx: 'application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip'
 }
 
@@ -68,7 +68,7 @@ export function downLoadXml (url:string,params:any,rType='get') {
     }
     try {
       const aLink = document.createElement('a')
-      var blob = new Blob([res.data], { type: 'application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet' })
+      var blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
       var patt = new RegExp('filename=([^;]+\\.[^\\.;]+);*')
       var contentDisposition = decodeURI(res.headers['content-disposition'] || res.headers['Content-Disposition'])
       var result = patt.exec(contentDisposition)

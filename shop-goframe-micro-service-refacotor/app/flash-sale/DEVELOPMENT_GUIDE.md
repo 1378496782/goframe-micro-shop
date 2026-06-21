@@ -368,7 +368,7 @@ server:
   
 database:
   default:
-    link: "mysql:flash_sale:password@tcp(127.0.0.1:3306)/flash_sale"
+    link: "mysql:flash_sale:CHANGE_ME_MYSQL_PASSWORD@tcp(127.0.0.1:3306)/flash_sale"
     
 redis:
   default:

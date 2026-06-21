@@ -33,7 +33,7 @@ database:
 
 
   default:
-    link:   "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/admin?charset=utf8mb4&parseTime=true&loc=Local"
+    link:   "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/admin?charset=utf8mb4&parseTime=true&loc=Local"
     debug:  true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -42,7 +42,7 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   goods:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/goods?charset=utf8mb4&parseTime=true&loc=Local"
     debug: true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -51,7 +51,7 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   user:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/user?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/user?charset=utf8mb4&parseTime=true&loc=Local"
     debug: true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -60,7 +60,7 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   interaction:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/interaction?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/interaction?charset=utf8mb4&parseTime=true&loc=Local"
     debug: true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -69,7 +69,7 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   order:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/order?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/order?charset=utf8mb4&parseTime=true&loc=Local"
     debug: true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -78,7 +78,7 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   resource:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/resource?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/resource?charset=utf8mb4&parseTime=true&loc=Local"
     debug: true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -87,7 +87,7 @@ database:
     maxLifetime: "30s" #(单位秒)连接对象可重复使用的时间长度
 
   banner:
-    link: "mysql:root:CHANGE_ME_MYSQL_ROOT_PASSWORD@tcp(mysql:3306)/banner?charset=utf8mb4&parseTime=true&loc=Local"
+    link: "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(mysql:3306)/banner?charset=utf8mb4&parseTime=true&loc=Local"
     debug: true
     charset: "utf8mb4" #数据库编码
     dryRun: false #空跑
@@ -100,7 +100,7 @@ gfToken:
   timeOut: 10800
   maxRefresh: 5400
   multiLogin: true
-  encryptKey: "CHANGE_ME_GFTOKEN_ENCRYPT_KEY"
+  encryptKey: "CHANGE_ME_SECRET"
   cacheModel: "redis"
   excludePaths:
     - "/api/v1/system/login"
@@ -139,8 +139,8 @@ upload:
   tencentCOS:
     upPath : "/gfast/"
     rawUrl :    "https://xxxxxx.ap-xxxxx.myqcloud.com"
-    secretID :  "xxxxxxxxxx"
-    secretKey : "xxxxxxxxxx"
+    secretID :  "CHANGE_ME_SECRET"
+    secretKey : "CHANGE_ME_SECRET"
 
 # 代码生成配置
 gen:

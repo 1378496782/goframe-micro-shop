@@ -43,7 +43,7 @@
     },
     "compileType": "miniprogram",
     "libVersion": "3.10.2",
-    "appid": "CHANGE_ME_WECHAT_APP_ID",
+    "appid": "CHANGE_ME_SECRET",
     "projectname": "gf%E5%95%86%E5%9F%8E",
     "debugOptions": {
         "hidedInDevtools": []

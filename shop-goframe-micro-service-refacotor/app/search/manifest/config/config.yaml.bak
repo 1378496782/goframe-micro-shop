@@ -15,7 +15,7 @@ server:
 
 database:
   default:
-    link:  "mysql:root:root@tcp(127.0.0.1:3306)/goods"
+    link:  "mysql:root:CHANGE_ME_MYSQL_PASSWORD@tcp(127.0.0.1:3306)/goods"
     debug:
 
 etcd:

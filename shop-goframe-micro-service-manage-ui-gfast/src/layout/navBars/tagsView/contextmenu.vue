@@ -17,7 +17,7 @@
 						tabindex="-1"
 						:key="k"
 						v-if="!v.affix"
-						@click="DEMO_WECHAT_OPEN_ID(v.contextMenuClickId)"
+						@click="onCurrentContextmenuClick(v.contextMenuClickId)"
 					>
 						<SvgIcon :name="v.icon" />
 						<span>{{ $t(v.txt) }}</span>
@@ -75,7 +75,7 @@ const dropdowns = computed(() => {
   }
 });
 // 当前项菜单点击
-const DEMO_WECHAT_OPEN_ID = (contextMenuClickId: number) => {
+const onCurrentContextmenuClick = (contextMenuClickId: number) => {
   emit('currentContextmenuClick', Object.assign({}, { contextMenuClickId }, state.item));
 };
 // 打开右键菜单：判断是否固定，固定则不显示关闭按钮

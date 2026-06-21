@@ -20,7 +20,7 @@ func NewCouponResultConsumer(ctx context.Context) *CouponResultConsumer {
 		ExchangeType:  "topic",
 		Queue:         g.Cfg().MustGet(ctx, "rabbitmq.queue.couponConfirmResultQueue").String(),
 		RoutingKey:    g.Cfg().MustGet(ctx, "rabbitmq.routingKey.couponConfirmResult").String(),
-		ConsumerTag:   "DEMO_WECHAT_OPEN_ID",
+		ConsumerTag:   "order_service_coupon_result",
 		AutoAck:       false,
 		PrefetchCount: 1,
 		Durable:       true,
