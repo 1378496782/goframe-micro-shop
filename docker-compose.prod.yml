@@ -210,6 +210,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - shop-micro-network
     restart: always
@@ -243,6 +245,8 @@ services:
       etcd:
         condition: service_healthy
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -313,6 +317,8 @@ services:
       etcd:
         condition: service_healthy
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - shop-micro-network
