@@ -1,0 +1,367 @@
+.search-container {
+  padding: 10px;
+  background: #f8f8f8;
+  min-height: 100vh;
+}
+
+/* 搜索头部 */
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  height: 36px;
+  background: white;
+  border-radius: 18px;
+  padding: 0 15px;
+  font-size: 14px;
+}
+
+.placeholder {
+  color: #86909C;
+}
+
+.search-btn {
+  background: #19aecc;
+  color: white;
+  border-radius: 18px;
+  padding: 0 15px;
+  height: 36px;
+  line-height: 36px;
+  font-size: 14px;
+}
+
+.filter-btn {
+  background: white;
+  border: 1px solid #E5E6EB;
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 36px;
+  line-height: 36px;
+}
+
+/* 筛选面板 */
+.filter-panel {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group {
+  margin-bottom: 15px;
+}
+
+.filter-label {
+  display: block;
+  font-size: 14px;
+  color: #4E5969;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.filter-input {
+  height: 36px;
+  background: #f8f8f8;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 1px solid #E5E6EB;
+}
+
+.price-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-input {
+  flex: 1;
+  height: 36px;
+  background: #f8f8f8;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 1px solid #E5E6EB;
+  text-align: center;
+}
+
+.price-separator {
+  color: #86909C;
+}
+
+.sort-picker {
+  background: #f8f8f8;
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 36px;
+  line-height: 36px;
+  border: 1px solid #E5E6EB;
+}
+
+.picker-value {
+  font-size: 14px;
+  color: #1D2129;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.filter-reset {
+  flex: 1;
+  background: white;
+  color: #19aecc;
+  border: 1px solid #19aecc;
+  border-radius: 6px;
+  height: 36px;
+  line-height: 36px;
+}
+
+.filter-apply {
+  flex: 1;
+  background: #19aecc;
+  color: white;
+  border-radius: 6px;
+  height: 36px;
+  line-height: 36px;
+}
+
+/* 商品列表 */
+.goods-list {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.goods-item {
+  display: flex;
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.goods-item:last-child {
+  border-bottom: none;
+}
+
+.goods-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  margin-right: 12px;
+}
+
+.goods-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.goods-name {
+  font-size: 14px;
+  color: #1D2129;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.goods-highlight {
+  font-size: 12px;
+  color: #F53F3F;
+  margin-top: 4px;
+}
+
+.goods-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.goods-brand {
+  font-size: 12px;
+  color: #86909C;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.goods-sale {
+  font-size: 12px;
+  color: #86909C;
+}
+
+.goods-price-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.goods-price {
+  font-size: 16px;
+  color: #F53F3F;
+  font-weight: bold;
+}
+
+.goods-stock {
+  font-size: 12px;
+  color: #86909C;
+}
+
+/* 搜索建议面板 */
+.suggestion-panel {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-text {
+  font-size: 14px;
+  color: #1D2129;
+}
+
+.suggestion-item:active {
+  background-color: #f8f8f8;
+}
+
+/* 搜索历史面板 */
+.history-panel {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.panel-title {
+  font-size: 16px;
+  color: #1D2129;
+  font-weight: 500;
+}
+
+.clear-history {
+  font-size: 12px;
+  color: #86909C;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.history-list {
+  padding: 0 15px;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-text {
+  font-size: 14px;
+  color: #1D2129;
+}
+
+.delete-history {
+  font-size: 16px;
+  color: #86909C;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* 热门搜索面板 */
+.hot-search-panel {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hot-search-list {
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hot-search-item {
+  background: #f8f8f8;
+  border-radius: 16px;
+  padding: 6px 12px;
+}
+
+.hot-search-text {
+  font-size: 12px;
+  color: #1D2129;
+}
+
+.hot-search-text.hot {
+  color: #F53F3F;
+  font-weight: 500;
+}
+
+.hot-search-item:active {
+  background-color: #e8e8e8;
+}
+
+/* 加载状态 */
+.loading-state,
+.no-more,
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: #86909C;
+  font-size: 14px;
+}
+
+.loading-state {
+  color: #19aecc;
+}

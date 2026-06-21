@@ -1,0 +1,248 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "goframe电商微服务v2",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "搜索"
+    }
+  ],
+  "paths": { 
+    "/search/goods": {
+      "get": {
+        "summary": "商品搜索",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "搜索"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "搜索关键词",
+            "required": false,
+            "schema": {
+              "description": "搜索关键词",
+              "format": "string",
+              "type": "string"
+            }
+          },
+          {
+            "name": "brand",
+            "in": "query",
+            "description": "品牌名称",
+            "required": false,
+            "schema": {
+              "description": "品牌名称",
+              "format": "string",
+              "type": "string"
+            }
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "description": "最低价格(分)",
+            "required": false,
+            "schema": {
+              "description": "最低价格(分)",
+              "format": "uint64",
+              "type": "integer"
+            }
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "description": "最高价格(分)",
+            "required": false,
+            "schema": {
+              "description": "最高价格(分)",
+              "format": "uint64",
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "排序方式: default-默认, price_asc-价格升序, price_desc-价格降序, sale-销量",
+            "required": false,
+            "schema": {
+              "description": "排序方式: default-默认, price_asc-价格升序, price_desc-价格降序, sale-销量",
+              "format": "string",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "页码",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "description": "页码",
+              "format": "uint32",
+              "type": "integer"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "每页数量",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "description": "每页数量",
+              "format": "uint32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/shop-goframe-micro-service-refacotor.app.search.api.search.v1.SearchGoodsRes",
+                  "description": ""
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "shop-goframe-micro-service-refacotor.app.search.api.search.v1.SearchGoodsRes": {
+        "properties": {
+          "list": {
+            "description": "商品列表",
+            "format": "[]*v1.GoodsInfoItem",
+            "items": {
+              "$ref": "#/components/schemas/shop-goframe-micro-service-refacotor.app.search.api.search.v1.GoodsInfoItem",
+              "description": ""
+            },
+            "type": "array"
+          },
+          "page": {
+            "description": "当前页码",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "size": {
+            "description": "每页数量",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "total": {
+            "description": "总数",
+            "format": "uint32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "shop-goframe-micro-service-refacotor.app.search.api.search.v1.GoodsInfoItem": {
+        "properties": {
+          "id": {
+            "description": "商品ID",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "name": {
+            "description": "商品名称",
+            "format": "string",
+            "type": "string"
+          },
+          "images": {
+            "description": "支持单图,多图",
+            "format": "string",
+            "type": "string"
+          },
+          "price": {
+            "description": "价格(分)",
+            "format": "uint64",
+            "type": "integer"
+          },
+          "level1_category_id": {
+            "description": "一级分类ID",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "level2_category_id": {
+            "description": "二级分类ID",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "level3_category_id": {
+            "description": "三级分类ID",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "brand": {
+            "description": "品牌",
+            "format": "string",
+            "type": "string"
+          },
+          "stock": {
+            "description": "库存",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "sale": {
+            "description": "销量",
+            "format": "uint32",
+            "type": "integer"
+          },
+          "tags": {
+            "description": "标签",
+            "format": "string",
+            "type": "string"
+          },
+          "detail_info": {
+            "description": "详情",
+            "format": "string",
+            "type": "string"
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/google.golang.org.protobuf.types.known.timestamppb.Timestamp",
+            "description": "创建时间"
+          },
+          "updated_at": {
+            "$ref": "#/components/schemas/google.golang.org.protobuf.types.known.timestamppb.Timestamp",
+            "description": "更新时间"
+          },
+          "highlight": {
+            "description": "高亮名称",
+            "format": "string",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "google.golang.org.protobuf.types.known.timestamppb.Timestamp": {
+        "properties": {
+          "seconds": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "nanos": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {}
+  },
+  "servers": [],
+  "security": []
+}

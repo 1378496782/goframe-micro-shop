@@ -1,0 +1,292 @@
+/* 页面容器 */
+.container {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+  padding-bottom: 120rpx;
+}
+
+/* 订单状态栏 */
+.order-status-bar {
+  display: flex;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  background: linear-gradient(135deg, #19aecc 0%, #147a8c 100%);
+  color: #ffffff;
+}
+
+.status-icon {
+  font-size: 60rpx;
+  margin-right: 20rpx;
+}
+
+.status-info {
+  flex: 1;
+}
+
+.status-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  margin-bottom: 10rpx;
+}
+
+.status-desc {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 收货地址信息 */
+.address-section {
+  display: flex;
+  align-items: flex-start;
+  padding: 30rpx;
+  background-color: #ffffff;
+  margin: 20rpx 0;
+}
+
+.address-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  color: #19aecc;
+}
+
+.address-info {
+  flex: 1;
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.receiver-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  margin-right: 20rpx;
+}
+
+.receiver-phone {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.address-detail {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* 商品区域 */
+.goods-section {
+  background-color: #ffffff;
+  margin-bottom: 20rpx;
+}
+
+.section-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.goods-list {
+  padding: 0 30rpx;
+}
+
+.goods-item {
+  display: flex;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.goods-item:last-child {
+  border-bottom: none;
+}
+
+.goods-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+  background-color: #f8f8f8;
+}
+
+.goods-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.goods-name {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.goods-spec {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 10rpx;
+}
+
+.goods-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.goods-price {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.goods-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 订单信息区域 */
+.order-info-section {
+  background-color: #ffffff;
+  margin-bottom: 20rpx;
+}
+
+.info-list {
+  padding: 0 30rpx;
+}
+
+.info-item {
+  display: flex;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666;
+  width: 160rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+}
+
+/* 价格信息区域 */
+.price-section {
+  background-color: #ffffff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10rpx 0;
+}
+
+.price-item.total {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.price-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.price-value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.price-item.total .price-label {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.price-item.total .price-value {
+  font-size: 32rpx;
+  color: #19aecc;
+  font-weight: 500;
+}
+
+/* 底部操作按钮 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background-color: #ffffff;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.action-btn {
+  height: 70rpx;
+  line-height: 70rpx;
+  padding: 0 40rpx;
+  margin-left: 20rpx;
+  font-size: 28rpx;
+  border-radius: 35rpx;
+  background-color: #ffffff;
+  border: 1rpx solid #ddd;
+}
+
+.action-btn.default {
+  color: #666;
+}
+
+.action-btn.primary {
+  color: #ffffff;
+  background-color: #19aecc;
+  border: 1rpx solid #19aecc;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 200rpx 0;
+  background-color: #ffffff;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  color: #ccc;
+  margin-bottom: 20rpx;
+}
+
+.empty-message {
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.empty-sub-message {
+  font-size: 26rpx;
+  color: #999;
+}

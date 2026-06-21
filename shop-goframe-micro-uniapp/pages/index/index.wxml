@@ -1,0 +1,97 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索商品" 
+      placeholder-class="placeholder"
+      bindinput="onSearchInput"
+    />
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+  
+  <!-- 轮播图 -->
+  <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000" duration="500">
+    <swiper-item wx:for="{{banners}}" wx:key="id">
+      <image 
+        src="{{item.image}}" 
+        class="banner-image" 
+        mode="aspectFill" 
+        lazy-load="true"
+        binderror="onBannerImageError"
+        bindload="onBannerImageLoad"
+        bindtap="onBannerClick" 
+        data-url="{{item.url}}"
+        show-menu-by-longpress="true"
+      />
+    </swiper-item>
+  </swiper>
+
+  <!-- 分类导航 -->
+  <view class="category-nav">
+    <view 
+      class="category-item" 
+      wx:for="{{categories}}" 
+      wx:key="id"
+      bindtap="onCategoryClick"
+      data-id="{{item.id}}"
+    >
+      <image src="{{item.icon}}" class="category-icon"/>
+      <text class="category-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 拼团砍价专区 -->
+  <!-- <view class="section group-buy-section">
+    <view class="section-header">
+      <text class="section-title">🔥 拼团砍价</text>
+      <text class="section-more" bindtap="onGroupBuyMore">更多活动 ></text>
+    </view>
+    <scroll-view class="group-buy-list" scroll-x="true">
+      <view 
+        class="group-buy-item" 
+        wx:for="{{groupBuyProducts}}" 
+        wx:key="id"
+        bindtap="onGroupBuyClick"
+        data-id="{{item.id}}"
+      >
+        <image src="{{item.mainImage}}" class="group-buy-image" mode="aspectFill"/>
+        <view class="group-buy-info">
+          <text class="group-buy-name">{{item.name}}</text>
+          <view class="price-section">
+            <text class="group-price">¥{{item.groupPrice}}</text>
+            <text class="original-price">¥{{item.originalPrice}}</text>
+          </view>
+          <text class="group-count">{{item.groupCount}}人团</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view> -->
+
+  <!-- 推荐商品 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">热门推荐</text>
+      <text class="section-more" bindtap="onViewMore">查看更多 ></text>
+    </view>
+    <view class="product-list">
+      <view 
+        class="product-item" 
+        wx:for="{{products}}" 
+        wx:key="id"
+        bindtap="onProductClick"
+        data-id="{{item.id}}"
+      >
+        <image src="{{item.mainImage || 'https://via.placeholder.com/200x200?text=商品图片'}}" class="product-image" mode="aspectFill"/>
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <view class="price-section">
+            <text class="current-price">¥{{item.priceFormatted}}</text>
+            <text class="original-price">¥{{item.originalPriceFormatted}}</text>
+          </view>
+          <text class="sales">已售{{item.sale || 0}}件</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

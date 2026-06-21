@@ -1,0 +1,143 @@
+<view class="container">
+  <!-- 商品列表 -->
+  <view class="goods-list">
+    <view class="section-title">商品信息</view>
+    <view wx:for="{{orderItems}}" wx:key="id" class="goods-item">
+      <image class="goods-image" src="{{item.image || item.goods_pic_url}}" mode="aspectFill" />
+      <view class="goods-info">
+        <view class="goods-name">{{item.name || item.goods_name}}</view>
+        <view class="goods-spec">品牌：{{item.spec || item.goods_brand || '默认规格'}}</view>
+        <view class="goods-price">¥{{item.formattedPrice}} x {{item.quantity || item.count || 1}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐商品 -->
+<!--  <view class="recommend-section" wx:if="{{recommendGoods.length > 0}}">
+    <view class="section-title">顺手买</view>
+    <view class="recommend-list">
+      <view wx:for="{{recommendGoods}}" wx:key="id" class="recommend-item">
+        <checkbox class="recommend-checkbox" value="{{item.id}}" checked="{{item.selected}}" bindchange="onRecommendSelect" />
+        <image class="recommend-image" src="{{item.image}}" mode="aspectFill" />
+        <view class="recommend-info">
+          <view class="recommend-name">{{item.name}}</view>
+          <view class="recommend-price">
+            <text class="current-price">¥{{item.price}}</text>
+            <text class="original-price">¥{{item.originalPrice}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view> -->
+
+  <!-- 优惠券选择 -->
+  <view class="coupon-section">
+    <view class="section-title">优惠券</view>
+    <view class="coupon-select" bindtap="openCouponPopup">
+      <text class="coupon-text">
+        {{selectedCoupon ? '已选择优惠券：¥' + selectedCoupon.amountYuan + '（点击可取消）' : '选择优惠券'}}
+      </text>
+      <text class="coupon-arrow">›</text>
+    </view>
+    <view wx:if="{{selectedCoupon}}" class="coupon-cancel-btn" bindtap="removeCoupon">
+      <text class="cancel-text">取消使用</text>
+    </view>
+  </view>
+
+  <!-- 备注输入框 -->
+  <view class="remark-section">
+    <view class="section-title">
+      备注信息
+      <text class="required-mark">*</text>
+      <text class="remark-hint">（请填写微信号或手机号，方便客服联系）</text>
+    </view>
+    <textarea 
+      class="remark-input {{remarkError ? 'error' : ''}}" 
+      placeholder="请填写微信号或者手机号" 
+      placeholder-class="placeholder"
+      value="{{remark}}"
+      bindinput="onRemarkInput"
+      maxlength="50"
+      bindblur="onRemarkBlur"
+    ></textarea>
+    <view wx:if="{{remarkError}}" class="error-message">{{remarkError}}</view>
+    <view class="char-count">{{remark.length}}/50</view>
+  </view>
+
+
+  <!-- 价格汇总 -->
+  <view class="price-section">
+    <!-- 主商品总价 -->
+    <view class="price-item">
+      <text>商品总价：</text>
+      <text class="price">¥{{totalPrice}}</text>
+    </view>
+    
+    <!-- 勾选的推荐商品明细 -->
+    <view wx:for="{{recommendGoods}}" wx:key="id" wx:if="{{item.selected}}">
+      <view class="price-item recommend-item">
+        <text>+ {{item.name}}</text>
+        <text class="price">¥{{item.price}}</text>
+      </view>
+    </view>
+    
+    <!-- 优惠券抵扣 -->
+    <view class="price-item" wx:if="{{couponPrice > 0}}">
+      <text>优惠券：</text>
+      <text class="price">-¥{{couponPrice}}</text>
+    </view>
+    
+    <!-- 实付金额 -->
+    <view class="price-item total">
+      <text>实付金额：</text>
+      <text class="price total">¥{{actualPrice}}</text>
+    </view>
+  </view>
+
+  <!-- 优惠券选择弹窗 -->
+  <view class="popup-mask" wx:if="{{showCouponPopup}}" bindtap="closeCouponPopup">
+    <view class="coupon-popup" catchtap="stopPropagation">
+      <view class="popup-header">
+        <text class="popup-title">选择优惠券</text>
+        <text class="popup-close" bindtap="closeCouponPopup">×</text>
+      </view>
+      <scroll-view class="coupon-list" scroll-y>
+        <view 
+          wx:for="{{coupons}}" 
+          wx:key="id" 
+          class="coupon-item {{selectedCoupon && selectedCoupon.id === item.id ? 'selected' : ''}}"
+          bindtap="selectCoupon"
+          data-coupon="{{item}}"
+        >
+          <view class="coupon-amount">¥{{item.amountYuan}}</view>
+          <view class="coupon-info">
+            <text class="coupon-desc">{{item.desc}}</text>
+            <text class="coupon-expire">{{selectedCoupon && selectedCoupon.id === item.id ? '点击取消选择' : '点击使用优惠券'}}</text>
+          </view>
+        </view>
+        <view wx:if="{{coupons.length === 0}}" class="empty-coupon">
+          <text>暂无可用优惠券</text>
+        </view>
+      </scroll-view>
+      <view class="popup-footer">
+        <button class="cancel-coupon-btn" wx:if="{{selectedCoupon}}" bindtap="removeCoupon">取消使用优惠券</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="footer">
+    <view class="total-price">
+      <text>合计：</text>
+      <text class="price">¥{{totalPrice}}</text>
+    </view>
+    <button 
+      class="submit-btn" 
+      bindtap="submitOrder"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      {{loading ? '提交中...' : '提交订单'}}
+    </button>
+  </view>
+</view>

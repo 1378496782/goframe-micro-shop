@@ -1,0 +1,95 @@
+/* 页面容器 */
+.container {
+  padding: 20rpx;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 页面标题 */
+.page-header {
+  padding: 30rpx 0;
+  text-align: center;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  border-radius: 10rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 商品列表 */
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.product-item {
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.product-item:active {
+  transform: scale(0.98);
+}
+
+.product-image {
+  width: 100%;
+  height: 320rpx;
+  background-color: #f8f8f8;
+}
+
+.product-info {
+  padding: 20rpx;
+}
+
+.product-name {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 80rpx;
+  margin-bottom: 15rpx;
+}
+
+.price-section {
+  margin-bottom: 10rpx;
+}
+
+.current-price {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #e64340;
+}
+
+.sales {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 加载更多 */
+.load-more {
+  text-align: center;
+  padding: 40rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 刷新指示器 */
+.refresh-indicator {
+  text-align: center;
+  padding: 30rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}

@@ -1,0 +1,25 @@
+<view class="goods-card" bindtap="onTap">
+  <image 
+    class="goods-image" 
+    src="{{goods.mainImage}}" 
+    mode="aspectFill" 
+    lazy-load="true"
+    binderror="onImageError"
+    data-index="{{index}}"
+    show-menu-by-longpress="true"
+  />
+  
+  <view class="goods-info">
+    <text class="goods-name">{{goods.name}}</text>
+    
+    <view class="goods-meta">
+      <text class="goods-brand" wx:if="{{goods.brand}}">{{goods.brand}}</text>
+      <text class="goods-sale">销量: {{goods.sale || 0}}</text>
+    </view>
+
+    <view class="goods-price-section">
+      <text class="goods-price">¥{{goods.priceFormatted}}</text>
+      <text class="goods-stock" wx:if="{{goods.stock}}">库存: {{goods.stock}}</text>
+    </view>
+  </view>
+</view>

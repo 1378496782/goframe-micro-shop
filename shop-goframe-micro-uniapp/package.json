@@ -1,0 +1,20 @@
+{
+  "name": "shop-goframe-micro-uniapp",
+  "version": "1.0.0",
+  "description": "一个完整的微信小程序商城项目，包含商品展示、分类浏览、购物车、用户中心等核心功能。",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@codeup.aliyun.com:60fadd729187b7df39056384/training_camp/shop-goframe-micro-uniapp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
