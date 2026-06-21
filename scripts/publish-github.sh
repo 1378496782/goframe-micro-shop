@@ -104,6 +104,71 @@ rsync -a --delete \
   --exclude '.env.*' \
   "$ROOT_DIR/" "$PUBLISH_DIR/"
 
+echo "Removing files that should not be published..."
+python3 - "$PUBLISH_DIR" <<'PY'
+from pathlib import Path
+import shutil
+import sys
+
+root = Path(sys.argv[1]).resolve()
+skip_dirs = {".git"}
+remove_dirs = {
+    ".github-publish",
+    ".idea",
+    ".qoder",
+    ".vscode",
+    "build",
+    "dist",
+    "node_modules",
+    "unpackage",
+}
+remove_exact_files = {
+    ".DS_Store",
+    ".env",
+    "gfast-app",
+    "project.private.config.json",
+}
+remove_suffixes = {
+    ".bak",
+    ".exe",
+    ".log",
+    ".tmp",
+}
+
+removed = []
+
+def is_under_skip(path: Path) -> bool:
+    return any(part in skip_dirs for part in path.relative_to(root).parts)
+
+for path in sorted(root.rglob("*"), key=lambda item: len(item.parts), reverse=True):
+    if is_under_skip(path):
+        continue
+    if path.is_dir() and path.name in remove_dirs:
+        shutil.rmtree(path)
+        removed.append(str(path.relative_to(root)) + "/")
+        continue
+    if not path.is_file():
+        continue
+    name = path.name
+    if (
+        name in remove_exact_files
+        or name.endswith("~")
+        or path.suffix.lower() in remove_suffixes
+        or (name.startswith(".env.") and name != ".env.example")
+    ):
+        path.unlink()
+        removed.append(str(path.relative_to(root)))
+
+if removed:
+    print("Removed publish-only excluded paths:")
+    for item in removed[:80]:
+        print(f"  - {item}")
+    if len(removed) > 80:
+        print(f"  ... {len(removed) - 80} more")
+else:
+    print("No excluded publish paths needed removal.")
+PY
+
 echo "Sanitizing public copy..."
 python3 - "$PUBLISH_DIR" <<'PY'
 from pathlib import Path
