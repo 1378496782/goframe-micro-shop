@@ -1,0 +1,683 @@
+<template>
+  {{$lens := .table.Columns|len}}
+  {{$businessName := .table.BusinessName | CaseCamelLower}}
+  {{$treeParentCode := .table.TreeParentCode}}
+  {{$treeCode := .table.TreeCode}}
+  {{$treeName := .table.TreeName}}
+  <div class="{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit">
+    <!-- 添加或修改{{.table.TableComment}}对话框 -->
+    <el-dialog v-model="isShowDialog" width="800px" :close-on-click-modal="false" :destroy-on-close="true">
+      <template #header>
+        <div v-drag="['.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog', '.{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit .el-dialog__header']">{{"{{"}}(!formData.{{.table.PkColumn.HtmlField}} || formData.{{.table.PkColumn.HtmlField}}==0?'添加':'修改')+'{{.table.TableComment}}'{{"}}"}}</div>
+      </template>
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px">
+      {{if .table.IsPkInsertable}}
+        <el-form-item label="{{.table.PkColumn.ColumnComment}}" prop="{{.table.PkColumn.HtmlField}}">
+          <el-input v-model="formData.{{.table.PkColumn.HtmlField}}" placeholder="请输入{{.table.PkColumn.ColumnComment}}" />
+        </el-form-item>
+      {{end}}
+      {{range $index, $column := .table.EditColumns}}
+        {{if and (ne $treeParentCode "") (eq $column.HtmlField $treeParentCode)}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-cascader
+            v-model="formData.{{$column.HtmlField}}"
+            placeholder="请选择"
+            :options="{{$businessName}}Options"
+            filterable
+            clearable
+            :props="{ label: '{{$treeName}}',value: '{{$treeCode}}',checkStrictly: true,emitPath: false }"
+          />
+        </el-form-item>
+        {{else if eq $column.HtmlType "input"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-input v-model="formData.{{$column.HtmlField}}" placeholder="请输入{{$column.ColumnComment}}" />
+        </el-form-item>
+        {{else if eq $column.HtmlType "inputNumber"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-input-number v-model="formData.{{$column.HtmlField}}" placeholder="请输入{{$column.ColumnComment}}" />
+        </el-form-item>
+        {{else if eq $column.HtmlType "select" "selects"}}
+          {{if ne $column.LinkTableName ""}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-select filterable clearable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" {{if $column.IsCascadeParent}}@change="form{{$column.ColumnName | CaseCamel}}Changed"{{end}} {{if eq $column.HtmlType "selects"}}multiple{{end}}>
+              <el-option
+              {{if $column.IsCascade}}
+                  v-for="item in {{$column.HtmlField}}FormOptions"
+              {{else}}
+                  v-for="item in {{$column.HtmlField}}Options"
+              {{end}}
+                  :key="item.key"
+                  :label="item.value"
+                  :value="item.key"
+              ></el-option>
+          </el-select>
+        </el-form-item>
+          {{else if ne $column.DictType ""}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-select filterable clearable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" >
+            <el-option
+              v-for="dict in {{$column.HtmlField}}Options"
+              :key="dict.value"
+              :label="dict.label"
+              {{if eq $column.GoType "Integer"}}
+              :value="parseInt(dict.value)"
+              {{else}}
+                  :value="dict.value"
+              {{end}}
+            ></el-option>
+          </el-select>
+        </el-form-item>
+          {{else}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-select filterable clearable v-model="formData.{{$column.HtmlField}}" placeholder="请选择{{$column.ColumnComment}}" >
+            <el-option label="请选择字典生成" value="" />
+          </el-select>
+        </el-form-item>
+          {{end}}
+        {{else if eq $column.HtmlType "treeSelect" "treeSelects"}}
+        {{if ne $column.LinkTableName ""}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          {{$tLabel:=""}}
+          {{$tValue:=""}}
+          {{range $li,$lc := $.table.LinkedTables}}
+            {{if eq $lc.TableName $column.LinkTableName}}
+              {{$tLabel = $column.LinkLabelName|CaseCamelLower}}
+              {{$tValue = $column.LinkLabelId|CaseCamelLower}}
+            {{end}}
+          {{end}}
+          <el-cascader
+                  v-model="formData.{{$column.HtmlField}}"
+                  placeholder="请选择"
+                  :options="{{$column.HtmlField}}Options"
+                  filterable
+                  clearable
+                  :props="{ label: '{{$tLabel}}',value: '{{$tValue}}',checkStrictly: true,emitPath: false {{if eq $column.HtmlType "treeSelects"}},multiple: true{{end}} }"
+          />
+        </el-form-item>
+        {{end}}
+        {{else if eq $column.HtmlType "switch"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-switch  v-model="formData.{{$column.HtmlField}}" class="ml-2" />
+        </el-form-item>
+        {{else if eq $column.HtmlType "radio" }}
+        {{if ne $column.LinkTableName ""}}
+          <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+            <el-radio-group v-model="formData.{{$column.HtmlField}}">
+              <el-radio
+                      v-for="dict in {{$column.HtmlField}}Options"
+                      :key="dict.key"
+                      :value="dict.key"
+              >{{ VueTag "{{" }}dict.value {{VueTag "}}"}}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        {{else if ne $column.DictType ""}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-radio-group v-model="formData.{{$column.HtmlField}}">
+            <el-radio
+              v-for="dict in {{$column.HtmlField}}Options"
+              :key="dict.value"
+              :value="dict.value"
+            >{{ VueTag "{{" }}dict.label {{VueTag "}}"}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+          {{else}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-radio-group v-model="formData.{{$column.HtmlField}}">
+            <el-radio>请选择字典生成</el-radio>
+          </el-radio-group>
+        </el-form-item>
+          {{end}}
+        {{else if eq $column.HtmlType "date"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-date-picker clearable  style="width: 200px"
+            v-model="formData.{{$column.HtmlField}}"
+            type="date"
+            value-format="YYYY-MM-DD"
+            placeholder="选择{{$column.ColumnComment}}">
+          </el-date-picker>
+        </el-form-item>
+        {{else if eq $column.HtmlType "datetime"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-date-picker clearable  style="width: 200px"
+            v-model="formData.{{$column.HtmlField}}"
+            type="datetime"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            placeholder="选择{{$column.ColumnComment}}">
+          </el-date-picker>
+        </el-form-item>
+        {{else if eq $column.HtmlType "textarea"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-input v-model="formData.{{$column.HtmlField}}" type="textarea" placeholder="请输入{{$column.ColumnComment}}" />
+        </el-form-item>
+        {{else if eq $column.HtmlType "checkbox" }}
+        {{if ne $column.LinkTableName ""}}
+          <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+            <el-checkbox-group v-model="formData.{{$column.HtmlField}}">
+              <el-checkbox
+                      v-for="dict in {{$column.HtmlField}}Options"
+                      :key="dict.key"
+                      :value="dict.key"
+              >{{ VueTag "{{" }}dict.value {{VueTag "}}"}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        {{else if  ne $column.DictType ""}}
+         <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-checkbox-group v-model="formData.{{$column.HtmlField}}">
+            <el-checkbox
+              v-for="dict in {{$column.HtmlField}}Options"
+              :key="dict.value"
+              :value="dict.value"
+            >{{ VueTag "{{" }}dict.label {{VueTag "}}"}}</el-checkbox>
+          </el-checkbox-group>
+         </el-form-item>
+        {{end}}
+        {{else if eq $column.HtmlType "richtext"}}
+        <el-form-item label="{{$column.ColumnComment}}">
+          <gf-ueditor editorId="ue{{$.table.ClassName}}{{$column.GoField}}" v-model="formData.{{$column.HtmlField}}"></gf-ueditor>
+        </el-form-item>
+        {{else if eq $column.HtmlType "imagefile"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <el-upload
+            v-loading="upLoading{{$column.GoField}}"
+            :action="baseURL+'{{$.apiVersion}}/system/upload/singleImg'"
+            :before-upload="beforeAvatarUpload{{$column.GoField}}"
+            :data="setUpData()"
+            :on-success="handleAvatarSuccess{{$column.GoField}}"
+            :show-file-list="false"
+            class="avatar-uploader"
+            name="file"
+          >
+            <div v-if="!proxy.isEmpty(imageUrl{{$column.GoField}})">
+              <el-link type="danger" style="position: absolute; right: 5px; top: 6px;font-size: 18px;" :underline="false" @click.stop="deleteImageUrl{{$column.GoField}}" title="删除">
+                <el-icon><ele-DeleteFilled /></el-icon>
+              </el-link>
+              <img :src="imageUrl{{$column.GoField}}" class="avatar">
+            </div>
+            <el-icon v-else class="avatar-uploader-icon"><ele-Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+        {{else if eq $column.HtmlType "images"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}" >
+          <upload-img :action="baseURL+'{{$.apiVersion}}/system/upload/singleImg'" v-model="formData.{{$column.HtmlField}}" :limit="10"></upload-img>
+        </el-form-item>
+        {{else if eq $column.HtmlType "file"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}" >
+          <upload-file :action="baseURL+'{{$.apiVersion}}/system/upload/singleFile'" v-model="formData.{{$column.HtmlField}}" :limit="1"></upload-file>
+        </el-form-item>
+        {{else if eq $column.HtmlType "files"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}" >
+          <upload-file :action="baseURL+'{{$.apiVersion}}/system/upload/singleFile'" v-model="formData.{{$column.HtmlField}}" :limit="10"></upload-file>
+        </el-form-item>
+        {{else if eq $column.HtmlType "imageSelector"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <upload-selector v-model="formData.{{$column.HtmlField}}" fileType="image" :limit="10"></upload-selector>
+        </el-form-item>
+        {{else if eq $column.HtmlType "fileSelector"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <upload-selector v-model="formData.{{$column.HtmlField}}" fileType="file" :limit="10"></upload-selector>
+        </el-form-item>
+        {{else if eq $column.HtmlType "userSelectorSingle"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <select-user v-model="{{$column.HtmlField}}" :multiple="false"></select-user>
+        </el-form-item>
+        {{else if eq $column.HtmlType "userSelectorMultiple"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <select-user v-model="formData.{{$column.HtmlField}}"></select-user>
+        </el-form-item>
+        {{else if eq $column.HtmlType "deptSelectorSingle"}}
+          <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <select-dept v-model="formData.{{$column.HtmlField}}"></select-dept>
+          </el-form-item>
+        {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+        <el-form-item label="{{$column.ColumnComment}}" prop="{{$column.HtmlField}}">
+          <select-dept v-model="formData.{{$column.HtmlField}}" :multiple="true"></select-dept>
+        </el-form-item>
+        {{else if eq $column.HtmlType "keyValue"}}
+        <p class="kv-label" >{{$column.ColumnComment}}</p>
+        <el-row class="kv-row" :gutter="20" v-for="(v, k) in formData.{{$column.HtmlField}}" :key="k">
+          <el-col :span="12" class="colBlock">
+            <el-form-item>
+              <template #label>
+                <el-button class="mini-btn" type="primary" circle size="small" @click="onAddRow{{$column.GoField}}" v-if="k === 0">
+                  <el-icon>
+                    <ele-Plus />
+                  </el-icon>
+                </el-button>
+                <el-button class="mini-btn" type="danger" circle size="small" @click="onDelRow{{$column.GoField}}(k)" v-else>
+                  <el-icon>
+                    <ele-Delete />
+                  </el-icon>
+                </el-button>
+                <span class="ml10">键名</span>
+              </template>
+              <el-input
+                      v-model="formData.{{$column.HtmlField}}[k].key"
+                      placeholder="请输入{{$column.ColumnComment}}键名"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" class="colBlock">
+            <el-form-item label="键值">
+              <el-input
+                      v-model="formData.{{$column.HtmlField}}[k].value"
+                      placeholder="请输入{{$column.ColumnComment}}键值"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        {{end}} {{/* $column.HtmlType */}}
+      {{end}} {{/* range */}}
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="onSubmit" :disabled="loading">确 定</el-button>
+          <el-button @click="onCancel">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+{{$tokenImp := false}}
+{{$imgsImp := false}}
+{{$editImp := false }}
+{{$fileImp := false}}
+{{$fileSelectorImp := false}}
+{{$getUserList:=false}}
+{{$selectorUserImp:=false}}
+{{$selectorDeptImp:=false}}
+
+{{range $index,$column:=.table.Columns}}
+  {{if eq $column.HtmlType "richtext"}}
+    {{$editImp = true}}
+  {{else if eq $column.HtmlType "imagefile"}}
+    {{$tokenImp = true}}
+  {{else if eq $column.HtmlType "images"}}
+    {{$imgsImp = true}}
+  {{else if eq $column.HtmlType "file" "files"}}
+    {{$fileImp = true}}
+  {{else if or (eq $column.HtmlType "fileSelector") (eq $column.HtmlType "imageSelector")}}
+    {{$fileSelectorImp = true}}
+  {{else if or (eq $column.HtmlType "userSelectorSingle") (eq $column.HtmlType "userSelectorMultiple")}}
+    {{$selectorUserImp = true}}
+  {{else if or (eq $column.HtmlType "deptSelectorSingle") (eq $column.HtmlType "deptSelectorMultiple")}}
+    {{$selectorDeptImp = true}}
+  {{end}}
+  {{if eq $column.HtmlField "createdBy" "updatedBy"}}
+    {{$getUserList = true}}
+  {{end}}
+{{end}}
+
+<script setup lang="ts">
+import { reactive, toRefs, ref,unref,getCurrentInstance,computed } from 'vue';
+import {ElMessageBox, ElMessage, FormInstance,UploadProps} from 'element-plus';
+{{/*去重处理*/}}
+import {
+  list{{.table.ClassName}},
+  get{{.table.ClassName}},
+  del{{.table.ClassName}},
+  add{{.table.ClassName}},
+  update{{.table.ClassName}},
+  {{range $index,$column:= .table.Columns}}
+  {{if and $column.IsStatus $column.IsList}}
+  change{{$.table.ClassName}}{{$column.GoField}},
+  {{end}}
+  {{end}}
+} from "/@/api/{{.modulePath}}/{{$businessName}}";
+
+{{if $editImp}}
+import GfUeditor from "/@/components/ueditor/index.vue"
+{{end}}
+{{if $tokenImp}}
+import {getToken} from "/@/utils/gfast"
+{{end}}
+{{if $imgsImp}}
+import uploadImg from "/@/components/uploadImg/index.vue"
+{{end}}
+{{if $fileImp}}
+import uploadFile from "/@/components/uploadFile/index.vue"
+{{end}}
+{{if $fileSelectorImp}}
+import uploadSelector from "/@/components/uploadSelector/index.vue"
+{{end}}
+{{if $selectorUserImp}}
+import selectUser from "/@/components/selectUser/index.vue"
+{{end}}
+{{if $selectorDeptImp}}
+import selectDept from "/@/components/selectDept/index.vue"
+{{end}}
+import {
+  {{.table.ClassName}}TableColumns,
+  {{.table.ClassName}}InfoData,
+  {{.table.ClassName}}TableDataState,
+  {{.table.ClassName}}EditState
+} from "/@/views/{{.modulePath}}/{{$businessName}}/list/component/model"
+defineOptions({ name: "{{.apiVersion|replace "/" "_"|CaseCamel}}{{.modulePath|replace "/" "_"|CaseCamel}}{{.table.ClassName}}Edit"})
+const emit = defineEmits(['{{$businessName}}List'])
+{{$hascomponent := false}}
+{{if or $imgsImp $tokenImp $fileImp}}
+{{$hascomponent = true}}
+{{end}}
+{{$hasProps := false}}
+{{if eq .table.TplCategory "tree"}}
+  {{$hasProps = true}}
+{{end}}
+{{if not $hasProps}}
+  {{range $index, $column := .table.Columns}}
+    {{if or (ne $column.DictType "") (ne $column.LinkTableName "") }}
+      {{$hasProps = true}}
+    {{end}}
+  {{end}}
+{{end}}
+{{if $hasProps}}
+  const props = defineProps({
+    {{range $index, $column := .table.Columns}}
+    {{if ne $column.DictType ""}}
+    {{$column.HtmlField}}Options:{
+      type:Array,
+      default:()=>[]
+    },
+    {{else if ne $column.LinkTableName ""}}
+    {{if $column.IsCascade}}
+    {{/*级联处理*/}}
+    {{end}}
+    {{/*关联表处理*/}}
+    {{$column.HtmlField}}Options:{
+      type:Array,
+      default:()=>[]
+    },
+    {{end}}
+    {{end}}
+    {{if eq .table.TplCategory "tree"}}
+    // {{.table.TableComment}}树选项
+    {{$businessName}}Options :{
+      type:Array,
+      default:()=>[]
+    },
+    {{end}}
+  })
+{{end}}
+
+{{if or $imgsImp $tokenImp $fileImp}}
+const baseURL:string|undefined|boolean = import.meta.env.VITE_API_URL
+{{end}}
+const {proxy} = <any>getCurrentInstance()
+const formRef = ref<HTMLElement | null>(null);
+const menuRef = ref();
+{{range $index, $column := .table.Columns}}
+{{if eq $column.HtmlType "imagefile"}}
+//图片上传地址
+const imageUrl{{$column.GoField}} = ref('')
+//上传加载
+const upLoading{{$column.GoField}} = ref(false)
+{{end}}
+{{end}}
+const state = reactive<{{.table.ClassName}}EditState>({
+  loading:false,
+  isShowDialog: false,
+  formData: {
+    {{range $index, $column := .table.Columns}}
+    {{if eq $column.HtmlType "switch"}}
+    {{$column.HtmlField}}: false ,
+    {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "imageSelector" "fileSelector" "deptSelectorMultiple" "userSelectorMultiple"}}
+    {{$column.HtmlField}}: [] ,
+    {{else if eq $column.HtmlType "keyValue"}}
+    {{$column.HtmlField}}:[{key:"",value:""}],
+    {{else}}
+    {{$column.HtmlField}}: undefined,
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+    linked{{$column.GoField}}:[],
+    {{else if eq $column.HtmlType "userSelectorSingle" "deptSelectorSingle"}}
+    linked{{$column.GoField}}:null,
+    {{end}}
+    {{end}}
+    {{range $ti, $linkedTable := .table.LinkedTables}}
+    linked{{$.table.ClassName}}{{$linkedTable.ClassName}}: {
+      {{range $ci, $linkedColumn := $linkedTable.RefColumns.Values}}
+      {{$linkedColumn.HtmlField}}:{{if eq $linkedColumn.HtmlType "images" "file" "files" "imageSelector" "fileSelector" "deptSelectorMultiple" "userSelectorMultiple"}}[]{{else}}undefined{{end}},    // {{$linkedColumn.ColumnComment}}
+      {{end}}
+    },
+    {{end}}
+  },
+  // 表单校验
+  rules: {
+    {{range $index, $column := .table.Columns}}
+    {{if $column.IsRequired}}
+    {{$column.HtmlField}} : [
+        { required: true, message: "{{$column.ColumnComment}}不能为空", trigger: "blur" }
+    ]{{if ne $lens $index}},{{end}}
+    {{end}}
+    {{end}}
+  }
+});
+const { loading,isShowDialog,formData,rules } = toRefs(state);
+{{range $index, $column := .table.EditColumns}}
+{{if eq $column.HtmlType "userSelectorSingle"}}
+const {{$column.HtmlField}} = computed({
+  get:()=>{
+    return state.formData.{{$column.HtmlField}}?[state.formData.{{$column.HtmlField}}]:[]
+  },
+  set:(val:number[])=>{
+    state.formData.{{$column.HtmlField}} = val?val[0]:0
+  }
+})
+{{end}}
+{{end}}
+// 打开弹窗
+const openDialog = (row?: {{.table.ClassName}}InfoData) => {
+  resetForm();
+  if(row) {
+    get{{.table.ClassName}}(row.{{.table.PkColumn.HtmlField}}!).then((res:any)=>{
+      const data = res.data;
+      {{range $index, $column := .table.EditColumns}}
+      {{if eq $column.HtmlType "checkbox" "selects"}}
+      data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",")
+      {{else if eq $column.HtmlType "treeSelects"}}
+      {{$isNumber := false}}
+      {{range $li,$lc := $.table.LinkedTables}}
+      {{if and (eq $lc.TableName $column.LinkTableName) (ne $lc.OptionsStruct.ColumnAttr.GoType "string")}}
+      {{$isNumber = true}}
+      {{end}}
+      {{end}}
+      {{if $isNumber}}
+      data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",").map((item:any)=>{return parseInt(item)})
+      {{else}}
+      data.{{$column.HtmlField}} = data.{{$column.HtmlField}}.split(",")
+      {{end}}
+      {{else if eq $column.HtmlType "switch"}}
+      data.{{$column.HtmlField}} = Boolean(data.{{$column.HtmlField}})
+      {{else if and (eq $column.HtmlType "radio" "select") (ne $column.DictType "")}}
+      {{if eq $column.TsType "boolean"}}
+      data.{{$column.HtmlField}} = data.{{$column.HtmlField}}?'1':'0'
+      {{else}}
+      data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
+      {{end}}
+      {{else if eq $column.HtmlType "radio" "select" }}
+      {{if eq $column.TsType "number"}}
+      data.{{$column.HtmlField}} = parseInt(data.{{$column.HtmlField}})
+      {{else if eq $column.TsType "string"}}
+      data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
+      {{else}}
+      data.{{$column.HtmlField}} = data.{{$column.HtmlField}}
+      {{end}}
+      {{else if eq $column.HtmlType "treeSelect"}}
+      {{$isNumber := false}}
+      {{range $li,$lc := $.table.LinkedTables}}
+      {{if and (eq $lc.TableName $column.LinkTableName) (ne $lc.OptionsStruct.ColumnAttr.GoType "string")}}
+      {{$isNumber = true}}
+      {{end}}
+      {{end}}
+      {{if and (not $isNumber) (eq $column.TsType "number")}}
+      {{$isNumber = true}}
+      {{end}}
+      {{if $isNumber}}
+      data.{{$column.HtmlField}} = parseInt(data.{{$column.HtmlField}})
+      {{else}}
+      data.{{$column.HtmlField}} = ''+data.{{$column.HtmlField}}
+      {{end}}
+      {{else if eq $column.HtmlType "imagefile"}}
+      //单图地址赋值
+      imageUrl{{$column.GoField}}.value = data.{{$column.HtmlField}} ? proxy.getUpFileUrl(data.{{$column.HtmlField}}) : ''
+      {{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}
+      data.{{$column.HtmlField}} =data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : []
+      {{else if eq $column.HtmlType "keyValue"}}
+      data.{{$column.HtmlField}} = data.{{$column.HtmlField}}?JSON.parse(data.{{$column.HtmlField}}) : [{key:'',value:''}]
+      {{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+      data.{{$column.HtmlField}} = data.{{$column.HtmlField}}?data.{{$column.HtmlField}}:[]
+      {{end}}
+      {{end}}
+      state.formData = data;
+  })
+}
+  state.isShowDialog = true;
+};
+// 关闭弹窗
+const closeDialog = () => {
+  state.isShowDialog = false;
+};
+defineExpose({
+  openDialog,
+});
+// 取消
+const onCancel = () => {
+  closeDialog();
+};
+// 提交
+const onSubmit = () => {
+  const formWrap = unref(formRef) as any;
+  if (!formWrap) return;
+  formWrap.validate((valid: boolean) => {
+    if (valid) {
+      state.loading = true;
+      if(!state.formData.{{.table.PkColumn.HtmlField}} || state.formData.{{.table.PkColumn.HtmlField}}===0){
+        //添加
+      add{{.table.ClassName}}(state.formData).then(()=>{
+          ElMessage.success('添加成功');
+          closeDialog(); // 关闭弹窗
+          emit('{{$businessName}}List')
+        }).finally(()=>{
+          state.loading = false;
+        })
+      }else{
+        //修改
+      update{{.table.ClassName}}(state.formData).then(()=>{
+          ElMessage.success('修改成功');
+          closeDialog(); // 关闭弹窗
+          emit('{{$businessName}}List')
+        }).finally(()=>{
+          state.loading = false;
+        })
+      }
+    }
+  });
+};
+const resetForm = ()=>{
+  state.formData = {
+    {{range $index, $column := .table.Columns}}
+    {{if eq $column.HtmlType "switch"}}
+    {{$column.HtmlField}}: false ,
+    {{else if eq $column.HtmlType "radio"}}
+    {{$column.HtmlField}}: '' ,
+    {{else if eq $column.HtmlType "images" "file" "files" "checkbox" "selects" "treeSelects" "imageSelector" "fileSelector" "userSelectorMultiple" "deptSelectorMultiple"}}
+    {{$column.HtmlField}}: [] ,
+    {{else if eq $column.HtmlType "keyValue"}}
+    {{$column.HtmlField}}:[{key:"",value:""}],
+    {{else}}
+    {{$column.HtmlField}}: undefined,
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}
+    linked{{$column.GoField}}:[],
+    {{else if eq $column.HtmlType "userSelectorSingle" "deptSelectorSingle"}}
+    linked{{$column.GoField}}:null,
+    {{end}}
+    {{end}}
+    {{range $ti, $linkedTable := .table.LinkedTables}}
+    linked{{$.table.ClassName}}{{$linkedTable.ClassName}}: {
+      {{range $ci, $linkedColumn := $linkedTable.RefColumns.Values}}
+      {{$linkedColumn.HtmlField}}:{{if eq $linkedColumn.HtmlType "images" "file" "files" "imageSelector" "fileSelector" "userSelectorMultiple" "deptSelectorMultiple"}}[]{{else}}undefined{{end}},    // {{$linkedColumn.ColumnComment}}
+      {{end}}
+    },
+    {{end}}
+  }
+  {{range $index, $column := .table.Columns}}
+  {{if eq $column.HtmlType "imagefile"}}
+  imageUrl{{$column.GoField}}.value = ''
+  {{end}}
+  {{end}}
+};
+{{$setUpData:=true}}
+{{range $index, $column := .table.Columns}}
+{{if eq $column.HtmlType "imagefile"}}
+//单图上传{{$column.ColumnComment}}
+const handleAvatarSuccess{{$column.GoField}}:UploadProps['onSuccess'] = (res, file) => {
+  if (res.code === 0) {
+    imageUrl{{$column.GoField}}.value = URL.createObjectURL(file.raw!)
+    state.formData.{{$column.HtmlField}} = res.data.path
+  } else {
+    ElMessage.error(res.msg)
+  }
+  upLoading{{$column.GoField}}.value = false
+}
+const beforeAvatarUpload{{$column.GoField}} = () => {
+  upLoading{{$column.GoField}}.value = true
+  return true
+}
+{{if $setUpData}}
+const setUpData = () => {
+  return { token: getToken() }
+}
+{{$setUpData = false}}
+{{end}}
+const deleteImageUrl{{$column.GoField}} = ()=>{
+  state.formData.{{$column.HtmlField}} = ''
+  imageUrl{{$column.GoField}}.value = ''
+}
+{{else if eq $column.HtmlType "keyValue"}}
+// 新增{{$column.ColumnComment}}行
+const onAddRow{{$column.GoField}} = () => {
+  state.formData.{{$column.HtmlField}}.push({
+    key: '',
+    value: '',
+  });
+};
+// 删除{{$column.ColumnComment}}行
+const onDelRow{{$column.GoField}} = (k: number) => {
+  state.formData.{{$column.HtmlField}}.splice(k, 1);
+};
+{{end}}
+{{end}}
+</script>
+
+<style scoped>
+  {{if $tokenImp}}
+  .{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit :deep(.avatar-uploader .avatar) {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+  .{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit :deep(.avatar-uploader .el-upload) {
+    border: 1px dashed var(--el-border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
+  }
+
+  .{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit :deep(.avatar-uploader .el-upload:hover) {
+    border-color: var(--el-color-primary);
+  }
+
+  .{{.table.ModuleName}}-{{.table.BusinessName|CaseCamelLower}}-edit :deep(.el-icon.avatar-uploader-icon) {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    text-align: center;
+  }
+  {{end}}
+  .kv-label{margin-bottom: 15px;font-size: 14px;}
+  .mini-btn i.el-icon{margin: unset;}
+  .kv-row{margin-bottom: 12px;}
+</style>

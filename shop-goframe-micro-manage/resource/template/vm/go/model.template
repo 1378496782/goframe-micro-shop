@@ -1,0 +1,231 @@
+// ==========================================================================
+// GFast自动生成model操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/model/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+package model
+////
+{{$hasUpFile:=false}}
+{{$hasArr:=false}}
+{{$hasGtime:=false}}
+{{$hasUser:=false}}
+
+
+
+{{range $index,$column :=.table.Columns}}
+    {{if and (or (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle")) (ne $.table.ModuleName "system")}}
+        {{$hasUser = true}}
+    {{end}}
+    {{if eq $column.HtmlType "imagefile" "images" "file" "files" "imageSelector" "fileSelector"}}
+        {{$hasUpFile = true}}
+    {{end}}
+    {{if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}
+        {{$hasArr = true}}
+    {{end}}
+{{end}}
+{{range $index,$column :=.table.EditColumns}}
+    {{if and (or (eq $column.HtmlField "createdBy" "updatedBy" "deptId") (eq $column.HtmlType "userSelectorMultiple" "userSelectorSingle" "deptSelectorMultiple" "deptSelectorSingle")) (ne $.table.ModuleName "system")}}
+        {{$hasUser = true}}
+    {{end}}
+    {{if eq $column.GoType "Time"}}
+        {{$hasGtime = true}}
+    {{end}}
+{{end}}
+import (
+    {{if $hasArr}}
+    "github.com/gogf/gf/v2/container/garray"
+    {{end}}
+    {{if or .table.HasTimeColumn $hasGtime}}
+    "github.com/gogf/gf/v2/os/gtime"
+    {{end}}
+    "github.com/gogf/gf/v2/util/gmeta"
+    comModel "{{.goModName}}/internal/app/common/model"
+    {{if $hasUser}}
+    systemModel "{{.goModName}}/internal/app/system/model"
+    {{end}}
+)
+
+////
+// {{.table.ClassName}}InfoRes is the golang structure for table {{.table.TableName}}.
+type {{.table.ClassName}}InfoRes struct {
+    gmeta.Meta   `orm:"table:{{.table.TableName}}"`
+    {{range $index, $column := .table.Columns}}
+    {{if $column.IsPk}}{{$column.GoField}}       {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}},primary" json:"{{$column.HtmlField}}{{if $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`    // {{$column.ColumnComment}} {{else}}{{$column.GoField}}    {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}         `orm:"{{$column.ColumnName}}" json:"{{$column.HtmlField}}" dc:"{{$column.ColumnComment}}"`    // {{$column.ColumnComment}} {{end}}
+    {{range $ti, $linkedTable := $.table.LinkedTables}}
+    {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+    Linked{{$column.GoField}}  {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}[]{{end}}*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `{{if not (eq $column.HtmlType "selects" "checkbox" "treeSelects")}}orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" {{end}}json:"linked{{$column.GoField}}"`
+    {{end}}
+    {{end}}
+    {{if eq $column.HtmlField "createdBy"}}
+    CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
+    {{end}}
+    {{if eq $column.HtmlField "deptId"}}
+    DeptInfo        *{{if $hasUser}}systemModel.{{end}}LinkDeptRes     `json:"deptInfo"`
+    {{end}}
+    {{if eq $column.HtmlField "updatedBy"}}
+    UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedUser"`
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}SysUserSimpleRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{end}}
+}
+
+{{range $ti, $linkedTable := .table.LinkedTables}}
+type Linked{{$.table.ClassName}}{{$linkedTable.ClassName}} struct {
+    gmeta.Meta   `orm:"table:{{$linkedTable.TableName}}"`
+	{{range $ci, $linkedColumn := $linkedTable.RefColumns.Values}}
+    {{$linkedColumn.GoField}}    {{if eq $linkedColumn.GoType "Time"}}*gtime.Time{{else if eq $linkedColumn.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$linkedColumn.GoType}}{{end}}         `orm:"{{$linkedColumn.ColumnName}}" json:"{{$linkedColumn.HtmlField}}" dc:"{{$linkedColumn.ColumnComment}}"`    // {{$linkedColumn.ColumnComment}}
+	{{end}}
+    {{if eq $linkedTable.TplCategory "tree"}}
+    {{$linkedTable.OptionsStruct.ColumnAttr.GoField}} {{$linkedTable.OptionsStruct.ColumnAttr.GoType}} `orm:"{{$linkedTable.OptionsStruct.ColumnAttr.ColumnName}}" json:"{{$linkedTable.OptionsStruct.ColumnAttr.HtmlField}}"`
+    {{end}}
+}
+////
+{{end}}
+
+////
+type {{.table.ClassName}}ListRes struct{
+    {{if eq .table.TplCategory "tree"}}
+    {{range $index, $column := .table.Columns}}
+    {{if or (eq $column.HtmlField $.table.TreeCode) (eq $column.HtmlField $.table.TreeParentCode) (eq $column.HtmlField $.table.TreeName) }}
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}{{if and $column.IsPk $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{end}}
+    {{range $index, $column := .table.Columns}}
+    {{if and $column.IsList (ne $column.HtmlField $.table.TreeCode) (ne $column.HtmlField $.table.TreeParentCode) (ne $column.HtmlField $.table.TreeName) }}
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}" dc:"{{$column.ColumnComment}}"`
+    {{range $ti, $linkedTable := $.table.LinkedTables}}
+    {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+    Linked{{$column.GoField}}  {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}[]{{end}}*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `{{if not (eq $column.HtmlType "selects" "checkbox" "treeSelects")}}orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" {{end}}json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{end}}
+    {{if eq $column.HtmlField "createdBy"}}
+    CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
+    {{end}}
+    {{if eq $column.HtmlField "deptId"}}
+    DeptInfo        *{{if $hasUser}}systemModel.{{end}}LinkDeptRes     `json:"deptInfo"`
+    {{end}}
+    {{if eq $column.HtmlField "updatedBy"}}
+    UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedUser"`
+    {{end}}
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}SysUserSimpleRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{end}}
+    {{else}}
+    {{if not .table.IsPkListable }}
+    {{.table.PkColumn.GoField}}    {{.table.PkColumn.GoType}}  `json:"{{.table.PkColumn.HtmlField}}{{if $.table.UseSnowId}},string{{end}}" dc:"{{.table.PkColumn.ColumnComment}}"`
+    {{end}}
+    {{range $index, $column := .table.ListColumns}}
+    {{if eq $column.HtmlField "createdBy"}}
+    CreatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=created_by" json:"createdUser"`
+    {{end}}
+    {{if eq $column.HtmlField "deptId"}}
+    DeptInfo        *{{if $hasUser}}systemModel.{{end}}LinkDeptRes     `json:"deptInfo"`
+    {{end}}
+    {{if eq $column.HtmlField "updatedBy"}}
+    UpdatedUser        *{{if $hasUser}}systemModel.{{end}}LinkUserRes     `orm:"with:id=updated_by" json:"updatedBy"`
+    {{end}}
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `json:"{{$column.HtmlField}}{{if and $column.IsPk $.table.UseSnowId}},string{{end}}" dc:"{{$column.ColumnComment}}"`
+    {{range $ti, $linkedTable := $.table.LinkedTables}}
+    {{if eq $column.LinkTableClass $linkedTable.ClassName}}
+    Linked{{$column.GoField}}  {{if eq $column.HtmlType "selects" "checkbox" "treeSelects"}}[]{{end}}*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `{{if not (eq $column.HtmlType "selects" "checkbox" "treeSelects")}}orm:"with:{{$column.LinkLabelId}}={{$column.ColumnName}}" {{end}}json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkUserRes `orm:"with:id={{$column.ColumnName}}" json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "userSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}SysUserSimpleRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorSingle"}}
+    Linked{{$column.GoField}} *{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if eq $column.HtmlType "deptSelectorMultiple"}}
+    Linked{{$column.GoField}} []*{{if $hasUser}}systemModel.{{end}}LinkDeptRes `json:"linked{{$column.GoField}}" dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{end}}
+    {{end}}
+}
+
+////
+// {{.table.ClassName}}SearchReq 分页请求参数
+type {{.table.ClassName}}SearchReq struct {
+    {{if ne $.table.ModuleName "common"}}
+    comModel.PageReq
+    {{end}}
+    {{range $index, $column := .table.QueryColumns}}
+    {{$column.GoField}}  {{if eq $column.GoType "Time" "int" "int64" "uint" "uint64" "float" "float64" "bool"}}{{if eq $column.QueryType "BETWEEN"}}[]{{end}}string{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{if eq $column.QueryType "BETWEEN"}}[]{{end}}{{$column.GoType}}{{end}} `p:"{{$column.HtmlField}}"{{if ne $column.FieldValidation ""}} v:"{{$column.FieldValidation}}"{{end}} dc:"{{$column.ColumnComment}}"` //{{$column.ColumnComment}}
+    {{end}}
+}
+
+////
+// {{.table.ClassName}}SearchRes 列表返回结果
+type {{.table.ClassName}}SearchRes struct {
+    comModel.ListRes
+    List []*{{.table.ClassName}}ListRes `json:"list"`
+}
+
+
+{{if gt (len .table.LinkedTables) 0}}
+////
+//相关连表查询数据
+type Linked{{$.table.ClassName}}DataSearchRes struct{
+{{range $ti, $linkedTable := .table.LinkedTables}}
+    Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  []*Linked{{$.table.ClassName}}{{$linkedTable.ClassName}}  `json:"linked{{$.table.ClassName}}{{$linkedTable.ClassName}}"`
+{{end}}
+}
+{{end}}
+
+////
+// {{.table.ClassName}}AddReq 添加操作请求参数
+type {{.table.ClassName}}AddReq struct {
+    {{if .table.IsPkInsertable}}
+    {{.table.PkColumn.GoField}}    {{.table.PkColumn.GoType}}  `p:"{{.table.PkColumn.HtmlField}}" v:"required#主键ID不能为空" dc:"{{.table.PkColumn.ColumnComment}}"`
+    {{end}}
+    {{range $index, $column := .table.EditColumns}}
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}[]*comModel.UpFile{{else if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}garray.StrArray{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}}   `p:"{{$column.HtmlField}}" {{if $column.IsRequired}}v:"required#{{$column.ColumnComment}}不能为空"{{end}} dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if .table.HasCreatedBy}}
+    CreatedBy       uint64
+    {{end}}
+    {{if .table.HasDeptId}}
+    DeptId       uint64
+    {{end}}
+}
+
+////
+// {{.table.ClassName}}EditReq 修改操作请求参数
+type {{.table.ClassName}}EditReq struct {
+    {{.table.PkColumn.GoField}}    {{.table.PkColumn.GoType}}  `p:"{{.table.PkColumn.HtmlField}}" v:"required#主键ID不能为空" dc:"{{.table.PkColumn.ColumnComment}}"`
+    {{range $index, $column := .table.EditColumns}}
+    {{$column.GoField}}  {{if eq $column.GoType "Time"}}*gtime.Time{{else if eq $column.HtmlType "images" "file" "files" "imageSelector" "fileSelector"}}[]*comModel.UpFile{{else if eq $column.HtmlType "checkbox" "selects" "treeSelects"}}garray.StrArray{{else if eq $column.HtmlType "userSelectorMultiple" "deptSelectorMultiple"}}[]uint64{{else}}{{$column.GoType}}{{end}} `p:"{{$column.HtmlField}}" {{if $column.IsRequired}}v:"required#{{$column.ColumnComment}}不能为空"{{end}} dc:"{{$column.ColumnComment}}"`
+    {{end}}
+    {{if .table.HasUpdatedBy}}
+    UpdatedBy       uint64
+    {{end}}
+}

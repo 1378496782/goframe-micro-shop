@@ -1,0 +1,454 @@
+// ==========================================================================
+// GFast自动生成controller操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/controller/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+
+{{$structName := .table.BusinessName | CaseCamelLower}}
+{{$businessName := .table.BusinessName | CaseCamelLower}}
+
+package controller
+////
+{{$hasGmap:=false}}
+{{$hasGstr:=false}}
+{{$hasGconv:=false}}
+{{$hasSystemApi:=false}}
+{{$hasCommonService:=false}}
+{{$excel :=false}}
+{{$serviceVal := "service"}}
+{{$modelVal := "model"}}
+{{if ne .table.ModuleName "system"}}
+    {{$serviceVal = "systemService"}}
+    {{$modelVal = "systemModel"}}
+{{end}}
+{{$usedSystemModel := false}}
+{{$impSystemService := false}}
+{{if or .table.ExcelPort .table.ExcelImp}}
+{{$excel = true}}
+{{end}}
+{{if .table.ExcelPort}}
+{{if .table.UseSnowId}}
+    {{$hasGconv = true}}
+{{end}}
+{{range $index, $column := .table.Columns}}
+    {{if ne $column.DictType ""}}
+        {{$hasGmap = true}}
+        {{$hasGconv = true}}
+        {{$hasSystemApi = true}}
+        {{$hasCommonService = true}}
+        {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
+            {{$hasGstr = true}}
+            {{$hasGconv = true}}
+        {{end}}
+    {{else if ne $column.LinkTableName ""}}
+        {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
+            {{$hasGstr = true}}
+            {{$hasGconv = true}}
+        {{end}}
+    {{end}}
+    {{if and (eq $column.HtmlType "userSelectorSingle" "userSelectorMultiple" "deptSelectorMultiple" "deptSelectorSingle") (ne $.table.ModuleName "system")}}
+        {{$usedSystemModel = true}}
+        {{$hasGconv = true}}
+        {{$impSystemService = true}}
+    {{end}}
+{{end}}
+{{end}}
+import (
+    "context"
+    "{{.goModName}}/api/v1/{{.modulePath}}"
+    "{{.goModName}}/{{.table.PackageName}}/service"
+    {{if ne $.table.ModuleName "system"}}
+    systemController "{{.goModName}}/internal/app/system/controller"
+    {{end}}
+    {{if gt (len .table.LinkedTables) 0}}
+    "errors"
+    {{if ne $.table.ModuleName "system"}}
+    {{$impSystemService = true}}
+    {{else}}
+    "{{.goModName}}/internal/app/system/service"
+    {{end}}
+    {{end}}
+    {{if .table.ExcelPort }}
+    {{if $hasGmap}}
+    "github.com/gogf/gf/v2/container/gmap"
+    {{end}}
+    "github.com/gogf/gf/v2/encoding/gurl"
+    "github.com/gogf/gf/v2/net/ghttp"
+    {{if $hasGstr}}
+    "github.com/gogf/gf/v2/text/gstr"
+    {{end}}
+    {{if $hasGconv}}
+    "github.com/gogf/gf/v2/util/gconv"
+    {{end}}
+    {{if and (ne $.table.ModuleName "system") $hasSystemApi}}
+    systemApi "{{$.goModName}}/api/v1/system"
+    {{end}}
+    {{if $usedSystemModel}}
+    systemModel "{{.goModName}}/internal/app/system/model"
+    {{end}}
+    {{if $hasCommonService}}
+    commonService "{{.goModName}}/internal/app/common/service"
+    {{end}}
+    "{{$.goModName}}/{{$.table.PackageName}}/model"
+    {{end}}
+    {{if $excel}}
+    "{{$.goModName}}/library/libUtils"
+    "github.com/xuri/excelize/v2"
+    {{end}}
+    {{if not $impSystemService}}
+        {{range $index,$column:= .table.Columns}}
+            {{if eq $column.HtmlType "switch"}}
+                {{$impSystemService = true}}
+            {{end}}
+        {{end}}
+    {{end}}
+    {{if $impSystemService}}
+    systemService "{{.goModName}}/internal/app/system/service"
+    {{end}}
+)
+////
+type {{$structName}}Controller struct {
+    {{if ne $.table.ModuleName "system"}}
+    systemController.BaseController
+    {{else}}
+    BaseController
+    {{end}}
+}
+////
+var {{.table.ClassName}} = new({{$structName}}Controller)
+////
+// List 列表
+func (c *{{$structName}}Controller) List(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}SearchReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}SearchRes, err error) {
+    res = new({{.table.ModuleName}}.{{.table.ClassName}}SearchRes)
+    res.{{.table.ClassName}}SearchRes, err = service.{{.table.ClassName}}().List(ctx, &req.{{.table.ClassName}}SearchReq)
+    return
+}
+
+{{if .table.ExcelPort }}
+////
+// Export 导出excel
+func (c *{{$structName}}Controller) Export(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}ExportReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}ExportRes, err error) {
+    var (
+        r=ghttp.RequestFromCtx(ctx)
+        listData []*model.{{.table.ClassName}}InfoRes
+        //表头
+        {{$tableHeader := ""}}
+        {{range $index, $column := .table.Columns}}
+            {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+                {{$tableHeader = concat $tableHeader `"` $column.ColumnComment `"` "," }}
+            {{end}}
+        {{end}}
+        tableHead = []interface{}{ {{$tableHeader}} }
+        excelData     [][]interface{}
+        //字典选项处理
+        {{$dictArr:=newArray}}
+        {{range $index, $column := .table.Columns}}
+            {{if and (ne $column.DictType "") (ne (inArray $dictArr $column.DictType) true)}}
+                {{$dictArr = append $dictArr $column.DictType}}
+            {{end}}
+        {{end}}
+        {{$apiModelName := "system"}}
+        {{if ne $.table.ModuleName "system"}}
+        {{$apiModelName = "systemApi"}}
+        {{end}}
+        {{range $index, $column := $dictArr}}
+        {{$column|CaseCamelLower}} *{{$apiModelName}}.GetDictRes
+        {{$column|CaseCamelLower}}Map = gmap.New()
+        {{end}}
+    )
+    req.PageNum = 1
+    req.PageSize = 500
+    //获取字典数据
+    {{range $index, $column := $dictArr}}
+    {{$column|CaseCamelLower}},err = commonService.SysDictData().GetDictWithDataByType(ctx,"{{$column}}","")
+    if err!=nil{
+        return
+    }
+    {{end}}
+    {{range $index, $column := $dictArr}}
+    for _,v:=range {{$column|CaseCamelLower}}.Values{
+        {{$column|CaseCamelLower}}Map.Set(v.DictValue,v.DictLabel)
+    }
+    {{end}}
+    excelData = append(excelData,tableHead)
+    for {
+        listData,err = service.{{.table.ClassName}}().GetExportData(ctx,&req.{{.table.ClassName}}SearchReq)
+        if err!=nil{
+            return
+        }
+        if listData==nil{
+            break
+        }
+        for _,v:=range listData{
+            var (
+                {{range $index, $column := .table.Columns}}
+                {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+                {{if or (ne $column.DictType "") (ne $column.LinkTableName "")}}
+                {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
+                //多选-{{$column.ColumnComment}}
+                {{$column.HtmlField}} []string
+                {{if ne $column.DictType ""}}
+                {{$column.HtmlField}}Arr = gstr.Split(v.{{$column.GoField}},",")
+                {{end}}
+                {{else}}
+                //单选-{{$column.ColumnComment}}
+                {{if ne $column.DictType ""}}
+                {{$column.HtmlField}} interface{}
+                {{else}}
+                {{$column.HtmlField}} string
+                {{end}}
+                {{end}}
+                {{else if eq $column.ColumnName "created_by" "updated_by"}}
+                //{{$column.ColumnComment}}
+                {{$column.HtmlField}} string
+                {{end}}
+                {{end}}
+                {{end}}
+            )
+            {{range $index, $column := .table.Columns}}
+            {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+            {{if ne $column.DictType ""}}
+            {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
+            //字典-多选-{{$column.ColumnComment}}
+            for _,ctv:=range {{$column.HtmlField}}Arr {
+                if {{$column.DictType|CaseCamelLower}}Map.Contains(ctv){
+                    {{$column.HtmlField}} = append({{$column.HtmlField}},gconv.String({{$column.DictType|CaseCamelLower}}Map.Get(ctv)))
+                }
+            }
+            {{else}}
+            //字典-单选-{{$column.ColumnComment}}
+            {{$column.HtmlField}} = {{$column.DictType|CaseCamelLower}}Map.Get(gconv.String(v.{{$column.GoField}}))
+            {{end}}
+            {{else if ne $column.LinkTableName ""}}
+            {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
+            //关联表-多选-{{$column.ColumnComment}}
+            for _,ctv :=range  v.Linked{{$column.GoField}}{
+                {{$column.HtmlField}} = append({{$column.HtmlField}},gconv.String(ctv.{{$column.LinkLabelName|CaseCamel}}))
+            }
+            {{else}}
+            //关联表-单选-{{$column.ColumnComment}}
+            if v.Linked{{$column.GoField}}!=nil{
+                {{$column.HtmlField}} = gconv.String(v.Linked{{$column.GoField}}.{{$column.LinkLabelName|CaseCamel}})
+            }
+            {{end}}
+            {{else if eq $column.ColumnName "created_by"}}
+            //{{$column.ColumnComment}}
+            if v.CreatedUser!=nil{
+                {{$column.HtmlField}} = v.CreatedUser.UserNickname
+            }
+            {{else if eq $column.ColumnName "updated_by"}}
+            //{{$column.ColumnComment}}
+            if v.UpdatedUser!=nil{
+                {{$column.HtmlField}} = v.UpdatedUser.UserNickname
+            }
+            {{else if eq $column.HtmlType "userSelectorSingle"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str := ""
+            if v.Linked{{$column.GoField}} != nil {
+                {{$column.HtmlField}}Str = v.Linked{{$column.GoField}}.UserNickname
+            }
+            {{else if eq $column.HtmlType "userSelectorMultiple"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str:=""
+            v.Linked{{$column.GoField}}, err = {{$serviceVal}}.SysUser().GetUsers(ctx, gconv.Interfaces(v.{{$column.GoField}}))
+            if err != nil {
+                return
+            }
+            for _, us := range v.Linked{{$column.GoField}} {
+                {{$column.HtmlField}}Str += us.UserNickname + ","
+            }
+            {{else if eq $column.HtmlType "deptSelectorSingle"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str := ""
+            {{$column.HtmlField}}Obj := systemService.SysDept().GetByDept(ctx, v.{{$column.GoField}})
+            if {{$column.HtmlField}}Obj != nil {
+                {{$column.HtmlField}}Str = {{$column.HtmlField}}Obj.DeptName
+            }
+            {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+            //{{$column.ColumnComment}}
+            {{$column.HtmlField}}Str := ""
+            linked{{$column.GoField}} := make([]*{{$modelVal}}.LinkDeptRes, len(v.{{$column.GoField}}))
+            for lk, lv := range v.{{$column.GoField}} {
+                linked{{$column.GoField}}[lk] = {{$serviceVal}}.SysDept().GetByDept(ctx, lv)
+            }
+            for _, dv := range linked{{$column.GoField}} {
+                if dv != nil {
+                    {{$column.HtmlField}}Str += dv.DeptName + ","
+                }
+            }
+            {{end}}
+            {{end}}
+            {{end}}
+            dt := []interface{}{
+                {{range $index, $column := .table.Columns}}
+                {{if and (ne $column.HtmlType "richtext") (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+                {{if ne $column.DictType ""}}
+                {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
+                //字典-多选-{{$column.ColumnComment}}
+                gstr.Join({{$column.HtmlField}},","),
+                {{else}}
+                //字典-单选-{{$column.ColumnComment}}
+                {{$column.HtmlField}},
+                {{end}}
+                {{else if ne $column.LinkTableName ""}}
+                {{if eq $column.HtmlType "checkbox" "" "selects" "treeSelects"}}
+                //关联表-多选-{{$column.ColumnComment}}
+                gstr.Join({{$column.HtmlField}},","),
+                {{else}}
+                //关联表-单选-{{$column.ColumnComment}}
+                {{$column.HtmlField}},
+                {{end}}
+                {{else if eq $column.ColumnName "created_by"}}
+                //{{$column.ColumnComment}}
+                {{$column.HtmlField}} ,
+                {{else if eq $column.ColumnName "updated_by"}}
+                //{{$column.ColumnComment}}
+                {{$column.HtmlField}},
+                {{else if eq $column.HtmlType "date" "datetime"}}
+                v.{{$column.GoField}}.Format("Y-m-d H:i:s"),
+                {{else if eq $column.HtmlType "userSelectorSingle"}}
+                //用户选择器-单选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if eq $column.HtmlType "userSelectorMultiple"}}
+                //用户选择器-多选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if eq $column.HtmlType "deptSelectorSingle"}}
+                //部门选择器-单选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if eq $column.HtmlType "deptSelectorMultiple"}}
+                //部门选择器-多选-{{$column.ColumnComment}}
+                {{$column.HtmlField}}Str,
+                {{else if and $column.IsPk $.table.UseSnowId}}
+                gconv.String(v.{{$column.GoField}}),
+                {{else}}
+                v.{{$column.GoField}},
+                {{end}}
+                {{end}}
+                {{end}}
+            }
+            excelData = append(excelData,dt)
+        }
+        req.PageNum++
+    }
+    //创建excel处理对象
+    excel := new(libUtils.ExcelHelper).CreateFile()
+    defer excel.Close()
+    excel.ArrToExcel("Sheet1", "A1", excelData)
+    col, _ := excelize.ColumnNumberToName(len(tableHead))
+    row := len(excelData)
+    cr, _ := excelize.JoinCellName(col, row)
+    excel.SetCellBorder("Sheet1", "A1", cr)
+    _, err = excel.WriteTo(r.Response.BufferWriter)
+    if err != nil {
+        return
+    }
+    r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
+    r.Response.Header().Set("Accept-Ranges", "bytes")
+    r.Response.Header().Set("Access-Control-Expose-Headers", "*")
+    r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("{{.table.TableComment}}")+".xlsx")
+    r.Response.Buffer()
+    r.Exit()
+    return
+}
+{{end}}
+
+{{if .table.ExcelImp}}
+func (c *{{$structName}}Controller) ExcelTemplate(ctx context.Context,req *{{.table.ModuleName}}.{{.table.ClassName}}ExcelTemplateReq)(res *{{.table.ModuleName}}.{{.table.ClassName}}ExcelTemplateRes,err error){
+    var(
+        r        = ghttp.RequestFromCtx(ctx)
+        //表头
+        {{$tableHeader := ""}}
+        {{range $index, $column := .table.Columns}}
+        {{if and (or (ne $column.IsPk true) $.table.IsPkInsertable) (ne $column.HtmlType "imagefile") (ne $column.HtmlType "images") (ne $column.HtmlType "file") (ne $column.HtmlType "files")}}
+        {{$tableHeader = concat $tableHeader `"` $column.ColumnComment `"` "," }}
+        {{end}}
+        {{end}}
+        tableHead = []interface{}{ {{$tableHeader}} }
+        excelData = [][]interface{}{tableHead}
+    )
+    //创建excel处理对象
+    excel := new(libUtils.ExcelHelper).CreateFile()
+    defer excel.Close()
+    excel.ArrToExcel("Sheet1", "A1", excelData)
+    col, _ := excelize.ColumnNumberToName(len(tableHead))
+    row := len(excelData)
+    cr, _ := excelize.JoinCellName(col, row)
+    excel.SetCellBorder("Sheet1", "A1", cr)
+    _, err = excel.WriteTo(r.Response.BufferWriter)
+    if err != nil {
+        return
+    }
+    r.Response.Header().Set("Content-Type", "application/vnd.DEMO_WECHAT_OPEN_ID.spreadsheetml.sheet")
+    r.Response.Header().Set("Accept-Ranges", "bytes")
+    r.Response.Header().Set("Access-Control-Expose-Headers", "*")
+    r.Response.Header().Set("Content-Disposition", "attachment; filename="+gurl.Encode("{{.table.TableComment}}模板")+".xlsx")
+    r.Response.Buffer()
+    r.Exit()
+    return
+}
+
+func(c *{{$structName}}Controller)Import(ctx context.Context,req *{{.table.ModuleName}}.{{.table.ClassName}}ImportReq)(res *{{.table.ModuleName}}.{{.table.ClassName}}ImportRes,err error){
+    err = service.{{.table.ClassName}}().Import(ctx,req.File)
+    return
+}
+{{end}}
+
+{{if gt (len .table.LinkedTables) 0}}
+// Linked{{$.table.ClassName}}DataSearch 相关连表查询数据
+func(c *{{$structName}}Controller) Linked{{$.table.ClassName}}DataSearch(ctx context.Context, req *{{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchReq) (res *{{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchRes, err error) {
+    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/list") {
+        err = errors.New("没有访问权限")
+        return
+    }
+    res = new({{.table.ModuleName}}.Linked{{$.table.ClassName}}DataSearchRes)
+    res.Linked{{$.table.ClassName}}DataSearchRes,err = service.{{.table.ClassName}}().Linked{{$.table.ClassName}}DataSearch(ctx)
+    return
+}
+{{end}}
+
+////
+// Get 获取{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Get(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}GetReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}GetRes, err error) {
+    res = new({{.table.ModuleName}}.{{.table.ClassName}}GetRes)
+    res.{{.table.ClassName}}InfoRes,err = service.{{.table.ClassName}}().GetBy{{.table.PkColumn.GoField}}(ctx, req.{{.table.PkColumn.GoField}})
+    return
+}
+
+////
+// Add 添加{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Add(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}AddReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}AddRes, err error) {
+	err = service.{{.table.ClassName}}().Add(ctx, req.{{.table.ClassName}}AddReq)
+	return
+}
+
+////
+// Edit 修改{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Edit(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}EditReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}EditRes, err error) {
+	err = service.{{.table.ClassName}}().Edit(ctx, req.{{.table.ClassName}}EditReq)
+	return
+}
+
+////
+// Delete 删除{{.table.FunctionName}}
+func (c *{{$structName}}Controller) Delete(ctx context.Context, req *{{.table.ModuleName}}.{{.table.ClassName}}DeleteReq) (res *{{.table.ModuleName}}.{{.table.ClassName}}DeleteRes, err error) {
+	err = service.{{.table.ClassName}}().Delete(ctx, req.{{$.table.PkColumn.GoField}}s)
+	return
+}
+
+{{range $index,$column:= .table.Columns}}
+{{if eq $column.HtmlType "switch"}}
+// {{$.table.FunctionName}}{{$column.ColumnComment}}修改（状态）
+func(c *{{$structName}}Controller)Change{{$column.GoField}}(ctx context.Context, req *{{$.table.ModuleName}}.{{$.table.ClassName}}{{$column.GoField}}SwitchReq)(res *{{$.table.ModuleName}}.{{$.table.ClassName}}{{$column.GoField}}SwitchRes,err error){
+    if !{{$serviceVal}}.SysUser().AccessRule(ctx, {{$serviceVal}}.Context().GetUserId(ctx), "{{$.apiVersion}}/{{$.modulePath}}/{{$.table.BusinessName | CaseCamelLower}}/edit") {
+        err = errors.New("没有修改权限")
+        return
+    }
+    err = service.{{$.table.ClassName}}().Change{{$column.GoField}}(ctx,req.{{$.table.PkColumn.GoField}},req.{{$column.GoField}})
+    return
+}
+{{end}}
+{{end}}

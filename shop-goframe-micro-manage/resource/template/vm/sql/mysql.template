@@ -1,0 +1,77 @@
+/*
+==========================================================================
+GFast自动生成菜单SQL
+生成日期：{{date "Y-m-d H:i:s"}}
+生成路径: resource/data/gen_sql/{{.table.ModuleName}}/{{.table.BusinessName}}_menu.sql
+生成人：{{.table.FunctionAuthor}}
+==========================================================================
+*/
+////
+
+
+-- 删除原有数据
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/list';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/get';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/add';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/edit';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/delete';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/export';
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/import';
+{{range $index,$column:= .table.Columns}}
+{{if and $column.IsStatus $column.IsList}}
+DELETE FROM `sys_auth_rule` WHERE `name` = '{{.apiVersion}}/{{.modulePath}}/{{$.table.BusinessName | CaseCamelLower}}/change{{$column.GoField}}';
+{{end}}
+{{end}}
+
+-- 当前日期
+select @now := now();
+
+{{if eq .table.MenuPid 0}}
+-- 目录 SQL
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at` )
+VALUES(0,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}','{{.table.TableComment}}管理','iconfont icon-fuwenbenkuang','','{{.table.TableComment}}管理',0,0,1,0,'/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}','','layout/routerView/parent',0,'sys_admin',0,@now,@now);
+
+-- 菜单父目录ID
+SELECT @parentId := LAST_INSERT_ID();
+{{else}}
+-- 菜单父目录ID
+SELECT @parentId := {{$.table.MenuPid}};
+{{end}}
+
+-- 菜单 SQL
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/list','{{.table.TableComment}}列表','ele-Fold','','{{.table.TableComment}}列表',1,0,1,0,'/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/list','','{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/list/index',0,'sys_admin',0,@now,@now);
+
+-- 按钮父目录ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/get','{{.table.TableComment}}查询','','','{{.table.TableComment}}查询',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/add','{{.table.TableComment}}添加','','','{{.table.TableComment}}添加',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/edit','{{.table.TableComment}}修改','','','{{.table.TableComment}}修改',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/delete','{{.table.TableComment}}删除','','','{{.table.TableComment}}删除',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+
+{{if .table.ExcelPort}}
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/export','{{.table.TableComment}}导出','','','{{.table.TableComment}}导出',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+{{end}}
+
+{{if .table.ExcelImp}}
+    INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+    VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{.table.BusinessName | CaseCamelLower}}/import','{{.table.TableComment}}导入','','','{{.table.TableComment}}导入',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+{{end}}
+
+{{range $index,$column:= .table.Columns}}
+{{if and $column.IsStatus $column.IsList}}
+INSERT INTO `sys_auth_rule` (`pid`,`name`,`title`,`icon`,`condition`,`remark`,`menu_type`,`weigh`,`is_cached`,`is_hide`,`path`,`link_url`,`component`,`is_iframe`,`module_type`,`model_id`,`created_at`,`updated_at`)
+VALUES(@parentId,'{{.apiVersion}}/{{.modulePath}}/{{$.table.BusinessName | CaseCamelLower}}/change{{$column.GoField}}','{{$.table.TableComment}}{{$column.ColumnComment}}修改','','','{{$.table.TableComment}}{{$column.ColumnComment}}修改',2,0,1,0,'','','',0,'sys_admin',0,@now,@now);
+{{end}}
+{{end}}

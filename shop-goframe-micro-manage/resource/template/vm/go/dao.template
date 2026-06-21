@@ -1,0 +1,32 @@
+// ==========================================================================
+// GFast自动生成dao操作代码。
+// 生成日期：{{date "Y-m-d H:i:s"}}
+// 生成路径: {{.table.PackageName}}/dao/{{.table.TableName}}.go
+// 生成人：{{.table.FunctionAuthor}}
+// desc:{{.table.FunctionName}}
+// company:云南奇讯科技有限公司
+// ==========================================================================
+////
+package dao
+////
+import (
+    "{{.goModName}}/{{.table.PackageName}}/dao/internal"
+)
+
+
+// {{.table.BusinessName | CaseCamelLower}}Dao is the manager for logic model data accessing and custom defined data operations functions management.
+// You can define custom methods on it to extend its functionality as you wish.
+type {{.table.BusinessName | CaseCamelLower}}Dao struct {
+	*internal.{{.table.BusinessName | CaseCamel}}Dao
+}
+
+var (
+    // {{.table.ClassName}} is globally public accessible object for table tools_gen_table operations.
+    {{.table.ClassName}} = {{.table.BusinessName | CaseCamelLower}}Dao{
+        internal.New{{.table.ClassName}}Dao(),
+    }
+)
+
+////
+// Fill with you ideas below.
+////
