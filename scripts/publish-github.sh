@@ -338,7 +338,14 @@ print("Secret scan passed.")
 PY
 
 echo "Checking publish diff..."
-git -C "$PUBLISH_DIR" status --short
+STATUS_FILE="$(mktemp)"
+git -C "$PUBLISH_DIR" status --short > "$STATUS_FILE"
+sed -n '1,120p' "$STATUS_FILE"
+STATUS_COUNT="$(wc -l < "$STATUS_FILE" | tr -d ' ')"
+if [[ "$STATUS_COUNT" -gt 120 ]]; then
+  echo "  ... $((STATUS_COUNT - 120)) more"
+fi
+rm -f "$STATUS_FILE"
 
 git -C "$PUBLISH_DIR" add -A
 if git -C "$PUBLISH_DIR" diff --cached --quiet; then
