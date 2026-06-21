@@ -4,6 +4,7 @@ import (
 	"context"
 	v1 "shop-goframe-micro-service-refacotor/app/interaction/api/praise_info/v1"
 	"shop-goframe-micro-service-refacotor/app/interaction/internal/dao"
+	"shop-goframe-micro-service-refacotor/app/interaction/utility/interactionRedis"
 	"shop-goframe-micro-service-refacotor/utility/consts"
 	"strings"
 
@@ -26,7 +27,8 @@ func Create(ctx context.Context, req *v1.PraiseInfoCreateReq) (res *v1.PraiseInf
 	infoError := consts.InfoError(consts.PraiseInfo, consts.CreateFail)
 
 	var id int64
-	err = dao.PraiseInfo.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+	var praiseChanged bool
+	txErr := dao.PraiseInfo.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		if req.Type == PraiseTypeComment {
 			if err := ensureCommentLikeTargetTx(ctx, tx, req.ObjectId); err != nil {
 				g.Log().Errorf(ctx, "%v %v", infoError, err)
@@ -53,10 +55,19 @@ func Create(ctx context.Context, req *v1.PraiseInfoCreateReq) (res *v1.PraiseInf
 				return gerror.WrapCode(gcode.CodeDbOperationError, err, infoError)
 			}
 		}
+		praiseChanged = true
 		return nil
 	})
-	if err != nil {
-		return nil, err
+	if txErr != nil {
+		return nil, txErr
+	}
+
+	// 增加点赞数
+	if praiseChanged && req.Type == PraiseTypeComment {
+		if cacheErr := interactionRedis.IncrCommentLikeCount(ctx, req.ObjectId); cacheErr != nil {
+			g.Log().Warningf(ctx, "增加评论点赞 Redis 计数失败: comment_id=%d, err=%v", req.ObjectId, cacheErr)
+			_ = interactionRedis.DeleteCommentLikeCount(ctx, req.ObjectId)
+		}
 	}
 
 	res.Id = uint32(id)
@@ -73,6 +84,7 @@ func isDuplicatePraiseError(err error) bool {
 
 func Delete(ctx context.Context, req *v1.PraiseInfoDeleteReq) (res *v1.PraiseInfoDeleteRes, err error) {
 	res = &v1.PraiseInfoDeleteRes{}
+	var praiseChanged bool
 	txErr := dao.PraiseInfo.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		result, err := tx.Model(dao.PraiseInfo.Table()).
 			Where(g.Map{
@@ -106,10 +118,18 @@ func Delete(ctx context.Context, req *v1.PraiseInfoDeleteReq) (res *v1.PraiseInf
 			}
 		}
 
+		praiseChanged = true
 		return nil
 	})
 	if txErr != nil {
 		return nil, txErr
+	}
+
+	if praiseChanged && req.Type == PraiseTypeComment {
+		if cacheErr := interactionRedis.DecrCommentLikeCount(ctx, req.ObjectId); cacheErr != nil {
+			g.Log().Warningf(ctx, "减少评论点赞 Redis 计数失败: comment_id=%d, err=%v", req.ObjectId, cacheErr)
+			_ = interactionRedis.DeleteCommentLikeCount(ctx, req.ObjectId)
+		}
 	}
 	return
 }

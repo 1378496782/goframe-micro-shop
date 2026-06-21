@@ -6,6 +6,7 @@ import (
 	"shop-goframe-micro-service-refacotor/app/interaction/api/pbentity"
 	"shop-goframe-micro-service-refacotor/app/interaction/internal/dao"
 	"shop-goframe-micro-service-refacotor/app/interaction/internal/model/entity"
+	"shop-goframe-micro-service-refacotor/app/interaction/utility/interactionRedis"
 	"shop-goframe-micro-service-refacotor/utility"
 	"shop-goframe-micro-service-refacotor/utility/consts"
 
@@ -125,7 +126,7 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 			continue
 		}
 
-		pbComment := convertCommentEntity(comment)
+		pbComment := convertCommentEntity(ctx, comment)
 		response.List = append(response.List, pbComment)
 		// 只有在查顶层评论时才需要继续查它们的回复
 		if req.ParentId == 0 {
@@ -157,7 +158,7 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 				continue
 			}
 
-			pbReply := convertCommentEntity(reply)
+			pbReply := convertCommentEntity(ctx, reply)
 			replyMap[pbReply.RootId] = append(replyMap[pbReply.RootId], pbReply)
 		}
 
@@ -172,7 +173,16 @@ func GetList(ctx context.Context, req *v1.CommentInfoGetListReq) (res *v1.Commen
 	return &v1.CommentInfoGetListRes{Data: response}, nil
 }
 
-func convertCommentEntity(comment entity.CommentInfo) *pbentity.CommentInfo {
+func convertCommentEntity(ctx context.Context, comment entity.CommentInfo) *pbentity.CommentInfo {
+	likeCount := uint32(comment.LikeCount)
+	if cachedCount, ok, err := interactionRedis.GetCommentLikeCount(ctx, uint32(comment.Id)); err == nil && ok {
+		likeCount = cachedCount
+	} else if err == nil {
+		_ = interactionRedis.SetCommentLikeCount(ctx, uint32(comment.Id), likeCount)
+	} else {
+		g.Log().Warningf(ctx, "读取评论点赞 Redis 计数失败: comment_id=%d, err=%v", comment.Id, err)
+	}
+
 	return &pbentity.CommentInfo{
 		Id:          int32(comment.Id),
 		ParentId:    int32(comment.ParentId),

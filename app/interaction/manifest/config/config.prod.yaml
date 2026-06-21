@@ -19,3 +19,13 @@ database:
 
 etcd:
   address: "etcd:2379"
+
+redis:
+  default:
+    address: "redis:6379"
+    db: 3
+    pass: ""
+    idleTimeout: "600s"
+    maxActive: 50
+    idle: 10
+    connectTimeout: "5s"
