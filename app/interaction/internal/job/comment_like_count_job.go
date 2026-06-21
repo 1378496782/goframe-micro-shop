@@ -6,6 +6,7 @@ import (
 	"time"
 
 	comment_info "shop-goframe-micro-service-refacotor/app/interaction/internal/logic/comment_info"
+	"shop-goframe-micro-service-refacotor/app/interaction/utility/interactionRedis"
 
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -32,6 +33,21 @@ func StartCommentLikeCountCalibrateJob(ctx context.Context) {
 				mu.Lock()
 				running = false
 				mu.Unlock()
+			}()
+
+			lockValue, acquired, err := interactionRedis.TryAcquireCommentLikeCountCalibrateLock(ctx)
+			if err != nil {
+				g.Log().Errorf(ctx, "获取评论点赞计数校准分布式锁失败: %v", err)
+				return
+			}
+			if !acquired {
+				g.Log().Info(ctx, "其他实例正在执行评论点赞计数校准，本轮跳过")
+				return
+			}
+			defer func() {
+				if err := interactionRedis.ReleaseCommentLikeCountCalibrateLock(ctx, lockValue); err != nil {
+					g.Log().Warningf(ctx, "释放评论点赞计数校准分布式锁失败: %v", err)
+				}
 			}()
 
 			result, err := comment_info.CalibrateCommentLikeCount(ctx, 500)
