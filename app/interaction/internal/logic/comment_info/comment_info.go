@@ -191,7 +191,7 @@ func convertCommentEntity(ctx context.Context, comment entity.CommentInfo) *pben
 		ObjectId:    int32(comment.ObjectId),
 		Type:        int32(comment.Type),
 		ReplyUserId: int32(comment.ReplyUserId),
-		LikeCount:   int32(comment.LikeCount),
+		LikeCount:   int32(likeCount),
 		ReplyCount:  int32(comment.ReplyCount),
 		Content:     comment.Content,
 		CreatedAt:   utility.SafeConvertTime(comment.CreatedAt),

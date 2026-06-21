@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"context"
+
 	"github.com/gogf/gf/contrib/rpc/grpcx/v2"
 	"google.golang.org/grpc"
 	"shop-goframe-micro-service-refacotor/app/interaction/internal/controller/collection_info"
 	"shop-goframe-micro-service-refacotor/app/interaction/internal/controller/comment_info"
 	"shop-goframe-micro-service-refacotor/app/interaction/internal/controller/praise_info"
+	"shop-goframe-micro-service-refacotor/app/interaction/internal/job"
 
 	"github.com/gogf/gf/v2/os/gcmd"
 )
@@ -27,6 +29,7 @@ var (
 			praise_info.Register(s)
 			comment_info.Register(s)
 			collection_info.Register(s)
+			job.StartCommentLikeCountCalibrateJob(ctx)
 			s.Run()
 			return nil
 		},
