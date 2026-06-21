@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package user_coupon_info;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/user_coupon_info/v1";
+
+import "pbentity/user_coupon_info.proto";
+
+service user_coupon_info {
+  rpc GetList(UserCouponInfoGetListReq) returns (UserCouponInfoGetListRes) {}
+  rpc Create(UserCouponInfoCreateReq) returns (UserCouponInfoCreateRes) {}
+  rpc Update(UserCouponInfoUpdateReq) returns (UserCouponInfoUpdateRes) {}
+  rpc Delete(UserCouponInfoDeleteReq) returns (UserCouponInfoDeleteRes) {}
+}
+
+// 新增消息定义
+message UserCouponInfoCreateReq {
+  uint32                     UserId    = 1; // 用户id
+  uint32                     CouponId  = 2; // 优惠券id
+  uint32                     Status    = 3; // 状态：0-待使用，1-已使用，2-已过期
+  uint64                     Amount    = 4; // 优惠金额（单位：分）
+}
+
+message UserCouponInfoCreateRes {
+  uint32 id = 1;
+}
+
+message UserCouponInfoGetListReq {
+  uint32 page = 1;
+  uint32 size = 2;  // 修改：字段编号必须从1开始递增
+  uint32 UserId = 3;
+}
+
+message UserCouponInfoUpdateReq {
+  uint32                     Id        = 1; //
+  uint32                     UserId    = 2; // 用户id
+  uint32                     CouponId  = 3; // 优惠券id
+  uint32                     Status    = 4; // 状态：0-待使用，1-已使用，2-已过期
+  uint64                     Amount    = 5; // 优惠金额（单位：分）
+}
+
+message UserCouponInfoUpdateRes {
+  uint32 id = 1;
+}
+
+message UserCouponInfoDeleteReq {
+  uint32 id = 1;
+}
+
+message UserCouponInfoDeleteRes {
+
+}
+
+
+message UserCouponInfoListResponse {
+  repeated pbentity.UserCouponInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message UserCouponInfoGetListRes {
+  UserCouponInfoListResponse data = 1;
+}

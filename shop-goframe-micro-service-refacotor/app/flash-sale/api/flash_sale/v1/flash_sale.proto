@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package flash_sale.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/flash-sale/api/flash_sale/v1";
+
+// 秒杀商品信息
+message FlashSaleGoodsInfo {
+  uint32 goods_id = 1;          // 商品ID
+  uint32 activity_id = 2;       // 活动ID
+  string title = 3;             // 商品标题
+  string description = 4;       // 商品描述
+  int64 original_price = 5;     // 原价（分）
+  int64 sale_price = 6;         // 秒杀价（分）
+  int32 total_stock = 7;        // 总库存
+   int32 available_stock = 8;   // 可用库存
+  uint32 start_time = 9;        // 开始时间
+  uint32 end_time = 10;         // 结束时间
+  uint32 status = 11;           // 状态：1-进行中，2-已结束，3-未开始
+  string image_url = 12;        // 商品图片URL
+}
+
+// 秒杀商品列表请求
+message FlashSaleGoodsListReq {
+  uint32 activity_id = 1;       // 活动ID
+  int32 page_num = 2;           // 页码
+  int32 page_size = 3;           // 每页数量
+}
+
+// 秒杀商品列表响应
+message FlashSaleGoodsListRes {
+  int32 total = 1;              // 总数量
+  repeated FlashSaleGoodsInfo list = 2; // 商品列表
+}
+
+// 秒杀商品详情请求
+message FlashSaleGoodsDetailReq {
+  uint32 goods_id = 1;          // 商品ID
+  uint32 activity_id = 2;       // 活动ID
+}
+
+// 秒杀商品详情响应
+message FlashSaleGoodsDetailRes {
+  FlashSaleGoodsInfo goods_info = 1;    // 商品信息
+  int64 remain_seconds = 2;      // 距离开始/结束的秒数
+  bool can_buy = 3;              // 是否可以购买
+}
+
+// 创建秒杀订单请求
+message CreateFlashSaleOrderReq {
+  uint32 goods_id = 1;           // 商品ID
+  uint32 activity_id = 2;        // 活动ID
+  uint32 user_id = 3;            // 用户ID
+  int32 count = 4;               // 购买数量
+}
+
+// 创建秒杀订单响应
+message CreateFlashSaleOrderRes {
+  bool success = 1;              // 是否成功
+  string order_no = 2;           // 订单号（如果成功）
+  string message = 3;            // 提示信息
+  string result_id = 4;          // 结果查询ID
+  int32 status = 5;              // 状态码：0-处理中，1-成功，2-失败
+}
+
+// 查询秒杀结果请求
+message GetFlashSaleResultReq {
+  string result_id = 1;          // 结果查询ID
+  uint32 user_id = 2;            // 用户ID
+}
+
+// 查询秒杀结果响应
+message GetFlashSaleResultRes {
+  int32 status = 1;              // 状态码：0-处理中，1-成功，2-失败
+  string message = 2;            // 提示信息
+  string order_no = 3;           // 订单号（如果成功）
+  uint32 goods_id = 4;           // 商品ID
+  int64 pay_amount = 5;          // 支付金额
+}
+
+// 秒杀服务接口定义
+service FlashSaleService {
+  // 获取秒杀商品列表
+  rpc GetFlashSaleGoodsList(FlashSaleGoodsListReq) returns (FlashSaleGoodsListRes);
+  
+  // 获取秒杀商品详情
+  rpc GetFlashSaleGoodsDetail(FlashSaleGoodsDetailReq) returns (FlashSaleGoodsDetailRes);
+  
+  // 创建秒杀订单
+  rpc CreateFlashSaleOrder(CreateFlashSaleOrderReq) returns (CreateFlashSaleOrderRes);
+  
+  // 查询秒杀结果
+  rpc GetFlashSaleResult(GetFlashSaleResultReq) returns (GetFlashSaleResultRes);
+}

@@ -1,0 +1,38 @@
+[2025-10-14 00:48:57] ==========================================
+[2025-10-14 00:48:57] 开始重新构建单个服务: order-service
+[2025-10-14 00:48:57] ==========================================
+[2025-10-14 00:48:57] 步骤1: 检查服务当前状态
+NAME            IMAGE                                                COMMAND     SERVICE         CREATED       STATUS                 PORTS
+order-service   shop-goframe-micro-service-refacotor-order-service   "./order"   order-service   5 hours ago   Up 5 hours (healthy)   0.0.0.0:31005->31005/tcp, :::31005->31005/tcp
+[2025-10-14 00:48:58] 停止 order-service 服务...
+ Container order-service  Stopping
+ Container order-service  Stopped
+[2025-10-14 00:48:59] ✅ order-service 服务停止成功
+[2025-10-14 00:48:59] 清理 order-service 相关的容器...
+[2025-10-14 00:49:00] 查找 order-service 相关的镜像...
+[2025-10-14 00:49:00] 找到以下相关镜像，将被删除：
+shop-goframe-micro-service-refacotor-order-service:latest
+[2025-10-14 00:49:00] 删除镜像: shop-goframe-micro-service-refacotor-order-service:latest
+[2025-10-14 00:49:00] ✅ 镜像删除成功: shop-goframe-micro-service-refacotor-order-service:latest
+[2025-10-14 00:49:00] 构建 order-service 服务...
+[2025-10-14 00:50:25] ✅ order-service 服务构建成功
+[2025-10-14 00:50:25] 启动 order-service 服务...
+ Container etcd  Running
+ Container rabbitmq  Running
+ Container mysql  Running
+ Container order-service  Creating
+ Container order-service  Created
+ Container etcd  Waiting
+ Container mysql  Waiting
+ Container rabbitmq  Waiting
+ Container etcd  Healthy
+ Container rabbitmq  Healthy
+ Container mysql  Healthy
+ Container order-service  Starting
+ Container order-service  Started
+[2025-10-14 00:50:26] ✅ order-service 服务启动成功
+[2025-10-14 00:50:26] 步骤6: 等待服务启动...
+[2025-10-14 00:50:41] 步骤7: 最终状态检查
+NAME            IMAGE                                                COMMAND     SERVICE         CREATED          STATUS                             PORTS
+order-service   shop-goframe-micro-service-refacotor-order-service   "./order"   order-service   16 seconds ago   Up 15 seconds (health: starting)   0.0.0.0:31005->31005/tcp, :::31005->31005/tcp
+[2025-10-14 00:50:42] ✅ 健康检查通过: http://localhost:31005/

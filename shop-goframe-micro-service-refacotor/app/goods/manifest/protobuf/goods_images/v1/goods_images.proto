@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package goods_images.v1;
+
+option go_package = "shop-goframe-micro-service/app/goods/api/goods_images/v1";
+
+import "pbentity/goods_images.proto";
+
+service goods_images {
+  // 商品图片列表
+  rpc GetList(GoodsImagesGetListReq) returns (GoodsImagesGetListRes) {}
+  // 创建商品图片
+  rpc Create(GoodsImagesCreateReq) returns (GoodsImagesCreateRes) {}
+  // 删除商品图片
+  rpc Delete(GoodsImagesDeleteReq) returns (GoodsImagesDeleteRes) {}
+}
+
+
+// 新增消息定义
+message GoodsImagesCreateReq {
+  uint32  GoodsId = 1; // 商品ID
+  uint32  FileId  = 2; // 文件ID（关联file_info）
+  uint32  Sort    = 3; // 排序
+}
+
+message GoodsImagesCreateRes {
+  uint32 id = 1;
+}
+
+
+
+
+message GoodsImagesDeleteReq {
+  uint32 id = 1;
+}
+
+message GoodsImagesDeleteRes {
+
+}
+
+message GoodsImagesGetListReq {
+  uint32 page = 1;
+  uint32 size = 2;  // 修改：字段编号必须从1开始递增
+}
+
+
+message GoodsImagesListResponse {
+  repeated pbentity.GoodsImages list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message GoodsImagesGetListRes {
+  GoodsImagesListResponse data = 1;
+}

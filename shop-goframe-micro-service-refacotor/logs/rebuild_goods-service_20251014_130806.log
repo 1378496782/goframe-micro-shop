@@ -1,0 +1,13 @@
+[2025-10-14 13:08:06] ==========================================
+[2025-10-14 13:08:06] 开始重新构建单个服务: goods-service
+[2025-10-14 13:08:06] ==========================================
+[2025-10-14 13:08:06] 步骤1: 检查服务当前状态
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+[2025-10-14 13:08:06] 停止 goods-service 服务...
+[2025-10-14 13:08:06] ✅ goods-service 服务停止成功
+[2025-10-14 13:08:06] 清理 goods-service 相关的容器...
+[2025-10-14 13:08:07] 查找 goods-service 相关的镜像...
+[2025-10-14 13:08:07] 没有找到 goods-service 相关的镜像需要清理
+[2025-10-14 13:08:07] 构建 goods-service 服务...
+failed to solve: process "/bin/sh -c go build -o bin/goods ./app/goods" did not complete successfully: exit code: 1
+[2025-10-14 13:08:24] ❌ goods-service 服务构建失败

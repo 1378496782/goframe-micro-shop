@@ -1,0 +1,1145 @@
+package logic
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	cartApi "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1"
+	goods_info "shop-goframe-micro-service-refacotor/app/goods/api/goods_info/v1"
+	v1 "shop-goframe-micro-service-refacotor/app/order/api/order_info/v1"
+	"shop-goframe-micro-service-refacotor/app/order/api/pbentity"
+	"shop-goframe-micro-service-refacotor/app/order/internal/consts"
+	"shop-goframe-micro-service-refacotor/app/order/internal/dao"
+	"shop-goframe-micro-service-refacotor/app/order/internal/model/entity"
+	cart "shop-goframe-micro-service-refacotor/app/order/utility/cart_info"
+	goods "shop-goframe-micro-service-refacotor/app/order/utility/goods_info"
+	"shop-goframe-micro-service-refacotor/app/order/utility/rabbitmq"
+	"shop-goframe-micro-service-refacotor/utility"
+	consts_ctrl "shop-goframe-micro-service-refacotor/utility/consts"
+	"shop-goframe-micro-service-refacotor/utility/metrics"
+	grabbitmq "shop-goframe-micro-service-refacotor/utility/rabbitmq"
+	"time"
+
+	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
+
+	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/gogf/gf/v2/util/guid"
+)
+
+// Create 创建订单（包含完整的事务处理）
+func Create(ctx context.Context, req *v1.OrderInfoCreateReq) (int32, string, error) {
+	//对订单请求进行校验
+	if len(req.OrderGoodsInfo) == 0 {
+		return 0, "", errors.New("订单必须至少包含一个商品")
+	}
+	//订单金额必须等于商品金额之和
+	var totalGoodsPrice uint32
+	var totalCouponPrice uint32
+	var goodsIds []uint32
+	for _, item := range req.OrderGoodsInfo {
+		totalGoodsPrice += item.Price
+		totalCouponPrice += item.CouponPrice
+		goodsIds = append(goodsIds, item.GoodsId)
+	}
+	if req.Price != totalGoodsPrice {
+		return 0, "", fmt.Errorf("订单总价[%d]与商品总价[%d]不符", req.Price, totalGoodsPrice)
+	}
+
+	if req.ActualPrice != req.Price-req.CouponPrice {
+		return 0, "", fmt.Errorf("订单实际支付价格[%d]不等于订单总价[%d]减去优惠券价格[%d]", req.ActualPrice, req.Price, req.CouponPrice)
+	}
+	if req.CouponPrice < totalCouponPrice {
+		return 0, "", fmt.Errorf("订单优惠券价格[%d]小于商品优惠券价格[%d]", req.CouponPrice, totalCouponPrice)
+	}
+	// 库存校验
+	goodsStockMap, err := goods.Client.GetGoodsStock(ctx, &goods_info.GetGoodsStockReq{GoodsIds: goodsIds})
+	if err != nil {
+		return 0, "", fmt.Errorf("调用 goods 模块失败,err:%v", err)
+	}
+	fmt.Println("goodsStockMap", goodsStockMap)
+	for _, item := range req.OrderGoodsInfo {
+		if item.Count > uint32(goodsStockMap.GoodsStock[item.GoodsId]) {
+			return 0, "", fmt.Errorf("商品{%d}库存不足", item.GoodsId)
+		}
+	}
+
+	// 计算OrderGoodsItem中分摊的coupon_price
+	var preAssignedCouponPrice uint32
+	var orderGoodsList []entity.OrderGoodsInfo
+	var itemsToAllocate []*entity.OrderGoodsInfo
+	var allocatableItemsTotalPrice uint32
+
+	if err := gconv.Structs(req.OrderGoodsInfo, &orderGoodsList); err != nil {
+		return 0, "", fmt.Errorf("订单商品数据转换失败: %v", err)
+	}
+
+	for i := 0; i < len(orderGoodsList); i++ {
+		item := &orderGoodsList[i]
+		if item.CouponPrice > 0 {
+			preAssignedCouponPrice += uint32(item.CouponPrice)
+		} else {
+			itemsToAllocate = append(itemsToAllocate, item)
+			allocatableItemsTotalPrice += uint32(item.Price)
+		}
+	}
+
+	couponPriceToAllocate := req.CouponPrice - preAssignedCouponPrice
+
+	if couponPriceToAllocate > 0 && len(itemsToAllocate) > 0 {
+		if allocatableItemsTotalPrice > 0 {
+			var allocatedSoFar int = 0
+			for i, item := range itemsToAllocate {
+				if i == len(itemsToAllocate)-1 {
+					item.CouponPrice = int(couponPriceToAllocate) - allocatedSoFar
+					item.ActualPrice = item.Price - item.CouponPrice
+				} else {
+					// 使用uint64进行计算以防止溢出
+					share := (uint64(item.Price) * uint64(couponPriceToAllocate)) / uint64(allocatableItemsTotalPrice)
+					item.CouponPrice = int(share)
+					item.ActualPrice = item.Price - item.CouponPrice
+					allocatedSoFar += item.CouponPrice
+				}
+			}
+		}
+	}
+
+	// 开启事务
+	db := g.DB()
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
+		return 0, "", fmt.Errorf("开启事务失败: %v", err)
+	}
+
+	// 确保事务回滚
+	var success bool
+	defer func() {
+		if !success {
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				g.Log().Errorf(ctx, "事务回滚失败: %v", rollbackErr)
+			}
+		}
+	}()
+
+	// 使用 gconv.Struct 转换主订单
+	var order entity.OrderInfo
+	if err := gconv.Struct(req, &order); err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
+		return 0, "", fmt.Errorf("订单数据转换失败: %v", err)
+	}
+
+	// 设置订单特有字段
+	order.Number = utility.GenerateOrderNumber()
+	//order.Status = 1 // 6待确认
+	if req.CouponId > 0 {
+		order.Status = int(consts.OrderStatusPendingConfirm) // 使用优惠券，待确认
+	} else {
+		order.Status = int(consts.OrderStatusPendingPayment) // 不使用优惠券，待支付
+	}
+	order.CreatedAt = gtime.Now()
+	order.UpdatedAt = gtime.Now()
+
+	// 使用事务插入主订单
+	result, err := dao.OrderInfo.Ctx(ctx).TX(tx).InsertAndGetId(order)
+	if err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
+		return 0, "", fmt.Errorf("插入订单失败: %v", err)
+	}
+	orderId := int32(result)
+
+	// 设置订单商品公共字段
+	for i := range orderGoodsList {
+		orderGoodsList[i].OrderId = int(orderId)
+		orderGoodsList[i].CreatedAt = gtime.Now()
+		orderGoodsList[i].UpdatedAt = gtime.Now()
+	}
+
+	// 订单商品列表不为空时，执行批量插入操作
+	if len(orderGoodsList) > 0 {
+		_, err = dao.OrderGoodsInfo.Ctx(ctx).TX(tx).Insert(orderGoodsList)
+		if err != nil {
+			// 记录订单创建失败的业务指标
+			metrics.RecordOrderCreate(ctx, false)
+			return 0, "", fmt.Errorf("插入订单商品失败: %v", err)
+		}
+	}
+
+	// 提交事务
+	if err = tx.Commit(); err != nil {
+		// 记录订单创建失败的业务指标
+		metrics.RecordOrderCreate(ctx, false)
+		return 0, "", fmt.Errorf("提交事务失败: %v", err)
+	}
+
+	success = true
+
+	// 订单创建成功后，发布订单创建事件，用于后续操作（如删除购物车商品）
+	var goodsInfos []*grabbitmq.OrderGoodsInfo
+	for _, item := range req.OrderGoodsInfo {
+		goodsInfos = append(goodsInfos, &grabbitmq.OrderGoodsInfo{
+			GoodsId: int(item.GoodsId),
+			Count:   int(item.Count),
+		})
+	}
+	event := grabbitmq.OrderCreatedEvent{
+		UserId:    req.UserId,
+		OrderId:   uint32(orderId),
+		GoodsIds:  goodsIds,
+		GoodsInfo: goodsInfos,
+	}
+
+	go grabbitmq.PublishOrderCreatedEvent(event)
+
+	// 订单创建成功后，如果有优惠券使用，发送订单确认消息给goods服务进行优惠券扣减
+	if req.CouponId > 0 {
+		go grabbitmq.PublishCouponConfirmEvent(orderId, int32(req.UserId), int32(req.CouponId))
+	}
+
+	// 订单创建成功后，异步发送延迟消息
+	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
+	go grabbitmq.PublishOrderTimeoutEvent(int(orderId), delay)
+
+	// 记录订单创建成功的业务指标
+	metrics.RecordOrderCreate(ctx, true)
+
+	// 对于每个商品，更新库存指标
+	for _, goodsInfo := range goodsInfos {
+		metrics.UpdateInventory(ctx, fmt.Sprintf("%d", goodsInfo.GoodsId), int64(goodsStockMap.GoodsStock[uint32(goodsInfo.GoodsId)]-int32(goodsInfo.Count)))
+	}
+
+	return orderId, order.Number, nil
+}
+
+// sendOrderTimeoutMessage 发送订单超时消息
+//func sendOrderTimeoutMessage(ctx context.Context, orderId int32) {
+//	// 获取配置的延迟时间
+//	delay := rabbitmq.GetOrderTimeoutDelay(ctx)
+//
+//	// 使用静态方法发送订单超时消息
+//	err := rabbitmq.SendOrderTimeoutMessageStatic(ctx, orderId, delay)
+//	if err != nil {
+//		g.Log().Errorf(ctx, "发送订单超时消息失败, 订单ID: %d, 错误: %v", orderId, err)
+//	}
+//}
+
+// GetDetail 获取订单详情
+func GetDetail(ctx context.Context, orderId uint32, userId uint32) (*pbentity.OrderInfo, []*pbentity.OrderGoodsInfo, error) {
+	// 查询主订单
+	var order entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).WherePri(orderId).Scan(&order)
+	if err != nil {
+		return nil, nil, fmt.Errorf("查询订单失败: %v", err)
+	}
+	// 检查订单是否存在
+	if order.Id == 0 {
+		return nil, nil, gerror.NewCode(gcode.CodeNotFound, "订单不存在")
+	}
+	// 校验订单归属
+	if order.UserId != int(userId) {
+		return nil, nil, gerror.NewCode(gcode.CodeNotAuthorized, "无权访问此订单")
+	}
+
+	// 查询订单商品
+	var goodsList []*entity.OrderGoodsInfo
+	err = dao.OrderGoodsInfo.Ctx(ctx).Where("order_id", orderId).Scan(&goodsList)
+	if err != nil {
+		return nil, nil, fmt.Errorf("查询订单商品失败: %v", err)
+	}
+
+	// 转换订单数据
+	var pbOrder pbentity.OrderInfo
+	if err := gconv.Struct(order, &pbOrder); err != nil {
+		return nil, nil, fmt.Errorf("转换订单数据失败: %v", err)
+	}
+	pbOrder.CreatedAt = utility.SafeConvertTime(order.CreatedAt)
+	pbOrder.UpdatedAt = utility.SafeConvertTime(order.UpdatedAt)
+
+	// 转换订单商品数据
+	var pbGoodsList []*pbentity.OrderGoodsInfo
+	for _, goods := range goodsList {
+		var pbGoods pbentity.OrderGoodsInfo
+		if err := gconv.Struct(goods, &pbGoods); err != nil {
+			continue
+		}
+		pbGoods.CreatedAt = utility.SafeConvertTime(goods.CreatedAt)
+		pbGoods.UpdatedAt = utility.SafeConvertTime(goods.UpdatedAt)
+		pbGoodsList = append(pbGoodsList, &pbGoods)
+	}
+
+	return &pbOrder, pbGoodsList, nil
+}
+
+// getlist V4版本分步联表查询 修改嵌套内容
+func GetList(ctx context.Context, req *v1.OrderInfoGetListReq) ([]*v1.OrderListInfo, int, error) {
+	// 1. 查询订单主表
+	var orders []*entity.OrderInfo
+	err := g.Model("order_info").
+		Where("user_id", req.UserId).
+		Where("status", req.Status).
+		Page(int(req.Page), int(req.Size)).
+		Order("id DESC").
+		Scan(&orders)
+	if err != nil {
+		return nil, 0, gerror.Wrap(err, "查询订单失败")
+	}
+
+	// 2. 查询总数
+	total, err := g.Model("order_info").
+		Where("user_id", req.UserId).
+		Where("status", req.Status).
+		Count()
+	if err != nil {
+		return nil, 0, gerror.Wrap(err, "查询订单总数失败")
+	}
+
+	if len(orders) == 0 {
+		return []*v1.OrderListInfo{}, total, nil
+	}
+
+	// 3. 构建结果
+	result := make([]*v1.OrderListInfo, 0, len(orders))
+	for _, order := range orders {
+		// 查询商品信息
+		var goods []*entity.OrderGoodsInfo
+		err := g.Model("order_goods_info").
+			Where("order_id", order.Id).
+			Scan(&goods)
+		if err != nil {
+			g.Log().Errorf(ctx, "查询订单商品失败, order_id=%d: %v", order.Id, err)
+			continue
+		}
+
+		// 转换商品信息
+		goodsInfo := make([]*v1.OrderListGoodsInfo, 0, len(goods))
+		for _, g := range goods {
+			goodsInfo = append(goodsInfo, &v1.OrderListGoodsInfo{
+				GoodsId: int32(g.GoodsId),
+				Count:   int32(g.Count),
+			})
+		}
+
+		// 构建订单信息
+		result = append(result, &v1.OrderListInfo{
+			Id:          int32(order.Id),
+			UserId:      int32(order.UserId),
+			Number:      order.Number,
+			Status:      int32(order.Status),
+			Price:       int32(order.Price),
+			ActualPrice: int32(order.ActualPrice),
+			GoodsInfo:   goodsInfo,
+		})
+	}
+
+	g.Log().Debugf(ctx, "成功查询到 %d 条订单数据", len(result))
+	return result, total, nil
+}
+
+// UpdateOrderStatus 更新订单状态
+func UpdateOrderStatus(ctx context.Context, orderId, status int) error {
+	updateData := g.Map{
+		"status":     status,
+		"updated_at": gtime.Now(),
+	}
+
+	// 只有当订单状态变为已支付(2)时才设置支付时间
+	if status == int(consts.OrderStatusPaid) {
+		updateData["pay_at"] = gtime.Now()
+	}
+
+	_, err := dao.OrderInfo.Ctx(ctx).Where("id", orderId).Update(updateData)
+	if err != nil {
+		return fmt.Errorf("更新订单状态失败: %v", err)
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单ID: %d, 新状态: %d", orderId, status)
+	return nil
+}
+
+type OrderStatusTransitionReq struct {
+	UserId     uint32
+	OrderId    uint32
+	FromStatus int
+	ToStatus   int
+}
+
+// UpdateOrderStatusIfMatch 只有当前状态匹配时才更新订单状态
+func UpdateOrderStatusIfMatch(ctx context.Context, req *OrderStatusTransitionReq) (bool, error) {
+	fromStatus := consts.OrderStatus(req.FromStatus)
+	toStatus := consts.OrderStatus(req.ToStatus)
+	if !CanTransitOrderStatus(fromStatus, toStatus) {
+		return false, fmt.Errorf("订单状态转换不合法: %d -> %d", req.FromStatus, req.ToStatus)
+	}
+
+	updateData := g.Map{
+		"status":     req.ToStatus,
+		"updated_at": gtime.Now(),
+	}
+
+	// 只有当订单状态变为已支付(2)时才设置支付时间
+	if req.ToStatus == int(consts.OrderStatusPaid) {
+		updateData["pay_at"] = gtime.Now()
+	}
+
+	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		"id":      req.OrderId,
+		"user_id": req.UserId,
+		"status":  req.FromStatus,
+	}).Update(updateData)
+	if err != nil {
+		return false, fmt.Errorf("更新订单状态失败: %v", err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("获取订单状态更新结果失败: %v", err)
+	}
+	if rows == 0 {
+		return false, nil
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单ID: %d, 原状态: %d, 新状态: %d", req.OrderId, req.FromStatus, req.ToStatus)
+	return true, nil
+}
+
+// UpdateOrderStatus 更新订单状态
+// true  = 本次真的把订单从待支付改成已支付
+// false = 订单已经处理过，或者状态不是待支付
+// error = 数据库错误
+func UpdateOrderStatusByNumber(ctx context.Context, number, transactionId string, status int) (bool, error) {
+	// exists, err := dao.OrderInfo.Ctx(ctx).
+	// 	Where("number", number).
+	// 	Where("status", consts.OrderStatusPaid).
+	// 	Exist()
+	// if err != nil {
+	// 	return gerror.WrapCode(gcode.CodeDbOperationError, err)
+	// }
+	// if exists {
+	// 	g.Log().Infof(ctx, "{%s}订单的状态已修改，不需要再修改", number)
+	// 	return nil
+	// }
+
+	fromStatus := consts.OrderStatusPendingPayment
+	toStatus := consts.OrderStatus(status)
+	if !CanTransitOrderStatus(fromStatus, toStatus) {
+		return false, fmt.Errorf("订单状态转换不合法: %d -> %d", fromStatus, toStatus)
+	}
+
+	updateData := g.Map{
+		"status":         status,
+		"updated_at":     gtime.Now(),
+		"transaction_id": transactionId,
+	}
+	if toStatus == consts.OrderStatusPaid {
+		updateData["pay_at"] = gtime.Now()
+	}
+
+	// 更新订单状态
+	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		"number": number,
+		"status": fromStatus,
+	}).Update(updateData)
+	if err != nil {
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+	if rows == 0 {
+		g.Log().Infof(ctx, "订单状态未更新，可能已处理或状态不允许更新, 订单编号: %s", number)
+		return false, nil
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单编号: %s, 新状态: %d", number, status)
+	return true, nil
+}
+
+func UpdateOrderSalesStatusByNumber(ctx context.Context, number string, salesStatus consts.OrderSalesStatus) error {
+	_, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		dao.OrderInfo.Columns().Number: number,
+		dao.OrderInfo.Columns().Status: consts.OrderStatusPaid,
+	}).Data(g.Map{
+		dao.OrderInfo.Columns().SalesStatus: int(salesStatus),
+		dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
+	}).Update()
+	if err != nil {
+		return gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	return nil
+}
+
+// TryUpdateOrderSalesStatus 订单销量的状态更新
+func TryUpdateOrderSalesStatus(ctx context.Context, number string, fromStatus, toStatus consts.OrderSalesStatus) (bool, error) {
+	result, err := dao.OrderInfo.Ctx(ctx).Where(g.Map{
+		dao.OrderInfo.Columns().Number:      number,
+		dao.OrderInfo.Columns().Status:      consts.OrderStatusPaid,
+		dao.OrderInfo.Columns().SalesStatus: int(fromStatus),
+	}).Data(g.Map{
+		dao.OrderInfo.Columns().SalesStatus: int(toStatus),
+		dao.OrderInfo.Columns().UpdatedAt:   gtime.Now(),
+	}).Update()
+	if err != nil {
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return false, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	return rows > 0, nil
+}
+
+// HandlePaidOrder 处理支付成功后的业务动作。
+//
+// 采用事务消息发件箱（Transactional Outbox）模式：在同一个本地事务里
+// 完成「订单改为已支付」和「写入 order_outbox_message」两件事，二者要么
+// 同时成功、要么同时回滚，从而保证订单状态与待发送事件的最终一致性。
+// 真正的 RabbitMQ 投递由独立的 Outbox 中继任务异步轮询发送，不在本函数内进行。
+//
+// 当订单状态未发生变更（rows==0）时，表示该支付回调已处理过，提交空事务并安全忽略。
+func HandlePaidOrder(ctx context.Context, orderNumber, transactionId string) error {
+	return dao.OrderInfo.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		// 1. 把订单从待支付改成已支付（事务内执行，ctx 已携带事务）
+		success, err := UpdateOrderStatusByNumber(ctx, orderNumber, transactionId, int(consts.OrderStatusPaid))
+		if err != nil {
+			return err
+		}
+		if !success {
+			// 幂等：订单已是已支付状态，无需再写 Outbox，提交空事务即可
+			g.Log().Infof(ctx, "订单状态未变更，跳过 Outbox 写入, order=%s", orderNumber)
+			return nil
+		}
+
+		// 2. 在同一事务内写入 Outbox 消息
+		event := grabbitmq.OrderPaidEvent{
+			OrderNumber:   orderNumber,
+			TransactionId: transactionId,
+			PaidAt:        gtime.Now().Format("2006-01-02 15:04:05"),
+		}
+		payload, err := json.Marshal(event)
+		if err != nil {
+			return gerror.WrapCode(gcode.CodeInternalError, err)
+		}
+
+		// exchange / routingKey 与 PublishOrderPaidEvent 保持一致，供中继任务投递时使用
+		exchange := g.Cfg().MustGet(ctx, "rabbitmq.exchange.orderExchange").String()
+		routingKey := g.Cfg().MustGet(ctx, "rabbitmq.routingKey.orderPaid").String()
+
+		cols := dao.OrderOutboxMessage.Columns()
+		_, err = dao.OrderOutboxMessage.Ctx(ctx).Data(g.Map{
+			cols.EventId:     guid.S(),
+			cols.EventType:   consts.OrderPaidEventType,
+			cols.AggregateId: orderNumber,
+			cols.Exchange:    exchange,
+			cols.RoutingKey:  routingKey,
+			cols.Payload:     string(payload),
+			cols.Status:      int(consts.OutboxStatusPending),
+			cols.RetryCount:  0,
+			cols.CreatedAt:   gtime.Now(),
+			cols.UpdatedAt:   gtime.Now(),
+		}).Insert()
+		if err != nil {
+			return gerror.WrapCode(gcode.CodeDbOperationError, err)
+		}
+
+		g.Log().Infof(ctx, "订单已支付并写入 Outbox, order=%s", orderNumber)
+		return nil
+	})
+}
+
+// HandleCouponResult 处理优惠券扣减结果
+// goods服务通过userid和couponid在user_coupon_info表中定位数据
+// 如果找到数据且状态为"待使用"，则修改为"已使用"并返回成功
+// 如果未找到数据或状态不是"待使用"，则返回失败
+func HandleCouponResult(ctx context.Context, orderId int, success bool, message string) error {
+
+	if success {
+		// 优惠券扣减成功，订单状态改为待支付(1)
+		err := UpdateOrderStatus(ctx, orderId, int(consts.OrderStatusPendingPayment))
+		if err != nil {
+			g.Log().Errorf(ctx, "优惠券扣减成功，但更新订单状态失败, 订单ID: %d, 错误: %v", orderId, err)
+			return err
+		}
+		g.Log().Infof(ctx, "优惠券扣减成功，订单状态已更新为待支付, 订单ID: %d", orderId)
+	} else {
+		// 优惠券扣减失败（未找到数据或状态不是"待使用"），订单状态改为已取消(7)
+		err := UpdateOrderStatus(ctx, orderId, int(consts.OrderStatusCancelled))
+		if err != nil {
+			g.Log().Errorf(ctx, "优惠券扣减失败，但更新订单状态失败, 订单ID: %d, 错误: %v", orderId, err)
+			return err
+		}
+		g.Log().Warningf(ctx, "优惠券扣减失败，订单状态已更新为已取消, 订单ID: %d, 原因: %s", orderId, message)
+	}
+
+	return nil
+}
+
+// GetCount 获取各类订单数量
+func GetCount(ctx context.Context, userId uint32) (*v1.OrderInfoGetCountRes, error) {
+	var results []struct {
+		Status int    `json:"status"`
+		Count  uint32 `json:"count"`
+	}
+	err := dao.OrderInfo.Ctx(ctx).
+		Fields("status, COUNT(*) as count").
+		Where("user_id", userId).
+		Group("status").
+		Scan(&results)
+	if err != nil {
+		return nil, gerror.Wrap(err, "查询订单数量失败")
+	}
+
+	res := &v1.OrderInfoGetCountRes{}
+	for _, item := range results {
+		switch consts.OrderStatus(item.Status) {
+		case consts.OrderStatusPendingPayment:
+			res.Pending += item.Count
+		case consts.OrderStatusPaid:
+			res.Shipping += item.Count
+		case consts.OrderStatusShipped:
+			res.Delivered += item.Count
+		case consts.OrderStatusReceived, consts.OrderStatusCompleted:
+			res.Completed += item.Count
+			//TODO 不代表售后
+			//case consts.OrderStatusCancelled:
+			//res.AfterSale += item.Count // Assuming cancelled orders are "afterSale" for now
+		}
+	}
+
+	return res, nil
+}
+
+func HandleOrderTimeoutResult(ctx context.Context, orderId int) error {
+	// 更新字段
+	updateData := g.Map{
+		"status":     consts.OrderStatusCancelled,
+		"updated_at": gtime.Now(), // 可选：更新时间戳
+	}
+	// 更新订单状态
+	result, err := dao.OrderInfo.Ctx(ctx).Where("id=? AND status=?", orderId, consts.OrderStatusPendingPayment).Update(updateData)
+	if err != nil {
+		return gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	row, _ := result.RowsAffected()
+	if row == 0 {
+		g.Log().Infof(ctx, "订单已取消，无需再取消, orderId=%d", orderId)
+		return nil
+	}
+
+	g.Log().Infof(ctx, "订单状态更新成功, 订单编号:{%d}, 新状态: %d", orderId, consts.OrderStatusPendingPayment)
+	return nil
+}
+
+func GetOrderDetail(ctx context.Context, orderId int) ([]*grabbitmq.OrderGoodsInfo, error) {
+	// 查询主订单
+	var order entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).WherePri(orderId).Scan(&order)
+	if err != nil {
+		return nil, fmt.Errorf("查询订单失败: %v", err)
+	}
+	// 检查订单是否存在
+	if order.Id == 0 {
+		return nil, gerror.NewCode(gcode.CodeNotFound, "订单不存在")
+	}
+	// 查询订单商品
+	var goodsList []*entity.OrderGoodsInfo
+	err = dao.OrderGoodsInfo.Ctx(ctx).Where("order_id", orderId).Scan(&goodsList)
+	if err != nil {
+		return nil, fmt.Errorf("查询订单商品失败: %v", err)
+	}
+
+	// 转换订单商品数据
+	var orderGoodsInfo []*grabbitmq.OrderGoodsInfo
+	for _, goods := range goodsList {
+		orderGoodsInfo = append(orderGoodsInfo, &grabbitmq.OrderGoodsInfo{
+			GoodsId: goods.GoodsId,
+			Count:   goods.Count,
+		})
+	}
+
+	return orderGoodsInfo, nil
+}
+
+func Preview(ctx context.Context, req *v1.OrderInfoPreviewReq) (*v1.OrderInfoPreviewRes, error) {
+	if len(req.CartIds) == 0 || req.UserId == 0 {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+
+	cartRes, err := cart.Client.GetSelectedItems(ctx, &cartApi.CartInfoGetSelectedItemsReq{
+		UserId:  req.UserId,
+		CartIds: req.CartIds,
+	})
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	items := []*v1.OrderInfoPreviewItem{}
+	totalPrice := uint64(0)
+	totalCount := uint32(0)
+	for _, item := range cartRes.Items {
+		subTotal := item.GoodsPrice * uint64(item.Count)
+
+		items = append(items, &v1.OrderInfoPreviewItem{
+			CartId:     item.Id,
+			GoodsId:    item.GoodsId,
+			GoodsName:  item.GoodsName,
+			GoodsPrice: item.GoodsPrice,
+			Count:      item.Count,
+			SubTotal:   subTotal,
+		})
+
+		totalPrice += subTotal
+		totalCount += item.Count
+	}
+
+	return &v1.OrderInfoPreviewRes{
+		Items:      items,
+		TotalPrice: totalPrice,
+		TotalCount: totalCount,
+	}, nil
+}
+
+/*
+1. 参数校验
+2. 查选中的购物车商品
+3. 校验必须全部命中
+4. 校验商品有效性和库存，同时计算金额
+5. 组装订单主表
+6. 事务插入订单主表和订单商品表
+*/
+func CreateFromCart(ctx context.Context, req *v1.OrderInfoCreateFromCartReq) (orderId int32, orderNumber string, err error) {
+	// 1. 参数校验
+	if len(req.CartIds) == 0 || req.UserId == 0 {
+		return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "参数错误")
+	}
+
+	// 2. 查选中的购物车商品
+	cartRes, err := cart.Client.GetSelectedItems(ctx, &cartApi.CartInfoGetSelectedItemsReq{
+		UserId:  req.UserId,
+		CartIds: req.CartIds,
+	})
+	if err != nil {
+		return 0, "", gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	// 3. 校验必须全部命中
+	if len(cartRes.Items) != len(req.CartIds) {
+		return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "购物车商品数量与请求参数不一致")
+	}
+
+	// 4. 校验商品有效性和库存，同时计算金额
+	totalPrice := uint64(0)
+	orderGoodsList := []entity.OrderGoodsInfo{}
+
+	goodsIds := []uint32{}
+	counts := []uint32{}
+	for _, item := range cartRes.Items {
+		goodsIds = append(goodsIds, item.GoodsId)
+		counts = append(counts, item.Count)
+		if item.GoodsId == 0 || item.GoodsName == "" || item.GoodsPrice <= 0 || item.Count <= 0 {
+			return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "商品名称、价格或数量无效")
+		}
+		if item.GoodsStock < item.Count {
+			return 0, "", gerror.NewCode(gcode.CodeInvalidParameter, "商品库存不足")
+		}
+
+		subTotal := item.GoodsPrice * uint64(item.Count)
+		totalPrice += subTotal
+
+		orderGoodsList = append(orderGoodsList, entity.OrderGoodsInfo{
+			GoodsId:     int(item.GoodsId),
+			Count:       int(item.Count),
+			Price:       int(subTotal),
+			CouponPrice: 0,
+			ActualPrice: int(subTotal),
+			CreatedAt:   gtime.Now(),
+			UpdatedAt:   gtime.Now(),
+		})
+	}
+
+	// 调 goods-service DeductStock
+	if _, err = goods.Client.DeductStock(ctx, &goods_info.DeductStockReq{
+		GoodsIds: goodsIds,
+		Counts:   counts,
+	}); err != nil {
+		g.Log().Errorf(ctx, "扣减商品库存失败: %v", err)
+		return 0, "", fmt.Errorf("扣减商品库存失败: %v", err)
+	}
+
+	// 5. 组装订单主表
+	order := entity.OrderInfo{
+		Number:           utility.GenerateOrderNumber(),
+		UserId:           int(req.UserId),
+		Remark:           req.Remark,
+		Status:           int(consts.OrderStatusPendingPayment),
+		ConsigneeName:    req.ConsigneeName,
+		ConsigneePhone:   req.ConsigneePhone,
+		ConsigneeAddress: req.ConsigneeAddress,
+		Price:            int(totalPrice),
+		CouponPrice:      0,
+		ActualPrice:      int(totalPrice),
+		CreatedAt:        gtime.Now(),
+		UpdatedAt:        gtime.Now(),
+	}
+
+	// 6. 事务插入
+	db := g.DB()
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		return 0, "", fmt.Errorf("开启事务失败: %v", err)
+	}
+
+	success := false
+	defer func() {
+		if !success {
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				g.Log().Errorf(ctx, "事务回滚失败: %v", rollbackErr)
+			}
+		}
+	}()
+
+	id, err := dao.OrderInfo.Ctx(ctx).TX(tx).InsertAndGetId(order)
+	if err != nil {
+		return 0, "", fmt.Errorf("插入订单失败: %v", err)
+	}
+
+	orderId = int32(id)
+
+	for i := range orderGoodsList {
+		orderGoodsList[i].OrderId = int(orderId)
+	}
+
+	if len(orderGoodsList) > 0 {
+		if _, err = dao.OrderGoodsInfo.Ctx(ctx).TX(tx).Insert(orderGoodsList); err != nil {
+			return 0, "", fmt.Errorf("插入订单商品失败: %v", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return 0, "", fmt.Errorf("提交事务失败: %v", err)
+	}
+
+	success = true
+
+	// 7. 删除购物车商品
+	if _, err = cart.Client.DeleteSelectedItems(ctx, &cartApi.CartInfoDeleteSelectedItemsReq{
+		UserId:  req.UserId,
+		CartIds: req.CartIds,
+	}); err != nil {
+		g.Log().Errorf(ctx, "删除购物车商品失败: %v", err)
+	}
+
+	return orderId, order.Number, nil
+}
+
+func CancelOrder(ctx context.Context, req *v1.CancelOrderReq) (res *v1.CancelOrderRes, err error) {
+	infoError := consts_ctrl.InfoError(consts_ctrl.OrderInfo, consts_ctrl.GetOrderRecord)
+
+	record, err := dao.OrderInfo.Ctx(ctx).Where("id", req.Id).One()
+
+	if err != nil {
+		g.Log().Errorf(ctx, "%v %v", infoError, err)
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	if record.IsEmpty() {
+		return nil, gerror.NewCode(gcode.CodeNotFound, "订单不存在")
+	}
+
+	var order entity.OrderInfo
+	err = record.Struct(&order)
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "查询订单失败")
+	}
+
+	// 只有待支付订单才允许取消
+	ok, err := UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
+		UserId:     req.UserId,
+		OrderId:    req.Id,
+		FromStatus: int(consts.OrderStatusPendingPayment),
+		ToStatus:   int(consts.OrderStatusCancelled),
+	})
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeDbOperationError, err, "系统错误，取消失败")
+	}
+	if !ok {
+		return nil, gerror.NewCode(gcode.CodeInvalidParameter, "订单不存在或状态不允许取消")
+	}
+
+	event := grabbitmq.OrderCancelledEvent{
+		OrderNumber: order.Number,
+		Reason:      "user_cancel",
+		CancelledAt: gtime.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	err = grabbitmq.PublishOrderCancelledEvent(ctx, event)
+	if err != nil {
+		return nil, gerror.WrapCode(gcode.CodeInternalError, err, "订单已取消，但发布库存恢复事件失败")
+	}
+
+	return &v1.CancelOrderRes{
+		Message: "订单取消成功",
+	}, nil
+}
+
+func IncreaseOrderGoodsSales(ctx context.Context, orderNumber string) error {
+	// 根据订单号查订单ID
+	var order entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).Where(dao.OrderInfo.Columns().Number, orderNumber).Scan(&order)
+	if err != nil {
+		g.Log().Errorf(ctx, "查询订单失败: %v", err)
+		return err
+	}
+	if order.Id == 0 {
+		return gerror.NewCode(gcode.CodeNotFound, "订单不存在")
+	}
+
+	// 查询订单商品
+	var orderGoodsList []*entity.OrderGoodsInfo
+	err = dao.OrderGoodsInfo.Ctx(ctx).Where(dao.OrderGoodsInfo.Columns().OrderId, order.Id).Scan(&orderGoodsList)
+	if err != nil {
+		g.Log().Errorf(ctx, "查询订单商品失败: %v", err)
+		return err
+	}
+	if len(orderGoodsList) == 0 {
+		return gerror.NewCode(gcode.CodeInvalidParameter, "订单商品为空")
+	}
+
+	goodsIds := make([]uint32, 0, len(orderGoodsList))
+	counts := make([]uint32, 0, len(orderGoodsList))
+	for _, item := range orderGoodsList {
+		goodsIds = append(goodsIds, uint32(item.GoodsId))
+		counts = append(counts, uint32(item.Count))
+	}
+
+	// 调 goods-service IncreaseSales
+	_, err = goods.Client.IncreaseSales(ctx, &goods_info.IncreaseSalesReq{
+		GoodsIds: goodsIds,
+		Counts:   counts,
+	})
+	if err != nil {
+		g.Log().Errorf(ctx, "增加商品销售量失败: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+/*
+- 查询 order_info 中 status=已支付 且 sales_status=同步失败 的订单。
+- limit 控制一次最多处理多少条，比如传 20。
+- 遍历这些订单，重新执行 IncreaseOrderGoodsSales(ctx, order.Number)。
+- 如果成功，把 sales_status 改成已同步。
+- 如果失败，保持 sales_status=同步失败，打印日志，继续处理下一单。
+- 整体方法不要因为某一单失败就中断全部补偿，除非查询失败这类全局错误。
+*/
+func CompensateFailedSales(ctx context.Context, limit int) (int, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+
+	var orders []*entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).
+		Where(dao.OrderInfo.Columns().Status, consts.OrderStatusPaid).
+		Where(dao.OrderInfo.Columns().SalesStatus, consts.OrderSalesStatusFailed).
+		Limit(limit).
+		Scan(&orders)
+	if err != nil {
+		g.Log().Errorf(ctx, "查询订单失败: %v", err)
+		return 0, err
+	}
+	if len(orders) == 0 {
+		g.Log().Infof(ctx, "没有需要补偿的订单")
+		return 0, nil
+	}
+
+	cnt_suc := 0
+	for _, order := range orders {
+		// 补偿时不要查出来就直接加销量，而是先“抢占”
+		success, err := TryUpdateOrderSalesStatus(
+			ctx,
+			order.Number,
+			consts.OrderSalesStatusFailed,
+			consts.OrderSalesStatusSyncing,
+		)
+		if err != nil {
+			g.Log().Errorf(ctx, "抢占订单销量补偿任务失败: %v", err)
+			continue
+		}
+		if !success {
+			continue
+		}
+
+		salesErr := IncreaseOrderGoodsSales(ctx, order.Number)
+		if salesErr != nil {
+			// 如果增加销量失败，更新 sales_status=同步失败，打印日志，继续处理下一单。
+			if _, updateErr := TryUpdateOrderSalesStatus(ctx, order.Number, consts.OrderSalesStatusSyncing, consts.OrderSalesStatusFailed); updateErr != nil {
+				g.Log().Errorf(ctx, "标记订单销量同步失败状态失败: %v", updateErr)
+			}
+			g.Log().Errorf(ctx, "补偿订单销量失败: %v", salesErr)
+		} else {
+			// 如果增加销量成功，把 sales_status 改成已同步。
+			if _, updateErr := TryUpdateOrderSalesStatus(ctx, order.Number, consts.OrderSalesStatusSyncing, consts.OrderSalesStatusSynced); updateErr != nil {
+				g.Log().Errorf(ctx, "标记订单销量已同步状态失败: %v", updateErr)
+			} else {
+				g.Log().Infof(ctx, "订单销量已同步, 订单编号: %s", order.Number)
+				cnt_suc++
+			}
+		}
+	}
+	if cnt_suc == len(orders) {
+		g.Log().Infof(ctx, "补偿订单销量成功, 订单数量: %d, 成功数量: %d", len(orders), cnt_suc)
+	} else {
+		g.Log().Errorf(ctx, "补偿订单销量出现了失败的情况, 订单数量: %d, 失败数量: %d", len(orders), len(orders)-cnt_suc)
+	}
+
+	return cnt_suc, nil
+}
+
+// 补偿任务健壮性：处理 sales_status=3 同步中 卡住的问题。
+func ResetStuckSalesSyncing(ctx context.Context, timeoutMinutes int, limit int) (int, error) {
+	if timeoutMinutes <= 0 {
+		timeoutMinutes = 10
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+
+	var orders []*entity.OrderInfo
+	err := dao.OrderInfo.Ctx(ctx).
+		Where(dao.OrderInfo.Columns().Status, consts.OrderStatusPaid).
+		Where(dao.OrderInfo.Columns().SalesStatus, consts.OrderSalesStatusSyncing).
+		Where(fmt.Sprintf("%s < DATE_SUB(NOW(), INTERVAL ? MINUTE)", dao.OrderInfo.Columns().UpdatedAt), timeoutMinutes).
+		Limit(limit).
+		Scan(&orders)
+	if err != nil {
+		return 0, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	resetCount := 0
+	for _, order := range orders {
+		success, err := TryUpdateOrderSalesStatus(
+			ctx,
+			order.Number,
+			consts.OrderSalesStatusSyncing,
+			consts.OrderSalesStatusFailed,
+		)
+		if err != nil {
+			g.Log().Errorf(ctx, "恢复卡住的销量同步订单失败, order_number:%s, err:%v", order.Number, err)
+			continue
+		}
+		if success {
+			resetCount++
+		}
+	}
+
+	return resetCount, nil
+}
+
+func CanTransitOrderStatus(from, to consts.OrderStatus) bool {
+	switch from {
+	case consts.OrderStatusPendingPayment:
+		return to == consts.OrderStatusPaid || to == consts.OrderStatusCancelled
+	case consts.OrderStatusCancelled:
+		return to == consts.OrderStatusPendingPayment
+	default:
+		return false
+	}
+}
+
+func CancelTimeoutPendingOrders(ctx context.Context, timeoutMinutes int, limit int) (cancelCount int, err error) {
+	if timeoutMinutes <= 0 {
+		timeoutMinutes = 30
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+	expireTime := gtime.Now().Add(-time.Duration(timeoutMinutes) * time.Minute)
+	var orders []*entity.OrderInfo
+	err = dao.OrderInfo.Ctx(ctx).
+		Where(dao.OrderInfo.Columns().Status, consts.OrderStatusPendingPayment).
+		WhereLT(dao.OrderInfo.Columns().CreatedAt, expireTime).
+		Limit(limit).
+		Scan(&orders)
+	if err != nil {
+		return 0, gerror.WrapCode(gcode.CodeDbOperationError, err)
+	}
+
+	for _, order := range orders {
+		success, err := UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
+			UserId:     uint32(order.UserId),
+			OrderId:    uint32(order.Id),
+			FromStatus: int(consts.OrderStatusPendingPayment),
+			ToStatus:   int(consts.OrderStatusCancelled),
+		})
+		if err != nil {
+			g.Log().Errorf(ctx, "取消订单状态失败: %v", err)
+			continue
+		}
+		if !success {
+			g.Log().Warningf(ctx, "取消订单状态未生效, 订单ID: %d", order.Id)
+			continue
+		}
+
+		// 恢复库存
+		var orderGoodsList []*entity.OrderGoodsInfo
+		err = dao.OrderGoodsInfo.Ctx(ctx).Where(dao.OrderGoodsInfo.Columns().OrderId, order.Id).Scan(&orderGoodsList)
+		if err != nil {
+			g.Log().Errorf(ctx, "查询订单商品失败: %v", err)
+			// 回滚订单状态
+			rollbackTimeoutCancelledOrder(ctx, order)
+			continue
+		}
+
+		goodsIds := make([]uint32, 0, len(orderGoodsList))
+		counts := make([]uint32, 0, len(orderGoodsList))
+		for _, item := range orderGoodsList {
+			goodsIds = append(goodsIds, uint32(item.GoodsId))
+			counts = append(counts, uint32(item.Count))
+		}
+
+		if len(goodsIds) == 0 {
+			g.Log().Warningf(ctx, "超时订单没有商品快照, order_id:%d", order.Id)
+			// 回滚订单状态
+			rollbackTimeoutCancelledOrder(ctx, order)
+			continue
+		}
+
+		_, err = goods.Client.RestoreStock(ctx, &goods_info.RestoreStockReq{
+			GoodsIds: goodsIds,
+			Counts:   counts,
+		})
+		if err != nil {
+			g.Log().Errorf(ctx, "超时取消后恢复库存失败, order_id:%d, err:%v", order.Id, err)
+
+			// 回滚订单状态
+			rollbackTimeoutCancelledOrder(ctx, order)
+			continue
+		}
+		cancelCount++
+	}
+	return
+}
+
+func rollbackTimeoutCancelledOrder(ctx context.Context, order *entity.OrderInfo) {
+	_, rollbackErr := UpdateOrderStatusIfMatch(ctx, &OrderStatusTransitionReq{
+		UserId:     uint32(order.UserId),
+		OrderId:    uint32(order.Id),
+		FromStatus: int(consts.OrderStatusCancelled),
+		ToStatus:   int(consts.OrderStatusPendingPayment),
+	})
+	if rollbackErr != nil {
+		g.Log().Errorf(ctx, "回滚超时取消订单状态失败, order_id:%d, err:%v", order.Id, rollbackErr)
+	}
+}

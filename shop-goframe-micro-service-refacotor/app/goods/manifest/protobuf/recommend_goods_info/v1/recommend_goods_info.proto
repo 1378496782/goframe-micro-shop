@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package add_goods_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/recommend_goods_info/v1";
+
+import "pbentity/goods_info.proto";
+import "google/protobuf/timestamp.proto";
+
+service RecommendGoodsInfo {
+  rpc GetList(RecommendGoodsInfoGetListReq) returns (RecommendGoodsInfoGetListRes) {}
+}
+
+// 新增消息定义
+
+
+message RecommendGoodsInfoGetListReq {
+  uint32 id = 1;
+  uint32 count = 2;
+
+}
+
+message RecommendGoodsItem {
+  // 商品字段
+  uint32 id = 1;
+  string name = 2;
+  uint64 price = 3;
+  string PicUrl = 4;  // 主图
+  string Images = 5;
+  uint32 level1_category_id = 6;
+  uint32 level2_category_id = 7;
+  uint32 level3_category_id = 8;
+  string brand = 9;
+  uint32 stock = 10;
+  uint32 sale = 11;
+  string tags = 12;
+  string detail_info = 13;
+  uint32 sort = 14;
+}
+
+message RecommendGoodsInfoListResponse {
+  repeated pbentity.GoodsInfo list = 1;
+  uint32 total = 4;
+}
+
+message RecommendGoodsInfoGetListRes {
+  RecommendGoodsInfoListResponse data = 1;
+}

@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package collection_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/collection/api/collection_info/v1";
+
+import "pbentity/collection_info.proto";
+
+service collection_info {
+  rpc GetList(CollectionInfoGetListReq) returns (CollectionInfoGetListRes) {}
+  rpc Create(CollectionInfoCreateReq) returns (CollectionInfoCreateRes) {}
+  rpc Delete(CollectionInfoDeleteReq) returns (CollectionInfoDeleteRes) {}
+}
+
+// 新增消息定义
+message CollectionInfoCreateReq {
+  uint32                     UserId    = 1; // 用户id
+  uint32                     ObjectId  = 2; // 对象id
+  uint32                     Type      = 3; // 收藏类型：1商品 2文章
+}
+
+message CollectionInfoCreateRes {
+  uint32 id = 1;
+}
+
+message CollectionInfoDeleteReq {
+  uint32                     Id        = 1; // 收藏id
+  uint32                     UserId    = 2; // 用户id
+  // uint32                     Type      = 2; // 收藏类型：1商品 2文章
+  //uint32                     ObjectId  = 3; // 对象id
+}
+
+message CollectionInfoDeleteRes {
+  uint32 id = 1;
+}
+
+message CollectionInfoGetListReq {
+  uint32 UserId = 1; // 用户id
+  uint32 type   = 2; // 收藏类型：1商品 2文章
+  uint32 page   = 3; // 第几页。
+  uint32 size   = 4;  // 每页显示几个。修改：字段编号必须从1开始递增
+}
+
+
+message CollectionInfoListResponse {
+  repeated pbentity.CollectionInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message CollectionInfoGetListRes {
+  CollectionInfoListResponse data = 1;
+}

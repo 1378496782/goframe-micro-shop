@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package praise_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/praise/api/praise_info/v1";
+
+import "pbentity/praise_info.proto";
+
+service praise_info {
+  rpc GetList(PraiseInfoGetListReq) returns (PraiseInfoGetListRes) {}
+  rpc Create(PraiseInfoCreateReq) returns (PraiseInfoCreateRes) {}
+  rpc Delete(PraiseInfoDeleteReq) returns (PraiseInfoDeleteRes) {}
+}
+
+// 新增消息定义
+message PraiseInfoCreateReq {
+  uint32 object_id = 1; // 对象id
+  uint32 type = 2; // 收藏类型：1商品 2文章
+  uint32 user_id = 3; // 用户id
+}
+
+message PraiseInfoCreateRes {
+  uint32 id = 1;
+}
+
+message PraiseInfoDeleteReq {
+  uint32 id = 1; //
+  uint32 type = 2; // 收藏类型：1商品 2文章
+  uint32 object_id = 3; // 对象id
+  uint32 user_id = 4; // 用户id
+}
+
+message PraiseInfoDeleteRes {
+  uint32 id = 1;
+}
+
+message PraiseInfoGetListReq {
+  uint32 type = 1; // 收藏类型：1商品 2文章
+  uint32 page = 2;
+  uint32 size = 3;  // 修改：字段编号必须从1开始递增
+  uint32 user_id = 4; // 用户id
+}
+
+
+message PraiseInfoListResponse {
+  repeated pbentity.PraiseInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message PraiseInfoGetListRes {
+  PraiseInfoListResponse data = 1;
+}

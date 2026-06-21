@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package cart_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/goods/api/cart_info/v1";
+
+import "pbentity/cart_info.proto";
+import "google/protobuf/timestamp.proto";
+
+service cart_info {
+  rpc GetList(CartInfoGetListReq) returns (CartInfoGetListRes) {}
+  rpc Create(CartInfoCreateReq) returns (CartInfoCreateRes) {}
+  rpc Delete(CartInfoDeleteReq) returns (CartInfoDeleteRes) {}
+  rpc Put(CartInfoPutReq) returns (CartInfoPutRes) {}
+  rpc GetSelectedItems(CartInfoGetSelectedItemsReq) returns (CartInfoGetSelectedItemsRes) {}
+  rpc DeleteSelectedItems(CartInfoDeleteSelectedItemsReq) returns (CartInfoDeleteSelectedItemsRes) {}
+}
+
+// 新增消息定义
+message CartInfoCreateReq {
+  uint32 goods_id = 1; // 商品id
+  uint32 count = 2; // 商品数量
+  uint32 user_id = 3;
+}
+
+message CartInfoCreateRes {
+  uint32 id = 1;
+}
+
+message CartInfoPutReq {
+  uint32 id = 1; // 购物车ID
+  uint32 count = 2; // 商品数量
+  uint32 user_id = 3;
+}
+
+message CartInfoPutRes {
+}
+
+message CartInfoDeleteReq {
+  uint32 id = 1;
+  uint32 user_id = 2;
+}
+
+message CartInfoDeleteRes {
+}
+
+message CartInfoGetListReq {
+  uint32 page = 1;
+  uint32 size = 2;
+  uint32 user_id = 3;
+}
+
+message CartItem {
+  // 购物车字段
+  uint32 id = 1; // 购物车ID
+  uint32 user_id = 2; // 用户ID
+  uint32 count = 3; // 商品数量
+
+  // 商品字段
+  uint32 goods_id = 4; // 商品ID
+  string goods_name = 5; // 商品名字
+  string goods_pic_url = 6; // 主图
+  uint64 goods_price = 7; // 价格(分)
+  string goods_brand = 8; // 品牌
+  uint32 goods_stock = 9; // 库存
+  uint32 goods_sale = 10; // 销量
+  string goods_tags = 11; // 标签
+  uint32 goods_sort = 12; // 排序
+  google.protobuf.Timestamp goods_created_at = 13; // 商品创建时间
+  google.protobuf.Timestamp goods_updated_at = 14; // 商品更新时间
+}
+
+message CartInfoListResponse {
+  repeated CartItem list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+  uint64 total_price = 5; // 总金额(分)
+  uint32 total_count = 6; // 总数量
+}
+
+message CartInfoGetListRes {
+  CartInfoListResponse data = 1;
+}
+
+message CartInfoGetSelectedItemsReq {
+  uint32 user_id = 1;
+  repeated uint32 cart_ids = 2;
+}
+
+message CartInfoGetSelectedItemsRes {
+  repeated CartItem items = 1;
+}
+
+message CartInfoDeleteSelectedItemsReq {
+  uint32 user_id = 1;
+  repeated uint32 cart_ids = 2;
+}
+
+message CartInfoDeleteSelectedItemsRes {}

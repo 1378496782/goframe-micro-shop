@@ -1,0 +1,67 @@
+grpc:
+  name:             "order"
+  address:          ":31005"
+  logger:
+    path: "./log" # 日志文件路径。默认为空，表示关闭，仅输出到终端
+    file: "{Y-m-d}.log" # 日志文件格式。默认为"{Y-m-d}.log"
+    prefix: "微信：xjtu915：order-service" # 日志内容输出前缀。方便在所有日志行里一眼认出是我们这个服务产生的。
+    level: "all" # 日志输出级别
+    stdout: true  # 日志是否同时输出到终端。默认true
+    rotateSize: 104857600   # 100MB切割日志文件
+    rotateBackupLimit: 7    # 保留7天日志
+    # ctxKeys 告诉日志组件从 context 中提取指定键的值
+    ctxKeys: [ "traceId" ]    # 自动记录链路追踪ID 自定义Context上下文变量名称，自动打印Context的变量到日志中
+    timeFormat: "2006-01-02 15:04:05.000" # 精确到毫秒
+
+database:
+  default:
+    link:  "mysql:root:root@tcp(127.0.0.1:3306)/order"
+    debug:
+
+
+etcd:
+  address: "127.0.0.1:2379"
+
+# RabbitMQ 配置
+rabbitmq:
+  default:
+    host: "127.0.0.1"
+    port: "5672"
+    user: "root"
+    password: "root"
+    vhost: "/"
+  exchange:
+    orderDelayExchange: "order.delay.exchange"
+    #用于发送优惠券确认到goods服务
+    couponConfirmExchange: "coupon.confirm.exchange"  # Direct 类型推荐
+    #用于接收goods服务的优惠券确认结果
+    couponConfirmResultExchange: "coupon.confirm.result.exchange"
+    goodsStockExchange: "goods.stock.exchange"
+  queue:
+    orderTimeoutQueue: "order.timeout.queue"
+    #监听“确认结果”的队列（来自goods服务的回复）
+    couponConfirmResultQueue: "coupon.confirm.result.queue"
+  routingKey:
+    orderTimeout: "order.timeout"
+    # 发送优惠券确认消息用的 RoutingKey
+    couponConfirm: "coupon.confirm.request"
+    # 监听回复时绑定用的 RoutingKey（order服务回复时用这个key发回来）
+    couponConfirmResult: "coupon.confirm.result"
+    goodsStock: "goods.stock" # 配置添加到 bak
+
+
+# 业务配置
+business:
+  orderTimeout: 1800000  # 订单超时时间（毫秒），默认30分钟
+
+# 微信支付
+payment:
+  wechat:
+    mchId: "CHANGE_ME_WECHAT_MCH_ID"                                     # 微信商户号
+    serialNo: "CHANGE_ME_WECHAT_SERIAL_NO"    # 商户证书序列号
+    apiV3Key: "CHANGE_ME_WECHAT_API_V3_KEY"            # APIv3 密钥
+    appId: "CHANGE_ME_WECHAT_APP_ID"                             # 小程序 AppId
+    notifyUrl: "https://business.dayu.club/frontend/notify"         # 支付回调地址
+    refundNotifyUrl: "https://business.dayu.club/frontend/refundNotify" # 退款回调地址
+    privateKey: |
+      CHANGE_ME_WECHAT_PRIVATE_KEY

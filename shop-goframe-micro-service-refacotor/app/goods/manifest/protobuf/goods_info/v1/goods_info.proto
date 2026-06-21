@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package goods_info.v1;
+
+option go_package = "shop-goframe-micro-service/app/goods/api/goods_info/v1";
+
+import "pbentity/goods_info.proto";
+
+service goods_info {
+  // 商品列表
+  rpc GetList(GoodsInfoGetListReq) returns (GoodsInfoGetListRes) {}
+  // 商品详情
+  rpc GetDetail(GoodsInfoGetDetailReq) returns (GoodsInfoGetDetailRes) {}
+  // 创建商品
+  rpc Create(GoodsInfoCreateReq) returns (GoodsInfoCreateRes) {}
+  // 修改商品
+  rpc Update(GoodsInfoUpdateReq) returns (GoodsInfoUpdateRes) {}
+  // 删除商品
+  rpc Delete(GoodsInfoDeleteReq) returns (GoodsInfoDeleteRes) {}
+  // 获取商品库存
+  rpc GetGoodsStock(GetGoodsStockReq) returns (GetGoodsStockRes){}
+  // 扣减商品库存
+  rpc DeductStock(DeductStockReq) returns (DeductStockRes){}
+  // 返回商品库存
+  rpc RestoreStock(RestoreStockReq) returns (RestoreStockRes){}
+  // 增加商品销售量
+  rpc IncreaseSales(IncreaseSalesReq) returns (IncreaseSalesRes){}
+}
+
+message GoodsInfoGetDetailReq {
+  uint32 id = 1;
+}
+
+
+message GoodsInfoGetDetailRes {
+  pbentity.GoodsInfo data = 1;
+}
+
+
+// 新增消息定义
+message GoodsInfoCreateReq {
+  string name = 1;
+  uint64 price = 2;
+  string PicUrl = 3;  // 主图
+  string Images = 4;
+  uint32 level1_category_id = 5;
+  uint32 level2_category_id = 6;
+  uint32 level3_category_id = 7;
+  string brand = 8;
+  uint32 stock = 9;
+  uint32 sale = 10;
+  string tags = 11;
+  string detail_info = 12;
+  uint32 sort = 13;
+}
+
+message GoodsInfoCreateRes {
+  uint32 id = 1;
+}
+
+message GoodsInfoUpdateReq {
+  uint32 id = 1;
+  string name = 2;
+  uint64 price = 3;
+  string PicUrl = 4;  // 主图
+  string Images = 5;
+  uint32 level1_category_id = 6;
+  uint32 level2_category_id = 7;
+  uint32 level3_category_id = 8;
+  string brand = 9;
+  uint32 stock = 10;
+  uint32 sale = 11;
+  string tags = 12;
+  string detail_info = 13;
+  uint32 sort = 14;
+}
+
+message GoodsInfoUpdateRes {
+  uint32 id = 1;
+}
+
+message GoodsInfoDeleteReq {
+  uint32 id = 1;
+}
+
+message GoodsInfoDeleteRes {
+
+}
+
+message GoodsInfoGetListReq {
+  uint32 page = 1;
+  uint32 size = 2;  // 修改：字段编号必须从1开始递增
+  uint32 is_hot = 3;
+  string keyword = 4;
+  uint32 category_id = 5;
+  uint64 price_min = 6;
+  uint64 price_max = 7;
+  SortType sort_type = 8;
+  uint32 only_in_stock = 9;
+}
+
+enum SortType {
+  DEFAULT = 0;
+  PRICE_ASC = 1;
+  PRICE_DESC = 2;
+  SALE_DESC = 3;
+}
+
+message GoodsInfoListResponse {
+  repeated pbentity.GoodsInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message GoodsInfoGetListRes {
+  GoodsInfoListResponse data = 1;
+}
+
+message GetGoodsStockReq{
+  repeated uint32 goods_ids=1; // 商品列表
+}
+
+message GetGoodsStockRes{
+  map<uint32,int32>goods_stock=1;
+}
+
+message DeductStockReq{
+  repeated uint32 goods_ids=1; // 商品列表
+  repeated uint32 counts=2; // 商品数量
+}
+
+message DeductStockRes{
+}
+
+message RestoreStockReq{
+  repeated uint32 goods_ids=1; // 商品列表
+  repeated uint32 counts=2; // 商品数量
+}
+
+message RestoreStockRes{
+}
+
+message IncreaseSalesReq{
+  repeated uint32 goods_ids=1; // 商品列表
+  repeated uint32 counts=2; // 商品数量
+}
+
+message IncreaseSalesRes{
+}

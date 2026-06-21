@@ -1,0 +1,31 @@
+[2025-09-25 12:02:22] ==========================================
+[2025-09-25 12:02:22] 开始重新构建单个服务: gateway-h5
+[2025-09-25 12:02:22] ==========================================
+[2025-09-25 12:02:22] 步骤1: 检查服务当前状态
+NAME         IMAGE                                             COMMAND          SERVICE      CREATED             STATUS                       PORTS
+gateway-h5   shop-goframe-micro-service-refacotor-gateway-h5   "./gateway-h5"   gateway-h5   About an hour ago   Up About an hour (healthy)   0.0.0.0:8199->8199/tcp, :::8199->8199/tcp
+[2025-09-25 12:02:22] 停止 gateway-h5 服务...
+time="2025-09-25T12:02:22+08:00" level=warning msg="/home/shop-goframe-micro-service-refacotor/docker-compose.prod.yml: `version` is obsolete"
+ Container gateway-h5  Stopping
+ Container gateway-h5  Stopped
+[2025-09-25 12:02:22] ✅ gateway-h5 服务停止成功
+[2025-09-25 12:02:22] 查找 gateway-h5 相关的镜像...
+[2025-09-25 12:02:22] 没有找到 gateway-h5 相关的镜像需要清理
+[2025-09-25 12:02:22] 构建 gateway-h5 服务...
+time="2025-09-25T12:02:22+08:00" level=warning msg="/home/shop-goframe-micro-service-refacotor/docker-compose.prod.yml: `version` is obsolete"
+[2025-09-25 12:14:30] ✅ gateway-h5 服务构建成功
+[2025-09-25 12:14:30] 启动 gateway-h5 服务...
+time="2025-09-25T12:14:30+08:00" level=warning msg="/home/shop-goframe-micro-service-refacotor/docker-compose.prod.yml: `version` is obsolete"
+ Container etcd  Running
+ Container gateway-h5  Recreate
+ Container gateway-h5  Recreated
+ Container etcd  Waiting
+ Container etcd  Healthy
+ Container gateway-h5  Starting
+ Container gateway-h5  Started
+[2025-09-25 12:14:32] ✅ gateway-h5 服务启动成功
+[2025-09-25 12:14:32] 步骤6: 等待服务启动...
+[2025-09-25 12:14:47] 步骤7: 最终状态检查
+NAME         IMAGE                                             COMMAND          SERVICE      CREATED          STATUS                             PORTS
+gateway-h5   shop-goframe-micro-service-refacotor-gateway-h5   "./gateway-h5"   gateway-h5   16 seconds ago   Up 15 seconds (health: starting)   0.0.0.0:8199->8199/tcp, :::8199->8199/tcp
+[2025-09-25 12:14:47] ✅ 健康检查通过: http://localhost:8199/api.json

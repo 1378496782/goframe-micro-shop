@@ -1,0 +1,556 @@
+# 环境变量定义
+x-mysql-env: &mysql-env
+  MYSQL_ROOT_PASSWORD: 'CHANGE_ME_MYSQL_ROOT_PASSWORD'
+
+x-rabbitmq-env: &rabbitmq-env
+  RABBITMQ_DEFAULT_USER: root
+  RABBITMQ_DEFAULT_PASS: root
+
+x-common-env: &common-env
+  TZ: Asia/Shanghai
+  ENV: production
+  LOG_LEVEL: info
+
+services:
+  # MySQL 数据库 - 生产环境配置
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      <<: [*mysql-env, *common-env]
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db:/docker-entrypoint-initdb.d
+      - /etc/localtime:/etc/localtime:ro  # 同步宿主机时间
+    networks:
+      - shop-micro-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: always  # 生产环境使用always策略
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  # etcd 服务发现
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.0
+    container_name: etcd
+    environment:
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+      ETCD_NAME: etcd-node-1
+      ETCD_DATA_DIR: /etcd-data
+    ports:
+      - "2379:2379"
+    volumes:
+      - etcd_data:/etcd-data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - shop-micro-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 服务
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    environment:
+      <<: *common-env
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - shop-micro-network
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+
+  # RabbitMQ 服务（带延迟插件）
+  rabbitmq:
+    image: rabbitmq:4.1.0-management-alpine
+    container_name: rabbitmq
+    environment:
+      <<: [*rabbitmq-env, *common-env]
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq/plugins/rabbitmq_delayed_message_exchange-4.1.0.ez:/opt/rabbitmq/plugins/rabbitmq_delayed_message_exchange.ez
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - shop-micro-network
+    command:
+      - /bin/sh
+      - -c
+      - |
+        rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+        rabbitmq-plugins enable rabbitmq_management
+        exec rabbitmq-server
+    restart: always
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - TZ=${TZ:-Asia/Shanghai}
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+      - ./elasticsearch/plugins/ik:/tmp/ik-plugin
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - shop-micro-network
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ./bin/elasticsearch-plugin install --batch file:///tmp/ik-plugin/elasticsearch-analysis-ik-8.11.0.zip
+        exec /usr/local/bin/docker-entrypoint.sh
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  # Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_MONITORING_ENABLED=false
+      - TZ=${TZ:-Asia/Shanghai}
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5601/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Go 服务 - 生产环境配置
+  goods-service:
+    build:
+      context: .
+      dockerfile: app/goods/Dockerfile
+    container_name: goods-service
+    command: ["./goods"]
+    environment:
+      <<: *common-env
+    ports:
+      - "31004:31004"
+    volumes:
+      - ./app/goods/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      etcd:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "31004"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  order-service:
+    build:
+      context: .
+      dockerfile: app/order/Dockerfile
+    container_name: order-service
+    command: ["./order"]
+    environment:
+      <<: *common-env
+    ports:
+      - "31005:31005"
+    volumes:
+      - ./app/order/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      etcd:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "31005"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  user-service:
+    build:
+      context: .
+      dockerfile: app/user/Dockerfile
+    container_name: user-service
+    command: ["./user"]
+    environment:
+      <<: *common-env
+    ports:
+      - "31001:31001"
+    volumes:
+      - ./app/user/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      etcd:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "31001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  interaction-service:
+    build:
+      context: .
+      dockerfile: app/interaction/Dockerfile
+    container_name: interaction-service
+    command: ["./interaction"]
+    environment:
+      <<: *common-env
+    ports:
+      - "31002:31002"
+    volumes:
+      - ./app/interaction/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      etcd:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "31002"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  search-service:
+    build:
+      context: .
+      dockerfile: app/search/Dockerfile
+    container_name: search-service
+    command: ["./search"]
+    environment:
+      <<: *common-env
+    ports:
+      - "8499:8499"
+    volumes:
+      - ./app/search/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+      etcd:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8499"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  gateway-h5:
+    build:
+      context: .
+      dockerfile: app/gateway-h5/Dockerfile
+    container_name: gateway-h5
+    command: ["./gateway-h5"]
+    environment:
+      <<: *common-env
+    ports:
+      - "8199:8199"
+    volumes:
+      - ./app/gateway-h5/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      etcd:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8199/api.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  gateway-resource:
+    build:
+      context: .
+      dockerfile: app/gateway-resource/Dockerfile
+    container_name: gateway-resource
+    command: ["./gateway-resource"]
+    environment:
+      <<: *common-env
+    ports:
+      - "8399:8399"
+    volumes:
+      - ./app/gateway-resource/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      etcd:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8399"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  banner-service:
+    build:
+      context: .
+      dockerfile: app/banner/Dockerfile
+    container_name: banner-service
+    command: ["./banner"]
+    environment:
+      <<: *common-env
+    ports:
+      - "31006:31006"
+    volumes:
+      - ./app/banner/manifest/config/config.prod.yaml:/app/config/config.yaml
+      - ./log:/app/log
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      etcd:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "31006"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # 管理后台服务
+  manage-service:
+    build:
+      context: ../shop-goframe-micro-manage
+      dockerfile: Dockerfile
+    container_name: manage-service
+    command: ["./main"]
+    environment:
+      <<: *common-env
+    ports:
+      - "8808:8808"
+    volumes:
+      - ./log/manage:/app/resource/log
+      - /etc/localtime:/etc/localtime:ro
+      - ../shop-goframe-micro-service-manage-ui-gfast/dist:/app/resource/public
+      - ./uploads:/app/resource/public/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - shop-micro-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8808/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MySQL 备份服务
+  mysql-backup:
+    image: mysql:8.0
+    container_name: mysql-backup
+    networks:
+      - shop-micro-network
+    volumes:
+      - ./backups:/backups
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      <<: *mysql-env
+      BACKUP_RETENTION_DAYS: 7
+    command: >
+      /bin/sh -c "
+        while true; do
+          echo '--- Starting MySQL Backup for all application databases ---';
+          mysqldump -h mysql -u root -p$${MYSQL_ROOT_PASSWORD} --single-transaction --routines --triggers --databases goods admin user interaction order resource banner | gzip > /backups/backup-$$(date +%Y%m%d-%H%M%S).sql.gz;
+          echo '--- Backup Complete ---';
+          echo '--- Cleaning up old backups (older than $${BACKUP_RETENTION_DAYS} days) ---';
+          find /backups -name '*.sql.gz' -mtime +$${BACKUP_RETENTION_DAYS} -delete;
+          echo '--- Cleanup Complete, sleeping for 24 hours ---';
+          sleep 86400;
+        done
+      "
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+networks:
+  shop-micro-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450
+    name: shop-micro-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  etcd_data:
+    driver: local
+  es_data:
+    driver: local
+  kibana_data:
+    driver: local
+  uploads_volume:
+    driver: local

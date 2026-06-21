@@ -1,0 +1,34 @@
+[2025-09-28 11:53:03] ==========================================
+[2025-09-28 11:53:03] 开始重新构建单个服务: order-service
+[2025-09-28 11:53:03] ==========================================
+[2025-09-28 11:53:03] 步骤1: 检查服务当前状态
+NAME            IMAGE                                                COMMAND     SERVICE         CREATED          STATUS                    PORTS
+order-service   shop-goframe-micro-service-refacotor-order-service   "./order"   order-service   46 minutes ago   Up 46 minutes (healthy)   0.0.0.0:31005->31005/tcp, :::31005->31005/tcp
+[2025-09-28 11:53:03] 停止 order-service 服务...
+ Container order-service  Stopping
+ Container order-service  Stopped
+[2025-09-28 11:53:05] ✅ order-service 服务停止成功
+[2025-09-28 11:53:05] 查找 order-service 相关的镜像...
+[2025-09-28 11:53:05] 没有找到 order-service 相关的镜像需要清理
+[2025-09-28 11:53:05] 构建 order-service 服务...
+[2025-09-28 11:55:48] ✅ order-service 服务构建成功
+[2025-09-28 11:55:48] 启动 order-service 服务...
+ Container mysql  Running
+ Container rabbitmq  Running
+ Container etcd  Running
+ Container order-service  Recreate
+ Container order-service  Recreated
+ Container mysql  Waiting
+ Container rabbitmq  Waiting
+ Container etcd  Waiting
+ Container mysql  Healthy
+ Container etcd  Healthy
+ Container rabbitmq  Healthy
+ Container order-service  Starting
+ Container order-service  Started
+[2025-09-28 11:55:50] ✅ order-service 服务启动成功
+[2025-09-28 11:55:50] 步骤6: 等待服务启动...
+[2025-09-28 11:56:05] 步骤7: 最终状态检查
+NAME            IMAGE                                                COMMAND     SERVICE         CREATED          STATUS                             PORTS
+order-service   shop-goframe-micro-service-refacotor-order-service   "./order"   order-service   16 seconds ago   Up 15 seconds (health: starting)   0.0.0.0:31005->31005/tcp, :::31005->31005/tcp
+[2025-09-28 11:56:05] ✅ 健康检查通过: http://localhost:31005/

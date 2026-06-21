@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-h5
+  labels:
+    app: gateway-h5
+spec:
+  type: NodePort  # 对外暴露服务
+  ports:
+    - name: http
+      port: 8199
+      targetPort: 8199
+      protocol: TCP
+      nodePort: 30199  # 外部访问端口
+  selector:
+    app: gateway-h5
+

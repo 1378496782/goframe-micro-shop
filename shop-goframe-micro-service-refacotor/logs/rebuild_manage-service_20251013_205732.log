@@ -1,0 +1,32 @@
+[2025-10-13 20:57:32] ==========================================
+[2025-10-13 20:57:32] 开始重新构建单个服务: manage-service
+[2025-10-13 20:57:32] ==========================================
+[2025-10-13 20:57:32] 步骤1: 检查服务当前状态
+NAME             IMAGE                                                 COMMAND    SERVICE          CREATED          STATUS                    PORTS
+manage-service   shop-goframe-micro-service-refacotor-manage-service   "./main"   manage-service   49 minutes ago   Up 49 minutes (healthy)   0.0.0.0:8808->8808/tcp, :::8808->8808/tcp
+[2025-10-13 20:57:32] 停止 manage-service 服务...
+ Container manage-service  Stopping
+ Container manage-service  Stopped
+[2025-10-13 20:57:33] ✅ manage-service 服务停止成功
+[2025-10-13 20:57:33] 清理 manage-service 相关的容器...
+[2025-10-13 20:57:34] 查找 manage-service 相关的镜像...
+[2025-10-13 20:57:34] 没有找到 manage-service 相关的镜像需要清理
+[2025-10-13 20:57:34] 构建 manage-service 服务...
+[2025-10-13 21:01:35] ✅ manage-service 服务构建成功
+[2025-10-13 21:01:35] 启动 manage-service 服务...
+ Container mysql  Running
+ Container redis  Running
+ Container manage-service  Creating
+ Container manage-service  Created
+ Container redis  Waiting
+ Container mysql  Waiting
+ Container mysql  Healthy
+ Container redis  Healthy
+ Container manage-service  Starting
+ Container manage-service  Started
+[2025-10-13 21:01:36] ✅ manage-service 服务启动成功
+[2025-10-13 21:01:36] 步骤6: 等待服务启动...
+[2025-10-13 21:01:51] 步骤7: 最终状态检查
+NAME             IMAGE                                                 COMMAND    SERVICE          CREATED          STATUS                             PORTS
+manage-service   shop-goframe-micro-service-refacotor-manage-service   "./main"   manage-service   16 seconds ago   Up 15 seconds (health: starting)   0.0.0.0:8808->8808/tcp, :::8808->8808/tcp
+[2025-10-13 21:01:51] ✅ 健康检查通过: http://localhost:8808/

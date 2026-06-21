@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package admin_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/admin/api/admin_info/v1";
+
+import "google/protobuf/timestamp.proto";
+
+service AdminInfo {
+  // 管理员登录
+  rpc Login (AdminInfoLoginReq) returns (AdminInfoLoginRes) {}
+
+  // 管理员注册
+  rpc Register (AdminInfoRegisterReq) returns (AdminInfoRegisterRes) {}
+}
+
+// ========== 登录相关 ==========
+message AdminInfoLoginReq {
+  string name = 1;      // 用户名
+  string password = 2;  // 密码
+}
+
+message AdminInfoLoginRes {
+  string token = 1;                     // JWT令牌
+  google.protobuf.Timestamp expire = 2; // 有效期
+}
+
+// ========== 注册相关 ==========
+message AdminInfoRegisterReq {
+  string name = 1;      // 用户名
+  string password = 2;  // 密码
+}
+
+message AdminInfoRegisterRes {
+   uint32 id = 1;         // 用户ID
+  string name = 2;      // 用户名
+  string role_ids = 3;  // 角色IDs
+   uint32 is_admin = 4;    // 是否超级管理员
+  google.protobuf.Timestamp created_at = 5; // 创建时间
+}

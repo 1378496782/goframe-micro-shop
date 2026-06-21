@@ -1,0 +1,32 @@
+[2025-10-14 00:50:57] ==========================================
+[2025-10-14 00:50:57] 开始重新构建单个服务: gateway-h5
+[2025-10-14 00:50:57] ==========================================
+[2025-10-14 00:50:57] 步骤1: 检查服务当前状态
+NAME         IMAGE                                             COMMAND          SERVICE      CREATED       STATUS                 PORTS
+gateway-h5   shop-goframe-micro-service-refacotor-gateway-h5   "./gateway-h5"   gateway-h5   5 hours ago   Up 5 hours (healthy)   0.0.0.0:8199->8199/tcp, :::8199->8199/tcp
+[2025-10-14 00:50:57] 停止 gateway-h5 服务...
+ Container gateway-h5  Stopping
+ Container gateway-h5  Stopped
+[2025-10-14 00:50:58] ✅ gateway-h5 服务停止成功
+[2025-10-14 00:50:58] 清理 gateway-h5 相关的容器...
+[2025-10-14 00:50:58] 查找 gateway-h5 相关的镜像...
+[2025-10-14 00:50:58] 找到以下相关镜像，将被删除：
+shop-goframe-micro-service-refacotor-gateway-h5:latest
+[2025-10-14 00:50:58] 删除镜像: shop-goframe-micro-service-refacotor-gateway-h5:latest
+[2025-10-14 00:50:59] ✅ 镜像删除成功: shop-goframe-micro-service-refacotor-gateway-h5:latest
+[2025-10-14 00:50:59] 构建 gateway-h5 服务...
+[2025-10-14 00:59:33] ✅ gateway-h5 服务构建成功
+[2025-10-14 00:59:33] 启动 gateway-h5 服务...
+ Container etcd  Running
+ Container gateway-h5  Creating
+ Container gateway-h5  Created
+ Container etcd  Waiting
+ Container etcd  Healthy
+ Container gateway-h5  Starting
+ Container gateway-h5  Started
+[2025-10-14 00:59:35] ✅ gateway-h5 服务启动成功
+[2025-10-14 00:59:35] 步骤6: 等待服务启动...
+[2025-10-14 00:59:50] 步骤7: 最终状态检查
+NAME         IMAGE                                             COMMAND          SERVICE      CREATED          STATUS                             PORTS
+gateway-h5   shop-goframe-micro-service-refacotor-gateway-h5   "./gateway-h5"   gateway-h5   16 seconds ago   Up 15 seconds (health: starting)   0.0.0.0:8199->8199/tcp, :::8199->8199/tcp
+[2025-10-14 00:59:50] ✅ 健康检查通过: http://localhost:8199/api.json

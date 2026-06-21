@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package position_info.v1;
+
+option go_package = "shop-goframe-micro-service-refacotor/app/banner/api/position_info/v1";
+
+import "pbentity/position_info.proto";
+
+service position_info {
+  rpc GetList(PositionInfoGetListReq) returns (PositionInfoGetListRes) {}
+  rpc Create(PositionInfoCreateReq) returns (PositionInfoCreateRes) {}
+  rpc Update(PositionInfoUpdateReq) returns (PositionInfoUpdateRes) {}
+  rpc Delete(PositionInfoDeleteReq) returns (PositionInfoDeleteRes) {}
+}
+
+// 新增消息定义
+message PositionInfoCreateReq {
+  string                    PicUrl    = 1; // 图片链接
+  string                    GoodsName = 2; // 商品名称
+  string                    Link      = 3; // 跳转链接
+  uint32                     Sort      = 4; // 排序
+  uint32                     GoodsId   = 5; // 商品id
+}
+
+message PositionInfoCreateRes {
+  uint32 id = 1;
+}
+
+message PositionInfoUpdateReq {
+  uint32                     Id        = 1; //
+  string                    PicUrl    = 2; // 图片链接
+  string                    GoodsName = 3; // 商品名称
+  string                    Link      = 4; // 跳转链接
+  uint32                     Sort      = 5; // 排序
+  uint32                     GoodsId   = 6; // 商品id
+}
+
+message PositionInfoUpdateRes {
+  uint32 id = 1;
+}
+
+message PositionInfoDeleteReq {
+  uint32 id = 1;
+}
+
+message PositionInfoDeleteRes {
+
+}
+
+message PositionInfoGetListReq {
+  uint32 sort = 1;
+  uint32 page = 2;
+  uint32 size = 3;  // 修改：字段编号必须从1开始递增
+}
+
+
+message PositionInfoListResponse {
+  repeated pbentity.PositionInfo list = 1;
+  uint32 page = 2;
+  uint32 size = 3;
+  uint32 total = 4;
+}
+
+message PositionInfoGetListRes {
+  PositionInfoListResponse data = 1;
+}
